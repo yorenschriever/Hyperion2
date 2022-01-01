@@ -3,6 +3,7 @@
 #include "apcMiniController.hpp"
 #include "korgNanoKontrol2.hpp"
 #include "midiMixController.hpp"
+#include "espNowButtonController.hpp"
 #include "core/generation/controlHub/IHubController.hpp"
 #include "midiController.hpp"
 #include <memory>

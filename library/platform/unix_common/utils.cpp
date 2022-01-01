@@ -29,6 +29,11 @@ float Utils::random_f()
     return float(rand())/RAND_MAX;
 }
 
+void Utils::random_seed()
+{
+    srand(time(NULL));
+}
+
 int Utils::get_free_heap()
 {
     return 0;

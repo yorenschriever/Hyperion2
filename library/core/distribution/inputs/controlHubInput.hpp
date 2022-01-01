@@ -2,6 +2,7 @@
 
 #include "core/generation/controlHub/controlHub.hpp"
 #include "core/generation/patterns/pattern.hpp"
+#include "core/distribution/utils/indexMap.hpp"
 #include "input.hpp"
 #include "log.hpp"
 #include "utils.hpp"
@@ -19,7 +20,9 @@ public:
         int column;
         int slot;
         Pattern<T_COLOUR> *pattern;
+        bool noMasterDim {false};
         int paramsSlot {0};
+        IndexMap *indexMap {nullptr}; 
     };
 
     // length = the length in pixels
@@ -103,7 +106,9 @@ public:
 
             auto column = hub->findColumn(slotPattern.column);
             auto slot = hub->findSlot(column, slotPattern.slot);
-            uint8_t dimValue = (int) column->dim * hub->masterDim >> 8;
+            uint8_t dimValue = column->dim;
+            if (!slotPattern.noMasterDim)
+                dimValue = (int) dimValue * hub->masterDim >> 8;
 
             //Log::info("CONTROL_HUB_INPUT", "calculating pattern active = %d, dim = %d ,masterDim = %d", slot->activated, column->dim, hub->masterDim);
 
@@ -125,7 +130,14 @@ public:
                     //if the colour space is not RGBA, apply dimming and sum with the existing value.
                     ledData[i].dim(dimValue);
                 }
-                ((T_COLOUR *)dataPtr)[i] += ledData[i];
+
+                int index = (slotPattern.indexMap) ? slotPattern.indexMap->map(i) : i;
+                if(index < 0 || index >= safeLength)
+                {
+                    Log::error("CONTROL_HUB_INPUT", "Mapped index out of bounds: %d, length: %d", index, safeLength);
+                    continue;
+                }
+                ((T_COLOUR *)dataPtr)[index] += ledData[i];
             }
         }
 

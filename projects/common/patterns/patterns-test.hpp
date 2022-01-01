@@ -4,6 +4,7 @@
 #include "generation/patterns/helpers/interval.h"
 #include "generation/patterns/helpers/timeline.h"
 #include "generation/pixelMap.hpp"
+#include "../distributeAndMonitor.hpp"
 #include "mappingHelpers.hpp"
 #include <math.h>
 #include <vector>
@@ -51,6 +52,64 @@ namespace TestPatterns
             {
                 if (i % barSize < fadeSize)
                     pixels[i] = (RGBA)colors[(i / (barSize*barChainSize)) % numColors] * (1. - (((float)(i % barSize)) / float(fadeSize)));
+            }
+        }
+    };
+
+class DistributionPattern : public Pattern<RGBA>
+    {
+    public:
+        int barSize;
+        int fadeSize;
+        std::vector<int> sizes;
+        static const int numColors = 13;
+        RGB colors[numColors] = {
+            0xFF0000,
+            0x00FF00,
+            0x0000FF,
+            0x00FFFF,
+            0xFF00FF,
+            0xFFFF00,
+            0xFFFFFF,
+            
+            0xFF7F00,
+            0xFF007F,
+            0x7FFF00,
+            0x7F00FF,
+            0x00FF7F,
+            0x007FFF,
+        };
+        DistributionPattern(Distribution distribution, int barSize=60, int fadeSize=20)
+        {
+            this->barSize = barSize;
+            this->fadeSize = fadeSize;
+            this->name = "Distribution";
+
+            std::transform(distribution.begin(), distribution.end(), std::back_inserter(sizes), 
+                [](Slave slave) -> int{ return slave.size; });
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            int start = 0;
+            int colIndex = 0;
+            for (auto size : sizes)
+            {
+                RGBA color = colors[colIndex % numColors];
+                for (int i = 0; i < size; i++)
+                {
+                    int index = i+start;
+                    if (index > width)
+                        break;
+                    if (i % barSize < fadeSize)
+                        pixels[index] = color * (1. - (((float)(i % barSize)) / float(fadeSize)));
+                }
+
+                start += size;
+                colIndex++;
             }
         }
     };

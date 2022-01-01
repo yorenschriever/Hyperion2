@@ -31,6 +31,12 @@ float Utils::random_f()
     return esp_random();
 }
 
+void Utils::random_seed()
+{
+    // ESP-IDF does not have a random seed function, it uses hardware RNG
+    // If you need to reseed, you can use esp_random() directly.
+}
+
 int Utils::get_free_heap()
 {
     return esp_get_free_heap_size();

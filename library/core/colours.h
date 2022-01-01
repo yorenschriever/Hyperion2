@@ -43,6 +43,7 @@ class RGBWAmberUV;
 class Miniwash7;
 class Derby;
 class Strobe;
+class Effect;
 
 class Monochrome : Colour
 {
@@ -937,6 +938,50 @@ public:
 
     uint8_t brightness = 0;
     uint8_t speed = 0;
+};
+
+class Effect : Colour
+{
+public:
+    // we need an empty constructor that creates a black colour
+    Effect()
+    {
+        this->V = 0;
+    }
+
+    Effect(uint8_t V)
+    {
+        this->V = V;
+    }
+
+    // The point of Effect is that it does not dim, so it is not affected by the dim sliders
+    // You can use this for motors, fog, fire, etc
+    inline void ApplyLut(LUT *lut) {}
+    inline void dim(uint8_t value) { }
+
+    Effect operator+(Effect other)
+    {
+        // layering is implemented as HTP
+        return Effect(std::max(V, other.V));
+    }
+
+    Effect &operator+=(const Effect &other)
+    {
+        // layering is implemented as HTP
+        V = std::max(V, other.V);
+        return *this;
+    }
+
+    Effect operator*(float scale)
+    {
+        return Effect(Utils::constrain(V * scale, 0, 0xFF));
+    }
+    Effect operator/(float scale)
+    {
+        return Effect(Utils::constrain(V / scale, 0, 0xFF));
+    }
+
+    uint8_t V;
 };
 
 inline MovingHead::operator Miniwash7()

@@ -1,6 +1,7 @@
 
 #pragma once
 #include "hyperion.hpp"
+#include "mappingHelpers.hpp"
 #include <math.h>
 #include <vector>
 
@@ -11,13 +12,11 @@ namespace MaskPatterns
 
         Transition transition;
         LFO<Glow> lfo;
-        uint16_t *remap = nullptr;
 
     public:
-        SinChaseMaskPattern(uint16_t * remap=nullptr)
+        SinChaseMaskPattern()
         {
             this->name = "Sin chase Mask";
-            this->remap = remap;
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -33,9 +32,7 @@ namespace MaskPatterns
             for (int i = 0; i < width; i++)
             {
                 float phase = ((float)i / width) * amount * 48 + float(i % (width / 2)) * offset / width;
-                int index=i;
-                if (remap) index = remap[index];
-                pixels[index] = RGBA(0, 0, 0, 255) * (1. - lfo.getValue(phase)) * transition.getValue();
+                pixels[i] = RGBA(0, 0, 0, 255) * (1. - lfo.getValue(phase)) * transition.getValue();
             }
         }
     };
@@ -69,5 +66,33 @@ namespace MaskPatterns
         }
     };
 
+    class SegmentGradientMaskPattern : public Pattern<RGBA>
+    {
 
+        Transition transition;
+        LFO<Glow> lfo;
+        int segmentSize;
+        bool direction = false; 
+
+    public:
+        SegmentGradientMaskPattern(int segmentSize=60, bool direction = false)
+        {
+            this->name = "Gradient mask";
+            this->segmentSize = segmentSize;
+            this->direction = direction;
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            for (int i = 0; i < width; i++)
+            {
+                float value = (i % segmentSize) / float(segmentSize);
+                if (direction) value = 1. - value;
+                pixels[i] = RGBA(0, 0, 0, 255) * (1. - value) * transition.getValue();
+            }
+        }
+    };
 }

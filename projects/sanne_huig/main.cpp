@@ -12,8 +12,8 @@ void setupLedSide(Hyperion * hyp) {
     const int columnIndex = 1;
 
     PixelMap *map = new PixelMap(combineMaps({
-        gridMap(1, 8*60, 1.8/(8*60), 0.8, 0),
-        gridMap(1, 8*60, 1.8/(8*60), -0.8, 0),
+        gridMap(1, 8*60, 1.8/(8*60), 1.8/(8*60), 0.8, 0),
+        gridMap(1, 8*60, 1.8/(8*60), 1.8/(8*60), -0.8, 0),
     }));
 
     auto input = new ControlHubInput<RGBA>(

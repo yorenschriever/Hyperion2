@@ -29,8 +29,8 @@ void setupLed(Hyperion * hyp) {
 
     // auto map = circleMap(100, 0.5);
     PixelMap *map = new PixelMap(combineMaps({
-        gridMap(50, 0.5),
-        gridMap(50, 0.7),
+        gridMap(50,1),
+        gridMap(50,1),
     }));
 
     // auto map = gridMap(5,5);
