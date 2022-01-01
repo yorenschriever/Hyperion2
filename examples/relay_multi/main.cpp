@@ -26,6 +26,10 @@ int main()
       new UDPInput(9619),
       new DMXOutput(1)));
 
+  hyp->addPipe(new Pipe(
+      new UDPInput(9620),
+      new PWMOutput()));
+
   hyp->start(Hyperion::minimal);
 
   while (1) Thread::sleep(1000);
