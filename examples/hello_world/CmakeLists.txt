@@ -1,0 +1,53 @@
+cmake_minimum_required(VERSION 3.16)
+
+# The name of your project
+set(PROJECT hello_world)
+
+if ("$ENV{HYPERION_LIB_DIR}" STREQUAL "")
+    message(FATAL_ERROR "Hyperion lib dir not set. run export HYPERION_LIB_DIR=[path_to_hyperion]")
+endif ()
+message("Hyperion lib dir $ENV{HYPERION_LIB_DIR}")
+message("Target: ${TARGET}")
+
+project(${PROJECT})
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+if ("${TARGET}" STREQUAL "macos")
+    add_executable(${PROJECT} main/main.cpp)
+
+    add_subdirectory($ENV{HYPERION_LIB_DIR} "hyperion")
+    target_link_libraries(${PROJECT} PUBLIC Hyperion)
+    target_include_directories(${PROJECT} PUBLIC $ENV{HYPERION_LIB_DIR})
+
+    #create a link to the package under a static name so the run script can find it
+    ADD_CUSTOM_TARGET(link_target ALL COMMAND ${CMAKE_COMMAND} -E create_symlink ${PROJECT} "app")
+
+else ()
+
+    # https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html#using-esp-idf-in-custom-cmake-projects
+    # https://github.com/espressif/esp-idf/tree/db9586c53f/examples/build_system/cmake/idf_as_lib
+
+    include($ENV{IDF_PATH}/tools/cmake/idf.cmake)
+
+    set (SDK_CONFIG "$ENV{HYPERION_LIB_DIR}/platform/${TARGET}/sdkconfig")
+
+    idf_build_process("${TARGET}"
+                    COMPONENTS freertos esptool_py
+                    SDKCONFIG ${SDK_CONFIG}
+                    BUILD_DIR ${CMAKE_BINARY_DIR})
+
+    set(elf_file ${CMAKE_PROJECT_NAME}.elf)
+
+    add_executable(${elf_file} main/main.cpp)
+    
+    add_subdirectory($ENV{HYPERION_LIB_DIR} "hyperion")
+    
+    target_link_libraries(${elf_file} PUBLIC idf::freertos idf::spi_flash Hyperion)
+    target_include_directories(${elf_file} PUBLIC $ENV{HYPERION_LIB_DIR})
+    idf_build_executable(${elf_file})
+
+    #create a link to the package under a static name so the upload script can find it
+    ADD_CUSTOM_TARGET(link_target ALL COMMAND ${CMAKE_COMMAND} -E create_symlink ${elf_file} "firmware.elf")
+endif ()
