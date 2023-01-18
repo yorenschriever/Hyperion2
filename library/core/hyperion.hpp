@@ -1,5 +1,6 @@
 //#include "core/pipe.hpp"
 #include "platform/includes/log.hpp"
+#include "platform/includes/ethernet.hpp"
 
 class Hyperion
 {
@@ -43,7 +44,7 @@ private:
 
     virtual void setup_network()
     {
-
+        Ethernet::Initialize("hyperion");
     }
 
     virtual void setup_rotary()

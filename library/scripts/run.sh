@@ -7,6 +7,8 @@
 BASEDIR=.
 TARGET="$1"
 
+[ ! $TARGET ] && echo "no target specified" && exit 1;
+
 if [ $TARGET = 'macos' ]; then
     "${BASEDIR}/build/${TARGET}/app"
 

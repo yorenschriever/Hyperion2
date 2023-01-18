@@ -1,19 +1,11 @@
 #include "core/hyperion.hpp"
 #include "platform/includes/thread.hpp"
+#include "platform/includes/ethernet.hpp"
 
-extern "C"
-{
-  void app_main(void);
-}
+#include "platform/includes/log.hpp"
+
 int main()
 {
-  app_main();
-}
-
-void app_main(void)
-{
-  Log::info("HELLO_WORLD", "log working");
-
   auto hyp = Hyperion();
   hyp.setup();
 

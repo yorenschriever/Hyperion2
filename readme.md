@@ -14,7 +14,7 @@ alias run='$HYPERION_LIB_DIR/scripts/run.sh'
 Add these lines to include path of vscode plugin "microsoft c/c++ extension". (also change the path here)
 ```
 /Users/yoren/repos/esp-idf/**
-${HYPERION_LIB_DIR}
+/Users/yoren/repos/Hyperion2/library
 ```
 Close your terminal (and reopen if you still need it)
 
@@ -46,3 +46,5 @@ build esp32
 run esp32
 ```
 
+### change sdkconfig
+create an sdkconfig that works for you. eg by running `idf.py menuconfig` in one of the example projects. make sure to run `idf.py set-target esp32s3` first to set the correct target. Then run `idf.py save-defconfig` to create an sdkconfig.defaults. copy the contents of this file and add it to the sdkconfig.defaults in the platform folder is you want therse settings to available to all new projectds in this platform, or create a new sdkconfig.defaults in your pojrect folder and paste it there. The build system will detect changes automatically and build a new sdkconfig for you.

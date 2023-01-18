@@ -3,6 +3,8 @@ TARGET="$1"
 BASEDIR=.
 BUILDDIR="$BASEDIR/build/${TARGET}"
 
+[ ! $TARGET ] && echo "no target specified" && exit 1;
+
 if [ $TARGET = 'macos' ]; then
     PARAM="-DTARGET=${TARGET}"
 elif [ $TARGET = 'esp32' ] || [ $TARGET = 'esp32s3' ]; then
