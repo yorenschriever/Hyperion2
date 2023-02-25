@@ -1,6 +1,29 @@
 #include "platform/includes/ethernet.hpp"
+#include "platform/includes/log.hpp"
+#include "platform/includes/ipAddress.hpp"
 
-void Ethernet::Initialize(const char *hostname)
+
+
+static const char *TAG = "ETH";
+
+void Ethernet::initialize()
 {
-    //todo register mdns
+    //nothing to do, assume ethernet is initialized by os
+    Log::info(TAG,"Got IP: %s", Ethernet::getIp().toString().c_str());
+}
+
+IPAddress Ethernet::getIp()
+{
+   //TODO
+   return IPAddress::fromHostName("localhost");
+}
+
+bool Ethernet::isConnected()
+{
+    return true;
+} 
+
+bool Ethernet::isConnecting()
+{
+    return false;
 }

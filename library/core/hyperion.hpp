@@ -44,7 +44,7 @@ private:
 
     virtual void setup_network()
     {
-        Ethernet::Initialize("hyperion");
+        Ethernet::initialize();
     }
 
     virtual void setup_rotary()

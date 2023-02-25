@@ -14,7 +14,7 @@ if (${ESP_PLATFORM})
 
     idf_component_register(
         INCLUDE_DIRS ${INCLUDE_DIRS} 
-        PRIV_REQUIRES driver esp_eth
+        PRIV_REQUIRES driver esp_eth esp_netif esp_phy
         SRC_DIRS ${CORE_SRC_DIR} "platform/${TARGET}"
     )
 
