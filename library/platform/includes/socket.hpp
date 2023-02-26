@@ -19,9 +19,8 @@ public:
         int err;
         this->addr_family = addr_family;
         struct sockaddr_in6 dest_addr;
-        int dest_addr_size=0;
+        int dest_addr_size = 0;
         ::bzero(&dest_addr, sizeof(dest_addr));
-
 
         int ip_protocol = 0;
         if (addr_family == AF_INET)
@@ -61,7 +60,7 @@ public:
         if (err != 0)
         {
             Log::error(TAG, "unable to set recv timeout");
-        }        
+        }
 
         if (port != 0)
         {
@@ -69,7 +68,9 @@ public:
             if (err != 0)
             {
                 Log::error(TAG, "unable to bind to port %d. error code %d", port, sock);
-            } else {
+            }
+            else
+            {
                 Log::info(TAG, "socket bound to port %d", port);
             }
         }
@@ -83,19 +84,17 @@ public:
             return;
         }
 
-        // struct sockaddr dest_addr;
         int err;
         if (addr_family == AF_INET6)
         {
             auto dest_addr = *(destination.getSockaddrIn6());
-            dest_addr.sin6_port = htons(port); 
+            dest_addr.sin6_port = htons(port);
             err = ::sendto(sock, (void *)payload, len, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
         }
         else
         {
             auto dest_addr = *(destination.getSockaddrIn());
             dest_addr.sin_port = htons(port);
-            
             err = ::sendto(sock, (void *)payload, len, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
         }
 
@@ -117,8 +116,9 @@ public:
         socklen_t socklen = sizeof(source_addr);
         int len = recvfrom(sock, rx_buffer, buffer_length, 0, (struct sockaddr *)&source_addr, &socklen);
 
-        if (len < 0) {
-            Log::error(TAG, "error during recvfrom: errno: %d",len);
+        if (len < 0)
+        {
+            Log::error(TAG, "error during recvfrom: errno: %d", len);
         }
 
         return len;

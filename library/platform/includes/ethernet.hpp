@@ -5,13 +5,13 @@
 class Ethernet
 {
 public:
-    //starts the network
+    // starts the network
     static void initialize();
 
-    //tells if the network is connected
-    static bool isConnected();  
+    // tells if the network is connected
+    static bool isConnected();
     static bool isConnecting();
 
     static IPAddress getIp();
-    //static uint8_t* GetMac(uint8_t* buffer);
+    // static uint8_t* GetMac(uint8_t* buffer);
 };

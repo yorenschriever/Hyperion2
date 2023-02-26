@@ -1,13 +1,13 @@
-//#include "core/pipe.hpp"
-#include "platform/includes/log.hpp"
+// #include "core/pipe.hpp"
 #include "platform/includes/ethernet.hpp"
+#include "platform/includes/log.hpp"
 
 class Hyperion
 {
-public: 
+public:
     virtual void setup()
     {
-        Log::info("Hyperion","setup");
+        Log::info("Hyperion", "setup");
 
         check_safe_mode();
 
@@ -24,7 +24,7 @@ public:
 
     virtual void run()
     {
-        Log::info("Hyperion","run 123");
+        Log::info("Hyperion", "run 123");
     }
 
 private:
@@ -39,7 +39,6 @@ private:
 
     virtual void setup_safe_mode()
     {
-
     }
 
     virtual void setup_network()
@@ -49,21 +48,17 @@ private:
 
     virtual void setup_rotary()
     {
-
     }
 
     virtual void setup_display()
     {
-
     }
 
     virtual void setup_tempo()
     {
-
     }
 
     virtual void setup_midi()
     {
-
     }
 };

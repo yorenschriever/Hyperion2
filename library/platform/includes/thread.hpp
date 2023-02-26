@@ -1,6 +1,7 @@
 #pragma once
 
-class Thread {
+class Thread
+{
 public:
     static void sleep(unsigned int duration_ms);
 };
