@@ -2,6 +2,13 @@
 #include "platform/includes/ipAddress.hpp"
 #include "platform/includes/log.hpp"
 
+#include <stdio.h>      
+#include <sys/types.h>
+#include <ifaddrs.h>
+#include <netinet/in.h> 
+#include <string.h> 
+#include <arpa/inet.h>
+
 static const char *TAG = "ETH";
 
 void Ethernet::initialize()
@@ -12,8 +19,46 @@ void Ethernet::initialize()
 
 IPAddress Ethernet::getIp()
 {
-    // TODO
-    return IPAddress::fromHostName("localhost");
+    //it is likely that your machine has a lot of ip addresses.
+    //we use some heuristics here to find the one that is most likely
+    //the most interesting one. 
+    struct ifaddrs * ifAddrStruct=NULL;
+    struct ifaddrs * ifa=NULL;
+    void * tmpAddrPtr=NULL;
+    sockaddr_in *ip4;
+    sockaddr_in6 *ip6;
+
+    getifaddrs(&ifAddrStruct);
+
+    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+        if (!ifa->ifa_addr) {
+            continue;
+        }
+        if (strncmp(ifa->ifa_name, "en", 2))
+        {
+            //on macos the wifi and eth interface names begin with 'en'
+            //so skip if we got another name
+            continue;
+        }
+        if (ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
+            // is a valid IP4 Address
+            // tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+            // char addressBuffer[INET_ADDRSTRLEN];
+            // inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+            // printf("%s IP Address %s\n", ifa->ifa_name, addressBuffer); 
+            ip4 = (struct sockaddr_in *) ifa->ifa_addr;
+        } else if (ifa->ifa_addr->sa_family == AF_INET6) { // check it is IP6
+            // is a valid IP6 Address
+            // tmpAddrPtr=&((struct sockaddr_in6 *)ifa->ifa_addr)->sin6_addr;
+            // char addressBuffer[INET6_ADDRSTRLEN];
+            // inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
+            // printf("%s IP Address %s\n", ifa->ifa_name, addressBuffer); 
+            ip6 = (struct sockaddr_in6 *)ifa->ifa_addr;
+        } 
+    }
+    if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
+
+    return IPAddress(ip4,ip6);
 }
 
 bool Ethernet::isConnected()
