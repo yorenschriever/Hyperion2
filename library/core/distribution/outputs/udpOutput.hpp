@@ -1,6 +1,7 @@
 #pragma once
 
 #include "output.hpp"
+#include "core/distribution/utils/hostnameCache.hpp"
 #include "platform/includes/log.hpp"
 #include "platform/includes/socket.hpp"
 #include "platform/includes/thread.hpp"
@@ -36,9 +37,8 @@ public:
 
     void show() override
     {
-        //Log::info("UPD_OUTPUT","sending data %s", buffer );
         lastFrame = Utils::millis();
-        sock.send(IPAddress::fromIPString(hostname), port, buffer, length);
+        sock.send(HostnameCache::lookup(hostname), port, buffer, length);
     }
 
     void postProcess() override

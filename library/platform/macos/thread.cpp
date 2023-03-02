@@ -1,6 +1,9 @@
 #include "thread.hpp"
+#include "platform/includes/log.hpp"
 #include <chrono>
 #include <thread>
+
+static const char *TAG = "THREAD";
 
 void Thread::sleep(unsigned int duration_ms)
 {
@@ -13,11 +16,11 @@ int Thread::create(
     Purpose purpose,
     const uint32_t usStackDepth,
     void * const pvParameters,
-    int uxPriority,
-    TaskHandle_t * const pvCreatedTask
+    int uxPriority
 ){
-    //auto threadHandle = std::thread(pvCreatedTask, pvParameters);
-    //threadHandle.detach();
+    //Log::info(TAG,"creating thread");
+    auto threadHandle = std::thread(pvTaskCode, pvParameters);
+    threadHandle.detach();
     return 0;
 }
 

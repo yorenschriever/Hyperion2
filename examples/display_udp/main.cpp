@@ -38,6 +38,7 @@ int main()
     }
 
     const char *buf2 = "hello";
-    s_out.send(IPAddress::fromIPString("127.0.0.1"), 4445, (uint8_t *)buf2, sizeof(buf2));
+    auto dest = IPAddress::fromIPString("127.0.0.1");
+    s_out.send(&dest, 4445, (uint8_t *)buf2, sizeof(buf2));
   }
 }

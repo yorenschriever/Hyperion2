@@ -18,8 +18,7 @@ public:
         Purpose purpose,
         const uint32_t usStackDepth,
         void * const pvParameters,
-        int uxPriority,
-        TaskHandle_t * const pvCreatedTask
+        int uxPriority
     );
 
     static void destroy();

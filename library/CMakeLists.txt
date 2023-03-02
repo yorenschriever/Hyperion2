@@ -20,12 +20,20 @@ if (${ESP_PLATFORM})
 
 else ()
 
-    file(GLOB PLATFORM_SRC CONFIGURE_DEPENDS
+    file(GLOB_RECURSE PLATFORM_SRC CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_LIST_DIR}/platform/${TARGET}/*.cpp"
         "${CORE_SRC_DIR}/*.cpp"
     )
 
     add_library(Hyperion ${PLATFORM_SRC})
     target_include_directories(Hyperion PUBLIC ${INCLUDE_DIRS})
+
+    find_package(Threads REQUIRED)
+    if(THREADS_HAVE_PTHREAD_ARG)
+      target_compile_options(Hyperion PUBLIC "-pthread")
+    endif()
+    if(CMAKE_THREAD_LIBS_INIT)
+      target_link_libraries(Hyperion "${CMAKE_THREAD_LIBS_INIT}")
+    endif()
 
 endif ()

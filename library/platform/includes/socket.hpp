@@ -73,8 +73,11 @@ public:
         }
     }
 
-    void send(IPAddress destination, uint16_t port, uint8_t *payload, unsigned int len)
+    void send(IPAddress *destination, uint16_t port, uint8_t *payload, unsigned int len)
     {
+        if (destination == NULL)
+            return;
+
         if (!Ethernet::isConnected())
         {
             //lwip stack initializes on eth connect event (or wifi), before that we will get an error
@@ -91,13 +94,13 @@ public:
         int err;
         if (addr_family == AF_INET6)
         {
-            auto dest_addr = *(destination.getSockaddrIn6());
+            auto dest_addr = *(destination->getSockaddrIn6());
             dest_addr.sin6_port = htons(port);
             err = ::sendto(sock, (void *)payload, len, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
         }
         else
         {
-            auto dest_addr = *(destination.getSockaddrIn());
+            auto dest_addr = *(destination->getSockaddrIn());
             dest_addr.sin_port = htons(port);
             err = ::sendto(sock, (void *)payload, len, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
         }

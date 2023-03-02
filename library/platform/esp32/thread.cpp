@@ -13,8 +13,7 @@ int Thread::create(
     Purpose purpose,
     const uint32_t usStackDepth,
     void * const pvParameters,
-    int uxPriority,
-    TaskHandle_t * const pvCreatedTask
+    int uxPriority
 ){
     return xTaskCreatePinnedToCore(
         pvTaskCode,
@@ -22,7 +21,7 @@ int Thread::create(
         usStackDepth,
         pvParameters,
         uxPriority,
-        (TaskHandle_t*) pvCreatedTask,
+        NULL,
         (purpose == Thread::Purpose::distribution) ? 1:0
     )
 }

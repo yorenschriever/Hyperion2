@@ -14,9 +14,15 @@ IPAddress *HostnameCache::lookup(const char *hostname)
     if (it == cache.end())
     {
         // start lookup
-        cache[hostname] = CacheItem::CacheItem{IPAddress::fromUint32(0), Utils::millis(), false};
-        // Log::info(TAG,"hostname item created");
-        Thread::create(resolveTask,"ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0, NULL);
+        cache.insert(
+            std::pair<std::string,HostnameCache::CacheItem>(
+                hostname,
+                HostnameCache::CacheItem{IPAddress::fromUint32(0), Utils::millis(), false}
+            )
+        );
+
+        Log::info(TAG,"hostname item created");
+        Thread::create(resolveTask,"ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0);
         return NULL;
     }
 
@@ -29,18 +35,19 @@ IPAddress *HostnameCache::lookup(const char *hostname)
             // Log::info(TAG,"less than 5 sec. waiting");
             return NULL;
         }
-        // Log::info(TAG,"item was queried before, but not found, retry");
-        cache[hostname].updated = Utils::millis();
-        Thread::create(resolveTask,"ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0, NULL);
+        Log::info(TAG,"item was queried before, but not found, retry");
+        cache.find(hostname)->second.updated = Utils::millis();
+
+        Thread::create(resolveTask,"ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0);
         return NULL;
     }
 
     if (Utils::millis() - cacheHit.updated > 10000)
     {
         // entry is older than 1 minute, refresh
-        // Log::info(TAG,"refreshing hostname item");
-        cache[hostname].updated = Utils::millis();
-        Thread::create(resolveTask,"ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0, NULL);
+        Log::info(TAG,"refreshing hostname item");
+        cache.find(hostname)->second.updated = Utils::millis();
+        Thread::create(resolveTask,"ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0);
     }
 
     // Log::info(TAG,"return cached ip %s\r\n",cacheHit.ip.toString().c_str());
@@ -50,9 +57,15 @@ IPAddress *HostnameCache::lookup(const char *hostname)
 void HostnameCache::resolveTask(void *pvParameters)
 {
     const char *hostname = static_cast<const char *>(pvParameters);
-    cache[hostname].ip = IPAddress::fromHostname(hostname);
-    cache[hostname].updated = Utils::millis();
-    cache[hostname].found = true;
+    auto item = cache.find(hostname);
+
+    if (item == cache.end()){
+        Log::error(TAG,"item not found");
+    } else {
+        item->second.ip = IPAddress::fromHostname(hostname);
+        item->second.updated = Utils::millis();
+        item->second.found = true; 
+    }
 
     Thread::destroy();
 }
