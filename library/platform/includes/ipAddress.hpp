@@ -38,11 +38,6 @@ private:
         this->hasip6= true;
     }
 
-    // IPAddress()
-    // {
-    //     Log::info("IPADDR","private constructor error");
-    // }
-
     IPAddress(sockaddr_in *ip4, sockaddr_in6 *ip6)
     {
         if (ip4 != NULL)
@@ -73,18 +68,8 @@ private:
         return &ip6;
     }
 
-    // static IPAddress fromSockAddr_in(sockaddr_in *sockaddr_arg)
-    // {
-    //     return IPAddress(*(sockaddr_arg));
-    // }
-
-    // static IPAddress fromSockAddr_in6(sockaddr_in6 *sockaddr_arg)
-    // {
-    //     return IPAddress(*(sockaddr_arg));
-    // }
-
 public:
-    static IPAddress fromHostName(const char *hostname)
+    static IPAddress fromHostname(const char *hostname)
     {
         struct addrinfo hints, *addressInfo;
         int errcode;

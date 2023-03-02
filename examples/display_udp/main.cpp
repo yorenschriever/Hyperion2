@@ -5,14 +5,26 @@
 #include "platform/includes/socket.hpp"
 #include "platform/includes/thread.hpp"
 
+#include "core/distribution/pipes/pipe.hpp"
+#include "core/distribution/inputs/udpInput.hpp"
+#include "core/distribution/outputs/udpOutput.hpp"
+
 int main()
 {
   auto hyp = Hyperion();
-  hyp.setup();
 
   Socket s_out = Socket();
-  Socket s_in = Socket(4445);
+  Socket s_in = Socket(4446);
   char buf[500];
+
+  auto pipe = new Pipe(
+    new UDPInput(4445),
+    new UDPOutput("localhost",4446,60)
+  );
+
+  hyp.addPipe(pipe);
+
+  hyp.setup();
 
   while (1)
   {

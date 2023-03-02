@@ -1,8 +1,12 @@
 #pragma once
 #include "ipAddress.hpp"
+#include "ethernet.hpp"
 #include "log.hpp"
 #include <netdb.h>
+#include <fcntl.h>
 #include <unistd.h>
+#include <sys/select.h>
+#include <sys/socket.h>
 
 static const char *TAG = "SOCK";
 
@@ -53,14 +57,7 @@ public:
             return;
         }
 
-        struct timeval timeout;
-        timeout.tv_sec = 1;
-        timeout.tv_usec = 0;
-        err = ::setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof timeout);
-        if (err != 0)
-        {
-            Log::error(TAG, "unable to set recv timeout");
-        }
+        set_recv_timeout(0);
 
         if (port != 0)
         {
@@ -78,6 +75,13 @@ public:
 
     void send(IPAddress destination, uint16_t port, uint8_t *payload, unsigned int len)
     {
+        if (!Ethernet::isConnected())
+        {
+            //lwip stack initializes on eth connect event (or wifi), before that we will get an error
+            Log::error(TAG, "cannot send. eth not connected");
+            return;
+        }
+
         if (sock <= 0)
         {
             Log::error(TAG, "cannot send. socket not open");
@@ -116,12 +120,37 @@ public:
         socklen_t socklen = sizeof(source_addr);
         int len = recvfrom(sock, rx_buffer, buffer_length, 0, (struct sockaddr *)&source_addr, &socklen);
 
-        if (len < 0)
+        if (len < 0 && errno != EWOULDBLOCK)
         {
-            Log::error(TAG, "error during recvfrom: errno: %d", len);
+            Log::error(TAG, "error during recvfrom: errno: %d", errno);
         }
 
         return len;
+    }
+
+    int set_recv_timeout(int ms)
+    {
+        if (ms == 0){
+            const int flags = fcntl(sock, F_GETFL, 0);
+            if (flags < 0) {
+                Log::error(TAG, "unable to set non blocking node"); 
+                return -1;
+            }
+            if (fcntl(sock, F_SETFL, flags|O_NONBLOCK) < 0) {
+                Log::error(TAG, "unable to set non blocking mode");
+                return -1;
+            }
+        } 
+
+        struct timeval timeout;
+        timeout.tv_sec = ms/1000;
+        timeout.tv_usec = (ms%1000)*1000;
+        int err = ::setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof timeout);
+        if (err != 0)
+        {
+            Log::error(TAG, "unable to set recv timeout");
+        }
+        return err;
     }
 
     ~Socket()

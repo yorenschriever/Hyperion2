@@ -1,4 +1,6 @@
-// #include "core/pipe.hpp"
+#include <vector>
+
+#include "core/distribution/pipes/pipe.hpp"
 #include "platform/includes/ethernet.hpp"
 #include "platform/includes/log.hpp"
 
@@ -17,16 +19,40 @@ public:
         setup_tempo();
         setup_midi();
 
-        // for(output: outputs){
-        //     output->initialize();
-        // }
-    }
+        Log::info("HYP", "starting outputs");
+        for (Pipe* pipe : pipes)
+            pipe->out->begin();
+
+        clearAll();
+
+        Log::info("Hyperion", "starting inputs");
+        for (Pipe* pipe : pipes)
+            pipe->in->begin();
+        }
 
     virtual void run()
     {
         Log::info("Hyperion", "run 123");
+
+        for (Pipe* pipe : pipes)
+            pipe->process();
+
+        for (Pipe* pipe : pipes)
+            pipe->out->postProcess();
     }
 
+    virtual void addPipe(Pipe* pipe) {
+        pipes.push_back(pipe);
+    }
+
+    virtual void clearAll()
+    {
+        for (Pipe* pipe : pipes)
+        {
+            pipe->out->clear();
+            pipe->out->show();
+        }
+    }
 private:
     virtual void check_safe_mode()
     {
@@ -61,4 +87,6 @@ private:
     virtual void setup_midi()
     {
     }
+
+    std::vector<Pipe*> pipes;
 };
