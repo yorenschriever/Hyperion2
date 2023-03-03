@@ -8,6 +8,10 @@
 #include "core/distribution/pipes/pipe.hpp"
 #include "core/distribution/inputs/udpInput.hpp"
 #include "core/distribution/outputs/udpOutput.hpp"
+#include "core/distribution/outputs/monitorOutput.hpp"
+
+#include "colours.h"
+#include "freakMap.h"
 
 int main()
 {
@@ -19,7 +23,8 @@ int main()
 
   auto pipe = new Pipe(
     new UDPInput(4445),
-    new UDPOutput("localhost",4446,60)
+    //new UDPOutput("localhost",4446,60)
+    new MonitorOutput(freakMap)
   );
 
   hyp.addPipe(pipe);
@@ -37,8 +42,8 @@ int main()
       Log::info("TEST", "received package: %s", buf);
     }
 
-    const char *buf2 = "hello";
+    RGBA buf2 = Hue(Utils::millis()*10);
     auto dest = IPAddress::fromIPString("127.0.0.1");
-    s_out.send(&dest, 4445, (uint8_t *)buf2, sizeof(buf2));
+    s_out.send(&dest, 4445, (uint8_t *)&buf2, sizeof(buf2));
   }
 }

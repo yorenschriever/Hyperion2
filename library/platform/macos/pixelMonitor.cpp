@@ -1,0 +1,59 @@
+#include "pixelMonitor.hpp"
+#include "thread.hpp"
+#include "platform/includes/log.hpp"
+
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <array>
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+
+static const char *TAG = "PIXEL_MONITOR";
+
+void PixelMonitor::initialize(PixelMap map, unsigned int port)
+{
+    char tempFileName[]="/tmp/pixelMap_XXXXXX";
+    //this replaces tempFileName placeholder variable with a unique filename
+    int temp_fd=mkstemp(tempFileName);
+
+    Log::info (TAG,"monitor map file name: %s", tempFileName );
+ 
+    FILE *fp;
+    fp = fopen(tempFileName,"w");
+    fprintf( fp, "[\n");
+    int index = 0;
+    for (auto pixel: map)
+        fprintf(fp, "    {\"x\" : %f, \"y\" : %f}%s \n", pixel.x, pixel.y, index++ == map.size()-1 ? "":",");
+    fprintf(fp,"]\n");
+    fclose(fp);
+
+    Log::info (TAG,"monitor map written" );
+
+    char *command = new char[150];
+    sprintf(command,"python3 $HYPERION_LIB_DIR/scripts/pixelMonitor.py %s %d", &tempFileName, port);
+
+    Log::info(TAG,"starting monitor task");
+    Thread::create(monitorTask,"monitorTask", Thread::Purpose::distribution, 3000, (void *)command, 0);
+}
+
+void PixelMonitor::monitorTask(void *pvParameters)
+{
+    const char *command = static_cast<const char *>(pvParameters);
+
+    Log::info(TAG,"command: %s", command);
+
+    std::array<char, 128> buffer;
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command, "r"), pclose);
+    if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+    }
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        Log::info(TAG,buffer.data());
+    }
+
+    Thread::destroy();
+}

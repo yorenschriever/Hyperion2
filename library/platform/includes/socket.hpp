@@ -66,10 +66,6 @@ public:
             {
                 Log::error(TAG, "unable to bind to port %d. error code %d", port, sock);
             }
-            else
-            {
-                Log::info(TAG, "socket bound to port %d", port);
-            }
         }
     }
 
