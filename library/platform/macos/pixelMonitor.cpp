@@ -14,6 +14,11 @@ static const char *TAG = "PIXEL_MONITOR";
 
 unsigned int PixelMonitor::addOutput(PixelMap map)
 {
+    if (begun)
+    {
+        Log::error(TAG, "you must call PixelMonitor::addOutput before starting the monitor.");
+        return 0;
+    }
     outputs.push_back({.map = map, .port = ++port});
     return port;
 }
@@ -33,7 +38,7 @@ void PixelMonitor::begin()
     FILE *fp;
     fp = fopen(tempFileName, "w");
     fprintf(fp, "[\n");
-    int outputIndex=0;
+    int outputIndex = 0;
     for (auto output : outputs)
     {
         fprintf(fp, "  {\n");

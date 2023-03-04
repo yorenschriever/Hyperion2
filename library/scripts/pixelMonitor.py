@@ -87,5 +87,8 @@ def update(dt):
             b = msg[i+2]
             circles[i//3].color = (r,g,b)
 
-pyglet.clock.schedule_interval(update,1/60.0)
-pyglet.app.run()
+try:
+    pyglet.clock.schedule_interval(update,1/60.0)
+    pyglet.app.run()
+except KeyboardInterrupt:
+    sys.exit(0) # or 1, or whatever

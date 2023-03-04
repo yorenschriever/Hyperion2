@@ -14,6 +14,7 @@ macro(hyperion_before)
 
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
+    set(CMAKE_CXX_FLAGS "-O2")
 
     if (NOT "${TARGET}" STREQUAL "macos")
         config_esp()
