@@ -21,12 +21,12 @@ namespace Mapped
             1000, Transition::none, 0);
 
     public:
-        ConcentricWavePattern(PixelMap map, int numWaves = 1, int period = 5000)
+        ConcentricWavePattern(PixelMap map, int numWaves = 1, int numColourWaves=2, int period = 5000)
         {
             this->map = map;
             this->numWaves = numWaves;
             this->lfo = LFO<T>(period);
-            this->lfoColour = LFO<Square>(period / 2);
+            this->lfoColour = LFO<Square>(period / numColourWaves);
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active) override

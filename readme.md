@@ -27,6 +27,7 @@ Close your terminal (and reopen if you still need it)
 - Install esp idf following this
 [Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/get-started/linux-macos-setup.html)
 
+- Add the generated export.sh to ~/.zprofile TODO check if necessary, or if running it once is enough
 
 # Build and run
 
