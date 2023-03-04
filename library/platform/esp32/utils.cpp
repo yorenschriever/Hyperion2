@@ -1,5 +1,9 @@
+
 #include "platform/includes/utils.hpp"
+
 #include "esp_timer.h"
+#include "esp_system.h"
+#include "esp_random.h"
 
 unsigned long Utils::millis()
 {
@@ -11,17 +15,22 @@ unsigned long Utils::micros()
     return esp_timer_get_time();
 }
 
-static void Utils::exit()
+void Utils::exit()
 {
-    ESP.restart();
+    esp_restart();
 }
 
-static int Utils::random(int minimum, int maximum)
+int Utils::random(int minimum, int maximum)
 {
     return minimum + (esp_random() % (maximum - minimum));
 }
 
+float Utils::random_f()
+{
+    return esp_random();
+}
+
 int Utils::get_free_heap()
 {
-    return ESP.getFreeHeap();
+    return esp_get_free_heap_size();
 }

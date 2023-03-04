@@ -104,6 +104,8 @@ public:
         if (err < 0)
         {
             Log::error(TAG, "error occurred during sending. error code %d", err);
+        } else {
+            //Log::info(TAG, "send %d bytes to %d", len, port);
         }
     }
 

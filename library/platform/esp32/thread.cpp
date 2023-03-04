@@ -23,7 +23,7 @@ int Thread::create(
         uxPriority,
         NULL,
         (purpose == Thread::Purpose::distribution) ? 1:0
-    )
+    );
 }
 
 void Thread::destroy(){

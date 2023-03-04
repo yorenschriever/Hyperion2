@@ -19,7 +19,7 @@ Add these lines to include path of vscode plugin "microsoft c/c++ extension". (a
 Close your terminal (and reopen if you still need it)
 
 ## Mac
-- install python3
+- brew install python3
 - pip3 install pyglet
 
 ## Espressif devices

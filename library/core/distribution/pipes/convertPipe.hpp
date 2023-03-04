@@ -5,7 +5,7 @@
 // to target format. eg. from RGB to RGBW or from RGB to Monochrome.
 // ConvertPipe can also apply a look up table (LUT) to adjust the colour
 template <class T_SOURCE_COLOUR, class T_TARGET_COLOUR>
-class ConvertPipe:
+class ConvertPipe : public Pipe
 {
 protected:
     // Transfer function that can convert between colour representations and apply LUTs
@@ -16,7 +16,7 @@ protected:
     {
         // tell the output the new length so it can allocate enough space for the data
         // we are going to send
-        out->SetLength(length / sizeof(T_SOURCE_COLOUR) * sizeof(T_TARGET_COLOUR));
+        out->setLength(length / sizeof(T_SOURCE_COLOUR) * sizeof(T_TARGET_COLOUR));
 
         int numPixels = length / sizeof(T_SOURCE_COLOUR);
         for (int i = 0; i < numPixels; i++)
@@ -38,7 +38,7 @@ protected:
             // pixel. cant we dump the entire byte array in one go?
             // What about a function that passes us a data pointer, and we place the items directly into it
             // this saves a function call for each pixel, and an additional memcpy.
-            out->SetData((uint8_t *)&outCol, sizeof(T_TARGET_COLOUR), i * sizeof(T_TARGET_COLOUR));
+            out->setData((uint8_t *)&outCol, sizeof(T_TARGET_COLOUR), i * sizeof(T_TARGET_COLOUR));
         }
         return numPixels;
     }

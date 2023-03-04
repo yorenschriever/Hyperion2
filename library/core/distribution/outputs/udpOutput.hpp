@@ -76,7 +76,7 @@ public:
         }
     }
 
-private:
+protected:
     const char *hostname;
     int port;
     int frameInterval;

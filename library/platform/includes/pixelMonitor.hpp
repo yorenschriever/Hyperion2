@@ -1,12 +1,24 @@
 #pragma once
 
 #include <stdint.h>
-#include "core/generation/pixelMap.h"
+#include <vector>
+#include "core/generation/pixelMap.hpp"
 
 class PixelMonitor
 {
 public:
-    void initialize(PixelMap map, unsigned int port);
+    static unsigned int addOutput(PixelMap map);
+    static void begin();
 private: 
+
+    struct PixelMonitorOutput
+    {
+        PixelMap map;
+        unsigned int port;
+    };
+
     static void monitorTask(void * pvParameters);
+    static std::vector<PixelMonitorOutput> outputs;
+    static bool begun;
+    static unsigned int port;
 };

@@ -9,6 +9,7 @@ public:
     static void exit();
 
     static int random(int minimum, int maximum);
+    static float random_f();
 
     static int get_free_heap();
 

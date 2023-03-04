@@ -26,7 +26,7 @@ public:
     // to keep track of the number of frames that that we used by the pipe,
     // and the ones that your input received, but were already
     // replaced before loadData was called
-    virtual int getUsedFramecount() { return usedframecount; }
+    virtual int getUsedFrameCount() { return usedframecount; }
     virtual int getMissedFrameCount() { return missedframecount; }
     virtual int getTotalFrameCount() { return missedframecount + usedframecount; }
     virtual void resetFrameCount()
