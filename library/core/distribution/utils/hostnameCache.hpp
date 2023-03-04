@@ -20,7 +20,7 @@ public:
                     hostname,
                     HostnameCache::CacheItem{IPAddress::fromUint32(0), Utils::millis(), false}));
 
-            Log::info("HOSTNAME_CACHE", "hostname cache item created");
+            // Log::info("HOSTNAME_CACHE", "hostname cache item created");
             Thread::create(resolveTask, "ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0);
             return NULL;
         }
@@ -41,7 +41,7 @@ public:
             return NULL;
         }
 
-        if (Utils::millis() - cacheHit.updated > 10000)
+        if (Utils::millis() - cacheHit.updated > 60000)
         {
             // entry is older than 1 minute, refresh
             Log::info("HOSTNAME_CACHE", "refreshing hostname cache item for %s", hostname);
@@ -53,6 +53,19 @@ public:
         return &it->second.ip;
     }
 
+    static void refresh(const char *hostname)
+    {
+        auto it = cache.find(hostname);
+        if (it == cache.end())
+            return;
+        if (Utils::millis() - it->second.updated > 5000)
+            return;
+
+        Log::info("HOSTNAME_CACHE","refreshing %s",hostname);
+
+        it->second.updated = Utils::millis();
+        Thread::create(resolveTask, "ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0);
+    }
 private:
     struct CacheItem
     {

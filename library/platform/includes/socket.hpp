@@ -69,22 +69,22 @@ public:
         }
     }
 
-    void send(IPAddress *destination, uint16_t port, uint8_t *payload, unsigned int len)
+    int send(IPAddress *destination, uint16_t port, uint8_t *payload, unsigned int len)
     {
         if (destination == NULL)
-            return;
+            return 0;
 
         if (!Ethernet::isConnected())
         {
             //lwip stack initializes on eth connect event (or wifi), before that we will get an error
             Log::error(TAG, "cannot send. eth not connected");
-            return;
+            return -1;
         }
 
         if (sock <= 0)
         {
             Log::error(TAG, "cannot send. socket not open");
-            return;
+            return -1;
         }
 
         int err;
@@ -104,9 +104,11 @@ public:
         if (err < 0)
         {
             Log::error(TAG, "error occurred during sending. error code %d", err);
+            return err;
         } else {
             //Log::info(TAG, "send %d bytes to %d", len, port);
         }
+        return 0;
     }
 
     int recv(void *rx_buffer, unsigned int buffer_length)

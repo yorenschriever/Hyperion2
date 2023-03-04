@@ -91,4 +91,4 @@ try:
     pyglet.clock.schedule_interval(update,1/60.0)
     pyglet.app.run()
 except KeyboardInterrupt:
-    sys.exit(0) # or 1, or whatever
+    sys.exit(0) 
