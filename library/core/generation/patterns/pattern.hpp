@@ -1,6 +1,6 @@
 #pragma once
 
-#include "colours.h"
+#include "core/colours.h"
 #include "helpers/fade.h"
 #include "helpers/interval.h"
 #include "helpers/lfo.h"
