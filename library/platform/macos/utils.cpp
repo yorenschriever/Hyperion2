@@ -28,3 +28,13 @@ int Utils::get_free_heap()
 {
     return 0;
 }
+
+void *Utils::malloc_dma(int size)
+{
+    return malloc(size);
+}
+
+void *Utils::realloc_dma(void* ptr, int size)
+{
+    return realloc(ptr, size);
+}

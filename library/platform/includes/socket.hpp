@@ -1,12 +1,12 @@
 #pragma once
-#include "ipAddress.hpp"
 #include "ethernet.hpp"
+#include "ipAddress.hpp"
 #include "log.hpp"
-#include <netdb.h>
 #include <fcntl.h>
-#include <unistd.h>
+#include <netdb.h>
 #include <sys/select.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 static const char *TAG = "SOCK";
 
@@ -76,7 +76,7 @@ public:
 
         if (!Ethernet::isConnected())
         {
-            //lwip stack initializes on eth connect event (or wifi), before that we will get an error
+            // lwip stack initializes on eth connect event (or wifi), before that we will get an error
             Log::error(TAG, "cannot send. eth not connected");
             return -1;
         }
@@ -90,13 +90,24 @@ public:
         int err;
         if (addr_family == AF_INET6)
         {
-            auto dest_addr = *(destination->getSockaddrIn6());
+            if (!destination->hasip6)
+            {
+                Log::error(TAG, "cannot use ipv6 socket for this ipaddress");
+                return -1;
+            }
+            auto dest_addr = *(&destination->ip6);
             dest_addr.sin6_port = htons(port);
             err = ::sendto(sock, (void *)payload, len, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
         }
         else
         {
-            auto dest_addr = *(destination->getSockaddrIn());
+            if (!destination->hasip4)
+            {
+                Log::error(TAG, "cannot use ipv4 socket for this ipaddress");
+                return -1;
+            }
+            // Log::info(TAG,"sending to %s", destination->toString().c_str());
+            auto dest_addr = *(&destination->ip4);
             dest_addr.sin_port = htons(port);
             err = ::sendto(sock, (void *)payload, len, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
         }
@@ -105,8 +116,10 @@ public:
         {
             Log::error(TAG, "error occurred during sending. error code %d", err);
             return err;
-        } else {
-            //Log::info(TAG, "send %d bytes to %d", len, port);
+        }
+        else
+        {
+            // Log::info(TAG, "send %d bytes to %d", len, port);
         }
         return 0;
     }
@@ -133,21 +146,24 @@ public:
 
     int set_recv_timeout(int ms)
     {
-        if (ms == 0){
+        if (ms == 0)
+        {
             const int flags = fcntl(sock, F_GETFL, 0);
-            if (flags < 0) {
-                Log::error(TAG, "unable to set non blocking node"); 
+            if (flags < 0)
+            {
+                Log::error(TAG, "unable to set non blocking node");
                 return -1;
             }
-            if (fcntl(sock, F_SETFL, flags|O_NONBLOCK) < 0) {
+            if (fcntl(sock, F_SETFL, flags | O_NONBLOCK) < 0)
+            {
                 Log::error(TAG, "unable to set non blocking mode");
                 return -1;
             }
-        } 
+        }
 
         struct timeval timeout;
-        timeout.tv_sec = ms/1000;
-        timeout.tv_usec = (ms%1000)*1000;
+        timeout.tv_sec = ms / 1000;
+        timeout.tv_usec = (ms % 1000) * 1000;
         int err = ::setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof timeout);
         if (err != 0)
         {

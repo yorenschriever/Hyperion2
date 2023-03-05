@@ -14,8 +14,8 @@ if (${ESP_PLATFORM})
 
     idf_component_register(
         INCLUDE_DIRS ${INCLUDE_DIRS} 
-        PRIV_REQUIRES driver esp_eth esp_netif esp_phy esp_timer
-        SRC_DIRS ${CORE_SRC_DIR} "platform/${TARGET}"
+        PRIV_REQUIRES driver esp_eth esp_netif esp_phy esp_timer 
+        SRC_DIRS ${CORE_SRC_DIR} "platform/${TARGET}" "platform/${TARGET}/misc"
     )
 
     target_compile_options(${COMPONENT_LIB} PUBLIC "-Wno-maybe-uninitialized")

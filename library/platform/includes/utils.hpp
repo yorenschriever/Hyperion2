@@ -18,4 +18,7 @@ public:
         if (value > maximum) return maximum;
         return value;
     }
+
+    static void* malloc_dma(int size);
+    static void* realloc_dma(void* ptr, int size);
 };

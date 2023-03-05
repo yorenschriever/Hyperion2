@@ -28,43 +28,32 @@ public:
         auto cacheHit = it->second;
         if (!cacheHit.found)
         {
-            if ((Utils::millis() - cacheHit.updated) < 5000)
+            if ((Utils::millis() - cacheHit.updated) < 5*1000)
             {
                 // last hostname query returned nothing, and was less than 5 seconds ago. Do not ask again yet
                 // Log::info("HOSTNAME_CACHE","less than 5 sec. waiting");
                 return NULL;
             }
-            Log::info("HOSTNAME_CACHE", "item was queried before, but not found, retry");
+            // Log::info("HOSTNAME_CACHE", "item was queried before, but not found, retry");
             cache.find(hostname)->second.updated = Utils::millis();
 
             Thread::create(resolveTask, "ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0);
             return NULL;
         }
 
-        if (Utils::millis() - cacheHit.updated > 60000)
+        if (Utils::millis() - cacheHit.updated > 60*1000)
         {
             // entry is older than 1 minute, refresh
-            Log::info("HOSTNAME_CACHE", "refreshing hostname cache item for %s", hostname);
+            // Log::info("HOSTNAME_CACHE", "refreshing hostname cache item for %s", hostname);
             cache.find(hostname)->second.updated = Utils::millis();
             Thread::create(resolveTask, "ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0);
         }
+        
+        if (!cacheHit.found)
+            return NULL;
 
-        // Log::info("HOSTNAME_CACHE","return cached ip %s\r\n",cacheHit.ip.toString().c_str());
+        //Log::info("HOSTNAME_CACHE","return cached ip %s",cacheHit.ip.toString().c_str());
         return &it->second.ip;
-    }
-
-    static void refresh(const char *hostname)
-    {
-        auto it = cache.find(hostname);
-        if (it == cache.end())
-            return;
-        if (Utils::millis() - it->second.updated > 5000)
-            return;
-
-        Log::info("HOSTNAME_CACHE","refreshing %s",hostname);
-
-        it->second.updated = Utils::millis();
-        Thread::create(resolveTask, "ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0);
     }
 private:
     struct CacheItem
@@ -88,7 +77,7 @@ private:
         {
             item->second.ip = IPAddress::fromHostname(hostname);
             item->second.updated = Utils::millis();
-            item->second.found = true;
+            item->second.found = item->second.ip.isValid();
         }
 
         Thread::destroy();

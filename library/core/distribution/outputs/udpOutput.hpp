@@ -38,9 +38,7 @@ public:
     void show() override
     {
         lastFrame = Utils::millis();
-        int err = sock.send(HostnameCache::lookup(hostname), port, buffer, length);
-        //if (err != 0)
-        //   HostnameCache::refresh(hostname);
+        int err = sock->send(HostnameCache::lookup(hostname), port, buffer, length);
     }
 
     void postProcess() override
@@ -50,6 +48,8 @@ public:
     void begin() override
     {
         lastFrame = Utils::millis();
+        if (sock == NULL)
+            sock = new Socket();
     }
 
     void clear() override
@@ -78,6 +78,11 @@ public:
         }
     }
 
+    ~UDPOutput()
+    {
+        if (sock != NULL)
+            delete sock;
+    }
 protected:
     const char *hostname;
     int port;
@@ -88,7 +93,7 @@ protected:
     uint8_t *buffer;
 
     // share 1 socket instance with all UdpOutputs, because the number of sockets is limited on esp platforms
-    static Socket sock;
+    static Socket *sock;
 };
 
-Socket UDPOutput::sock;
+Socket *UDPOutput::sock;

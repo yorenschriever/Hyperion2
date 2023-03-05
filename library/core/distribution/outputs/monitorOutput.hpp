@@ -18,13 +18,11 @@ public:
         this->port = PixelMonitor::addOutput(map);
     }
 
-
     void begin() override
     {
         UDPOutput::begin();
         PixelMonitor::begin();
     }
-
 
 private:
     PixelMap map;

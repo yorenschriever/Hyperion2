@@ -52,22 +52,6 @@ private:
         }
     }
 
-    // get the ipv4 address
-    sockaddr_in *getSockaddrIn()
-    {
-        if (!hasip4)
-            return NULL;
-        return &ip4;
-    }
-
-    // get the ipv6 address
-    sockaddr_in6 *getSockaddrIn6()
-    {
-        if (!hasip6)
-            return NULL;
-        return &ip6;
-    }
-
 public:
     static IPAddress fromHostname(const char *hostname)
     {
@@ -81,24 +65,31 @@ public:
 
         errcode = getaddrinfo(hostname, NULL, &hints, &addressInfo);
         if (errcode != 0)
-            return IPAddress(NULL, NULL);
-
-        sockaddr_in *ip4;
-        sockaddr_in6 *ip6;
-
-        struct addrinfo *res = addressInfo;
-        while (res)
         {
-            if (ip4 == NULL && res->ai_family == AF_INET)
-                ip4 = (struct sockaddr_in *)res->ai_addr;
-            else if (ip6 == NULL && res->ai_family == AF_INET6)
-                ip6 = (struct sockaddr_in6 *)res->ai_addr;
-            res = res->ai_next;
+            Log::error("IPADDRESS", "error resolving hostname %s", hostname);
+            return IPAddress(NULL, NULL);
         }
 
+        IPAddress result = IPAddress(NULL, NULL);
+        struct addrinfo *res = addressInfo;
+
+        while (res)
+        {
+            if (!result.hasip4 && res->ai_family == AF_INET)
+            {
+                result.ip4 = *((struct sockaddr_in *)res->ai_addr);
+                result.hasip4 = true;
+            }
+            else if (!result.hasip6 && res->ai_family == AF_INET6)
+            {
+                result.ip6 = *((struct sockaddr_in6 *)res->ai_addr);
+                result.hasip6 = true;
+            }
+            res = res->ai_next;
+        }
         freeaddrinfo(addressInfo);
 
-        return IPAddress(ip4, ip6);
+        return result;
     }
 
     static IPAddress fromUint32(uint32_t ipv4)
@@ -125,10 +116,14 @@ public:
 
     const std::string toString()
     {
+        if (!hasip4)
+            return "[none]";
         char addrstr[INET_ADDRSTRLEN]; // INET6_ADDRSTRLEN
-        inet_ntop(AF_INET, &(getSockaddrIn()->sin_addr), addrstr, sizeof(addrstr));
+        inet_ntop(AF_INET, &(ip4.sin_addr), addrstr, sizeof(addrstr));
         return std::string(addrstr);
     }
+
+    bool isValid() { return hasip4 || hasip6; }
 
     friend class Socket;
     friend class Ethernet;

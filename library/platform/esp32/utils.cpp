@@ -4,6 +4,7 @@
 #include "esp_timer.h"
 #include "esp_system.h"
 #include "esp_random.h"
+#include "esp_heap_caps.h"
 
 unsigned long Utils::millis()
 {
@@ -33,4 +34,14 @@ float Utils::random_f()
 int Utils::get_free_heap()
 {
     return esp_get_free_heap_size();
+}
+
+void *Utils::malloc_dma(int size)
+{
+    return heap_caps_malloc(size, MALLOC_CAP_DMA);
+}
+
+void *Utils::realloc_dma(void* ptr, int size)
+{
+    return heap_caps_realloc(ptr, size, MALLOC_CAP_DMA);
 }
