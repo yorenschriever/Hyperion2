@@ -103,8 +103,10 @@ void Ethernet::initialize()
     ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ETHERNET_EVENT_START, &event_handler, NULL));
     ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ETHERNET_EVENT_STOP, &event_handler, NULL));
 
+    Log::info(TAG,"Duurt lang?1");
     /* start Ethernet driver state machine */
     ESP_ERROR_CHECK(esp_eth_start(eth_handle));
+    Log::info(TAG,"Duurt lang?2");
 }
 
 bool Ethernet::isConnected()

@@ -35,7 +35,7 @@ int Thread::mapPurposeToCore(Purpose purpose)
     switch (purpose)
     {
     case Purpose::distribution:
-        return 1;
+        return 0;
     case Purpose::control:
     case Purpose::network:
     default:
