@@ -274,11 +274,11 @@ namespace Ledster
             lfo.setPeriod(Params::getVelocity(10000, 500));
             lfo.setSkew(Params::getIntensity());
             lfo.setPulseWidth(1);
-            //int variant = Params::getVariant() * 7 + 1;
+            int variant = Params::getVariant() * 7 + 1;
 
             // lfo.setSkew(0.5);
             // lfo.setPulseWidth(1);
-            int variant = 5;
+            //int variant = 5;
 
             if (!transition.Calculate(active))
                 return;

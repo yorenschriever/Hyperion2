@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include <stdint.h>
 #include <math.h>
+#include "log.hpp"
 
 template <class T>
 class LFO
@@ -40,7 +41,11 @@ public:
     float getPhase(float deltaPhase, int periodArg)
     {
         int deltaPhaseMs = periodArg * deltaPhase;
-        unsigned long phase = (Utils::millis() - startingpoint - deltaPhaseMs + periodArg) % periodArg;
+        // Correction to make sure the phase never goes negative if deltaphase > 1,
+        // This fixes glitches when setPeriod has just been called, and 
+        // (Utils::millis() - startingpoint) is close to 0
+        long correction = std::ceil(deltaPhase) * periodArg; 
+        unsigned long phase = (Utils::millis() - startingpoint - deltaPhaseMs + correction) % periodArg;
         return ((float)phase / (float)periodArg);
     }
 
@@ -65,6 +70,8 @@ public:
 
     void setPeriod(int newPeriod)
     {
+        if (newPeriod == period)
+           return;
         //correct the phase so the period change doesn't result in a phase change
         float phase = getPhase();
         this->startingpoint = Utils::millis() - phase * newPeriod;

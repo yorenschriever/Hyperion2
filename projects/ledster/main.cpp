@@ -14,7 +14,7 @@ void addLedsterPipe(Hyperion *hyp);
 int main()
 {
   Params::primaryColour = RGB(255, 0, 255);
-  Params::secondaryColour = RGB(50, 10, 0);
+  Params::secondaryColour = RGB(250, 210, 0);
   Params::intensity = 1;
   Params::variant= 0.7;
   Params::velocity = 0.7;
