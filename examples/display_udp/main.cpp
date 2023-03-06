@@ -15,11 +15,11 @@
 
 int main()
 {
-  auto hyp = Hyperion();
+  auto hyp = new Hyperion();
 
   Socket s_out = Socket();
-  Socket s_in = Socket(4446);
-  char buf[500];
+  //Socket s_in = Socket(4446);
+  //char buf[500];
 
   auto pipe = new Pipe(
     new UDPInput(4445),
@@ -27,20 +27,19 @@ int main()
     new MonitorOutput(freakMap)
   );
 
-  hyp.addPipe(pipe);
+  hyp->addPipe(pipe);
 
-  hyp.setup();
+  hyp->start();
 
   while (1)
   {
-    hyp.run();
     Thread::sleep(200);
 
-    int ret = s_in.recv(&buf, sizeof(buf));
-    if (ret)
-    {
-      Log::info("TEST", "received package: %s", buf);
-    }
+    // int ret = s_in.recv(&buf, sizeof(buf));
+    // if (ret)
+    // {
+    //   Log::info("TEST", "received package: %s", buf);
+    // }
 
     RGBA buf2 = Hue(Utils::millis()*10);
     auto dest = IPAddress::fromIPString("127.0.0.1");

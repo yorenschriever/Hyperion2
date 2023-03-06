@@ -28,14 +28,12 @@ Installation tetra = {
 
 int main()
 {
+  auto hyp = new Hyperion();
 
-  auto hyp = Hyperion();
+  addLedShapes(hyp);
 
-  addLedShapes(&hyp);
-
-  hyp.setup();
-  while (1)
-    hyp.run();
+  hyp->start();
+  while (1) Thread::sleep(1000);
 }
 
 void addLedShapes(Hyperion *hyp)

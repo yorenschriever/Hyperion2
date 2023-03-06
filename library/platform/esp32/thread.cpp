@@ -9,12 +9,12 @@ void Thread::sleep(unsigned int duration_ms)
 
 int Thread::create(
     TaskFunction_t pvTaskCode,
-    const char * const pcName,
+    const char *const pcName,
     Purpose purpose,
     const uint32_t usStackDepth,
-    void * const pvParameters,
-    int uxPriority
-){
+    void *const pvParameters,
+    int uxPriority)
+{
     return xTaskCreatePinnedToCore(
         pvTaskCode,
         pcName,
@@ -22,10 +22,23 @@ int Thread::create(
         pvParameters,
         uxPriority,
         NULL,
-        (purpose == Thread::Purpose::distribution) ? 1:0
-    );
+        mapPurposeToCore(purpose));
 }
 
-void Thread::destroy(){
+void Thread::destroy()
+{
     vTaskDelete(NULL);
+}
+
+int Thread::mapPurposeToCore(Purpose purpose)
+{
+    switch (purpose)
+    {
+    case Purpose::distribution:
+        return 1;
+    case Purpose::control:
+    case Purpose::network:
+    default:
+        return 0;
+    }
 }

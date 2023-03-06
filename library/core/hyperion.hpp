@@ -12,9 +12,9 @@
 class Hyperion
 {
 public:
-    virtual void setup()
+    virtual void start()
     {
-        Log::info("Hyperion", "setup");
+        Log::info("Hyperion", "start");
 
         check_safe_mode();
 
@@ -34,18 +34,8 @@ public:
         for (Pipe* pipe : pipes)
             pipe->in->begin();
 
-        Thread::create(UpdateDisplayTask,"UpdateDisplay",Thread::Purpose::distribution,3000,this,0);
-    }
-
-    virtual void run()
-    {
-        //Log::info("Hyperion", "run 123");
-
-        for (Pipe* pipe : pipes)
-            pipe->process();
-
-        for (Pipe* pipe : pipes)
-            pipe->out->postProcess();
+        Thread::create(UpdateDisplayTask,"UpdateDisplay",Thread::Purpose::control,3000,this,4);
+        Thread::create(runTask,"run",Thread::Purpose::distribution,30000,this,0);
     }
 
     virtual void addPipe(Pipe* pipe) {
@@ -173,6 +163,26 @@ private:
 
             Thread::sleep(500);
         }
+        Thread::destroy();
+    }
+
+    virtual void run()
+    {
+        //Log::info("Hyperion", "running");
+
+        for (Pipe* pipe : pipes)
+            pipe->process();
+
+        for (Pipe* pipe : pipes)
+            pipe->out->postProcess();
+
+    }
+
+    static void runTask(void * param)
+    {
+        auto instance = (Hyperion*) param;
+        while (1)
+            instance->run();
         Thread::destroy();
     }
 

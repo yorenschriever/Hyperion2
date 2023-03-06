@@ -8,7 +8,7 @@ public:
     typedef void (*TaskFunction_t)( void * );
     typedef void * TaskHandle_t;
 
-    enum Purpose { distribution, generation, network };
+    enum Purpose { distribution, network, control };
 
     static void sleep(unsigned int duration_ms);
 
@@ -22,4 +22,7 @@ public:
     );
 
     static void destroy();
+
+private:
+    static int mapPurposeToCore(Purpose purpose);
 };

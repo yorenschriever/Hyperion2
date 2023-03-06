@@ -19,18 +19,16 @@ int main()
   Params::variant= 0.7;
   Params::velocity = 0.7;
 
-  auto hyp = Hyperion();
+  auto hyp = new Hyperion();
 
-  addLedsterPipe(&hyp);
+  addLedsterPipe(hyp);
 
   Tempo::AddSource(ConstantTempo::getInstance());
   ConstantTempo::getInstance()->setBpm(120);
 
-  hyp.setup();
-  while (1){
-    hyp.run();
-    Thread::sleep(12);
-  }
+  hyp->start();
+
+  while(1)Thread::sleep(1000);
 }
 
 #if ESP_PLATFORM

@@ -67,8 +67,6 @@ void RMT::send(uint8_t *buffer, int length)
 
 bool RMT::ready()
 {
-    //wait max 0 ms to finish, deduce from the error if it was still sending
-    //return rmt_tx_wait_all_done(led_chan, 0) == ESP_OK;
     return ready_;
 }
 

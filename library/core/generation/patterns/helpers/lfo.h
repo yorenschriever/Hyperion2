@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include <stdint.h>
 #include <math.h>
+#include <cmath>
 #include "log.hpp"
 
 template <class T>

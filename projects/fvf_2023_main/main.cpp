@@ -27,14 +27,13 @@ int main()
   Params::primaryColour = RGB(255, 0, 255);
   Params::secondaryColour = RGB(50, 50, 50);
 
-  auto hyp = Hyperion();
+  auto hyp = new Hyperion();
 
-  addColumnPipes(&hyp);
-  addLedsterPipe(&hyp);
+  addColumnPipes(hyp);
+  addLedsterPipe(hyp);
 
-  hyp.setup();
-  while (1)
-    hyp.run();
+  hyp->start();
+  while (1) Thread::sleep(1000);
 }
 
 void addLedsterPipe(Hyperion *hyp)

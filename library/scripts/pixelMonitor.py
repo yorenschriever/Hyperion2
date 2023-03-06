@@ -80,7 +80,7 @@ def update(dt):
             continue;
 
         circles = pixelSet['circles']
-        size = min(len(msg), len(circles)*3)
+        size = min(len(msg)-2, len(circles)*3)
         for i in range(0,size,3):
             r = msg[i+0]
             g = msg[i+1]

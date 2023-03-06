@@ -1,4 +1,5 @@
 #include "../../../main.cpp"
+#include "thread.hpp"
 
 extern "C"
 {
@@ -8,4 +9,5 @@ extern "C"
 void app_main(void)
 {
   main();
+  Thread::destroy();
 }
