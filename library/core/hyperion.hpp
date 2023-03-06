@@ -35,7 +35,7 @@ public:
             pipe->in->begin();
 
         Thread::create(UpdateDisplayTask,"UpdateDisplay",Thread::Purpose::control,3000,this,4);
-        Thread::create(runTask,"run",Thread::Purpose::distribution,30000,this,0);
+        Thread::create(runTask,"run",Thread::Purpose::distribution,30000,this,1);
     }
 
     virtual void addPipe(Pipe* pipe) {
@@ -176,6 +176,7 @@ private:
         for (Pipe* pipe : pipes)
             pipe->out->postProcess();
 
+        Thread::sleep(10);
     }
 
     static void runTask(void * param)
