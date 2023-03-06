@@ -6,6 +6,8 @@
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
 
+#include "core/generation/patterns/helpers/tempo/tapTempo.h"
+#include "core/generation/patterns/helpers/tempo/tempo.h"
 
 class Hyperion
 {
@@ -87,6 +89,22 @@ private:
 
     virtual void setup_tempo()
     {
+        //add tempo sources in order of importance. first has highest priority
+        // Tempo::AddSource(ProDJLinkTempo::getInstance());
+        // Tempo::AddSource(MidiClockTempo::getInstance());
+        // Tempo::AddSource(TapTempo::getInstance()); 
+        // Tempo::AddSource(UdpTempo::getInstance()); 
+
+        // Midi::Initialize();
+        // Midi::onNoteOn([](uint8_t ch, uint8_t note, uint8_t velocity) {
+        //     if (note == Configuration.tapMidiNote) TapTempo::getInstance()->Tap();
+        //     if (note == Configuration.tapStopMidiNote) TapTempo::getInstance()->Stop();
+        //     if (note == Configuration.tapAlignMidiNote) TapTempo::getInstance()->Align();
+        //     if (note == Configuration.tapBarAlignMidiNote) Tempo::AlignPhrase();
+        // });
+
+        // Rotary::onPress([]() { TapTempo::getInstance()->Tap(); });
+        // Rotary::onLongPress([]() { TapTempo::getInstance()->Stop(); });
     }
 
     virtual void setup_midi()

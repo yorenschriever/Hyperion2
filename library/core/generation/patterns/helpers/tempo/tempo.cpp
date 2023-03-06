@@ -67,7 +67,7 @@ AbstractTempo *Tempo::getActive()
     for (auto &&source : sources)
         if (source->HasSignal())
             return source;
-    return NULL;
+    return nullptr;
 }
 
 void Tempo::TempoTask(void *param)
@@ -82,17 +82,12 @@ void Tempo::TempoTask(void *param)
 
 void Tempo::registerTask(TempoTaskType task)
 {
-    if (task == NULL)
+    if (task == nullptr)
         return;
 
     tasks.insert(task);
     if (!threadStarted){
-        //xTaskCreatePinnedToCore(TempoTask, "TempoTask", 5000, NULL, 1, NULL, 0);
-        // std::thread xHandle = std::thread(TempoTask, (void*) 0);
-        // xHandle.detach();
-
-        Thread::create(TempoTask, "TempoTask", Thread::Purpose::generation, 5000,NULL,0);
-
+        Thread::create(TempoTask, "TempoTask", Thread::Purpose::generation, 5000,nullptr,0);
         threadStarted = true;
     }
 }

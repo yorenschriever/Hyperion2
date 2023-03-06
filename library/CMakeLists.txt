@@ -15,7 +15,12 @@ if (${ESP_PLATFORM})
     idf_component_register(
         INCLUDE_DIRS ${INCLUDE_DIRS} 
         PRIV_REQUIRES driver esp_eth esp_netif esp_phy esp_timer 
-        SRC_DIRS ${CORE_SRC_DIR} "platform/${TARGET}" "platform/${TARGET}/misc"
+        SRC_DIRS 
+            ${CORE_SRC_DIR} 
+            "platform/${TARGET}" 
+            "platform/${TARGET}/misc"
+            "core/generation/patterns/helpers/tempo"
+
     )
 
     target_compile_options(${COMPONENT_LIB} PUBLIC "-Wno-maybe-uninitialized")

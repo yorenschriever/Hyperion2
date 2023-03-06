@@ -13,6 +13,7 @@ private:
     unsigned long startingpoint;
     float pulseWidth = 0.5;
     float skew = 1;
+    int period;
 
 public:
     LFO(int period=0)
@@ -20,8 +21,6 @@ public:
         this->period = period;
         reset();
     }
-
-    int period;
 
     //LFO value between 0-1
     float getValue() { return getValue(0, this->period); }
@@ -182,6 +181,22 @@ public:
             return 1;
         if (phase < 0.5 + pulsewidth)
             return 1 - (phase-0.5) / pulsewidth;
+        return 0;
+    }
+};
+
+class SoftPWM
+{
+public:
+    static float getValue(float phase, float pulsewidth)
+    {
+        float softWidth = 0.1;
+        if (phase < softWidth)
+            return phase / softWidth;
+        if (phase < pulsewidth)
+            return 1;
+        if (phase < pulsewidth + softWidth)
+            return 1 - (phase - pulsewidth) / softWidth;
         return 0;
     }
 };

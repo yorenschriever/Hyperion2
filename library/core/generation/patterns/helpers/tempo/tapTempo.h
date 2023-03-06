@@ -1,7 +1,6 @@
 #pragma once
 #include "abstractTempo.h"
 #include "utils.hpp"
-#include "debug.h"
 
 //#define DEFAULT_PERIOD 480000 //default at 125BPM
 #define DEFAULT_PERIOD 0 // default off

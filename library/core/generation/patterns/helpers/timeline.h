@@ -52,6 +52,16 @@ public:
         return result;
     }
 
+    void SetDuration(int duration)
+    {
+        if (duration == this->duration)
+            return;
+        //correct the phase so the period change doesn't result in a phase change
+        float phase = GetTimelinePosition();
+        this->startingpoint = Utils::millis() - phase * duration;
+        this->duration = duration;
+    }
+
     void reset()
     {
         this->startingpoint = Utils::millis();

@@ -38,7 +38,7 @@ public:
     void show() override
     {
         lastFrame = Utils::millis();
-        int err = sock->send(HostnameCache::lookup(hostname), port, buffer, length);
+        sock->send(HostnameCache::lookup(hostname), port, buffer, length);
     }
 
     void postProcess() override

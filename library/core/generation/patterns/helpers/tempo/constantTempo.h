@@ -1,6 +1,7 @@
 #pragma once
 #include "abstractTempo.h"
 #include "utils.hpp"
+#include "log.hpp"
 
 #define DEFAULT_PERIOD 0 // default off
 
@@ -38,6 +39,8 @@ private:
 
     static void ConstantTempoTask()
     {
+        //Log::info("ConstantTempo","ConstantTempoTask");
+
         ConstantTempo *instance = ConstantTempo::getInstance();
         if (!instance->validSignal || instance->period == 0)
             return;

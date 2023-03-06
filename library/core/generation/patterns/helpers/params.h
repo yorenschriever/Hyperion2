@@ -4,13 +4,16 @@
 class Params
 {
 public:
-    
-    static RGBA getPrimaryColour(){ return primaryColour; }
-    static RGBA getSecondaryColour(){ return secondaryColour; }
-    static RGBA getHighlightColour(){ return highlightColour; }
-    static float getVelocity(){ return velocity; }
-    static float getIntensity(){ return intensity; }
-    static float getVariant(){ return variant; }
+    static RGBA getPrimaryColour() { return primaryColour; }
+    static RGBA getSecondaryColour() { return secondaryColour; }
+    static RGBA getHighlightColour() { return highlightColour; }
+    static float getVelocity(float start = 0, float end = 1) { return convert(start, end, velocity); }
+    static float getIntensity(float start = 0, float end = 1) { return convert(start, end, intensity); }
+    static float getVariant(float start = 0, float end = 1) { return convert(start, end, variant); }
+
+    // static float getVelocityInv(float start = 0, float end = 1) { return convert(start, end, velocity); }
+    // static float getIntensityInv(float start = 0, float end = 1) { return convert(start, end, intensity); }
+    // static float getVariantInv(float start = 0, float end = 1) { return convert(start, end, variant); }
 
     static RGBA primaryColour;
     static RGBA secondaryColour;
@@ -18,6 +21,13 @@ public:
     static float velocity;
     static float intensity;
     static float variant;
+
+private:
+    static float convert(float start, float end, float value)
+    {
+        float distance = end - start;
+        return start + value * distance;
+    }
 };
 
 RGBA Params::primaryColour = RGB(255, 0, 0);
