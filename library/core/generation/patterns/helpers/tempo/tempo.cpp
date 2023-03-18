@@ -87,7 +87,7 @@ void Tempo::registerTask(TempoTaskType task)
 
     tasks.insert(task);
     if (!threadStarted){
-        Thread::create(TempoTask, "TempoTask", Thread::Purpose::control, 5000,nullptr,0);
+        Thread::create(TempoTask, "TempoTask", Thread::Purpose::control, 5000,nullptr,1);
         threadStarted = true;
     }
 }

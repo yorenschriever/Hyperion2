@@ -1,13 +1,15 @@
-#include <vector>
-
 #include "core/distribution/pipes/pipe.hpp"
-#include "platform/includes/ethernet.hpp"
-#include "platform/includes/log.hpp"
-#include "platform/includes/thread.hpp"
-#include "platform/includes/utils.hpp"
-
+#include "core/generation/controllers/midiController.hpp"
+#include "core/generation/controllers/midiControllerFactory.hpp"
 #include "core/generation/patterns/helpers/tempo/tapTempo.h"
 #include "core/generation/patterns/helpers/tempo/tempo.h"
+#include "platform/includes/ethernet.hpp"
+#include "platform/includes/log.hpp"
+#include "platform/includes/midi.hpp"
+#include "platform/includes/thread.hpp"
+#include "platform/includes/utils.hpp"
+#include <memory>
+#include <vector>
 
 class Hyperion
 {
@@ -25,31 +27,33 @@ public:
         setup_midi();
 
         Log::info("HYP", "starting outputs");
-        for (Pipe* pipe : pipes)
+        for (Pipe *pipe : pipes)
             pipe->out->begin();
 
         clearAll();
 
         Log::info("Hyperion", "starting inputs");
-        for (Pipe* pipe : pipes)
+        for (Pipe *pipe : pipes)
             pipe->in->begin();
 
-        Thread::create(UpdateDisplayTask,"UpdateDisplay",Thread::Purpose::control,3000,this,4);
-        Thread::create(runTask,"run",Thread::Purpose::distribution,30000,this,1);
+        Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
+        Thread::create(runTask, "run", Thread::Purpose::distribution, 30000, this, 1);
     }
 
-    virtual void addPipe(Pipe* pipe) {
+    virtual void addPipe(Pipe *pipe)
+    {
         pipes.push_back(pipe);
     }
 
     virtual void clearAll()
     {
-        for (Pipe* pipe : pipes)
+        for (Pipe *pipe : pipes)
         {
             pipe->out->clear();
             pipe->out->show();
         }
     }
+
 private:
     virtual void check_safe_mode()
     {
@@ -79,11 +83,11 @@ private:
 
     virtual void setup_tempo()
     {
-        //add tempo sources in order of importance. first has highest priority
-        // Tempo::AddSource(ProDJLinkTempo::getInstance());
-        // Tempo::AddSource(MidiClockTempo::getInstance());
-        // Tempo::AddSource(TapTempo::getInstance()); 
-        // Tempo::AddSource(UdpTempo::getInstance()); 
+        // add tempo sources in order of importance. first has highest priority
+        //  Tempo::AddSource(ProDJLinkTempo::getInstance());
+        //  Tempo::AddSource(MidiClockTempo::getInstance());
+        //  Tempo::AddSource(TapTempo::getInstance());
+        //  Tempo::AddSource(UdpTempo::getInstance());
 
         // Midi::Initialize();
         // Midi::onNoteOn([](uint8_t ch, uint8_t note, uint8_t velocity) {
@@ -99,13 +103,30 @@ private:
 
     virtual void setup_midi()
     {
+        hub = ControlHub::fromGrid(8, 8);
+        Midi::initialize();
+        Midi::onDeviceCreatedDestroyed(
+            [](MidiDevice *device, std::string name, void *userData)
+            {
+                auto hyp = (Hyperion *)userData;
+                auto controller = MidiControllerFactory::create(device, name, &hyp->hub);
+                hyp->midiControllers.insert({device, std::move(controller)});
+            },
+            [](MidiDevice *device, std::string name, void *userData)
+            {
+                auto hyp = (Hyperion *)userData;
+                //because midiControllers contains a smart pointer to the midiDevice
+                //it will automatically delete the device
+                hyp->midiControllers.erase(device);
+            },
+            this);
     }
 
     static void UpdateDisplayTask(void *parameter)
     {
-        Hyperion* instance = (Hyperion*) parameter;
+        Hyperion *instance = (Hyperion *)parameter;
         unsigned long lastFpsUpdate = 0;
-        bool firstRun=true;
+        bool firstRun = true;
         while (true)
         {
 
@@ -117,11 +138,11 @@ private:
             int totalMissedFrames = 0;
             int totalTotalFrames = 0;
             int totalLength = 0;
-            for (Pipe* pipe : instance->pipes)
+            for (Pipe *pipe : instance->pipes)
             {
                 if (pipe->in->getTotalFrameCount() == 0)
                     continue;
-                
+
                 activeChannels++;
                 totalUsedFrames += pipe->in->getUsedFrameCount();
                 totalMissedFrames += pipe->in->getMissedFrameCount();
@@ -130,7 +151,7 @@ private:
 
                 totalLength += pipe->getNumPixels();
             }
-    
+
             float outFps = activeChannels == 0 ? 0 : (float)1000. * totalUsedFrames / (elapsedTime) / activeChannels;
             float inFps = activeChannels == 0 ? 0 : (float)1000. * totalTotalFrames / (elapsedTime) / activeChannels;
             float misses = totalTotalFrames == 0 ? 0 : 100.0 * (totalMissedFrames) / totalTotalFrames;
@@ -140,18 +161,16 @@ private:
 
             if (firstRun)
             {
-                //skip the first run, we just started measuring, the stats do not make sense yet
+                // skip the first run, we just started measuring, the stats do not make sense yet
                 Thread::sleep(500);
                 firstRun = false;
                 continue;
             }
 
-            Log::info("HYP","FPS: %d of %d (%d%% miss)\t interval: %dms \t freeHeap: %d \t avg length: %d \t channels: %d \t totalLights: %d", (int)outFps, (int)inFps, (int)misses, (int)elapsedTime, Utils::get_free_heap(), avgLength, activeChannels, totalLength);
-            
+            Log::info("HYP", "FPS: %d of %d (%d%% miss)\t interval: %dms \t freeHeap: %d \t avg length: %d \t channels: %d \t totalLights: %d", (int)outFps, (int)inFps, (int)misses, (int)elapsedTime, Utils::get_free_heap(), avgLength, activeChannels, totalLength);
 
-
-            //Debug.printf("IPAddress: %s\r\n", Ethernet::GetIp().toString().c_str());
-            //Debug.printf("Tempo source: %s\r\n", Tempo::SourceName());
+            // Debug.printf("IPAddress: %s\r\n", Ethernet::GetIp().toString().c_str());
+            // Debug.printf("Tempo source: %s\r\n", Tempo::SourceName());
 
             // Display::setFPS(infps,outfps,misses);
             // Display::setLeds(totalLength);
@@ -168,24 +187,27 @@ private:
 
     virtual void run()
     {
-        //Log::info("Hyperion", "running");
+        // Log::info("Hyperion", "running");
 
-        for (Pipe* pipe : pipes)
+        for (Pipe *pipe : pipes)
             pipe->process();
 
-        for (Pipe* pipe : pipes)
+        for (Pipe *pipe : pipes)
             pipe->out->postProcess();
 
-        //Thread::sleep(10);
+        // Thread::sleep(10);
     }
 
-    static void runTask(void * param)
+    static void runTask(void *param)
     {
-        auto instance = (Hyperion*) param;
+        auto instance = (Hyperion *)param;
         while (1)
             instance->run();
         Thread::destroy();
     }
 
-    std::vector<Pipe*> pipes;
+    std::vector<Pipe *> pipes;
+    ControlHub hub;
+    std::map<MidiDevice *, std::unique_ptr<MidiController>> midiControllers;
+    // MidiControllerFactory *midiControllerFactory;
 };

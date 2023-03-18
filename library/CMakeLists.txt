@@ -27,12 +27,15 @@ if (${ESP_PLATFORM})
 
 else ()
 
-    file(GLOB_RECURSE PLATFORM_SRC CONFIGURE_DEPENDS
+    file(GLOB PLATFORM_SRC CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_LIST_DIR}/platform/${TARGET}/*.cpp"
+    )
+
+    file(GLOB_RECURSE CORE_SRC CONFIGURE_DEPENDS
         "${CORE_SRC_DIR}/*.cpp"
     )
 
-    add_library(Hyperion ${PLATFORM_SRC})
+    add_library(Hyperion ${PLATFORM_SRC} ${CORE_SRC})
     target_include_directories(Hyperion PUBLIC ${INCLUDE_DIRS})
 
     find_package(Threads REQUIRED)
@@ -42,5 +45,11 @@ else ()
     if(CMAKE_THREAD_LIBS_INIT)
       target_link_libraries(Hyperion "${CMAKE_THREAD_LIBS_INIT}")
     endif()
+
+    set(RTMIDI_BUILD_TESTING OFF)
+    add_subdirectory($ENV{HYPERION_LIB_DIR}/platform/${TARGET}/rtmidi "rtmidi")
+    target_link_libraries(Hyperion PUBLIC rtmidi)
+    target_include_directories(Hyperion PUBLIC $ENV{HYPERION_LIB_DIR}/platform/${target}/rtmidi)
+   
 
 endif ()

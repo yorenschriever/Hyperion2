@@ -39,13 +39,15 @@ private:
 
     static void ConstantTempoTask()
     {
-        //Log::info("ConstantTempo","ConstantTempoTask");
 
         ConstantTempo *instance = ConstantTempo::getInstance();
         if (!instance->validSignal || instance->period == 0)
             return;
 
         int newBeatNr = (Utils::micros() - instance->startingpoint) / instance->period;
+
+        // Log::info("ConstantTempo","ConstantTempoTask: %d", newBeatNr);
+
         if (newBeatNr != instance->beatNumber)
             instance->beat(newBeatNr, instance->period / 1000, false); //use the beat locally, but don't broadcast it.
     }
