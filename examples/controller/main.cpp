@@ -1,28 +1,31 @@
-#include "core/hyperion.hpp"
-
 #include "colours.h"
-#include "distribution/inputs/patternInput.hpp"
-#include "distribution/outputs/neopixelOutput.hpp"
+#include "distribution/inputs/controlHubInput.hpp"
+#include "distribution/outputs/monitorOutput.hpp"
 #include "distribution/pipes/convertPipe.hpp"
-#include "generation/patterns/pattern.hpp"
-#include "utils.hpp"
-
-#include <iostream>
-#include <cstdlib>
+#include "generation/patterns/mappedPatterns.h"
+#include "hyperion.hpp"
+#include "ledsterMap.hpp"
 
 int main()
 {
   auto hyp = new Hyperion();
 
-  // for (int i = 1; i <= 8; i++)
-  // {
-  //   auto pipe = new ConvertPipe<RGB, GRB>(
-  //       new PatternInput<RGB>(500, new RainbowPattern()),
-  //       new NeopixelOutput(i));
-  //   hyp->addPipe(pipe);
-  // }
+  auto pipe = new ConvertPipe<RGBA, RGB>(
+      new ControlHubInput<RGBA>(
+          ledsterMap.size(),
+          &hyp->hub,
+          {
+            {.column = 0, .slot = 0, .pattern = new Mapped::ConcentricWavePattern<SinFast>(ledsterMap)},
+            {.column = 0, .slot = 1, .pattern = new Mapped::HorizontalGradientPattern(ledsterMap)},
+          }),
+      new MonitorOutput(ledsterMap));
+
+  hyp->addPipe(pipe);
 
   hyp->start();
 
-  while (1) Thread::sleep(1000);
+  while (1)
+    Thread::sleep(1000);
 }
+
+

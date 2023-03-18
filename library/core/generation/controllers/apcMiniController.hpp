@@ -15,9 +15,8 @@ private:
     const int WIDTH = 8;
     const int HEIGHT = 8;
 
-    // const int NUM_FADERS = 8;
-    const int FADER0_CHANNEL = 48; // controller number of the first fader
-    const int MASTER_DIM_FADER_CHANNEL = 56;
+    const int FADER0_CONTROLLER_NUMBER = 48; 
+    const int MASTER_DIM_FADER_CONTROLLER_NUMBER = 56;
 
     const int MIDI_CHANNEL = 0;
 
@@ -72,16 +71,18 @@ public:
 
     void onControllerChange(uint8_t channel, uint8_t controller, uint8_t value) override
     {
-        if (channel == MASTER_DIM_FADER_CHANNEL)
+        //Log::info("APCMINI", "onControllerChange %d %d", controller, value);
+
+        if (controller == MASTER_DIM_FADER_CONTROLLER_NUMBER)
         {
-            hub->masterDim(value);
+            hub->setMasterDim(scale127to255(value));
             return;
         }
 
-        int column = controller - FADER0_CHANNEL;
+        int column = controller - FADER0_CONTROLLER_NUMBER;
         if (column < 0 || column >= WIDTH)
             return;
-        hub->dim(column, value);
+        hub->dim(column, scale127to255(value));
     }
     void onSystemRealtime(uint8_t message) override {}
 

@@ -1,3 +1,4 @@
+#pragma once
 
 #include "IHubController.hpp"
 #include "log.hpp"
@@ -23,10 +24,9 @@ public:
         char name[20] = "";
     };
 
+    uint8_t masterDim = 255;
 private:
     std::vector<Column> columns;
-    uint8_t masterDim_;
-
     std::vector<IHubController *> controllers;
 
 public:
@@ -81,18 +81,18 @@ public:
         if (column.dim == value)
             return;
 
-        column.dim = value;
+        columns[columnIndex].dim = value;
 
         for (auto controller : controllers)
             controller->onHubColumnDimChange(columnIndex, value);
     }
 
-    void masterDim(uint8_t value)
+    void setMasterDim(uint8_t value)
     {
-        if (masterDim_ == value)
+        if (masterDim == value)
             return;
 
-        masterDim_ = value;
+        masterDim = value;
 
         for (auto controller : controllers)
             controller->onHubMasterDimChange(value);
@@ -133,6 +133,20 @@ public:
             return nullptr;
 
         //Log::info("CONTROLHUB", "find slot %d %d", columns.size(), column->slots.size());
+
+        return &column->slots.data()[slotIndex];
+    }
+
+    Column *findColumn(int columnIndex) & {
+        if (columnIndex < 0 || columnIndex > columns.size() - 1)
+            return nullptr;
+        return &columns.data()[columnIndex];
+    }
+
+    Slot *findSlot(Column * column, int slotIndex) &
+    {
+        if (slotIndex < 0 || slotIndex > column->slots.size() - 1)
+            return nullptr;
 
         return &column->slots.data()[slotIndex];
     }

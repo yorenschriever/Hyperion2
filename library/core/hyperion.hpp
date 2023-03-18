@@ -54,6 +54,7 @@ public:
         }
     }
 
+    ControlHub hub;
 private:
     virtual void check_safe_mode()
     {
@@ -207,7 +208,6 @@ private:
     }
 
     std::vector<Pipe *> pipes;
-    ControlHub hub;
     std::map<MidiDevice *, std::unique_ptr<MidiController>> midiControllers;
     // MidiControllerFactory *midiControllerFactory;
 };
