@@ -6,19 +6,22 @@
 #include <math.h>
 #include "LedShape.h"
 #include "LedAnimation.h"
+#include "Palette.h"
 #include "platform/includes/log.hpp"
 
 class AnimationPattern : public Pattern<RGBA>
 {
     std::vector<LedShape> *ledShapes;
     LedAnimation *animation;
+    Palette *palette;
     bool updateCache = true;
 
 public:
-    AnimationPattern(std::vector<LedShape> *ledShapes, LedAnimation *animation)
+    AnimationPattern(std::vector<LedShape> *ledShapes, LedAnimation *animation, Palette *palette)
     {
         this->ledShapes = ledShapes;
         this->animation = animation;
+        this->palette = palette;
     }
 
     inline void Calculate(RGBA *pixels, int width, bool active) override
@@ -34,7 +37,7 @@ public:
             *(ledShapes),
 
             //todo read those parameters from Params or midi inputs
-            0,
+            palette,
             127,
             64,
             127,

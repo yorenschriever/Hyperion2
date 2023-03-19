@@ -32,7 +32,7 @@ public:
         int buffersize,
         vector<LedShape> ledShapes,
 
-        Palette colorPalette,
+        Palette *colorPalette,
 
         uint8_t speed,
         uint8_t amount,

@@ -2,6 +2,7 @@
 #include "LedShape.h"
 #include "animationPattern.h"
 #include "colours.h"
+#include "Palette.h"
 #include "core/distribution/inputs/inputSplitter.hpp"
 #include "core/distribution/inputs/patternInput.hpp"
 #include "core/distribution/inputs/udpInput.hpp"
@@ -25,6 +26,13 @@ Installation tetra = {
     LedShape(96, 3),  // 165cm Triangle ( 96 LEDs per side, 288 total, 17.28A powerdraw)
     LedShape(117, 3), // 200cm Triangle (117 LEDs per side, 351 total, 21.06A powerdraw)
 };
+
+Palette heatmap = Palette({
+  {.position=   0, .color = RGB(    0,  0,  0)},  // Black
+  {.position= 128, .color = RGB(  255,  0,  0)},  // Red
+  {.position= 224, .color = RGB(  255,255,  0)},  // Bright yellow
+  {.position= 255, .color = RGB(  255,255,255)}   // Full white
+});
 
 int main()
 {
@@ -66,7 +74,7 @@ void addLedShapes(Hyperion *hyp)
       new PatternInput<RGBA>(
           tetraMap.size(),
           // new Mapped::ConcentricWavePattern<SinFast>(tetraMap, 2, 2)),
-          new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, true))),
+          new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, true), &heatmap)),
       {12 * 3 * sizeof(RGBA),
        33 * 3 * sizeof(RGBA),
        54 * 3 * sizeof(RGBA),
