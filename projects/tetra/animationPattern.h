@@ -6,7 +6,7 @@
 #include <math.h>
 #include "LedShape.h"
 #include "LedAnimation.h"
-#include "Palette.h"
+#include "generation/patterns/helpers/palette.hpp"
 #include "platform/includes/log.hpp"
 
 class AnimationPattern : public Pattern<RGBA>

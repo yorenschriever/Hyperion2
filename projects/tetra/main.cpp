@@ -1,8 +1,8 @@
 #include "ChaserLedAnimation.h"
+#include "ShapeChaserLedAnimation.h"
 #include "LedShape.h"
 #include "animationPattern.h"
 #include "colours.h"
-#include "Palette.h"
 #include "core/distribution/inputs/inputSplitter.hpp"
 #include "core/distribution/inputs/patternInput.hpp"
 #include "core/distribution/inputs/udpInput.hpp"
@@ -13,8 +13,9 @@
 #include "core/generation/pixelMap.hpp"
 #include "core/generation/pixelMapSplitter.hpp"
 #include "core/hyperion.hpp"
-
+#include "generation/patterns/helpers/palette.hpp"
 #include "ChaserLedAnimation.cpp"
+#include "ShapeChaserLedAnimation.cpp"
 
 void addLedShapes(Hyperion *hyp);
 
@@ -74,7 +75,8 @@ void addLedShapes(Hyperion *hyp)
       new PatternInput<RGBA>(
           tetraMap.size(),
           // new Mapped::ConcentricWavePattern<SinFast>(tetraMap, 2, 2)),
-          new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, true), &heatmap)),
+          // new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, true), &heatmap)),
+          new AnimationPattern(&tetra, new ShapeChaserLedAnimation(true), &heatmap)),
       {12 * 3 * sizeof(RGBA),
        33 * 3 * sizeof(RGBA),
        54 * 3 * sizeof(RGBA),

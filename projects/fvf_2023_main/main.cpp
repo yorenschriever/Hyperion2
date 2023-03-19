@@ -18,6 +18,12 @@
 #include "platform/includes/log.hpp"
 #include "platform/includes/socket.hpp"
 #include "platform/includes/thread.hpp"
+#include "patterns.hpp"
+#include "palettes.hpp"
+#include "core/generation/patterns/helpers/tempo/constantTempo.h"
+
+auto pLedsterMap = toPolar(ledsterMap);
+auto pColumnMap = toPolar(columnMap);
 
 void addLedsterPipe(Hyperion *hyp);
 void addColumnPipes(Hyperion *hyp);
@@ -26,22 +32,29 @@ int main()
 {
   Params::primaryColour = RGB(255, 0, 255);
   Params::secondaryColour = RGB(50, 50, 50);
+  Params::palette = &sunset1;
 
   auto hyp = new Hyperion();
 
   addColumnPipes(hyp);
   addLedsterPipe(hyp);
 
+  Tempo::AddSource(ConstantTempo::getInstance());
+  ConstantTempo::getInstance()->setBpm(120);
+
   hyp->start();
   while (1) Thread::sleep(1000);
 }
+
+Pattern<RGBA> *patternLedster = new FWF::RadialGlitterFadePattern(pLedsterMap);
+Pattern<RGBA> *patternColumns = new FWF::RadialGlitterFadePattern(pColumnMap, 1./10);
 
 void addLedsterPipe(Hyperion *hyp)
 {
   auto ledsterPipe = new ConvertPipe<RGBA, RGB>(
       new PatternInput<RGBA>(
           ledsterMap.size(),
-          new Mapped::ConcentricWavePattern<SinFast>(ledsterMap, 2, 2)),
+          patternLedster),
       new MonitorOutput(ledsterMap));
   hyp->addPipe(ledsterPipe);
 }
@@ -54,7 +67,7 @@ void addColumnPipes(Hyperion *hyp)
   auto splitInput = new InputSplitter(
       new PatternInput<RGBA>(
           columnMap.size(),
-          new Mapped::ConcentricWavePattern<SinFast>(columnMap, 2, 2)),
+          patternColumns),
       {480 * sizeof(RGBA),
        480 * sizeof(RGBA),
        480 * sizeof(RGBA),

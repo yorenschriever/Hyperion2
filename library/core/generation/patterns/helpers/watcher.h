@@ -40,10 +40,10 @@ private:
     WatcherType type;
 };
 
-class TempoWatcher : public Watcher<int>
+class BeatWatcher : public Watcher<int>
 {
 public: 
-    TempoWatcher() : 
+    BeatWatcher() : 
         Watcher(
             Tempo::GetBeatNumber ,
             Changing

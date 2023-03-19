@@ -4,9 +4,11 @@
 using namespace std;
 
 #include "LedShape.h"
-#include "Palette.h"
+#include "generation/patterns/helpers/palette.hpp"
 #include "colours.h"
 #include <stdint.h>
+
+#define LINEARBLEND 0
 
 // -------------------------------------------------------------------- Class Definition
 class LedAnimation
@@ -65,6 +67,14 @@ protected:
         return (((uint16_t)i) * (1 + (uint16_t)(scale))) >> 8;
     }
 
+    uint8_t map8( uint8_t in, uint8_t rangeStart, uint8_t rangeEnd)
+    {
+        uint8_t rangeWidth = rangeEnd - rangeStart;
+        uint8_t out = scale8( in, rangeWidth);
+        out += rangeStart;
+        return out;
+    }
+
     template <class T, class A, class B, class C, class D>
     long map(T _x, A _in_min, B _in_max, C _out_min, D _out_max, typename std::enable_if<std::is_integral<T>::value>::type * = 0)
     {
@@ -107,4 +117,12 @@ protected:
     // {
     //     return (x - (T)in_min) * ((T)out_max - (T)out_min) / ((T)in_max - (T)in_min) + (T)out_min;
     // }
+
+    RGBA ColorFromPalette( Palette *palette, uint8_t index, uint8_t brightness, void* _blend=0)
+{
+    auto entry = palette->get(index);
+    //entry.dim(brightness);
+    return entry;
+}
+
 };

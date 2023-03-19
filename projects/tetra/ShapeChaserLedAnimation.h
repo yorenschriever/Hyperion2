@@ -6,29 +6,30 @@ using namespace std;
 #include "LedAnimation.h"
 
 // -------------------------------------------------------------------- Class Definition
-class ChaserLedAnimation : public LedAnimation
+class ShapeChaserLedAnimation : public LedAnimation
 {
 protected:
-    const char *TAG = "CHASERLEDANIMATION";
     bool _forward = true;
-    uint16_t _baseOffset = 0;
-    // TODO build cache for all chaser properties to optimize
-    //vector<CRGB*> _chaserBuffers;
+    
     uint8_t _numChasers;
     vector<double> _speedOptions;
+
+    uint16_t _relativeChaserDelta;
+    uint8_t _beatSpeed;
+    uint16_t _offsetRelativeDistance;
+    uint16_t _relativeChaserLength;
+    uint16_t _relativeDirectionOffset = 0;
+
     uint16_t _previousBeatCount = 0;
     uint16_t _previousBeatProgress = 0;
     uint16_t _previousRelativePosition = 0;
 
 public:
-    // TODO Use this internally instead of ANIMATION_STEP_SIZE (Although we should just be making sure we use the full uint16_t range)
-    const static uint16_t relativeSize = 10000;
-
-    ChaserLedAnimation(vector<LedShape> ledShapes, double baseOffset, bool forward);
-
+    ShapeChaserLedAnimation(bool forward);
+    
     void render(
         RGBA* buffer,
-        int buffersize,
+		int buffersize,
         vector<LedShape> ledShapes,
 
         Palette *colorPalette,

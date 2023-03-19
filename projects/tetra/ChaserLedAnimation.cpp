@@ -167,39 +167,11 @@ void ChaserLedAnimation::render(
 
 					// TODO Optimize the interpolationRatio calculation!
 					uint8_t interpolationRatio = ((positionModulo * ledShape.totalNumLeds) - (((positionModulo * ledShape.totalNumLeds) / ANIMATION_STEP_SIZE) * ANIMATION_STEP_SIZE)) * 255 / ANIMATION_STEP_SIZE;
-					//yoren: i didn't understand what the calculation above should do, and it gave me glitching led data, so i replaced it with this for the time being. 
-		
-					//uint8_t interpolationRatio = positionModulo * 255 / relativeChaserLength;
 					
-					//uint8_t interpolationRatio = (relativeDistancePerPixel - (positionModulo % relativeDistancePerPixel)) * 255 / relativeDistancePerPixel;
-
-					// yoren: i didn't work on the palettes yet, so i use hardcoded colors, but it should be hard to write in terms of RGBA objects
-					// CRGB color = ColorFromPalette(colorPalette, map(bufferPosition, 0, chaserPixelSize, 0, 255), 255, LINEARBLEND);
-					// CRGB color2 = ColorFromPalette(colorPalette, map(bufferPosition + deltaBuffer, 0, chaserPixelSize, 0, 255), 255, LINEARBLEND);
-					// CRGB color3 = ColorFromPalette(colorPalette, map(bufferPosition + ((chaserPixelSize - 1) * - deltaBuffer), 0, chaserPixelSize, 0, 255), 255, LINEARBLEND);
-					// RGBA color = RGB(255,0,0);
-					// RGBA color2 = RGB(255,200,0);
-					// RGBA color3 = RGB(0,0,255);
-					// RGBA color  = colorPalette->get( map(bufferPosition, 0, chaserPixelSize, 0, 255));
-					// RGBA color2 = colorPalette->get( map(bufferPosition + deltaBuffer, 0, chaserPixelSize, 0, 255));
-					// RGBA color3 = colorPalette->get( map(bufferPosition + ((chaserPixelSize - 1) * - deltaBuffer), 0, chaserPixelSize, 0, 255));
-					
+					//yoren: changed datatypes, added pointer to pixel
 					RGBA color = ColorFromPalette(colorPalette, map(bufferPosition, 0, chaserPixelSize, 0, 255), 255, LINEARBLEND);
 					RGBA color2 = ColorFromPalette(colorPalette, map(bufferPosition + deltaBuffer, 0, chaserPixelSize, 0, 255), 255, LINEARBLEND);
 					RGBA color3 = ColorFromPalette(colorPalette, map(bufferPosition + ((chaserPixelSize - 1) * - deltaBuffer), 0, chaserPixelSize, 0, 255), 255, LINEARBLEND);
-					
-					// RGBA color = ColorFromPalette(colorPalette, 255, 255, LINEARBLEND);
-					// RGBA color2 = ColorFromPalette(colorPalette, 127, 255, LINEARBLEND);
-					// RGBA color3 = ColorFromPalette(colorPalette, 0, 255, LINEARBLEND);
-
-					//Log::info("CHASER","pos1 = %d",(uint8_t) map(bufferPosition, 0, chaserPixelSize, 0, 255));
-					//Log::info("CHASER","pos2 = %d",(uint8_t) map(bufferPosition + deltaBuffer, 0, chaserPixelSize, 0, 255));
-					//Log::info("CHASER","pos3 = %d",(uint8_t) map(bufferPosition + ((chaserPixelSize - 1) * - deltaBuffer), 0, chaserPixelSize, 0, 255));					
-
-					// Log::info("CHASER","color1 = (%d,\t%d,\t%d,\t%d)", color.R, color.G, color.B, color.A);
-					// Log::info("CHASER","color2 = (%d,\t%d,\t%d,\t%d)", color.R, color.G, color.B, color.A);
-					// Log::info("CHASER","color3 = (%d,\t%d,\t%d,\t%d)", color.R, color.G, color.B, color.A);
-
 					auto pixel = &buffer[bufferIndex];
 
 					if (renderPosition == 0) {

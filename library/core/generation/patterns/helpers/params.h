@@ -1,5 +1,6 @@
 #pragma once
 #include "colours.h"
+#include "palette.hpp"
 
 class Params
 {
@@ -21,6 +22,7 @@ public:
     static float velocity;
     static float intensity;
     static float variant;
+    static Palette *palette;
 
 private:
     static float convert(float start, float end, float value)
@@ -36,3 +38,4 @@ RGBA Params::highlightColour = RGB(0, 0, 255);
 float Params::velocity = 0.5;
 float Params::intensity = 0.5;
 float Params::variant = 0.5;
+Palette *Params::palette = nullptr; 
