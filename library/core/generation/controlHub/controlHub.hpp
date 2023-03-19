@@ -14,6 +14,7 @@ public:
     {
         bool activated = false;
         bool flash = false;
+        bool releaseColumn = true;
         char name[20] = "";
     };
 
@@ -48,6 +49,23 @@ public:
 
         if (newValue != slot->activated)
         {
+            if (slot->releaseColumn)
+            {
+                int slot_off_index=0;
+                //for(auto slot_off : findColumn(columnIndex)->slots.data()){
+                auto column = findColumn(columnIndex);
+                for (auto slot_it = column->slots.begin(); slot_it < column->slots.end(); ++slot_it)
+                {
+                    if (slot_it->activated)
+                    {
+                        slot_it->activated = false;
+                        int slotIndex = std::distance(column->slots.begin(),slot_it);
+                        for (auto controller : controllers)
+                            controller->onHubSlotActiveChange(columnIndex, slotIndex, false);
+                    }
+                }
+            }
+
             slot->activated = newValue;
 
             //Log::info("CONTROLHUB", "onHubSlotActiveChange %d", controllers.size());

@@ -3,6 +3,9 @@
 #include <inttypes.h>
 #include <vector>
 #include <math.h>
+#include <algorithm>
+
+using namespace std;
 
 struct PixelPosition
 {
@@ -10,43 +13,60 @@ struct PixelPosition
     float y;
 };
 
-typedef std::vector<PixelPosition> PixelMap;
+class PixelMap: public vector<PixelPosition>  {
 
-struct PolarPixelPosition
-{
-    float r;
-    float th;
+public:
+
+    struct PolarPixelPosition
+    {
+        float r;
+        float th;
+    };
+
+    typedef vector<PolarPixelPosition> Polar;
+
+    using vector<PixelPosition>::vector;
+
+private:
+    Polar polar;
+    Polar polar90;
+
+public:
+
+    Polar toPolar()
+    {
+        if (polar.size() == this->size())
+            return polar;
+
+        transform(
+            this->begin(), 
+            this->end(), 
+            back_inserter(polar), [](PixelPosition pos) -> PolarPixelPosition{ 
+                return {
+                    .r = sqrt(pos.y * pos.y + pos.x * pos.x),
+                    .th = atan2(pos.y, pos.x)
+                };
+            });
+        return polar;
+    }
+
+    //to polar coordinates where th==0 points to the top instead of to the right
+    Polar toPolarRotate90()
+    {
+        if (polar90.size() == this->size())
+            return polar90;
+
+        transform(
+            this->begin(), 
+            this->end(), 
+            back_inserter(polar90), [](PixelPosition pos) -> PolarPixelPosition{ 
+                return {
+                    .r = sqrt(pos.y * pos.y + pos.x * pos.x),
+                    .th = atan2(pos.x, -1*pos.y)
+                };
+            });
+        return polar90;
+    }
 };
 
-typedef std::vector<PolarPixelPosition> PolarPixelMap;
 
-PolarPixelMap toPolar(PixelMap map)
-{
-    PolarPixelMap result;
-    std::transform(
-        map.begin(), 
-        map.end(), 
-        std::back_inserter(result), [](PixelPosition pos) -> PolarPixelPosition{ 
-            return {
-                .r = sqrt(pos.y * pos.y + pos.x * pos.x),
-                .th = atan2(pos.y, pos.x)
-            };
-        });
-    return result;
-}
-
-//to polar coordinates where th==0 points to the top instead of to the right
-PolarPixelMap toPolarRotate90(PixelMap map)
-{
-    PolarPixelMap result;
-    std::transform(
-        map.begin(), 
-        map.end(), 
-        std::back_inserter(result), [](PixelPosition pos) -> PolarPixelPosition{ 
-            return {
-                .r = sqrt(pos.y * pos.y + pos.x * pos.x),
-                .th = atan2(pos.x, -1*pos.y)
-            };
-        });
-    return result;
-}

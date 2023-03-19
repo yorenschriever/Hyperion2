@@ -62,7 +62,7 @@ public:
         }
 
         int column = controller - FADER0_CONTROLLER_NUMBER;
-        if (column > 0 && column < WIDTH){
+        if (column >= 0 && column < WIDTH){
             hub->dim(column, scale127to255(value));
             return;
         }

@@ -15,13 +15,13 @@ namespace FWF
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PolarPixelMap map;
+        PixelMap::Polar map;
         FadeDown fade = FadeDown(200, WaitAtEnd);
         BeatWatcher watcher = BeatWatcher();
         Permute perm;
 
     public:
-        RadialGlitterFadePattern(PolarPixelMap map)
+        RadialGlitterFadePattern(PixelMap::Polar map)
         {
             this->map = map;
             this->perm = Permute(map.size());
@@ -44,7 +44,7 @@ namespace FWF
 
             float velocity = Params::getVelocity(600, 100);
             // float trail = Params::getIntensity(0,1) * density;
-            float trail = Params::getIntensity(0, 200);
+            //float trail = Params::getIntensity(0, 200);
 
             for (int i = 0; i < map.size(); i++)
             {
@@ -69,13 +69,13 @@ namespace FWF
 
     class PaletteGradientPattern : public Pattern<RGBA>
     {
-        PolarPixelMap map;
+        PixelMap::Polar map;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
 
     public:
-        PaletteGradientPattern(PolarPixelMap map)
+        PaletteGradientPattern(PixelMap::Polar map)
         {
             this->map = map;
         }
@@ -98,13 +98,13 @@ namespace FWF
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PolarPixelMap map;
+        PixelMap::Polar map;
         FadeDown fade = FadeDown(200, WaitAtEnd);
         BeatWatcher watcher = BeatWatcher();
 
 
     public:
-        AngularFadePattern(PolarPixelMap map)
+        AngularFadePattern(PixelMap::Polar map)
         {
             this->map = map;
         }
@@ -120,9 +120,9 @@ namespace FWF
                 // perm.permute();
             }
 
-            float density = 481./width;
+            //float density = 481./width;
             float velocity = Params::getVelocity(200, 30);
-            float trail = Params::getIntensity(0, 200);
+            //float trail = Params::getIntensity(0, 200);
 
             for (int i = 0; i < map.size(); i++)
             {
@@ -132,7 +132,7 @@ namespace FWF
 
                 float fadePosition = fade.getValue(abs(map[i].th) * velocity);
                 RGBA color = Params::palette->get(255 - abs(map[i].th) / M_PI * 255);
-                pixels[i] = color * fadePosition * (map[i].r * 1.5);
+                pixels[i] = color * fadePosition * (map[i].r * 1.5) * transition.getValue();;
             }
         }
     };
@@ -149,7 +149,7 @@ namespace FWF
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
-            float density = 481./width;
+            //float density = 481./width;
             int density2 = width/481;
             lfo.setPeriod(Params::getVelocity(10000,500));
             lfo.setPulseWidth(0.1);
@@ -207,11 +207,11 @@ namespace FWF
 
     class GrowingStrobePattern : public Pattern<RGBA>
     {
-        PolarPixelMap map;
+        PixelMap::Polar map;
         FadeDown fade = FadeDown(5000, WaitAtEnd);
 
     public:
-        GrowingStrobePattern(PolarPixelMap map)
+        GrowingStrobePattern(PixelMap::Polar map)
         {
             this->map = map;
         }
