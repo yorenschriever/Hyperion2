@@ -34,3 +34,19 @@ PolarPixelMap toPolar(PixelMap map)
         });
     return result;
 }
+
+//to polar coordinates where th==0 points to the top instead of to the right
+PolarPixelMap toPolarRotate90(PixelMap map)
+{
+    PolarPixelMap result;
+    std::transform(
+        map.begin(), 
+        map.end(), 
+        std::back_inserter(result), [](PixelPosition pos) -> PolarPixelPosition{ 
+            return {
+                .r = sqrt(pos.y * pos.y + pos.x * pos.x),
+                .th = atan2(pos.x, -1*pos.y)
+            };
+        });
+    return result;
+}

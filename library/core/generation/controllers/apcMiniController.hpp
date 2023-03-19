@@ -89,7 +89,7 @@ public:
     void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) override
     {
         //Log::info("APCMINI", "slot active change %d %d %d", columnIndex, slotIndex, active);
-        int note = (HEIGHT - 1 - slotIndex) * 8 + columnIndex;
+        int note = (HEIGHT - 1 - slotIndex) * WIDTH + columnIndex;
         if (note < 0 || note > WIDTH * HEIGHT)
             return;
         midi->sendNoteOn(MIDI_CHANNEL, note, active ? GREEN : OFF);

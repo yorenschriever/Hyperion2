@@ -22,8 +22,8 @@
 #include "palettes.hpp"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"
 
-auto pLedsterMap = toPolar(ledsterMap);
-auto pColumnMap = toPolar(columnMap);
+auto pLedsterMap = toPolarRotate90(ledsterMap);
+auto pColumnMap = toPolarRotate90(columnMap);
 
 void addLedsterPipe(Hyperion *hyp);
 void addColumnPipes(Hyperion *hyp);
@@ -32,7 +32,8 @@ int main()
 {
   Params::primaryColour = RGB(255, 0, 255);
   Params::secondaryColour = RGB(50, 50, 50);
-  Params::palette = &sunset1;
+  Params::highlightColour = RGB(250, 250, 250);
+  Params::palette = &heatmap; //&sunset1;
 
   auto hyp = new Hyperion();
 
@@ -46,8 +47,21 @@ int main()
   while (1) Thread::sleep(1000);
 }
 
-Pattern<RGBA> *patternLedster = new FWF::RadialGlitterFadePattern(pLedsterMap);
-Pattern<RGBA> *patternColumns = new FWF::RadialGlitterFadePattern(pColumnMap, 1./10);
+// Pattern<RGBA> *patternLedster = new FWF::RadialGlitterFadePattern(pLedsterMap);
+// Pattern<RGBA> *patternColumns = new FWF::RadialGlitterFadePattern(pColumnMap, 1./10);
+
+// Pattern<RGBA> *patternLedster = new FWF::AngularFadePattern(pLedsterMap);
+// Pattern<RGBA> *patternColumns = new FWF::AngularFadePattern(pColumnMap, 1./10);
+
+// Pattern<RGBA> *patternLedster = new FWF::GlowPulsePattern();
+// Pattern<RGBA> *patternColumns = new FWF::GlowPulsePattern();
+
+// Pattern<RGBA> *patternLedster = new FWF::SquareGlitchPattern(ledsterMap);
+// Pattern<RGBA> *patternColumns = new FWF::SquareGlitchPattern(columnMap);
+
+Pattern<RGBA> *patternLedster = new FWF::GrowingStrobePattern(pLedsterMap);
+Pattern<RGBA> *patternColumns = new FWF::GrowingStrobePattern(pColumnMap);
+
 
 void addLedsterPipe(Hyperion *hyp)
 {

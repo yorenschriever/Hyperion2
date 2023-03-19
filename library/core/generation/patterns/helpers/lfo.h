@@ -132,24 +132,37 @@ class SinFast
     static float preCalc[256];
     static bool filled;
 
+    static void fill(){
+        for (int i = 0; i < 256; i++)
+        {
+            float phase = float(i) / 255;
+            preCalc[i] = 0.5 + 0.5 * sin(phase * 2 * M_PI);
+        }
+        filled = true;
+    }
+
 public:
     static float getValue(float phase, float pulsewidth)
     {
-        if (!filled)
-        {
-            for (int i = 0; i < 256; i++)
-            {
-                float phase = float(i) / 255;
-                preCalc[i] = 0.5 + 0.5 * sin(phase * 2 * M_PI);
-            }
-            filled = true;
-        }
-
+        if (!filled) fill();
         return preCalc[int(phase * 255)];
     }
+
+    friend class NegativeCosFast;
 };
 float SinFast::preCalc[256];
 bool SinFast::filled = false;
+
+//returns a sinus like value, in range 0-1 that start at 0. i.e.: -1*cos(phase)
+class NegativeCosFast
+{
+public:
+    static float getValue(float phase, float pulsewidth)
+    {
+        if (!SinFast::filled) SinFast::fill();
+        return SinFast::preCalc[int(phase * 255 + 256 - 256/4) % 256];
+    }
+};
 
 class Cos
 {

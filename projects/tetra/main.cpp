@@ -75,8 +75,8 @@ void addLedShapes(Hyperion *hyp)
       new PatternInput<RGBA>(
           tetraMap.size(),
           // new Mapped::ConcentricWavePattern<SinFast>(tetraMap, 2, 2)),
-          // new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, true), &heatmap)),
-          new AnimationPattern(&tetra, new ShapeChaserLedAnimation(true), &heatmap)),
+          new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, true), &heatmap)),
+          //new AnimationPattern(&tetra, new ShapeChaserLedAnimation(true), &heatmap)),
       {12 * 3 * sizeof(RGBA),
        33 * 3 * sizeof(RGBA),
        54 * 3 * sizeof(RGBA),
