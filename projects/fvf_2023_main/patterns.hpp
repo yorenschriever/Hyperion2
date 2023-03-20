@@ -4,6 +4,7 @@
 #include "generation/patterns/helpers/interval.h"
 #include "generation/patterns/helpers/timeline.h"
 #include "generation/pixelMap.hpp"
+#include "ledsterPatterns.hpp"
 #include <math.h>
 #include <vector>
 
@@ -62,7 +63,7 @@ namespace FWF
 
                 float fadePosition = fade.getValue(map[i].r * velocity);
                 RGBA color = Params::palette->get(fadePosition * 255);
-                pixels[i] = color * fadePosition * (1.5 - map[i].r);
+                pixels[i] = color * fadePosition * (1.5 - map[i].r) * transition.getValue();
             }
         }
     };
@@ -235,6 +236,86 @@ namespace FWF
                     continue;
 
                 pixels[i] = col;                
+            }
+        }
+    };
+
+
+    template <class T>
+    class RibbenClivePattern : public Pattern<RGBA>
+    {
+        const int segmentSize = 60;
+        int averagePeriod;
+        float precision;
+        LFO<T> lfo = LFO<T>();
+        Permute perm;
+
+    public:
+        RibbenClivePattern(int averagePeriod = 10000, float precision = 1, float pulsewidth = 0.025)
+        {
+            this->averagePeriod = averagePeriod;
+            this->precision = precision;
+            this->lfo.setPulseWidth(pulsewidth);
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active) override
+        {
+            if (!active)
+                return;
+
+            
+            int numSegments = width/segmentSize;
+            perm.setSize(numSegments);
+
+            for (int ribbe = 0; ribbe < numSegments; ribbe++)
+            {
+                int interval = averagePeriod + perm.at[ribbe] * (averagePeriod * precision) / numSegments;
+                RGBA col = Params::getPrimaryColour() * lfo.getValue(0, interval);
+                for (int j = 0; j < segmentSize; j++)
+                {
+                    pixels[ribbe * segmentSize + j] = col;
+                }
+            }
+        }
+    };
+
+    class RibbenFlashPattern : public Pattern<RGBA>
+    {
+        Permute perm;
+        BeatWatcher watcher = BeatWatcher();
+        FadeDown fade = FadeDown(2400, WaitAtEnd);
+
+    public:
+        inline void Calculate(RGBA *pixels, int width, bool active) override
+        {
+            if (!active)
+                return;
+
+            bool isLedster = width == 481;
+            int segmentSize = isLedster ? 10 : 60;
+            int numSegments = isLedster ? 36 : width/segmentSize;
+
+            if (watcher.Triggered()) {
+                perm.setSize(numSegments);
+                perm.permute();
+                fade.reset();
+            }
+
+
+            
+            fade.duration = Params::getVelocity(2500,100);
+
+            int numVisible = Params::getIntensity(1,numSegments);
+
+            for (int ribbe = 0; ribbe < numVisible; ribbe++)
+            {
+                RGBA col = Params::getHighlightColour() * fade.getValue();
+                if (isLedster)
+                    for (int j = 0; j < segmentSize; j++)
+                        pixels[Ledster::ribben[perm.at[ribbe]][j]] += col;
+                else
+                    for (int j = 0; j < segmentSize; j++)
+                        pixels[perm.at[ribbe] * segmentSize + j] += col;
             }
         }
     };

@@ -12,6 +12,7 @@
 #include "mapping/ledsterMap.hpp"
 #include "palettes.hpp"
 #include "patterns.hpp"
+#include "ledsterPatterns.hpp"
 #include "platform/includes/thread.hpp"
 
 auto pLedsterMap = ledsterMap.toPolarRotate90();
@@ -40,21 +41,6 @@ int main()
     Thread::sleep(1000);
 }
 
-// Pattern<RGBA> *patternLedster = new FWF::RadialGlitterFadePattern(pLedsterMap);
-// Pattern<RGBA> *patternColumns = new FWF::RadialGlitterFadePattern(pColumnMap, 1./10);
-
-// Pattern<RGBA> *patternLedster = new FWF::AngularFadePattern(pLedsterMap);
-// Pattern<RGBA> *patternColumns = new FWF::AngularFadePattern(pColumnMap, 1./10);
-
-// Pattern<RGBA> *patternLedster = new FWF::GlowPulsePattern();
-// Pattern<RGBA> *patternColumns = new FWF::GlowPulsePattern();
-
-// Pattern<RGBA> *patternLedster = new FWF::SquareGlitchPattern(ledsterMap);
-// Pattern<RGBA> *patternColumns = new FWF::SquareGlitchPattern(columnMap);
-
-Pattern<RGBA> *patternLedster = new FWF::GrowingStrobePattern(pLedsterMap);
-Pattern<RGBA> *patternColumns = new FWF::GrowingStrobePattern(pColumnMap);
-
 void addLedsterPipe(Hyperion *hyp)
 {
   auto ledsterPipe = new ConvertPipe<RGBA, RGB>(
@@ -68,15 +54,24 @@ void addLedsterPipe(Hyperion *hyp)
 
               {.column = 1, .slot = 0, .pattern = new FWF::SquareGlitchPattern(ledsterMap)},
               {.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(pLedsterMap)},
-              {.column = 1, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(ledsterMap)},
+              {.column = 1, .slot = 2, .pattern = new Ledster::RadialFadePattern(ledsterMap)},
 
-              {.column = 2, .slot = 0, .pattern = new Mapped::ConcentricWavePattern<SinFast>(ledsterMap)},
-              {.column = 2, .slot = 1, .pattern = new Mapped::HorizontalGradientPattern(ledsterMap)},
-              {.column = 2, .slot = 2, .pattern = new Mapped::ConcentricWavePattern<SinFast>(ledsterMap)},
+              {.column = 2, .slot = 0, .pattern = new Ledster::ClivePattern<SinFast>(10000)},
+              {.column = 2, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
+              {.column = 2, .slot = 2, .pattern = new Ledster::SnakePattern()},
 
-              {.column = 3, .slot = 0, .pattern = new Mapped::HorizontalGradientPattern(ledsterMap)},
-              {.column = 3, .slot = 1, .pattern = new Mapped::ConcentricWavePattern<SinFast>(ledsterMap)},
-              {.column = 3, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(ledsterMap)},
+              {.column = 3, .slot = 0, .pattern = new Ledster::RibbenClivePattern<SoftSquare>(40000)},
+              {.column = 3, .slot = 1, .pattern = new Ledster::RibbenClivePattern<SawDown>(500)},
+              {.column = 3, .slot = 2, .pattern = new Ledster::RibbenClivePattern<SinFast>(3000)},
+
+              {.column = 4, .slot = 0, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
+              {.column = 4, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
+              {.column = 4, .slot = 2, .pattern = new Ledster::RibbenClivePattern<PWM>(10000,1,0.0025)},
+
+
+              {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
+              {.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(ledsterMap),},
+              {.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
           }),
       new MonitorOutput(ledsterMap));
   hyp->addPipe(ledsterPipe);
@@ -100,13 +95,21 @@ void addColumnPipes(Hyperion *hyp)
               {.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(pColumnMap)},
               {.column = 1, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
 
-              {.column = 2, .slot = 0, .pattern = new Mapped::ConcentricWavePattern<SinFast>(columnMap)},
-              {.column = 2, .slot = 1, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
-              {.column = 2, .slot = 2, .pattern = new Mapped::ConcentricWavePattern<SinFast>(columnMap)},
+              {.column = 2, .slot = 0, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
+              {.column = 2, .slot = 1, .pattern = new FWF::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
+              {.column = 2, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
 
-              {.column = 3, .slot = 0, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
-              {.column = 3, .slot = 1, .pattern = new Mapped::ConcentricWavePattern<SinFast>(columnMap)},
-              {.column = 3, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
+              {.column = 3, .slot = 0, .pattern = new FWF::RibbenClivePattern<SoftSquare>(40000)},
+              {.column = 3, .slot = 1, .pattern = new FWF::RibbenClivePattern<SawDown>(500)},
+              {.column = 3, .slot = 2, .pattern = new FWF::RibbenClivePattern<SinFast>(3000)},
+
+              {.column = 4, .slot = 0, .pattern = new FWF::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
+              {.column = 4, .slot = 1, .pattern = new FWF::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
+              {.column = 4, .slot = 2, .pattern = new FWF::RibbenClivePattern<PWM>(10000,1,0.0025)},
+
+              {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
+              {.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(columnMap)},
+              {.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
           }),
       {480 * sizeof(RGBA),
        480 * sizeof(RGBA),
