@@ -1,15 +1,19 @@
 #include "colours.h"
 #include "core/distribution/inputs/inputSplitter.hpp"
 #include "core/distribution/outputs/monitorOutput.hpp"
+#include "core/distribution/outputs/monitorOutput3d.hpp"
 #include "core/distribution/pipes/convertPipe.hpp"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"
 #include "core/generation/pixelMap.hpp"
 #include "core/generation/patterns/mappedPatterns.h"
 #include "core/generation/pixelMapSplitter.hpp"
+#include "core/generation/pixelMapSplitter3d.hpp"
 #include "core/hyperion.hpp"
 #include "distribution/inputs/controlHubInput.hpp"
 #include "mapping/columnMap.hpp"
 #include "mapping/ledsterMap.hpp"
+#include "mapping/columnMap3d.hpp"
+#include "mapping/ledsterMap3d.hpp"
 #include "palettes.hpp"
 #include "patterns.hpp"
 #include "ledsterPatterns.hpp"
@@ -73,7 +77,7 @@ void addLedsterPipe(Hyperion *hyp)
               {.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(ledsterMap),},
               {.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
           }),
-      new MonitorOutput(ledsterMap));
+      new MonitorOutput3d(ledsterMap3d));
   hyp->addPipe(ledsterPipe);
 }
 
@@ -119,14 +123,14 @@ void addColumnPipes(Hyperion *hyp)
        480 * sizeof(RGBA)},
       true);
 
-  auto splitMap = PixelMapSplitter(
-      &columnMap, {480, 480, 480, 480, 480, 480});
+  auto splitMap = PixelMapSplitter3d(
+      &columnMap3d, {480, 480, 480, 480, 480, 480});
 
   for (int i = 0; i < splitInput->size(); i++)
   {
     auto pipe = new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(i),
-        new MonitorOutput(splitMap.getMap(i)));
+        new MonitorOutput3d(splitMap.getMap(i)));
     hyp->addPipe(pipe);
   }
 }

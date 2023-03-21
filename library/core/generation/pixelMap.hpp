@@ -70,3 +70,12 @@ public:
 };
 
 
+
+struct PixelPosition3d
+{
+    float x;
+    float y;
+    float z;
+};
+
+typedef std::vector<PixelPosition3d> PixelMap3d;
