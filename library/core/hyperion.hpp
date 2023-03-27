@@ -104,7 +104,6 @@ private:
 
     virtual void setup_midi()
     {
-        hub = ControlHub::fromGrid(8, 8);
         Midi::initialize();
         Midi::onDeviceCreatedDestroyed(
             [](MidiDevice *device, std::string name, void *userData)

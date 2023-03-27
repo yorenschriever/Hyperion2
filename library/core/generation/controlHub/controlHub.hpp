@@ -31,11 +31,12 @@ public:
 private:
     std::vector<Column> columns;
     std::vector<IHubController *> controllers;
+    const char* TAG = "CONTROL_HUB";
 
 public:
     void buttonPressed(int columnIndex, int slotIndex)
     {
-        // Log::info("CONTROLHUB", "button pressed %d %d", columnIndex, slotIndex);
+        // Log::info(TAG, "button pressed %d %d", columnIndex, slotIndex);
 
         auto slot = findSlot(columnIndex, slotIndex);
         if (slot == NULL)
@@ -47,7 +48,7 @@ public:
         else
             newValue = !slot->activated;
 
-        // Log::info("CONTROLHUB", "newvalue, slotactivated %d, %d", newValue, slot->activated);
+        // Log::info(TAG, "newvalue, slotactivated %d, %d", newValue, slot->activated);
 
         if (newValue != slot->activated)
         {
@@ -70,7 +71,7 @@ public:
 
             slot->activated = newValue;
 
-            // Log::info("CONTROLHUB", "onHubSlotActiveChange %d", controllers.size());
+            // Log::info(TAG, "onHubSlotActiveChange %d", controllers.size());
 
             for (auto controller : controllers)
                 controller->onHubSlotActiveChange(columnIndex, slotIndex, newValue);
@@ -120,6 +121,7 @@ public:
 
     void setVelocity(float velocity)
     {
+        // Log::info(TAG, "velocity %f", velocity);
         if (params.velocity == velocity)
             return;
 
@@ -189,19 +191,25 @@ public:
         controllers.erase(std::remove(controllers.begin(), controllers.end(), controller), controllers.end());
     }
 
-    static ControlHub fromGrid(unsigned int columns, unsigned int rows)
+    void expandTo(unsigned int minColumns, unsigned int minRows)
     {
-        auto result = ControlHub();
-        result.columns = std::vector<Column>(columns);
-        for (int i = 0; i < columns; i++)
+        for (int i = columns.size(); i <= minColumns; i++)
         {
-            result.columns.push_back(Column());
-            for (int j = 0; j < rows; j++)
+            columns.push_back(Column());
+            //Log::info(TAG,"added column. column size = %d", columns.size());
+        }
+
+        for (int i = 0; i < columns.size(); i++)
+        {
+            for (int j = columns[i].slots.size(); j <= minRows; j++)
             {
-                result.columns[i].slots.push_back(Slot());
+                columns[i].slots.push_back(Slot());
+                //Log::info(TAG,"added slot. columns.lots size = %d", columns[i].slots.size());
             }
         }
-        return result;
+
+        // for (int i = 0; i < columns.size(); i++)
+        //     Log::info(TAG,"column %d has %d slots", i, columns[i].slots.size());
     }
 
     Slot *findSlot(int columnIndex, int slotIndex) &
@@ -213,7 +221,7 @@ public:
         if (slotIndex < 0 || slotIndex > column->slots.size() - 1)
             return nullptr;
 
-        // Log::info("CONTROLHUB", "find slot %d %d", columns.size(), column->slots.size());
+        // Log::info(TAG, "find slot %d %d", columns.size(), column->slots.size());
 
         return &column->slots.data()[slotIndex];
     }

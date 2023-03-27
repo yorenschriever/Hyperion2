@@ -46,9 +46,11 @@ public:
             //todo alpha is already handled by the ControlHubInput, and therefore fixed at 255 here.
             //this param, and the alpha blending in the underlying patterns can be removed.
             255,
-            Tempo::GetProgress(4) * 1000,
+            //Tempo::GetProgress(4) * 1000,
+            Utils::millis()%1000,
             1000,
-            Tempo::GetBeatNumber(),
+            //Tempo::GetBeatNumber(),
+            Utils::millis() / 1000,
             updateCache
         );
 

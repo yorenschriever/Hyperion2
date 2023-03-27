@@ -40,6 +40,14 @@ public:
             Log::error("CONTROL_HUB_INPUT", "Unable to allocate memory for ControlHubInput, free heap = %d\n", Utils::get_free_heap());
             Utils::exit();
         }
+
+        //make sure the control hub is large enough to fit all the patterns.
+        //do this in reverse, because it is likely that the largest slot/column is passed last,
+        //so we only have to resize once
+        for (auto i = slotPatterns.rbegin(); i != slotPatterns.rend(); ++i ) 
+        { 
+            hub->expandTo(i->column, i->slot);
+        }
     }
 
     //simplified version of the constructor, where all patterns are added to a single column in the control hub

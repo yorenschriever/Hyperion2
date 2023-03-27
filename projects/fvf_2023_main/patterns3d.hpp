@@ -272,4 +272,42 @@ namespace FWF3D
             }
         }
     };
+
+    class ChevronsConePattern : public Pattern<RGBA>
+    {
+        PixelMap3d::Cylindrical map;
+        LFO<SawDown> lfo;
+        LFO<Square> lfoColour;
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        FadeDown fade1 = FadeDown(1400, WaitAtEnd);
+
+    public:
+        ChevronsConePattern(PixelMap3d map)
+        {
+            this->map = map.toCylindricalRotate90();
+            this->lfo = LFO<SawDown>(1000);
+            this->lfoColour = LFO<Square>(1000);
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            float amount = params->getIntensity(0.25,4);
+            lfo.setPeriod(params->getVelocity(2000,500));
+            lfoColour.setPeriod(params->getVariant(2000,500));
+
+            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            {
+                float conePos = 0.5 + (map[index].r - map[index].z) / 2;
+
+                float phase = conePos * amount; //(0.5 * abs(map[index].y) + map[index].x) * amount;
+                auto col = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
+                pixels[index] += col * lfo.getValue(phase) * transition.getValue();
+            }
+        }
+    };
 };

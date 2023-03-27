@@ -16,6 +16,7 @@
 #include "generation/patterns/helpers/palette.hpp"
 #include "ChaserLedAnimation.cpp"
 #include "ShapeChaserLedAnimation.cpp"
+#include "core/generation/patterns/helpers/tempo/constantTempo.h"
 
 void addLedShapes(Hyperion *hyp);
 
@@ -40,6 +41,9 @@ int main()
   auto hyp = new Hyperion();
 
   addLedShapes(hyp);
+
+  Tempo::AddSource(ConstantTempo::getInstance());
+  ConstantTempo::getInstance()->setBpm(120);
 
   hyp->start();
   while (1) Thread::sleep(1000);
