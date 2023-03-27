@@ -101,7 +101,7 @@ void Midi::midiTask(void *param)
 
 void Midi::createDevice(int in_index, int out_index, std::string name)
 {
-    Log::info("MIDI","Created device for %d,%d, %s", in_index,out_index,name.c_str());
+    Log::info("MIDI","Creating device for %d,%d, %s", in_index,out_index,name.c_str());
 
     auto midiDevice = new MidiDeviceMacos(in_index,out_index); 
 

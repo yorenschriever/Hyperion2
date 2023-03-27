@@ -84,7 +84,7 @@ public:
 
             //Log::info("CONTROL_HUB_INPUT", "calculating pattern active = %d, dim = %d ,masterDim = %d", slot->activated, column->dim, hub->masterDim);
 
-            slotPattern.pattern->Calculate(ledData, safeLength, slot->activated);
+            slotPattern.pattern->Calculate(ledData, safeLength, slot->activated, &hub->params);
 
             // apply dimming and copy to output buffer
             for (int i = 0; i < safeLength; i++)

@@ -24,7 +24,7 @@ public:
         this->palette = palette;
     }
 
-    inline void Calculate(RGBA *pixels, int width, bool active) override
+    inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
     {
         if (!active)
             return;
@@ -36,17 +36,19 @@ public:
             width,
             *(ledShapes),
 
-            //todo read those parameters from Params or midi inputs
             palette,
-            127,
-            64,
-            127,
-            64,
-            32,
+            params->velocity * 255,
+            params->amount * 255,
+            params->size * 255,
+            params->variant * 255,
+            params->offset * 255,
+
+            //todo alpha is already handled by the ControlHubInput, and therefore fixed at 255 here.
+            //this param, and the alpha blending in the underlying patterns can be removed.
             255,
-            Utils::millis() % 1000,
+            Tempo::GetProgress(4) * 1000,
             1000,
-            Utils::millis() / 1000,
+            Tempo::GetBeatNumber(),
             updateCache
         );
 

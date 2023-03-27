@@ -20,6 +20,7 @@ private:
 
     const int FADER0_CONTROLLER_NUMBER = 0; 
     const int MASTER_DIM_FADER_CONTROLLER_NUMBER = 23;
+    const int ROTARY0_CONTROLLER_NUMBER = 16;
 
     const std::vector<uint8_t> BUTTON_MAPPING = {
         32,33,34,35,36,37,38,39, 
@@ -55,17 +56,26 @@ public:
     {
         //Log::info(TAG, "onControllerChange %d %d", controller, value);
 
+        if (controller == ROTARY0_CONTROLLER_NUMBER)
+            return hub->setVelocity(scale127toFloat(value));
+        if (controller == ROTARY0_CONTROLLER_NUMBER+1)
+            return hub->setIntensity(scale127toFloat(value));
+        if (controller == ROTARY0_CONTROLLER_NUMBER+2)
+            return hub->setVariant(scale127toFloat(value));
+        if (controller == ROTARY0_CONTROLLER_NUMBER+3)
+            return hub->setSize(scale127toFloat(value));
+        if (controller == ROTARY0_CONTROLLER_NUMBER+4)
+            return hub->setOffset(scale127toFloat(value));
+        if (controller == ROTARY0_CONTROLLER_NUMBER+5)
+            return hub->setAmount(scale127toFloat(value));
+        //if (controller == ROTARY0_CONTROLLER_NUMBER+6)
+        //    todo palette
         if (controller == MASTER_DIM_FADER_CONTROLLER_NUMBER)
-        {
-            hub->setMasterDim(scale127to255(value));
-            return;
-        }
+            return hub->setMasterDim(scale127to255(value));
 
         int column = controller - FADER0_CONTROLLER_NUMBER;
-        if (column >= 0 && column < WIDTH){
-            hub->dim(column, scale127to255(value));
-            return;
-        }
+        if (column >= 0 && column < WIDTH)
+            return hub->dim(column, scale127to255(value));
 
         auto found = std::find(BUTTON_MAPPING.begin(), BUTTON_MAPPING.end(), controller);
         if (found != BUTTON_MAPPING.end()){
@@ -91,6 +101,12 @@ public:
     void onSystemRealtime(uint8_t message) override {}
     void onHubColumnDimChange(int columnIndex, uint8_t dim) override {}
     void onHubMasterDimChange(uint8_t dim) override {}
+    void onHubVelocityChange(float velocity) override {}
+    void onHubAmountChange(float amount) override {}
+    void onHubIntensityChange(float intensity) override {}
+    void onHubVariantChange(float variant) override {}
+    void onHubSizeChange(float size) override {}
+    void onHubOffsetChange(float offset) override {}
     void onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override {}
     void onNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) override {}
 };

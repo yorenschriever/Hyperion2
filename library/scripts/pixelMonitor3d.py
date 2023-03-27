@@ -39,8 +39,8 @@ def on_draw():
 def on_resize(width, height):
     window.viewport = (0, 0, *window.get_framebuffer_size())
     window.projection = Mat4.perspective_projection(window.aspect_ratio, z_near=0.1, z_far=255, fov=80)
-    # glViewport(0, 0, width, height)
-    glViewport(0, 0, width*2, height*2)
+    glViewport(0, 0, width, height)
+    # glViewport(0, 0, width*2, height*2)
     return pyglet.event.EVENT_HANDLED
 
 def update(dt):
@@ -50,7 +50,7 @@ def update(dt):
     frames = frames+1
     if (time - last_fps > 1):
         last_fps = time
-        print("fps",frames)
+        # print("fps",frames)
         frames=0
     
     updateLights()

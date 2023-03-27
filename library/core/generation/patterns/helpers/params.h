@@ -5,37 +5,38 @@
 class Params
 {
 public:
-    static RGBA getPrimaryColour() { return primaryColour; }
-    static RGBA getSecondaryColour() { return secondaryColour; }
-    static RGBA getHighlightColour() { return highlightColour; }
-    static float getVelocity(float start = 0, float end = 1) { return convert(start, end, velocity); }
-    static float getIntensity(float start = 0, float end = 1) { return convert(start, end, intensity); }
-    static float getVariant(float start = 0, float end = 1) { return convert(start, end, variant); }
+    RGBA getPrimaryColour() { return primaryColour; }
+    RGBA getSecondaryColour() { return secondaryColour; }
+    RGBA getHighlightColour() { return highlightColour; }
 
-    // static float getVelocityInv(float start = 0, float end = 1) { return convert(start, end, velocity); }
-    // static float getIntensityInv(float start = 0, float end = 1) { return convert(start, end, intensity); }
-    // static float getVariantInv(float start = 0, float end = 1) { return convert(start, end, variant); }
+    float getVelocity(float start = 0, float end = 1) { return convert(start, end, velocity); }
+    float getAmount(float start = 0, float end = 1) { return convert(start, end, amount); }
+    float getIntensity(float start = 0, float end = 1) { return convert(start, end, intensity); }
+    float getVariant(float start = 0, float end = 1) { return convert(start, end, variant); }
+    float getSize(float start = 0, float end = 1) { return convert(start, end, size); }
+    float getOffset(float start = 0, float end = 1) { return convert(start, end, offset); }
+    
+    RGBA primaryColour = RGB(255, 0, 0);
+    RGBA secondaryColour = RGB(0, 255, 0);
+    RGBA highlightColour = RGB(255, 255, 255);
+    Palette *palette = new Palette({
+        {.position = 0, .color = RGB(0, 0, 0)},        // Black
+        {.position = 128, .color = RGB(255, 0, 0)},    // Red
+        {.position = 224, .color = RGB(255, 255, 0)},  // Bright yellow
+        {.position = 255, .color = RGB(255, 255, 255)} // Full white
+    });
 
-    static RGBA primaryColour;
-    static RGBA secondaryColour;
-    static RGBA highlightColour;
-    static float velocity;
-    static float intensity;
-    static float variant;
-    static Palette *palette;
+    float velocity = 0.5;
+    float amount = 0.5;
+    float intensity = 0.5;
+    float variant = 0.5;
+    float size;
+    float offset = 0.5;
 
 private:
-    static float convert(float start, float end, float value)
+    float convert(float start, float end, float value)
     {
         float distance = end - start;
         return start + value * distance;
     }
 };
-
-RGBA Params::primaryColour = RGB(255, 0, 0);
-RGBA Params::secondaryColour = RGB(0, 255, 0);
-RGBA Params::highlightColour = RGB(0, 0, 255);
-float Params::velocity = 0.5;
-float Params::intensity = 0.5;
-float Params::variant = 0.5;
-Palette *Params::palette = nullptr; 

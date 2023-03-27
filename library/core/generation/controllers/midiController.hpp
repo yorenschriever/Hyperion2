@@ -14,4 +14,8 @@ protected:
         if (midiValue == 127) return 255;
         return midiValue * 2;
     }
+
+    inline float scale127toFloat(uint8_t midiValue){
+        return float(midiValue) / 127;
+    }
 };

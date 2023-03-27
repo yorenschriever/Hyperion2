@@ -29,7 +29,7 @@ namespace Mapped
             this->lfoColour = LFO<Square>(period / numColourWaves);
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
@@ -38,7 +38,7 @@ namespace Mapped
             {
                 float distance = std::abs(map[index].x) + std::abs(map[index].y);
                 float phase = (float)numWaves * distance;
-                RGBA colour = lfoColour.getValue(phase) ? Params::getSecondaryColour() : Params::getPrimaryColour();
+                RGBA colour = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 RGBA dimmedColour = colour * transition.getValue() * lfo.getValue(phase);
                 pixels[index] += dimmedColour;
             }
@@ -63,7 +63,7 @@ namespace Mapped
             // this->lfoColour = LFO<Square>(period / 2);
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
@@ -72,7 +72,7 @@ namespace Mapped
             {
                 // float distance = std::abs(map[index].x) + std::abs(map[index].y);
                 float phase = (map[index].x + 1) / 2.;
-                RGBA colour = Params::getSecondaryColour(); // lfoColour.getValue(phase) ? Params::getSecondaryColour() : Params::getPrimaryColour();
+                RGBA colour = params->getSecondaryColour(); // lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 RGBA dimmedColour = colour * transition.getValue() * lfo.getValue(phase);
                 pixels[index] += dimmedColour;
             }
@@ -98,7 +98,7 @@ namespace Mapped
             this->map = map;
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (active && !lastActive)
             {
@@ -119,7 +119,7 @@ namespace Mapped
                 if (l > 1)
                     l = 1;
 
-                pixels[index] += Params::getHighlightColour() * l;
+                pixels[index] += params->getHighlightColour() * l;
             }
         }
     };
@@ -143,14 +143,14 @@ namespace Mapped
                            { return (atan2(pos.y, pos.x) + M_PI) / (2 * M_PI); });
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
-                RGBA colour = Params::getSecondaryColour();
+                RGBA colour = params->getSecondaryColour();
                 float lfoVal = lfo.getValue(scaledAngles[index]);
                 RGBA dimmedColour = colour * transition.getValue() * lfoVal;
                 pixels[index] += dimmedColour;
@@ -171,7 +171,7 @@ namespace Mapped
             this->map = map;
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
@@ -179,7 +179,7 @@ namespace Mapped
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
                 float phase = (map[index].x + 1) / 2.;
-                RGBA colour = Params::getSecondaryColour() + Params::getPrimaryColour() * phase;
+                RGBA colour = params->getSecondaryColour() + params->getPrimaryColour() * phase;
                 RGBA dimmedColour = colour * transition.getValue();
                 pixels[index] += dimmedColour;
             }
@@ -205,14 +205,14 @@ namespace Mapped
             }
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
-                RGBA colour = (map[index].x + noise[index % maxNoiseMapSize] < 0) ? Params::getSecondaryColour() : Params::getPrimaryColour();
+                RGBA colour = (map[index].x + noise[index % maxNoiseMapSize] < 0) ? params->getSecondaryColour() : params->getPrimaryColour();
                 RGBA dimmedColour = colour * transition.getValue();
                 pixels[index] += dimmedColour;
             }
@@ -239,7 +239,7 @@ namespace Mapped
             this->lfo.setSkew(skew);
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
@@ -247,7 +247,7 @@ namespace Mapped
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
                 float phase = (map[index].x + map[index].y + 2) * numWaves;
-                RGBA colour = Params::getPrimaryColour() + Params::getSecondaryColour() * lfo.getValue(phase); 
+                RGBA colour = params->getPrimaryColour() + params->getSecondaryColour() * lfo.getValue(phase); 
                 RGBA dimmedColour = colour * transition.getValue();
                 pixels[index] += dimmedColour;
             }

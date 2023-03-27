@@ -25,6 +25,6 @@ public:
     //    (only if active is true)
     // width = number of pixels
     // active = is the pattern activated
-    virtual void Calculate(T_COLOUR *frameBuffer, int width, bool active){}
+    virtual void Calculate(T_COLOUR *frameBuffer, int width, bool active, Params *params){}
 };
 

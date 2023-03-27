@@ -16,17 +16,10 @@ LUT *PixelLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
 
 int main()
 {
-  Params::primaryColour = RGB(255, 0, 255);
-  Params::secondaryColour = RGB(250, 210, 0);
-  // Params::intensity = 1;
-  // Params::variant= 0.7;
-  // Params::velocity = 0.8;
-
-  Params::intensity = 0.5;
-  Params::variant = 0.5;
-  Params::velocity = 0.5;
-
   auto hyp = new Hyperion();
+
+  hyp->hub.params.primaryColour = RGB(255, 0, 255);
+  hyp->hub.params.secondaryColour = RGB(250, 210, 0);
 
   addLedsterPipe(hyp);
 

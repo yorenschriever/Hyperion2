@@ -28,12 +28,12 @@ namespace FWF3D
             this->perm = Permute(map.size());
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
 
-            fade.duration = Params::getIntensity(500, 100);
+            fade.duration = params->getIntensity(500, 100);
 
             // timeline.FrameStart();
             // if (timeline.Happened(0))
@@ -43,9 +43,9 @@ namespace FWF3D
                 perm.permute();
             }
 
-            float velocity = Params::getVelocity(600, 100);
-            // float trail = Params::getIntensity(0,1) * density;
-            // float trail = Params::getIntensity(0, 200);
+            float velocity = params->getVelocity(600, 100);
+            // float trail = params->getIntensity(0,1) * density;
+            // float trail = params->getIntensity(0, 200);
 
             for (int i = 0; i < map.size(); i++)
             {
@@ -67,7 +67,7 @@ namespace FWF3D
                 float conePos = 0.5 + (map[i].r - map[i].z) / 2;
 
                 float fadePosition = fade.getValue(conePos * velocity);
-                RGBA color = Params::palette->get(fadePosition * 255);
+                RGBA color = params->palette->get(fadePosition * 255);
                 pixels[i] = color * fadePosition * (1.5 - map[i].r) * transition.getValue();
             }
         }
@@ -88,7 +88,7 @@ namespace FWF3D
             this->map = map.toCylindricalRotate90();
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
@@ -100,8 +100,8 @@ namespace FWF3D
             }
 
             // float density = 481./width;
-            float velocity = Params::getVelocity(200, 30);
-            // float trail = Params::getIntensity(0, 200);
+            float velocity = params->getVelocity(200, 30);
+            // float trail = params->getIntensity(0, 200);
 
             for (int i = 0; i < map.size(); i++)
             {
@@ -110,7 +110,7 @@ namespace FWF3D
                 //     fade.duration *= perm.at[i] * 4 / (density * map.size()/ 10);
 
                 float fadePosition = fade.getValue(abs(map[i].th) * velocity);
-                RGBA color = Params::palette->get(255 - abs(map[i].th) / M_PI * 255);
+                RGBA color = params->palette->get(255 - abs(map[i].th) / M_PI * 255);
                 pixels[i] = color * fadePosition * (map[i].r * 1.5) * transition.getValue();
                 ;
             }
@@ -141,10 +141,10 @@ namespace FWF3D
             this->perm = Permute(map.size());
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             for (int i = 0; i < 6; i++)
-                fade[i].duration = Params::getIntensity(3000, 100);
+                fade[i].duration = params->getIntensity(3000, 100);
 
             if (!transition.Calculate(active))
                 return;
@@ -155,7 +155,7 @@ namespace FWF3D
                 fade[pos].reset();
             }
 
-            float velocity = Params::getVelocity(600, 100);
+            float velocity = params->getVelocity(600, 100);
             float density = 481. / width;
 
             for (int column = 0; column < 6; column++)
@@ -170,8 +170,8 @@ namespace FWF3D
                     float conePos = 0.5 - (map[i].r - map[i].z) / 2;
 
                     float fadePosition = fade[column].getValue(conePos * velocity);
-                    // RGBA color = Params::palette->get(fadePosition * 255);
-                    RGBA color = Params::palette->get((1 - map[i].z) * 255);
+                    // RGBA color = params->palette->get(fadePosition * 255);
+                    RGBA color = params->palette->get((1 - map[i].z) * 255);
                     pixels[i] = color * fadePosition * (1 - map[i].z) * transition.getValue();
                 }
             }
@@ -212,7 +212,7 @@ namespace FWF3D
             this->perm = Permute(map.size());
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
@@ -223,7 +223,7 @@ namespace FWF3D
                 fade[pos].reset();
             }
 
-            float velocity = 200; //Params::getVelocity(600, 100);
+            float velocity = 200; //params->getVelocity(600, 100);
             // float density = 481./width;
 
             for (int i = 0; i < width; i++)
@@ -231,7 +231,7 @@ namespace FWF3D
                 for (int column = 0; column < 6; column++)
                 {
                     float fadePosition = fade[column].getValue(radii[column][i] * velocity);
-                    RGBA color = Params::getPrimaryColour(); //::palette->get(fadePosition * 255);
+                    RGBA color = params->getPrimaryColour(); //::palette->get(fadePosition * 255);
                     pixels[i] += color * fadePosition; // * transition.getValue();
                 }
             }
@@ -253,7 +253,7 @@ namespace FWF3D
             this->map = map;
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!active && fade.getPhase() ==1)
                 return;
@@ -261,13 +261,13 @@ namespace FWF3D
             if (watcher.Triggered())
                 fade.reset();
 
-            float velocity = 100; //Params::getVelocity(600, 100);
+            float velocity = 100; //params->getVelocity(600, 100);
             // float density = 481./width;
 
             for (int i = 0; i < width; i++)
             {
                 float fadePosition = fade.getValue((1+map[i].z) * velocity);
-                RGBA color = Params::getHighlightColour(); 
+                RGBA color = params->getHighlightColour(); 
                 pixels[i] += color * fadePosition; // * transition.getValue();
             }
         }

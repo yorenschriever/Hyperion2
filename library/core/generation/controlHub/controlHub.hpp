@@ -3,8 +3,8 @@
 #include "IHubController.hpp"
 #include "log.hpp"
 #include "stdint.h"
+#include <algorithm>
 #include <vector>
-#include <algorithm> 
 
 class ControlHub
 {
@@ -26,6 +26,8 @@ public:
     };
 
     uint8_t masterDim = 255;
+    Params params;
+
 private:
     std::vector<Column> columns;
     std::vector<IHubController *> controllers;
@@ -33,7 +35,7 @@ private:
 public:
     void buttonPressed(int columnIndex, int slotIndex)
     {
-        //Log::info("CONTROLHUB", "button pressed %d %d", columnIndex, slotIndex);
+        // Log::info("CONTROLHUB", "button pressed %d %d", columnIndex, slotIndex);
 
         auto slot = findSlot(columnIndex, slotIndex);
         if (slot == NULL)
@@ -45,21 +47,21 @@ public:
         else
             newValue = !slot->activated;
 
-        //Log::info("CONTROLHUB", "newvalue, slotactivated %d, %d", newValue, slot->activated);
+        // Log::info("CONTROLHUB", "newvalue, slotactivated %d, %d", newValue, slot->activated);
 
         if (newValue != slot->activated)
         {
             if (slot->releaseColumn)
             {
-                int slot_off_index=0;
-                //for(auto slot_off : findColumn(columnIndex)->slots.data()){
+                int slot_off_index = 0;
+                // for(auto slot_off : findColumn(columnIndex)->slots.data()){
                 auto column = findColumn(columnIndex);
                 for (auto slot_it = column->slots.begin(); slot_it < column->slots.end(); ++slot_it)
                 {
                     if (slot_it->activated)
                     {
                         slot_it->activated = false;
-                        int slotIndex = std::distance(column->slots.begin(),slot_it);
+                        int slotIndex = std::distance(column->slots.begin(), slot_it);
                         for (auto controller : controllers)
                             controller->onHubSlotActiveChange(columnIndex, slotIndex, false);
                     }
@@ -68,7 +70,7 @@ public:
 
             slot->activated = newValue;
 
-            //Log::info("CONTROLHUB", "onHubSlotActiveChange %d", controllers.size());
+            // Log::info("CONTROLHUB", "onHubSlotActiveChange %d", controllers.size());
 
             for (auto controller : controllers)
                 controller->onHubSlotActiveChange(columnIndex, slotIndex, newValue);
@@ -116,6 +118,67 @@ public:
             controller->onHubMasterDimChange(value);
     }
 
+    void setVelocity(float velocity)
+    {
+        if (params.velocity == velocity)
+            return;
+
+        params.velocity = velocity;
+
+        for (auto controller : controllers)
+            controller->onHubVelocityChange(velocity);
+    }
+    void setAmount(float amount)
+    {
+        if (params.amount == amount)
+            return;
+
+        params.amount = amount;
+
+        for (auto controller : controllers)
+            controller->onHubAmountChange(amount);
+    }
+    void setIntensity(float intensity)
+    {
+        if (params.intensity == intensity)
+            return;
+
+        params.intensity = intensity;
+
+        for (auto controller : controllers)
+            controller->onHubIntensityChange(intensity);
+    }
+    void setVariant(float variant)
+    {
+        if (params.variant == variant)
+            return;
+
+        params.variant = variant;
+
+        for (auto controller : controllers)
+            controller->onHubVariantChange(variant);
+    }
+    void setSize(float size)
+    {
+        if (params.size == size)
+            return;
+
+        params.size = size;
+
+        for (auto controller : controllers)
+            controller->onHubSizeChange(size);
+    }
+    void setOffset(float offset)
+    {
+        if (params.offset == offset)
+            return;
+
+        params.offset = offset;
+
+        for (auto controller : controllers)
+            controller->onHubOffsetChange(offset);
+    }
+
     void subscribe(IHubController *controller)
     {
         controllers.push_back(controller);
@@ -150,18 +213,19 @@ public:
         if (slotIndex < 0 || slotIndex > column->slots.size() - 1)
             return nullptr;
 
-        //Log::info("CONTROLHUB", "find slot %d %d", columns.size(), column->slots.size());
+        // Log::info("CONTROLHUB", "find slot %d %d", columns.size(), column->slots.size());
 
         return &column->slots.data()[slotIndex];
     }
 
-    Column *findColumn(int columnIndex) & {
+    Column *findColumn(int columnIndex) &
+    {
         if (columnIndex < 0 || columnIndex > columns.size() - 1)
             return nullptr;
         return &columns.data()[columnIndex];
     }
 
-    Slot *findSlot(Column * column, int slotIndex) &
+    Slot *findSlot(Column *column, int slotIndex) &
     {
         if (slotIndex < 0 || slotIndex > column->slots.size() - 1)
             return nullptr;

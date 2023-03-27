@@ -28,12 +28,12 @@ namespace FWF
             this->perm = Permute(map.size());
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
 
-            fade.duration = Params::getIntensity(500, 100);
+            fade.duration = params->getIntensity(500, 100);
 
             // timeline.FrameStart();
             // if (timeline.Happened(0))
@@ -43,9 +43,9 @@ namespace FWF
                 perm.permute();
             }
 
-            float velocity = Params::getVelocity(600, 100);
-            // float trail = Params::getIntensity(0,1) * density;
-            //float trail = Params::getIntensity(0, 200);
+            float velocity = params->getVelocity(600, 100);
+            // float trail = params->getIntensity(0,1) * density;
+            //float trail = params->getIntensity(0, 200);
 
             for (int i = 0; i < map.size(); i++)
             {
@@ -62,7 +62,7 @@ namespace FWF
                     fade.duration *= perm.at[i] * 4 / (density * map.size() / 10);
 
                 float fadePosition = fade.getValue(map[i].r * velocity);
-                RGBA color = Params::palette->get(fadePosition * 255);
+                RGBA color = params->palette->get(fadePosition * 255);
                 pixels[i] = color * fadePosition * (1.5 - map[i].r) * transition.getValue();
             }
         }
@@ -81,14 +81,14 @@ namespace FWF
             this->map = map;
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
-                RGBA colour = Params::palette->get(255 - map[index].r * 255);
+                RGBA colour = params->palette->get(255 - map[index].r * 255);
                 pixels[index] = colour * transition.getValue();
             }
         }
@@ -110,7 +110,7 @@ namespace FWF
             this->map = map;
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
@@ -122,8 +122,8 @@ namespace FWF
             }
 
             //float density = 481./width;
-            float velocity = Params::getVelocity(200, 30);
-            //float trail = Params::getIntensity(0, 200);
+            float velocity = params->getVelocity(200, 30);
+            //float trail = params->getIntensity(0, 200);
 
             for (int i = 0; i < map.size(); i++)
             {
@@ -132,7 +132,7 @@ namespace FWF
                 //     fade.duration *= perm.at[i] * 4 / (density * map.size()/ 10);
 
                 float fadePosition = fade.getValue(abs(map[i].th) * velocity);
-                RGBA color = Params::palette->get(255 - abs(map[i].th) / M_PI * 255);
+                RGBA color = params->palette->get(255 - abs(map[i].th) / M_PI * 255);
                 pixels[i] = color * fadePosition * (map[i].r * 1.5) * transition.getValue();;
             }
         }
@@ -145,14 +145,14 @@ namespace FWF
         Transition transition;
 
     public:
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
             //float density = 481./width;
             int density2 = width/481;
-            lfo.setPeriod(Params::getVelocity(10000,500));
+            lfo.setPeriod(params->getVelocity(10000,500));
             lfo.setPulseWidth(0.1);
             perm.setSize(width);
 
@@ -160,7 +160,7 @@ namespace FWF
             {
                 if (index % density2 != 0)
                    continue;
-                pixels[perm.at[index]] = Params::getHighlightColour() * lfo.getValue(float(index)/width) * transition.getValue(index, width);
+                pixels[perm.at[index]] = params->getHighlightColour() * lfo.getValue(float(index)/width) * transition.getValue(index, width);
             }
         }
     };
@@ -181,7 +181,7 @@ namespace FWF
             this->map = map;
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
                 return;
@@ -191,8 +191,8 @@ namespace FWF
             //if (timeline.Happened(0))
                 perm.permute();
 
-            int threshold = Params::getIntensity(width * 0.01, width * 0.2);
-            int numSquares = Params::getVariant(2,9);
+            int threshold = params->getIntensity(width * 0.01, width * 0.2);
+            int numSquares = params->getVariant(2,9);
 
             for (int index = 0; index < width; index++)
             {
@@ -201,7 +201,7 @@ namespace FWF
                 int square = xquantized + yquantized * numSquares;
                 if (perm.at[square] > threshold / numSquares )
                     continue;
-                pixels[index] += Params::getHighlightColour() * transition.getValue();
+                pixels[index] += params->getHighlightColour() * transition.getValue();
             }
         }
     };
@@ -217,7 +217,7 @@ namespace FWF
             this->map = map;
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!active)
             {
@@ -225,8 +225,8 @@ namespace FWF
                 return;
             }
 
-            RGBA col = Utils::millis() % 100 < 25 ? Params::getPrimaryColour() : RGBA();
-            int directionUp = Params::getVariant() > 0.5;
+            RGBA col = Utils::millis() % 100 < 25 ? params->getPrimaryColour() : RGBA();
+            int directionUp = params->getVariant() > 0.5;
 
             for (int i = 0; i < map.size(); i++)
             {
@@ -258,7 +258,7 @@ namespace FWF
             this->lfo.setPulseWidth(pulsewidth);
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!active)
                 return;
@@ -270,7 +270,7 @@ namespace FWF
             for (int ribbe = 0; ribbe < numSegments; ribbe++)
             {
                 int interval = averagePeriod + perm.at[ribbe] * (averagePeriod * precision) / numSegments;
-                RGBA col = Params::getPrimaryColour() * lfo.getValue(0, interval);
+                RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval);
                 for (int j = 0; j < segmentSize; j++)
                 {
                     pixels[ribbe * segmentSize + j] = col;
@@ -286,7 +286,7 @@ namespace FWF
         FadeDown fade = FadeDown(2400, WaitAtEnd);
 
     public:
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!active)
                 return;
@@ -303,13 +303,13 @@ namespace FWF
 
 
             
-            fade.duration = Params::getVelocity(2500,100);
+            fade.duration = params->getVelocity(2500,100);
 
-            int numVisible = Params::getIntensity(1,numSegments);
+            int numVisible = params->getIntensity(1,numSegments);
 
             for (int ribbe = 0; ribbe < numVisible; ribbe++)
             {
-                RGBA col = Params::getHighlightColour() * fade.getValue();
+                RGBA col = params->getHighlightColour() * fade.getValue();
                 if (isLedster)
                     for (int j = 0; j < segmentSize; j++)
                         pixels[Ledster::ribben[perm.at[ribbe]][j]] += col;
@@ -326,7 +326,7 @@ namespace FWF
         LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(1000);
 
     public:
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!active)
                return;
@@ -341,7 +341,7 @@ namespace FWF
             for (int segment = 0; segment < numSegments; segment++)
             {
                 int randomSegment = perm.at[segment];
-                RGBA col = Params::getPrimaryColour() * lfo.getValue(float(randomSegment)/numSegments);
+                RGBA col = params->getPrimaryColour() * lfo.getValue(float(randomSegment)/numSegments);
                 for (int j = 0; j < segmentSize; j++)
                     if (isLedster)
                         pixels[Ledster::ribben[segment][j]] += col;
@@ -360,7 +360,7 @@ namespace FWF
 
 
     public:
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!active)
                return;
@@ -395,7 +395,7 @@ namespace FWF
                 //int randomSegment = perm.at[segment];
                 
                 for (int j = 0; j < segmentSize; j++) {
-                    RGBA col = Params::getPrimaryColour() * fade.getValue(float(j)*10);
+                    RGBA col = params->getPrimaryColour() * fade.getValue(float(j)*10);
                     if (isLedster)
                         pixels[Ledster::ribben[segment][j]] += col;
                     else
@@ -416,7 +416,7 @@ namespace FWF
 
 
     public:
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!active)
                return;
@@ -443,7 +443,7 @@ namespace FWF
                 
                 for (int j = 0; j < segmentSize; j++) {
                     float lfoVal = lfo.getValue(float(j)/lfoWidth + float(randomSegment)/numSegments+float(segment));
-                    RGBA col = Params::palette->get(lfoVal * 255) * lfoVal;
+                    RGBA col = params->palette->get(lfoVal * 255) * lfoVal;
                     if (isLedster)
                         pixels[Ledster::ribben[segment][j]] += col;
                     else
@@ -471,10 +471,10 @@ namespace FWF
         int pos = 0;
 
     public:
-        inline void Calculate(RGBA *pixels, int width, bool active) override
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             for(int i=0;i<6;i++) 
-                fade[i].duration = Params::getIntensity(3000, 100);
+                fade[i].duration = params->getIntensity(3000, 100);
 
             if (!transition.Calculate(active))
                 return;
@@ -489,7 +489,7 @@ namespace FWF
             {
                 int columnStart = column * width / 6;
                 int columnEnd = columnStart + width / 6;
-                RGBA col = Params::getPrimaryColour() * fade[column].getValue() * transition.getValue();
+                RGBA col = params->getPrimaryColour() * fade[column].getValue() * transition.getValue();
                 for (int j = columnStart; j < columnEnd; j++)
                     pixels[j] = col;
             }
