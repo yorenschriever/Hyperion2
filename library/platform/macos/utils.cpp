@@ -24,6 +24,11 @@ int Utils::random(int minimum, int maximum)
     return minimum + (rand() % (maximum - minimum));
 }
 
+float Utils::random_f()
+{
+    return float(rand())/RAND_MAX;
+}
+
 int Utils::get_free_heap()
 {
     return 0;

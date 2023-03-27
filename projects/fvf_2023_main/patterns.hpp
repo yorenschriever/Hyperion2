@@ -319,4 +319,183 @@ namespace FWF
             }
         }
     };
+
+    class RibbenFadePattern : public Pattern<RGBA>
+    {
+        Permute perm;
+        LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(1000);
+
+    public:
+        inline void Calculate(RGBA *pixels, int width, bool active) override
+        {
+            if (!active)
+               return;
+
+            bool isLedster = width == 481;
+            int segmentSize = isLedster ? 10 : 60;
+            int numSegments = isLedster ? 36 : width/segmentSize;
+
+            perm.setSize(numSegments);
+            lfo.setPulseWidth(0.15);
+
+            for (int segment = 0; segment < numSegments; segment++)
+            {
+                int randomSegment = perm.at[segment];
+                RGBA col = Params::getPrimaryColour() * lfo.getValue(float(randomSegment)/numSegments);
+                for (int j = 0; j < segmentSize; j++)
+                    if (isLedster)
+                        pixels[Ledster::ribben[segment][j]] += col;
+                    else
+                        pixels[segment * segmentSize + j] = col;
+            }
+        }
+    };
+
+    class SegmentChasePatternWITHFADE : public Pattern<RGBA>
+    {
+        Permute perm;
+        //LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(5000);
+        //LFO<PWM> segmentOnLfo = LFO<PWM>(200000);
+        std::vector<FadeDown> fades;
+
+
+    public:
+        inline void Calculate(RGBA *pixels, int width, bool active) override
+        {
+            if (!active)
+               return;
+
+            bool isLedster = width == 481;
+            int segmentSize = isLedster ? 10 : 60;
+            int numSegments = isLedster ? 36 : width/segmentSize;\
+            float density = 481./width;
+
+            if (fades.size() ==0){
+                for (int segment = 0; segment < numSegments; segment++){
+                    fades.push_back(FadeDown(1000,WaitAtEnd));
+                }
+            }
+            perm.setSize(numSegments);
+
+            // float amount = 0;
+            // float lfoWidth = segmentSize + amount * width;
+            // lfo.setPeriod(1000 + 1000*amount*numSegments);
+            // float pulseWidth = 1;
+            // lfo.setPulseWidth(pulseWidth / (1+amount * numSegments));
+
+            if (Utils::random_f() < 0.5){
+                fades[Utils::random(0,fades.size())].reset();
+            }
+
+            // lfo.setPulseWidth(1);
+
+            for (int segment = 0; segment < numSegments; segment++)
+            {
+                FadeDown fade = fades[segment];
+                //int randomSegment = perm.at[segment];
+                
+                for (int j = 0; j < segmentSize; j++) {
+                    RGBA col = Params::getPrimaryColour() * fade.getValue(float(j)*10);
+                    if (isLedster)
+                        pixels[Ledster::ribben[segment][j]] += col;
+                    else
+                        pixels[segment * segmentSize + j] = col;
+                }
+            }
+
+
+        }
+    };
+
+    class SegmentChasePattern : public Pattern<RGBA>
+    {
+        Permute perm;
+        LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(5000);
+        //LFO<PWM> segmentOnLfo = LFO<PWM>(200000);
+        //std::vector<FadeDown> fades;
+
+
+    public:
+        inline void Calculate(RGBA *pixels, int width, bool active) override
+        {
+            if (!active)
+               return;
+
+            bool isLedster = width == 481;
+            int segmentSize = isLedster ? 10 : 60;
+            int numSegments = isLedster ? 36 : width/segmentSize;
+
+            perm.setSize(numSegments);
+
+            float pulseWidth = 0.5;
+            float factor = 10; //1-50;
+            lfo.setPeriod(500 * factor);
+            lfo.setPulseWidth(pulseWidth /factor);
+            float lfoWidth = segmentSize * factor;
+
+
+
+            for (int segment = 0; segment < numSegments; segment++)
+            {
+                int randomSegment = perm.at[segment];
+                int direction = segment % 2 == 0;
+                //todo direction
+                
+                for (int j = 0; j < segmentSize; j++) {
+                    float lfoVal = lfo.getValue(float(j)/lfoWidth + float(randomSegment)/numSegments+float(segment));
+                    RGBA col = Params::palette->get(lfoVal * 255) * lfoVal;
+                    if (isLedster)
+                        pixels[Ledster::ribben[segment][j]] += col;
+                    else
+                        pixels[segment * segmentSize + j] = col;
+                }
+            }
+
+
+        }
+    };
+
+    class OnBeatColumnFadePattern : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        FadeDown fade[6] = {
+            FadeDown(1400, WaitAtEnd),
+            FadeDown(1400, WaitAtEnd),
+            FadeDown(1400, WaitAtEnd),
+            FadeDown(1400, WaitAtEnd),
+            FadeDown(1400, WaitAtEnd),
+            FadeDown(1400, WaitAtEnd)};
+        BeatWatcher watcher = BeatWatcher();
+        int pos = 0;
+
+    public:
+        inline void Calculate(RGBA *pixels, int width, bool active) override
+        {
+            for(int i=0;i<6;i++) 
+                fade[i].duration = Params::getIntensity(3000, 100);
+
+            if (!transition.Calculate(active))
+                return;
+
+            if (watcher.Triggered())
+            {
+                pos = (pos + 1) % 6;
+                fade[pos].reset();
+            }
+
+            for (int column = 0; column < 6; column++)
+            {
+                int columnStart = column * width / 6;
+                int columnEnd = columnStart + width / 6;
+                RGBA col = Params::getPrimaryColour() * fade[column].getValue() * transition.getValue();
+                for (int j = columnStart; j < columnEnd; j++)
+                    pixels[j] = col;
+            }
+        }
+    };
+
 };
+
+

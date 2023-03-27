@@ -36,6 +36,8 @@ def column(angle):
     line(x+0.15,   y,      0.4,    90,  0 , angle)
     line(x-0.15,   y,      0.4,    -90, 0 , angle)
 
+    # line(x-0.35,   y-0.35,      0.55,    -90, -45 , angle)
+
     # # # V
     # line(x,   y,   22-90 , angle)
     # line(x,   y,  -22-90 , angle)
