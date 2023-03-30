@@ -3,6 +3,8 @@
 #include "core/distribution/inputs/patternInput.hpp"
 #include "core/distribution/outputs/monitorOutput.hpp"
 #include "core/distribution/outputs/monitorOutput3d.hpp"
+#include "core/distribution/outputs/udpOutput.hpp"
+#include "core/distribution/outputs/cloneOutput.hpp"
 #include "core/distribution/pipes/convertPipe.hpp"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"
 #include "core/generation/pixelMap.hpp"
@@ -16,6 +18,7 @@
 #include "mapping/ledsterMap.hpp"
 #include "mapping/columnMap3d.hpp"
 #include "mapping/ledsterMap3d.hpp"
+#include "mapping/haloMap3d.hpp"
 #include "palettes.hpp"
 #include "patterns.hpp"
 #include "patterns3d.hpp"
@@ -27,6 +30,7 @@ auto pColumnMap = columnMap.toPolarRotate90();
 
 void addLedsterPipe(Hyperion *hyp);
 void addColumnPipes(Hyperion *hyp);
+void addHaloPipe(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
 
 int main()
@@ -40,6 +44,7 @@ int main()
 
   addColumnPipes(hyp);
   addLedsterPipe(hyp);
+  addHaloPipe(hyp);
   addPaletteColumn(hyp);
 
   Tempo::AddSource(ConstantTempo::getInstance());
@@ -115,7 +120,10 @@ void addLedsterPipe(Hyperion *hyp)
               //{.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(ledsterMap3d)},
           }),
       //new PatternInput<RGBA>(ledsterMap3d.size(), ledsterPattern),
-      new MonitorOutput3d(ledsterMap3d));
+      new CloneOutput({
+        new MonitorOutput3d(ledsterMap3d),
+        new UDPOutput("hyperslave1.local",9611,60)
+      }));
   hyp->addPipe(ledsterPipe);
 }
 
@@ -181,6 +189,50 @@ void addColumnPipes(Hyperion *hyp)
         new MonitorOutput3d(splitMap.getMap(i)));
     hyp->addPipe(pipe);
   }
+}
+
+void addHaloPipe(Hyperion *hyp)
+{
+  auto haloPipe = new ConvertPipe<RGBA, RGB>(
+      new ControlHubInput<RGBA>(
+          ledsterMap.size(),
+          &hyp->hub,
+          {
+              {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(haloMap3d)},
+              {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(haloMap3d)},
+              {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
+
+              //{.column = 1, .slot = 0, .pattern = new FWF::SquareGlitchPattern(haloMap3d)},
+              //{.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(haloMap3d)},
+              //{.column = 1, .slot = 2, .pattern = new Ledster::RadialFadePattern(haloMap3d)},
+
+              {.column = 2, .slot = 0, .pattern = new Ledster::ClivePattern<SinFast>(10000)},
+              {.column = 2, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
+              {.column = 2, .slot = 2, .pattern = new Ledster::SnakePattern()},
+
+              {.column = 3, .slot = 0, .pattern = new Ledster::RibbenClivePattern<SoftSquare>(40000)},
+              {.column = 3, .slot = 1, .pattern = new Ledster::RibbenClivePattern<SawDown>(500)},
+              {.column = 3, .slot = 2, .pattern = new Ledster::RibbenClivePattern<SinFast>(3000)},
+
+              {.column = 4, .slot = 0, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
+              {.column = 4, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
+              {.column = 4, .slot = 2, .pattern = new Ledster::RibbenClivePattern<PWM>(10000,1,0.0025)},
+
+              {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
+              //{.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(ledsterMap)},
+              {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(haloMap3d)},
+              //{.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
+
+              {.column = 6, .slot = 0, .pattern = new FWF::RibbenFadePattern()},
+              {.column = 6, .slot = 1, .pattern = new FWF::SegmentChasePattern()},
+              //{.column = 6, .slot = 2, .pattern = new FWF::OnBeatColumnFadePattern()},
+
+              //{.column = 7, .slot = 0, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(ledsterMap3d)},
+              //{.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(ledsterMap3d)},
+              //{.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(ledsterMap3d)},
+          }),
+      new MonitorOutput3d(haloMap3d));
+  hyp->addPipe(haloPipe);
 }
 
 void addPaletteColumn(Hyperion *hyp){

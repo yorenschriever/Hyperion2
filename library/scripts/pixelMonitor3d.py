@@ -34,7 +34,10 @@ def on_draw():
     window.clear()
     batch.draw()
 
-ortho = False
+# far = True
+# top = True
+# rotate = False
+far = False
 top = False
 rotate = True
 gridz = -0.45
@@ -43,10 +46,10 @@ gridz = -0.45
 def on_resize(width, height):
     window.viewport = (0, 0, *window.get_framebuffer_size())
 
-    fov = 5 if ortho else 80
+    fov = 5 if far else 80
     window.projection = Mat4.perspective_projection(window.aspect_ratio, z_near=0.1, z_far=255, fov=fov)
-    # glViewport(0, 0, width, height)
-    glViewport(0, 0, width*2, height*2)
+    glViewport(0, 0, width, height)
+    # glViewport(0, 0, width*2, height*2)
     return pyglet.event.EVENT_HANDLED
 
 def update(dt):
@@ -66,7 +69,7 @@ def update(dt):
 
     # i apply the vector to the grid only, but everything in the batch rotates with it.
     # i dont know why. but this is what i want, so why bother 
-    distance = -20 if ortho else -1.8
+    distance = -25 if far else -1.8
     grid_model.matrix = Mat4.from_translation((0, 0, distance)) @rot_z @ rot_y
 
 def setup():
