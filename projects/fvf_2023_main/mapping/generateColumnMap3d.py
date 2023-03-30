@@ -3,7 +3,7 @@ import json
 
 points = []
 scale = 1
-pitch = 0.006
+pitch = 0.00476
 
 def line(x_start,y_start,z_start,theta, phi,globalPhi):
     a = globalPhi/360*2*pi
@@ -23,18 +23,25 @@ def column(angle):
     y = 1 
     x = 0 
 
+    lengte = 60*pitch
+    hoogtekraaienpoot = lengte * cos(30 / 360 * 2*pi)
+    hoogteSter = 0.45
+
+    # print ("bottom",hoogteSter-hoogtekraaienpoot-2*lengte)
+
     #3 staande
-    line(x,   y,      0,      0,0 , angle)
-    line(x,   y+0.05,-0.2,  0,0 , angle)
-    line(x,   y,      -0.4,   0,0 , angle)
+    line(x,   y,      hoogteSter-hoogtekraaienpoot-2*lengte,      0,0 , angle)
+    line(x,   y+0.05, hoogteSter-hoogtekraaienpoot-1.5*lengte,  0,0 , angle)
+    line(x,   y,      hoogteSter-hoogtekraaienpoot-1*lengte,   0,0 , angle)
     
     #kraaienpoot
-    line(x,   y,      0.4,    45, 90+45 , angle)
-    line(x,   y,      0.4,    45, 90    ,  angle)
-    line(x,   y,      0.4,    45, 90-45 , angle)
+    line(x,   y,      hoogteSter-hoogtekraaienpoot,    45, 90+45 , angle)
+    line(x,   y,      hoogteSter-hoogtekraaienpoot,    45, 90    ,  angle)
+    line(x,   y,      hoogteSter-hoogtekraaienpoot,    45, 90-45 , angle)
 
-    line(x+0.15,   y,      0.4,    90,  0 , angle)
-    line(x-0.15,   y,      0.4,    -90, 0 , angle)
+    #horizontaal
+    line(x+0.27,   y,      hoogteSter,    90,  0 , angle)
+    line(x-0.27,   y,      hoogteSter,    -90, 0 , angle)
 
     # line(x-0.35,   y-0.35,      0.55,    -90, -45 , angle)
 

@@ -34,13 +34,19 @@ def on_draw():
     window.clear()
     batch.draw()
 
+ortho = False
+top = False
+rotate = True
+gridz = -0.45
 
 @window.event
 def on_resize(width, height):
     window.viewport = (0, 0, *window.get_framebuffer_size())
-    window.projection = Mat4.perspective_projection(window.aspect_ratio, z_near=0.1, z_far=255, fov=80)
-    glViewport(0, 0, width, height)
-    # glViewport(0, 0, width*2, height*2)
+
+    fov = 5 if ortho else 80
+    window.projection = Mat4.perspective_projection(window.aspect_ratio, z_near=0.1, z_far=255, fov=fov)
+    # glViewport(0, 0, width, height)
+    glViewport(0, 0, width*2, height*2)
     return pyglet.event.EVENT_HANDLED
 
 def update(dt):
@@ -55,11 +61,13 @@ def update(dt):
     
     updateLights()
 
-    rot_y = Mat4.from_rotation(time/8, Vec3(0, 1, 0))
-    rot_z = Mat4.from_rotation(-0.1, Vec3(1, 0, 0))
+    rot_y = Mat4.from_rotation(time/8 if rotate else 0, Vec3(0, 1, 0))
+    rot_z = Mat4.from_rotation(pi/2 if top else -0.1, Vec3(1, 0, 0))
+
     # i apply the vector to the grid only, but everything in the batch rotates with it.
     # i dont know why. but this is what i want, so why bother 
-    grid_model.matrix = Mat4.from_translation((0, 0, -2)) @rot_z @ rot_y
+    distance = -20 if ortho else -2
+    grid_model.matrix = Mat4.from_translation((0, 0, distance)) @rot_z @ rot_y
 
 def setup():
     # One-time GL setup
@@ -143,7 +151,7 @@ def grid():
     for j in range (slices+1):
         for i in range(slices+1):
             x = -1. + 2.*float(i)/float(slices)
-            y = -1.0
+            y = gridz
             z = -1. + 2.*float(j)/float(slices)
             vertices.extend([x,y,z]) 
 

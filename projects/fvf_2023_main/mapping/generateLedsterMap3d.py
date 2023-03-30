@@ -8,7 +8,11 @@ teller = 0
 f = 1/1.14
 points = []
 
-scale = (1/28)*0.8
+#als volgt uitgerekend:
+# - die 1/28 stond er al
+# - *1.1 maakt hem precies even groot als de truss balk
+# *5.5/7 schaalt de ledster (5.5m) tov de truss (7m) 
+scale = (1/28)*1.1 *5.5/7.
 
 for y in range(-size, size+1):
     aantal = 2*size - abs(y)+1
@@ -17,7 +21,7 @@ for y in range(-size, size+1):
 
     for nr in range(aantal):
         x = (xstart + nr)*dir/f
-        points.append({'x': -y*scale, 'y': 0.8, 'z': x*scale})
+        points.append({'x': -y*scale, 'y': 0.45, 'z': x*scale})
         teller = teller+1
 
 print('aantal leds midden: ', teller)
@@ -33,7 +37,7 @@ for a in range(6):
             x = x + cos(th/360*2*pi)/f
             y = y + sin(th/360*2*pi)/f
             if t != 4*size-1:
-                points.append({'x': -y*scale, 'y': 0.8, 'z': x*scale})
+                points.append({'x': -y*scale, 'y': 0.45, 'z': x*scale})
                 teller = teller+1
             t = t+1
 

@@ -30,7 +30,7 @@ public:
     float amount = 0.5;
     float intensity = 0.5;
     float variant = 0.5;
-    float size;
+    float size = 0.5;
     float offset = 0.5;
 
 private:

@@ -42,6 +42,8 @@ int main()
   Tempo::AddSource(ConstantTempo::getInstance());
   ConstantTempo::getInstance()->setBpm(120);
 
+  hyp->hub.buttonPressed(0,0);
+
   hyp->start();
   while (1)
     Thread::sleep(1000);
