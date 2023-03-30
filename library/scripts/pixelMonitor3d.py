@@ -26,7 +26,7 @@ except pyglet.window.NoSuchConfigException:
     window = pyglet.window.Window(resizable=True)
     # print ("fallback")
 
-dotsize = 1/50 
+dotsize = 1/60 
 num_vertices=0
 
 @window.event
@@ -66,7 +66,7 @@ def update(dt):
 
     # i apply the vector to the grid only, but everything in the batch rotates with it.
     # i dont know why. but this is what i want, so why bother 
-    distance = -20 if ortho else -2
+    distance = -20 if ortho else -1.8
     grid_model.matrix = Mat4.from_translation((0, 0, distance)) @rot_z @ rot_y
 
 def setup():

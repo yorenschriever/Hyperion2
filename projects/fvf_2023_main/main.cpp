@@ -11,6 +11,7 @@
 #include "core/generation/pixelMapSplitter3d.hpp"
 #include "core/hyperion.hpp"
 #include "distribution/inputs/controlHubInput.hpp"
+#include "generation/controlHub/paletteColumn.hpp"
 #include "mapping/columnMap.hpp"
 #include "mapping/ledsterMap.hpp"
 #include "mapping/columnMap3d.hpp"
@@ -26,6 +27,7 @@ auto pColumnMap = columnMap.toPolarRotate90();
 
 void addLedsterPipe(Hyperion *hyp);
 void addColumnPipes(Hyperion *hyp);
+void addPaletteColumn(Hyperion *hyp);
 
 int main()
 {
@@ -38,6 +40,7 @@ int main()
 
   addColumnPipes(hyp);
   addLedsterPipe(hyp);
+  addPaletteColumn(hyp);
 
   Tempo::AddSource(ConstantTempo::getInstance());
   ConstantTempo::getInstance()->setBpm(120);
@@ -178,4 +181,14 @@ void addColumnPipes(Hyperion *hyp)
         new MonitorOutput3d(splitMap.getMap(i)));
     hyp->addPipe(pipe);
   }
+}
+
+void addPaletteColumn(Hyperion *hyp){
+  auto paletteColumn = new PaletteColumn(&hyp->hub,0, {
+    &heatmap,
+    &sunset1,
+    &sunset3,
+    &sunset4
+  });
+  hyp->hub.subscribe(paletteColumn);
 }
