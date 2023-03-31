@@ -12,20 +12,20 @@ class LFO
 {
 
 private:
-    unsigned long startingpoint;
+    long starting_point = Utils::millis();
     float pulseWidth = 0.5;
     float skew = 1;
     int period;
 
 public:
-    LFO(int period=0)
+    LFO(int period=1000)
     {
         this->period = period;
         reset();
     }
 
     //LFO value between 0-1
-    float getValue() { return getValue(0, this->period); }
+    float getValue() { return getValue(0, period); }
     float getValue(float deltaPhase) { return getValue(deltaPhase, period); }
     float getValue(float deltaPhase, int periodArg)
     {
@@ -41,18 +41,20 @@ public:
     float getPhase() { return getPhase(0, period); }
     float getPhase(float deltaPhase, int periodArg)
     {
-        int deltaPhaseMs = periodArg * deltaPhase;
-        // Correction to make sure the phase never goes negative if deltaphase > 1,
-        // This fixes glitches when setPeriod has just been called, and 
-        // (Utils::millis() - startingpoint) is close to 0
+        if (periodArg == 0)
+            return 0;
+
+        int deltaPhaseMs = periodArg * deltaPhase; 
+        // Correction to make sure the phase never goes negative if deltaPhase > 1,
+        // Not all plaforms handle modulus of negative numbers the same
         long correction = std::ceil(deltaPhase) * periodArg; 
-        unsigned long phase = (Utils::millis() - startingpoint - deltaPhaseMs + correction) % periodArg;
-        return ((float)phase / (float)periodArg);
+        long phaseMs = (Utils::millis() - starting_point - deltaPhaseMs + correction) % periodArg;
+        return float(phaseMs) / periodArg;
     }
 
     void reset()
     {
-        this->startingpoint = Utils::millis();
+        this->starting_point = Utils::millis();
     }
 
     void setSkew(float skew)
@@ -60,9 +62,9 @@ public:
         this->skew = skew;
     }
 
-    void setPulseWidth(float pulsewidth)
+    void setPulseWidth(float pulse_width)
     {
-        this->pulseWidth = pulsewidth;
+        this->pulseWidth = pulse_width;
     }
 
     int getPeriod() {
@@ -73,17 +75,18 @@ public:
     {
         if (newPeriod == period)
            return;
-        //correct the phase so the period change doesn't result in a phase change
-        float phase = getPhase();
-        this->startingpoint = Utils::millis() - phase * newPeriod;
-        this->period = newPeriod;
+
+        long ms = Utils::millis();
+        long phaseMs = (ms - starting_point) % period;
+        this->starting_point = ms - phaseMs * newPeriod / period;
+        this->period = newPeriod;   
     }
 };
 
 class SawUp
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
         return phase;
     }
@@ -92,7 +95,7 @@ public:
 class SawDown
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
         return 1. - phase;
     }
@@ -101,18 +104,18 @@ public:
 class SawDownShort
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
-        if (phase > pulsewidth)
+        if (phase > pulse_width)
             return 0;
-        return 1. - phase/pulsewidth;
+        return 1. - phase/pulse_width;
     }
 };
 
 class Tri
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
         return abs(1 - 2 * phase);
     }
@@ -121,7 +124,7 @@ public:
 class Sin
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
         return 0.5 + 0.5 * sin(phase * 2 * M_PI);
     }
@@ -142,7 +145,7 @@ class SinFast
     }
 
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
         if (!filled) fill();
         return preCalc[int(phase * 255)];
@@ -157,7 +160,7 @@ bool SinFast::filled = false;
 class NegativeCosFast
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
         if (!SinFast::filled) SinFast::fill();
         return SinFast::preCalc[int(phase * 255 + 256 - 256/4) % 256];
@@ -167,7 +170,7 @@ public:
 class Cos
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
         return 0.5 + 0.5 * cos(phase * 2 * M_PI);
     }
@@ -176,16 +179,16 @@ public:
 class PWM
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
-        return phase < pulsewidth ? 1 : 0;
+        return phase < pulse_width ? 1 : 0;
     }
 };
 
 class Square
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
         return phase < 0.5 ? 1 : 0;
     }
@@ -194,14 +197,14 @@ public:
 class SoftSquare
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
-        if (phase < pulsewidth)
-            return phase / pulsewidth;
+        if (phase < pulse_width)
+            return phase / pulse_width;
         if (phase < 0.5)
             return 1;
-        if (phase < 0.5 + pulsewidth)
-            return 1 - (phase-0.5) / pulsewidth;
+        if (phase < 0.5 + pulse_width)
+            return 1 - (phase-0.5) / pulse_width;
         return 0;
     }
 };
@@ -209,15 +212,15 @@ public:
 class SoftPWM
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
         float softWidth = 0.1;
         if (phase < softWidth)
             return phase / softWidth;
-        if (phase < pulsewidth)
+        if (phase < pulse_width)
             return 1;
-        if (phase < pulsewidth + softWidth)
-            return 1 - (phase - pulsewidth) / softWidth;
+        if (phase < pulse_width + softWidth)
+            return 1 - (phase - pulse_width) / softWidth;
         return 0;
     }
 };
@@ -226,10 +229,10 @@ template <class INNER>
 class LFOPause
 {
 public:
-    static float getValue(float phase, float pulsewidth)
+    static float getValue(float phase, float pulse_width)
     {
-        if (phase > pulsewidth)
+        if (phase > pulse_width)
             return 0;
-        return INNER::getValue(phase/pulsewidth,pulsewidth);
+        return INNER::getValue(phase/pulse_width,pulse_width);
     }
 };
