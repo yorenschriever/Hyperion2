@@ -24,9 +24,12 @@
 #include "patterns3d.hpp"
 #include "ledsterPatterns.hpp"
 #include "platform/includes/thread.hpp"
+#include "patterns-low.hpp"
 
 auto pLedsterMap = ledsterMap.toPolarRotate90();
 auto pColumnMap = columnMap.toPolarRotate90();
+
+auto cColumnMap3d = columnMap3d.toCylindricalRotate90();
 
 void addLedsterPipe(Hyperion *hyp);
 void addColumnPipes(Hyperion *hyp);
@@ -44,7 +47,7 @@ int main()
 
   addColumnPipes(hyp);
   addLedsterPipe(hyp);
-  addHaloPipe(hyp);
+  //addHaloPipe(hyp);
   addPaletteColumn(hyp);
 
   Tempo::AddSource(ConstantTempo::getInstance());
@@ -61,8 +64,8 @@ int main()
 // auto ledsterPattern = new FWF::RibbenFasePattern();
 // auto columnPattern = new FWF::RibbenFasePattern();
 
-auto ledsterPattern = new FWF::SegmentChasePattern();
-auto columnPattern = new FWF::SegmentChasePattern();
+// auto ledsterPattern = new FWF::SegmentChasePattern();
+// auto columnPattern = new FWF::SegmentChasePattern();
 
 // auto ledsterPattern = new FWF::SegmentChasePattern(); //X
 // auto columnPattern = new FWF::OnBeatColumnFadePattern();
@@ -77,6 +80,7 @@ auto columnPattern = new FWF::SegmentChasePattern();
 // auto columnPattern = new FWF3D::LineLaunch(columnMap3d);
 
 
+//auto columnPattern = new Low::StaticGradientPattern(columnMap3d);
 
 
 void addLedsterPipe(Hyperion *hyp)
@@ -86,38 +90,38 @@ void addLedsterPipe(Hyperion *hyp)
           ledsterMap.size(),
           &hyp->hub,
           {
-              {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(ledsterMap3d)},
-              {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(ledsterMap3d)},
-              {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
+              // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(ledsterMap3d)},
+              // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(ledsterMap3d)},
+              // {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
 
-              {.column = 1, .slot = 0, .pattern = new FWF::SquareGlitchPattern(ledsterMap)},
-              {.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(pLedsterMap)},
-              {.column = 1, .slot = 2, .pattern = new Ledster::RadialFadePattern(ledsterMap)},
+              // {.column = 1, .slot = 0, .pattern = new FWF::SquareGlitchPattern(ledsterMap)},
+              // {.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(pLedsterMap)},
+              // {.column = 1, .slot = 2, .pattern = new Ledster::RadialFadePattern(ledsterMap)},
 
-              {.column = 2, .slot = 0, .pattern = new Ledster::ClivePattern<SinFast>(10000)},
-              {.column = 2, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
-              {.column = 2, .slot = 2, .pattern = new Ledster::SnakePattern()},
+              // {.column = 2, .slot = 0, .pattern = new Ledster::ClivePattern<SinFast>(10000)},
+              // {.column = 2, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
+              // {.column = 2, .slot = 2, .pattern = new Ledster::SnakePattern()},
 
-              {.column = 3, .slot = 0, .pattern = new Ledster::RibbenClivePattern<SoftSquare>(40000)},
-              {.column = 3, .slot = 1, .pattern = new Ledster::RibbenClivePattern<SawDown>(500)},
-              {.column = 3, .slot = 2, .pattern = new Ledster::RibbenClivePattern<SinFast>(3000)},
+              // {.column = 3, .slot = 0, .pattern = new Ledster::RibbenClivePattern<SoftSquare>(40000)},
+              // {.column = 3, .slot = 1, .pattern = new Ledster::RibbenClivePattern<SawDown>(500)},
+              // {.column = 3, .slot = 2, .pattern = new Ledster::RibbenClivePattern<SinFast>(3000)},
 
-              {.column = 4, .slot = 0, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
-              {.column = 4, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
-              {.column = 4, .slot = 2, .pattern = new Ledster::RibbenClivePattern<PWM>(10000,1,0.0025)},
+              // {.column = 4, .slot = 0, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
+              // {.column = 4, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
+              // {.column = 4, .slot = 2, .pattern = new Ledster::RibbenClivePattern<PWM>(10000,1,0.0025)},
 
-              {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
-              {.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(ledsterMap)},
-              {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(ledsterMap3d)},
-              //{.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
+              // {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
+              // {.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(ledsterMap)},
+              // {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(ledsterMap3d)},
+              // //{.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
 
-              {.column = 6, .slot = 0, .pattern = new FWF::RibbenFadePattern()},
-              {.column = 6, .slot = 1, .pattern = new FWF::SegmentChasePattern()},
-              //{.column = 6, .slot = 2, .pattern = new FWF::OnBeatColumnFadePattern()},
+              // {.column = 6, .slot = 0, .pattern = new FWF::RibbenFadePattern()},
+              // {.column = 6, .slot = 1, .pattern = new FWF::SegmentChasePattern()},
+              // //{.column = 6, .slot = 2, .pattern = new FWF::OnBeatColumnFadePattern()},
 
-              //{.column = 7, .slot = 0, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(ledsterMap3d)},
-              //{.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(ledsterMap3d)},
-              //{.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(ledsterMap3d)},
+              // //{.column = 7, .slot = 0, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(ledsterMap3d)},
+              // //{.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(ledsterMap3d)},
+              // //{.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(ledsterMap3d)},
           }),
       //new PatternInput<RGBA>(ledsterMap3d.size(), ledsterPattern),
       new CloneOutput({
@@ -137,38 +141,46 @@ void addColumnPipes(Hyperion *hyp)
           columnMap.size(),
           &hyp->hub,
           {
-              {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(columnMap3d)},
-              {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(columnMap3d)},
-              {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
+              // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(columnMap3d)},
+              // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(columnMap3d)},
+              // {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
 
-              {.column = 1, .slot = 0, .pattern = new FWF::SquareGlitchPattern(columnMap)},
-              {.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(pColumnMap)},
-              {.column = 1, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
+              // {.column = 1, .slot = 0, .pattern = new FWF::SquareGlitchPattern(columnMap)},
+              // {.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(pColumnMap)},
+              // {.column = 1, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
 
-              {.column = 2, .slot = 0, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
-              {.column = 2, .slot = 1, .pattern = new FWF::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
-              {.column = 2, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
+              // {.column = 2, .slot = 0, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
+              // {.column = 2, .slot = 1, .pattern = new FWF::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
+              // {.column = 2, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
 
-              {.column = 3, .slot = 0, .pattern = new FWF::RibbenClivePattern<SoftSquare>(40000)},
-              {.column = 3, .slot = 1, .pattern = new FWF::RibbenClivePattern<SawDown>(500)},
-              {.column = 3, .slot = 2, .pattern = new FWF::RibbenClivePattern<SinFast>(3000)},
+              // {.column = 3, .slot = 0, .pattern = new FWF::RibbenClivePattern<SoftSquare>(40000)},
+              // {.column = 3, .slot = 1, .pattern = new FWF::RibbenClivePattern<SawDown>(500)},
+              // {.column = 3, .slot = 2, .pattern = new FWF::RibbenClivePattern<SinFast>(3000)},
 
-              {.column = 4, .slot = 0, .pattern = new FWF::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
-              {.column = 4, .slot = 1, .pattern = new FWF::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
-              {.column = 4, .slot = 2, .pattern = new FWF::RibbenClivePattern<PWM>(10000,1,0.0025)},
+              // {.column = 4, .slot = 0, .pattern = new FWF::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
+              // {.column = 4, .slot = 1, .pattern = new FWF::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
+              // {.column = 4, .slot = 2, .pattern = new FWF::RibbenClivePattern<PWM>(10000,1,0.0025)},
 
-              {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
-              {.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(columnMap)},
-              {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(columnMap3d)},
-              // {.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
+              // {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
+              // {.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(columnMap)},
+              // {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(columnMap3d)},
+              // // {.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
 
-              {.column = 6, .slot = 0, .pattern = new FWF::RibbenFadePattern()},
-              {.column = 6, .slot = 1, .pattern = new FWF::SegmentChasePattern()},
-              {.column = 6, .slot = 2, .pattern = new FWF::OnBeatColumnFadePattern()},
+              // {.column = 6, .slot = 0, .pattern = new FWF::RibbenFadePattern()},
+              // {.column = 6, .slot = 1, .pattern = new FWF::SegmentChasePattern()},
+              // {.column = 6, .slot = 2, .pattern = new FWF::OnBeatColumnFadePattern()},
 
-              {.column = 7, .slot = 0, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(columnMap3d)},
-              {.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(columnMap3d)},
-              {.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(columnMap3d)},
+              // {.column = 7, .slot = 0, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(columnMap3d)},
+              // {.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(columnMap3d)},
+              // {.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(columnMap3d)},
+
+              //{.column = 0, .slot = 0, .pattern = new Low::StaticGradientPattern(columnMap3d)},
+              // {.column = 0, .slot = 0, .pattern = new Low::OnBeatColumnChaseUpPattern(columnMap3d)},
+              // {.column = 0, .slot = 0, .pattern = new Low::HorizontalSin(cColumnMap3d)},
+              // {.column = 0, .slot = 0, .pattern = new Low::HorizontalSaw(cColumnMap3d)},
+              // {.column = 0, .slot = 0, .pattern = new Low::GrowShrink(cColumnMap3d)},
+              // {.column = 0, .slot = 0, .pattern = new Low::GlowPulsePattern(columnMap3d)},
+              {.column = 0, .slot = 0, .pattern = new Low::VerticallyIsolated(cColumnMap3d)},
           }),
     //new PatternInput<RGBA>(columnMap3d.size(), columnPattern),
       {480 * sizeof(RGBA),
