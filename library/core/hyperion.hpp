@@ -195,7 +195,7 @@ private:
         for (Pipe *pipe : pipes)
             pipe->out->postProcess();
 
-        // Thread::sleep(10);
+        Thread::sleep(1);
     }
 
     static void runTask(void *param)
