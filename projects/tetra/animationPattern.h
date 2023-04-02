@@ -6,18 +6,18 @@
 #include <math.h>
 #include "LedShape.h"
 #include "LedAnimation.h"
-#include "generation/patterns/helpers/palette.hpp"
+#include "gradient.hpp"
 #include "platform/includes/log.hpp"
 
 class AnimationPattern : public Pattern<RGBA>
 {
     std::vector<LedShape> *ledShapes;
     LedAnimation *animation;
-    Palette *palette;
+    Gradient *palette;
     bool updateCache = true;
 
 public:
-    AnimationPattern(std::vector<LedShape> *ledShapes, LedAnimation *animation, Palette *palette)
+    AnimationPattern(std::vector<LedShape> *ledShapes, LedAnimation *animation, Gradient *palette)
     {
         this->ledShapes = ledShapes;
         this->animation = animation;

@@ -5,15 +5,15 @@
 #include <vector>
 #include "utils.hpp"
 
-class Palette
+class Gradient
 {
 public:
     typedef struct {
         uint8_t position;
         RGBA color;
-    } PaletteEntry;
+    } GradientEntry;
 
-    Palette(std::vector<PaletteEntry> entries)
+    Gradient(std::vector<GradientEntry> entries)
     {
         int start_index = 0;
         RGBA start_color;

@@ -19,7 +19,7 @@ public:
         int buffersize,
         vector<LedShape> ledShapes,
 
-        Palette *colorPalette,
+        Gradient *colorPalette,
 
         uint8_t speed,
         uint8_t amount,
@@ -118,7 +118,7 @@ protected:
     //     return (x - (T)in_min) * ((T)out_max - (T)out_min) / ((T)in_max - (T)in_min) + (T)out_min;
     // }
 
-    RGBA ColorFromPalette( Palette *palette, uint8_t index, uint8_t brightness, void* _blend=0)
+    RGBA ColorFromPalette( Gradient *palette, uint8_t index, uint8_t brightness, void* _blend=0)
 {
     auto entry = palette->get(index);
     //entry.dim(brightness);

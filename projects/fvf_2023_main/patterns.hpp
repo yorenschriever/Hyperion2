@@ -62,7 +62,7 @@ namespace FWF
                     fade.duration *= perm.at[i] * 4 / (density * map.size() / 10);
 
                 float fadePosition = fade.getValue(map[i].r * velocity);
-                RGBA color = params->palette->get(fadePosition * 255);
+                RGBA color = params->gradient->get(fadePosition * 255);
                 pixels[i] = color * fadePosition * (1.5 - map[i].r) * transition.getValue();
             }
         }
@@ -88,7 +88,7 @@ namespace FWF
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
-                RGBA colour = params->palette->get(255 - map[index].r * 255);
+                RGBA colour = params->gradient->get(255 - map[index].r * 255);
                 pixels[index] = colour * transition.getValue();
             }
         }
@@ -132,7 +132,7 @@ namespace FWF
                 //     fade.duration *= perm.at[i] * 4 / (density * map.size()/ 10);
 
                 float fadePosition = fade.getValue(abs(map[i].th) * velocity);
-                RGBA color = params->palette->get(255 - abs(map[i].th) / M_PI * 255);
+                RGBA color = params->gradient->get(255 - abs(map[i].th) / M_PI * 255);
                 pixels[i] = color * fadePosition * (map[i].r * 1.5) * transition.getValue();;
             }
         }
@@ -443,7 +443,7 @@ namespace FWF
                 
                 for (int j = 0; j < segmentSize; j++) {
                     float lfoVal = lfo.getValue(float(j)/lfoWidth + float(randomSegment)/numSegments+float(segment));
-                    RGBA col = params->palette->get(lfoVal * 255) * lfoVal;
+                    RGBA col = params->gradient->get(lfoVal * 255) * lfoVal;
                     if (isLedster)
                         pixels[Ledster::ribben[segment][j]] += col;
                     else
