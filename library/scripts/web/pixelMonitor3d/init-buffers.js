@@ -63,7 +63,7 @@ function initBuffers(gl) {
     //const vertices = [];
     //const normals = [];
   
-    const r = 0.02;
+    const r = 0.01;
     const stacks = 2;
     const sectors = 4;
     const startVertex = target.vertices.length/3;

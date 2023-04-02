@@ -26,6 +26,15 @@
 #include "platform/includes/thread.hpp"
 #include "patterns-low.hpp"
 
+#include "websocketServer.hpp"
+#include "webServer.hpp"
+#include "platform/macos/httpserver.hpp"
+
+#include <iostream>
+#include <iterator>
+#include <algorithm>
+
+
 auto pLedsterMap = ledsterMap.toPolarRotate90();
 auto pColumnMap = columnMap.toPolarRotate90();
 
@@ -36,7 +45,31 @@ void addColumnPipes(Hyperion *hyp);
 void addHaloPipe(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
 
+
 int main()
+{
+  //httpserver();
+
+  auto serv = WebServer::createInstance(80);
+  uint8_t content []= "hello world";
+  serv->addPath("index.html",content,11);
+  serv->addPath("/index.html",content,11);
+  serv->addPath("/",content,11);
+
+  while (1)
+    Thread::sleep(1000);
+}
+
+// int main()
+// {
+//   auto wss = WebsocketServer::createInstance();
+
+//   while (1)
+//     Thread::sleep(1000);
+// }
+
+
+int main2()
 {
   auto hyp = new Hyperion();
 

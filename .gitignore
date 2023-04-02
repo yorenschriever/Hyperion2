@@ -36,3 +36,11 @@
 sdkconfig.old
 .DS_Store
 .vscode
+
+**/*.crt.h
+**/*.key.h
+**/*.crt
+**/*.key
+**/*.pem
+**/*.csr
+**/*.srl
