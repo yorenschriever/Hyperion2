@@ -67,7 +67,7 @@ namespace FWF3D
                 float conePos = 0.5 + (map[i].r - map[i].z) / 2;
 
                 float fadePosition = fade.getValue(conePos * velocity);
-                RGBA color = params->palette->get(fadePosition * 255);
+                RGBA color = params->gradient->get(fadePosition * 255);
                 pixels[i] = color * fadePosition * (1.5 - map[i].r) * transition.getValue();
             }
         }
@@ -110,7 +110,7 @@ namespace FWF3D
                 //     fade.duration *= perm.at[i] * 4 / (density * map.size()/ 10);
 
                 float fadePosition = fade.getValue(abs(map[i].th) * velocity);
-                RGBA color = params->palette->get(255 - abs(map[i].th) / M_PI * 255);
+                RGBA color = params->gradient->get(255 - abs(map[i].th) / M_PI * 255);
                 pixels[i] = color * fadePosition * (map[i].r * 1.5) * transition.getValue();
                 ;
             }
@@ -170,8 +170,8 @@ namespace FWF3D
                     float conePos = 0.5 - (map[i].r - map[i].z) / 2;
 
                     float fadePosition = fade[column].getValue(conePos * velocity);
-                    // RGBA color = params->palette->get(fadePosition * 255);
-                    RGBA color = params->palette->get((1 - map[i].z) * 255);
+                    // RGBA color = params->gradient->get(fadePosition * 255);
+                    RGBA color = params->gradient->get((1 - map[i].z) * 255);
                     pixels[i] = color * fadePosition * (1 - map[i].z) * transition.getValue();
                 }
             }
@@ -231,7 +231,7 @@ namespace FWF3D
                 for (int column = 0; column < 6; column++)
                 {
                     float fadePosition = fade[column].getValue(radii[column][i] * velocity);
-                    RGBA color = params->getPrimaryColour(); //::palette->get(fadePosition * 255);
+                    RGBA color = params->getPrimaryColour();
                     pixels[i] += color * fadePosition; // * transition.getValue();
                 }
             }

@@ -43,7 +43,7 @@ int main()
   hyp->hub.params.primaryColour = RGB(255, 0, 255);
   hyp->hub.params.secondaryColour = RGB(50, 50, 50);
   hyp->hub.params.highlightColour = RGB(250, 250, 250);
-  hyp->hub.params.palette = &heatmap;
+  hyp->hub.params.gradient = &heatmap;
 
   addColumnPipes(hyp);
   addLedsterPipe(hyp);
@@ -249,10 +249,10 @@ void addHaloPipe(Hyperion *hyp)
 
 void addPaletteColumn(Hyperion *hyp){
   auto paletteColumn = new PaletteColumn(&hyp->hub,0, {
-    &heatmap,
-    &sunset1,
-    &sunset3,
-    &sunset4
+    {.gradient = &heatmap, .primary = heatmap.get(0), .secondary = heatmap.get(127), .highlight = heatmap.get(255) },
+    {.gradient = &sunset1, .primary = sunset1.get(0), .secondary = sunset1.get(127), .highlight = sunset1.get(255) },
+    {.gradient = &sunset3, .primary = sunset3.get(0), .secondary = sunset3.get(127), .highlight = sunset3.get(255) },
+    {.gradient = &sunset4, .primary = sunset4.get(0), .secondary = sunset4.get(127), .highlight = sunset4.get(255) }
   });
   hyp->hub.subscribe(paletteColumn);
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include "colours.h"
-#include "palette.hpp"
+#include "gradient.hpp"
 
 class Params
 {
@@ -19,7 +19,7 @@ public:
     RGBA primaryColour = RGB(255, 0, 0);
     RGBA secondaryColour = RGB(0, 255, 0);
     RGBA highlightColour = RGB(255, 255, 255);
-    Palette *palette = new Palette({
+    Gradient *gradient = new Gradient({
         {.position = 0, .color = RGB(0, 0, 0)},        // Black
         {.position = 128, .color = RGB(255, 0, 0)},    // Red
         {.position = 224, .color = RGB(255, 255, 0)},  // Bright yellow

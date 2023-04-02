@@ -13,7 +13,7 @@
 #include "core/generation/pixelMap.hpp"
 #include "core/generation/pixelMapSplitter.hpp"
 #include "core/hyperion.hpp"
-#include "generation/patterns/helpers/palette.hpp"
+#include "gradient.hpp"
 #include "ChaserLedAnimation.cpp"
 #include "ShapeChaserLedAnimation.cpp"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"
@@ -29,7 +29,7 @@ Installation tetra = {
     LedShape(117, 3), // 200cm Triangle (117 LEDs per side, 351 total, 21.06A powerdraw)
 };
 
-Palette heatmap = Palette({
+Gradient heatmap = Gradient({
   {.position=   0, .color = RGB(    0,  0,  0)},  // Black
   {.position= 128, .color = RGB(  255,  0,  0)},  // Red
   {.position= 224, .color = RGB(  255,255,  0)},  // Bright yellow
