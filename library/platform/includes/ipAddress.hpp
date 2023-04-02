@@ -2,7 +2,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <string>
-
+#include <cstring>
 #include "platform/includes/log.hpp"
 
 // forward declaration;
@@ -98,7 +98,6 @@ public:
         memset(&sockaddr, 0, sizeof(sockaddr));
         sockaddr.sin_family = AF_INET;
         sockaddr.sin_addr.s_addr = htonl(ipv4);
-        sockaddr.sin_len = sizeof(in_addr);
 
         return IPAddress(sockaddr);
     }
@@ -108,7 +107,6 @@ public:
         struct sockaddr_in sockaddr;
         memset(&sockaddr, 0, sizeof(sockaddr));
         sockaddr.sin_family = AF_INET;
-        sockaddr.sin_len = sizeof(in_addr);
         inet_pton(AF_INET, ip4, &sockaddr.sin_addr);
 
         return IPAddress(sockaddr);

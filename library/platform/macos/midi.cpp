@@ -4,6 +4,7 @@
 #include "thread.hpp"
 #include "log.hpp"
 #include "rtmidi/RtMidi.h"
+#include <algorithm>
 
 bool Midi::initialized = false;
 std::vector<MidiDevice*> Midi::devices;
