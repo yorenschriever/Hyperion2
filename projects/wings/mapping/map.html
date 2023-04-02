@@ -1,0 +1,23 @@
+<html>
+
+<img src="foto.jpeg" id="im"/>
+
+<button id ="done">Done</button>
+
+<script type="text/javascript">
+
+points = [];
+
+function getcoordinates(e)
+{
+    //console.log(e.offsetX, e.offsetY)
+    points.push({x:e.offsetX, y:e.offsetY})
+    console.log(points)
+};
+
+document.getElementById('im').onclick = getcoordinates
+
+document.getElementById('done').onclick = ()=> console.log(points)
+</script>
+
+  </html>
