@@ -31,7 +31,7 @@ public:
         return value;
     }
 
-    static int rescale(float value, float minimum_out, float maximum_out, float minimum_in = 0, float maximum_in = 1)
+    static float rescale(float value, float minimum_out, float maximum_out, float minimum_in = 0, float maximum_in = 1)
     {
         float normalized = (value - minimum_in) / (maximum_in - minimum_in);
         normalized = constrain_f(normalized, 0, 1);

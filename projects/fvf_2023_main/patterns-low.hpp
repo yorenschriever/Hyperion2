@@ -7,19 +7,9 @@
 #include "ledsterPatterns.hpp"
 #include <math.h>
 #include <vector>
+#include "mappingHelpers.hpp"
+#include "log.hpp"
 
-//helper functions to map the bottom (z=-0.45) - top (z=0.45) to range 0-1
-float fromTop(float y){
-    return (y + 0.45)/0.9;
-}
-
-float fromBottom(float y){
-    return (0.45 - y)/0.9;
-}
-
-float around(float th){
-    return (th + M_PI)/(2*M_PI);
-}
 
 namespace Low
 {
@@ -204,14 +194,14 @@ namespace Low
                 //RGBA color = params->getPrimaryColour(); 
                 //float lfoArg = orientationHorizontal ? around(map[index].th) : fromTop(map[index].z);
                 
-                float size = lfo.getValue(offset * around(map[index].th)) * size;
+                float lfoSize = lfo.getValue(offset * around(map[index].th)) * size; 
                 float distance = abs(map[index].z + 0.07);
-                if (distance > size)
+                if (distance > lfoSize)
                     continue;
 
-                float distanceAsRatio = 1 - distance / size ;
+                float distanceAsRatio = 1 - distance / lfoSize ;
 
-                pixels[index] = params->gradient->get(distanceAsRatio * 255) * distanceAsRatio * transition.getValue();
+                pixels[index] = params->gradient->get(distanceAsRatio * 255); // * distanceAsRatio * transition.getValue();
             }
         }
     };
