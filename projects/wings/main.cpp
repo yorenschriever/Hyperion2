@@ -34,6 +34,8 @@ int main()
 
   Tempo::AddSource(new ConstantTempo(120));
 
+  hyp->hub.buttonPressed(0,0);
+
   hyp->start();
 
   while (1)
@@ -58,7 +60,12 @@ void addWingsPipe(Hyperion *hyp)
           wingMap.size(),
           &hyp->hub,
           {
-              {.column = 0, .slot = 0, .pattern = new RadialFadePattern(wingMap)},
+
+
+              {.column = 0, .slot = 0, .pattern = new HorizontalGradientPattern(wingMap)},
+              {.column = 0, .slot = 0, .pattern = new PixelGlitchPattern()},
+
+              //{.column = 0, .slot = 0, .pattern = new RadialFadePattern(wingMap)},
               {.column = 0, .slot = 1, .pattern = new ChevronsPattern(wingMap)},
               {.column = 0, .slot = 2, .pattern = new PixelGlitchPattern()},
 
@@ -95,6 +102,12 @@ void addWingsPipe(Hyperion *hyp)
 
 void addPaletteColumn(Hyperion *hyp){
   auto paletteColumn = new PaletteColumn(&hyp->hub,0, std::vector<PaletteColumn::Palette>{
+    coralTeal,
+    retro,
+    candy,
+    greatBarrierReef,
+    campfire,
+    tunnel,
     {.gradient = &heatmap, .primary = heatmap.get(0), .secondary = heatmap.get(127), .highlight = heatmap.get(255) },
     {.gradient = &sunset1, .primary = sunset1.get(0), .secondary = sunset1.get(127), .highlight = sunset1.get(255) },
     {.gradient = &sunset3, .primary = sunset3.get(0), .secondary = sunset3.get(127), .highlight = sunset3.get(255) },
@@ -102,4 +115,3 @@ void addPaletteColumn(Hyperion *hyp){
   });
   hyp->hub.subscribe(paletteColumn);
 }
-

@@ -31,14 +31,12 @@ private:
 
     void TempoTask() override
     {
-        Log::info(TAG, "constant tempo task");
-
         if (!validSignal || period == 0)
             return;
 
         int newBeatNr = (Utils::micros() - startingpoint) / period;
 
-        Log::info(TAG, "ConstantTempoTask: %d", newBeatNr);
+        //Log::info(TAG, "ConstantTempoTask: %d", newBeatNr);
 
         if (newBeatNr != beatNumber)
             beat(newBeatNr, period / 1000, false); // use the beat locally, but don't broadcast it.

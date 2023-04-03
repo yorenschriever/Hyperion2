@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <set>
 
 class IMidiListener;
 
@@ -16,8 +17,8 @@ public:
 
     virtual bool isConnected() = 0;
 
-    void addMidiListener(IMidiListener *listener) { this->listener = listener; }
-    void removeMidiListener(IMidiListener *listener) { this->listener = nullptr; }
+    void addMidiListener(IMidiListener *listener) { listeners.insert(listener); }
+    void removeMidiListener(IMidiListener *listener) { listeners.erase(listener); }
 
     virtual ~MidiDevice() = default;
 
@@ -28,5 +29,5 @@ protected:
     static const uint8_t MIDI_NUMBER_OF_CONTROLLERS = 120;
     static const uint8_t MIDI_NUMBER_OF_NOTES = 127;
 
-    IMidiListener *listener;
+    std::set<IMidiListener *>listeners;
 };

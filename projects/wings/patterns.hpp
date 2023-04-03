@@ -271,129 +271,153 @@ class FlashesPattern : public Pattern<RGBA>
     }
 };
 
+class RadialGlitterFadePattern2 : public Pattern<RGBA>
+{
+    Transition transition = Transition(
+        200, Transition::none, 0,
+        1000, Transition::none, 0);
+    PixelMap::Polar map;
+    FadeDown fade = FadeDown(200, WaitAtEnd);
+    BeatWatcher watcher = BeatWatcher();
+    Permute perm;
 
-
-    class RadialGlitterFadePattern2 : public Pattern<RGBA>
+public:
+    RadialGlitterFadePattern2(PixelMap map)
     {
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
-        PixelMap::Polar map;
-        FadeDown fade = FadeDown(200, WaitAtEnd);
-        BeatWatcher watcher = BeatWatcher();
-        Permute perm;
+        this->map = map.toPolarRotate90();
+        this->perm = Permute(map.size());
+    }
 
-    public:
-        RadialGlitterFadePattern2(PixelMap map)
-        {
-            this->map = map.toPolarRotate90();
-            this->perm = Permute(map.size());
-        }
-
-        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
-        {
-            if (!transition.Calculate(active))
-                return;
-
-            fade.duration = params->getIntensity(500, 100);
-
-            if (watcher.Triggered())
-            {
-                fade.reset();
-                perm.permute();
-            }
-
-            float velocity = params->getVelocity(600, 100);
-
-            for (int i = 0; i < map.size(); i++)
-            {
-
-                float density = 481. / width;
-                fade.duration = 100; // trail + perm.at[i] / (density * map.size()/ 10);
-                if (perm.at[i] < density * map.size() / 10)
-                    fade.duration *= perm.at[i] * 4 / (density * map.size() / 10);
-
-                float conePos = 0.5 + (map[i].r ) / 2;
-
-                float fadePosition = fade.getValue(conePos * velocity);
-                RGBA color = params->gradient->get(fadePosition * 255);
-                pixels[i] = color * fadePosition * (1.5 - map[i].r) * transition.getValue();
-            }
-        }
-    };
-
-        class LineLaunch : public Pattern<RGBA>
+    inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
     {
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
-        FadeDown fade = FadeDown(50, WaitAtEnd);
-        BeatWatcher watcher = BeatWatcher();
-        PixelMap map;
+        if (!transition.Calculate(active))
+            return;
 
-    public:
-        LineLaunch(PixelMap map)
+        fade.duration = params->getIntensity(500, 100);
+
+        if (watcher.Triggered())
         {
-            this->map = map;
+            fade.reset();
+            perm.permute();
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
+        float velocity = params->getVelocity(600, 100);
+
+        for (int i = 0; i < map.size(); i++)
         {
-            if (!active && fade.getPhase() ==1)
-                return;
 
-            if (watcher.Triggered())
-                fade.reset();
+            float density = 481. / width;
+            fade.duration = 100; // trail + perm.at[i] / (density * map.size()/ 10);
+            if (perm.at[i] < density * map.size() / 10)
+                fade.duration *= perm.at[i] * 4 / (density * map.size() / 10);
 
-            float velocity = 100; //params->getVelocity(600, 100);
-            // float density = 481./width;
+            float conePos = 0.5 + (map[i].r) / 2;
 
-            for (int i = 0; i < width; i++)
-            {
-                float fadePosition = fade.getValue((1+map[i].y) * velocity);
-                RGBA color = params->getHighlightColour(); 
-                pixels[i] += color * fadePosition; // * transition.getValue();
-            }
+            float fadePosition = fade.getValue(conePos * velocity);
+            RGBA color = params->gradient->get(fadePosition * 255);
+            pixels[i] = color * fadePosition * (1.5 - map[i].r) * transition.getValue();
         }
-    };
+    }
+};
 
+class LineLaunch : public Pattern<RGBA>
+{
+    Transition transition = Transition(
+        200, Transition::none, 0,
+        1000, Transition::none, 0);
+    FadeDown fade = FadeDown(50, WaitAtEnd);
+    BeatWatcher watcher = BeatWatcher();
+    PixelMap map;
 
-    class SegmentChasePattern : public Pattern<RGBA>
+public:
+    LineLaunch(PixelMap map)
     {
-        Permute perm;
-        LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(5000);
+        this->map = map;
+    }
 
-    public:
-        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
+    inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    {
+        if (!active && fade.getPhase() == 1)
+            return;
+
+        if (watcher.Triggered())
+            fade.reset();
+
+        float velocity = 100; // params->getVelocity(600, 100);
+        // float density = 481./width;
+
+        for (int i = 0; i < width; i++)
         {
-            if (!active)
-               return;
-
-            int segmentSize =  60;
-            int numSegments = width/segmentSize;
-
-            perm.setSize(numSegments);
-
-            float pulseWidth = 0.5;
-            float factor = 10; //1-50;
-            lfo.setPeriod(500 * factor);
-            lfo.setPulseWidth(pulseWidth /factor);
-            float lfoWidth = segmentSize * factor;
-
-
-            for (int segment = 0; segment < numSegments; segment++)
-            {
-                int randomSegment = perm.at[segment];
-                int direction = segment % 2 == 0;
-                //todo direction
-                
-                for (int j = 0; j < segmentSize; j++) {
-                    float lfoVal = lfo.getValue(float(j)/lfoWidth + float(randomSegment)/numSegments+float(segment));
-                    RGBA col = params->gradient->get(lfoVal * 255) * lfoVal;
-                    pixels[segment * segmentSize + j] = col;
-                }
-            }
-
-
+            float fadePosition = fade.getValue((1 + map[i].y) * velocity);
+            RGBA color = params->getHighlightColour();
+            pixels[i] += color * fadePosition; // * transition.getValue();
         }
-    };
+    }
+};
+
+class SegmentChasePattern : public Pattern<RGBA>
+{
+    Permute perm;
+    LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(5000);
+
+public:
+    inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    {
+        if (!active)
+            return;
+
+        int segmentSize = 60;
+        int numSegments = width / segmentSize;
+
+        perm.setSize(numSegments);
+
+        float pulseWidth = 0.5;
+        float factor = 10; // 1-50;
+        lfo.setPeriod(500 * factor);
+        lfo.setPulseWidth(pulseWidth / factor);
+        float lfoWidth = segmentSize * factor;
+
+        for (int segment = 0; segment < numSegments; segment++)
+        {
+            int randomSegment = perm.at[segment];
+            int direction = segment % 2 == 0;
+            // todo direction
+
+            for (int j = 0; j < segmentSize; j++)
+            {
+                float lfoVal = lfo.getValue(float(j) / lfoWidth + float(randomSegment) / numSegments + float(segment));
+                RGBA col = params->gradient->get(lfoVal * 255) * lfoVal;
+                pixels[segment * segmentSize + j] = col;
+            }
+        }
+    }
+};
+
+class HorizontalGradientPattern : public Pattern<RGBA>
+{
+    PixelMap map;
+    Transition transition = Transition(
+        200, Transition::none, 0,
+        1000, Transition::none, 0);
+
+public:
+    HorizontalGradientPattern(PixelMap map)
+    {
+        this->map = map;
+    }
+
+    inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    {
+        if (!transition.Calculate(active))
+            return;
+
+        for (int index = 0; index < std::min(width, (int)map.size()); index++)
+        {
+            // float phase = (map[index].x + 1) / 2.;
+            // RGBA colour = params->getSecondaryColour() + params->getPrimaryColour() * phase;
+            RGBA colour = params->gradient->get(abs(map[index].x) * 255);
+            RGBA dimmedColour = colour * transition.getValue();
+            pixels[index] += dimmedColour;
+        }
+    }
+};
