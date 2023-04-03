@@ -273,7 +273,7 @@ namespace FWF
                 RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval);
                 for (int j = 0; j < segmentSize; j++)
                 {
-                    pixels[ribbe * segmentSize + j] = col;
+                    pixels[ribbe * segmentSize + j] += col;
                 }
             }
         }

@@ -1,37 +1,41 @@
 #include "colours.h"
 #include "core/distribution/inputs/inputSplitter.hpp"
 #include "core/distribution/inputs/patternInput.hpp"
+#include "core/distribution/outputs/cloneOutput.hpp"
 #include "core/distribution/outputs/monitorOutput.hpp"
 #include "core/distribution/outputs/monitorOutput3d.hpp"
 #include "core/distribution/outputs/udpOutput.hpp"
-#include "core/distribution/outputs/cloneOutput.hpp"
 #include "core/distribution/pipes/convertPipe.hpp"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"
-#include "core/generation/pixelMap.hpp"
 #include "core/generation/patterns/mappedPatterns.h"
+#include "core/generation/pixelMap.hpp"
 #include "core/generation/pixelMapSplitter.hpp"
 #include "core/generation/pixelMapSplitter3d.hpp"
 #include "core/hyperion.hpp"
 #include "distribution/inputs/controlHubInput.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
-#include "mapping/columnMap.hpp"
-#include "mapping/ledsterMap.hpp"
-#include "mapping/columnMap3d.hpp"
-#include "mapping/ledsterMap3d.hpp"
-#include "mapping/haloMap3d.hpp"
-#include "palettes.hpp"
-#include "patterns.hpp"
-#include "patterns3d.hpp"
 #include "ledsterPatterns.hpp"
-#include "platform/includes/thread.hpp"
+#include "mapping/columnMap.hpp"
+#include "mapping/columnMap3d.hpp"
+#include "mapping/haloMap3d.hpp"
+#include "mapping/ledsterMap.hpp"
+#include "mapping/ledsterMap3d.hpp"
+#include "palettes.hpp"
+#include "patterns-hi.hpp"
 #include "patterns-low.hpp"
 #include "patterns-mid.hpp"
+#include "patterns-min.hpp"
+#include "patterns-max.hpp"
+#include "patterns.hpp"
+#include "patterns3d.hpp"
+#include "platform/includes/thread.hpp"
 
 auto pLedsterMap = ledsterMap.toPolarRotate90();
 auto pColumnMap = columnMap.toPolarRotate90();
 
 auto cColumnMap3d = columnMap3d.toCylindricalRotate90();
 auto cLedsterMap3d = ledsterMap3d.toCylindricalRotate90();
+auto cHaloMap3d = haloMap3d.toCylindricalRotate90();
 
 void addLedsterPipe(Hyperion *hyp);
 void addColumnPipes(Hyperion *hyp);
@@ -41,8 +45,8 @@ void addPaletteColumn(Hyperion *hyp);
 int main()
 {
 
-  //Log::info("test","ip=%d",IPAddress::fromUint32(1234567).toUint32());
-  Log::info("test","mac%d",Ethernet::getMac());
+  // Log::info("test","ip=%d",IPAddress::fromUint32(1234567).toUint32());
+  Log::info("test", "mac%d", Ethernet::getMac());
 
   auto hyp = new Hyperion();
 
@@ -53,20 +57,18 @@ int main()
 
   addColumnPipes(hyp);
   addLedsterPipe(hyp);
-  //addHaloPipe(hyp);
+  addHaloPipe(hyp);
   addPaletteColumn(hyp);
 
   Tempo::AddSource(new ConstantTempo(120));
 
-  hyp->hub.buttonPressed(0,0);
-  hyp->hub.buttonPressed(2,6);
-  //hyp->hub.buttonPressed(1,4);
+  hyp->hub.buttonPressed(0, 0);
+  //hyp->hub.buttonPressed(4, 0);
 
   hyp->start();
   while (1)
     Thread::sleep(1000);
 }
-
 
 // auto ledsterPattern = new FWF::RibbenFasePattern();
 // auto columnPattern = new FWF::RibbenFasePattern();
@@ -86,9 +88,7 @@ int main()
 // auto ledsterPattern = new FWF3D::LineLaunch(ledsterMap3d); //X
 // auto columnPattern = new FWF3D::LineLaunch(columnMap3d);
 
-
-//auto columnPattern = new Low::StaticGradientPattern(columnMap3d);
-
+// auto columnPattern = new Low::StaticGradientPattern(columnMap3d);
 
 void addLedsterPipe(Hyperion *hyp)
 {
@@ -135,12 +135,40 @@ void addLedsterPipe(Hyperion *hyp)
               {.column = 2, .slot = 3, .pattern = new Mid::HaloOnBeat(cLedsterMap3d)},
               {.column = 2, .slot = 4, .pattern = new Mid::SnowflakePatternLedster()},
               {.column = 2, .slot = 6, .pattern = new Mid::PetalChase(cLedsterMap3d)},
+
+              {.column = 3, .slot = 0, .pattern = new Hi::SnakePattern()}, // TODO generate pattern
+              {.column = 3, .slot = 1, .pattern = new Hi::XY(ledsterMap3d)},
+              {.column = 3, .slot = 2, .pattern = new Hi::PetalRotatePattern()},
+              {.column = 3, .slot = 3, .pattern = new Hi::HexBeatPattern()},
+
+              // {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
+              // {.column = 4, .slot = 1, .pattern = new Min::RibbenClivePattern<SoftSquare>(40000)},
+              // {.column = 4, .slot = 2, .pattern = new Min::RibbenClivePattern<SawDown>(500)},
+              // {.column = 4, .slot = 3, .pattern = new Min::RibbenClivePattern<SinFast>(3000)},
+
+              // {.column = 4, .slot = 5, .pattern = new Min::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
+              // {.column = 4, .slot = 6, .pattern = new Min::RibbenClivePattern<PWM>(10000,1,0.0025)},
+
+              // TODO vanaf hier nog parameters en kleuren checken
+              {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
+              {.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
+              {.column = 4, .slot = 2, .pattern = new Min::SegmentChasePattern()},
+              {.column = 4, .slot = 3, .pattern = new Min::LineLaunch(ledsterMap3d)},
+              {.column = 4, .slot = 4, .pattern = new Min::GrowingCirclesPattern(ledsterMap3d)},
+              {.column = 4, .slot = 5, .pattern = new Min::GlowPulsePattern()},
+              //{.column = 4, .slot = 5, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(ledsterMap3d)},
+
+              {.column = 5, .slot = 0, .pattern = new Max::RadialGlitterFadePattern(ledsterMap3d)},
+              {.column = 5, .slot = 1, .pattern = new Max::AngularFadePattern(ledsterMap3d)},
+              {.column = 5, .slot = 2, .pattern = new Max::GrowingStrobePattern(cLedsterMap3d)},
+              {.column = 5, .slot = 3, .pattern = new Max::RadialFadePattern(cLedsterMap3d)},
+              {.column = 5, .slot = 4, .pattern = new Max::ChevronsPattern(ledsterMap3d)},
+              {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(ledsterMap3d)},
+
           }),
-      //new PatternInput<RGBA>(ledsterMap3d.size(), ledsterPattern),
-      new CloneOutput({
-        new MonitorOutput3d(ledsterMap3d),
-        new UDPOutput("hyperslave1.local",9611,60)
-      }));
+      // new PatternInput<RGBA>(ledsterMap3d.size(), ledsterPattern),
+      new CloneOutput({new MonitorOutput3d(ledsterMap3d),
+                       new UDPOutput("hyperslave1.local", 9611, 60)}));
   hyp->addPipe(ledsterPipe);
 }
 
@@ -201,8 +229,26 @@ void addColumnPipes(Hyperion *hyp)
               {.column = 2, .slot = 4, .pattern = new Mid::SnowflakePatternColumn(cColumnMap3d)},
               {.column = 2, .slot = 5, .pattern = new Mid::TakkenChase(cColumnMap3d)},
               // {.column = 2, .slot = 6, .pattern = new Mid::HaloChase(cColumnMap3d)},
+
+              {.column = 3, .slot = 1, .pattern = new Hi::XY(columnMap3d)},
+
+              {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
+              {.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
+              {.column = 4, .slot = 2, .pattern = new Min::SegmentChasePattern()},
+              {.column = 4, .slot = 3, .pattern = new Min::LineLaunch(columnMap3d)},
+              {.column = 4, .slot = 4, .pattern = new Min::GrowingCirclesPattern(columnMap3d)},
+              {.column = 4, .slot = 5, .pattern = new Min::GlowPulsePattern()},
+              //{.column = 4, .slot = 5, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(columnMap3d)},
+
+              {.column = 5, .slot = 0, .pattern = new Max::RadialGlitterFadePattern(columnMap3d)},
+              {.column = 5, .slot = 1, .pattern = new Max::AngularFadePattern(columnMap3d)},
+              {.column = 5, .slot = 2, .pattern = new Max::GrowingStrobePattern(cColumnMap3d)},
+              {.column = 5, .slot = 3, .pattern = new Max::RadialFadePattern(cColumnMap3d)},
+              {.column = 5, .slot = 4, .pattern = new Max::ChevronsPattern(columnMap3d)},
+              {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(columnMap3d)},
+
           }),
-    //new PatternInput<RGBA>(columnMap3d.size(), columnPattern),
+      // new PatternInput<RGBA>(columnMap3d.size(), columnPattern),
       {480 * sizeof(RGBA),
        480 * sizeof(RGBA),
        480 * sizeof(RGBA),
@@ -230,55 +276,71 @@ void addHaloPipe(Hyperion *hyp)
           ledsterMap.size(),
           &hyp->hub,
           {
-              {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(haloMap3d)},
-              {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(haloMap3d)},
-              {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
+              // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(haloMap3d)},
+              // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(haloMap3d)},
+              // {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
 
-              //{.column = 1, .slot = 0, .pattern = new FWF::SquareGlitchPattern(haloMap3d)},
-              //{.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(haloMap3d)},
-              //{.column = 1, .slot = 2, .pattern = new Ledster::RadialFadePattern(haloMap3d)},
+              // //{.column = 1, .slot = 0, .pattern = new FWF::SquareGlitchPattern(haloMap3d)},
+              // //{.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(haloMap3d)},
+              // //{.column = 1, .slot = 2, .pattern = new Ledster::RadialFadePattern(haloMap3d)},
 
-              {.column = 2, .slot = 0, .pattern = new Ledster::ClivePattern<SinFast>(10000)},
-              {.column = 2, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
-              {.column = 2, .slot = 2, .pattern = new Ledster::SnakePattern()},
+              // {.column = 2, .slot = 0, .pattern = new Ledster::ClivePattern<SinFast>(10000)},
+              // {.column = 2, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
+              // {.column = 2, .slot = 2, .pattern = new Ledster::SnakePattern()},
 
-              {.column = 3, .slot = 0, .pattern = new Ledster::RibbenClivePattern<SoftSquare>(40000)},
-              {.column = 3, .slot = 1, .pattern = new Ledster::RibbenClivePattern<SawDown>(500)},
-              {.column = 3, .slot = 2, .pattern = new Ledster::RibbenClivePattern<SinFast>(3000)},
+              // {.column = 3, .slot = 0, .pattern = new Ledster::RibbenClivePattern<SoftSquare>(40000)},
+              // {.column = 3, .slot = 1, .pattern = new Ledster::RibbenClivePattern<SawDown>(500)},
+              // {.column = 3, .slot = 2, .pattern = new Ledster::RibbenClivePattern<SinFast>(3000)},
 
-              {.column = 4, .slot = 0, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
-              {.column = 4, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
-              {.column = 4, .slot = 2, .pattern = new Ledster::RibbenClivePattern<PWM>(10000,1,0.0025)},
+              // {.column = 4, .slot = 0, .pattern = new Ledster::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
+              // {.column = 4, .slot = 1, .pattern = new Ledster::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
+              // {.column = 4, .slot = 2, .pattern = new Ledster::RibbenClivePattern<PWM>(10000,1,0.0025)},
 
-              {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
-              //{.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(ledsterMap)},
-              {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(haloMap3d)},
-              //{.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
+              // {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
+              // //{.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(ledsterMap)},
+              // {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(haloMap3d)},
+              // //{.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
 
-              {.column = 6, .slot = 0, .pattern = new FWF::RibbenFadePattern()},
-              {.column = 6, .slot = 1, .pattern = new FWF::SegmentChasePattern()},
-              //{.column = 6, .slot = 2, .pattern = new FWF::OnBeatColumnFadePattern()},
+              // {.column = 6, .slot = 0, .pattern = new FWF::RibbenFadePattern()},
+              // {.column = 6, .slot = 1, .pattern = new FWF::SegmentChasePattern()},
+              // //{.column = 6, .slot = 2, .pattern = new FWF::OnBeatColumnFadePattern()},
 
-              //{.column = 7, .slot = 0, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(ledsterMap3d)},
-              //{.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(ledsterMap3d)},
-              //{.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(ledsterMap3d)},
+              // //{.column = 7, .slot = 0, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(ledsterMap3d)},
+              // //{.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(ledsterMap3d)},
+              // //{.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(ledsterMap3d)},
+
+              {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
+              {.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
+              {.column = 4, .slot = 2, .pattern = new Min::SegmentChasePattern()},
+              {.column = 4, .slot = 3, .pattern = new Min::LineLaunch(haloMap3d)},
+              {.column = 4, .slot = 4, .pattern = new Min::GrowingCirclesPattern(haloMap3d)},
+              {.column = 4, .slot = 5, .pattern = new Min::GlowPulsePattern()},
+              //{.column = 4, .slot = 5, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(haloMap3d)},
+
+              {.column = 5, .slot = 0, .pattern = new Max::RadialGlitterFadePattern(haloMap3d)},
+              {.column = 5, .slot = 1, .pattern = new Max::AngularFadePattern(haloMap3d)},
+              {.column = 5, .slot = 2, .pattern = new Max::GrowingStrobePattern(cHaloMap3d)},
+              {.column = 5, .slot = 3, .pattern = new Max::RadialFadePattern(cHaloMap3d)},
+              {.column = 5, .slot = 4, .pattern = new Max::ChevronsPattern(haloMap3d)},
+              {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(haloMap3d)},
           }),
       new MonitorOutput3d(haloMap3d));
   hyp->addPipe(haloPipe);
 }
 
-void addPaletteColumn(Hyperion *hyp){
-  auto paletteColumn = new PaletteColumn(&hyp->hub,0, {
-    {.gradient = &heatmap, .primary = heatmap.get(127), .secondary = heatmap.get(200), .highlight = heatmap.get(255) },
-    {.gradient = &sunset1, .primary = sunset1.get(127), .secondary = sunset1.get(200), .highlight = sunset1.get(255) },
-    {.gradient = &sunset3, .primary = sunset3.get(127), .secondary = sunset3.get(200), .highlight = sunset3.get(255) },
-    {.gradient = &sunset4, .primary = sunset4.get(127), .secondary = sunset4.get(200), .highlight = sunset4.get(255) },
-    coralTeal,
-    //retro,
-    //candy,
-    greatBarrierReef,
-    campfire,
-    tunnel,
-  });
+void addPaletteColumn(Hyperion *hyp)
+{
+  auto paletteColumn = new PaletteColumn(&hyp->hub, 0, {
+                                                           {.gradient = &heatmap, .primary = heatmap.get(127), .secondary = heatmap.get(200), .highlight = heatmap.get(255)},
+                                                           {.gradient = &sunset1, .primary = sunset1.get(127), .secondary = sunset1.get(200), .highlight = sunset1.get(255)},
+                                                           {.gradient = &sunset3, .primary = sunset3.get(127), .secondary = sunset3.get(200), .highlight = sunset3.get(255)},
+                                                           {.gradient = &sunset4, .primary = sunset4.get(127), .secondary = sunset4.get(200), .highlight = sunset4.get(255)},
+                                                           coralTeal,
+                                                           // retro,
+                                                           // candy,
+                                                           greatBarrierReef,
+                                                           campfire,
+                                                           tunnel,
+                                                       });
   hyp->hub.subscribe(paletteColumn);
 }
