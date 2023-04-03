@@ -25,11 +25,13 @@
 #include "ledsterPatterns.hpp"
 #include "platform/includes/thread.hpp"
 #include "patterns-low.hpp"
+#include "patterns-mid.hpp"
 
 auto pLedsterMap = ledsterMap.toPolarRotate90();
 auto pColumnMap = columnMap.toPolarRotate90();
 
 auto cColumnMap3d = columnMap3d.toCylindricalRotate90();
+auto cLedsterMap3d = ledsterMap3d.toCylindricalRotate90();
 
 void addLedsterPipe(Hyperion *hyp);
 void addColumnPipes(Hyperion *hyp);
@@ -54,9 +56,11 @@ int main()
   //addHaloPipe(hyp);
   addPaletteColumn(hyp);
 
-  //Tempo::AddSource(new ConstantTempo(120));
+  Tempo::AddSource(new ConstantTempo(120));
 
   hyp->hub.buttonPressed(0,0);
+  hyp->hub.buttonPressed(2,6);
+  //hyp->hub.buttonPressed(1,4);
 
   hyp->start();
   while (1)
@@ -125,6 +129,12 @@ void addLedsterPipe(Hyperion *hyp)
               // //{.column = 7, .slot = 0, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(ledsterMap3d)},
               // //{.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(ledsterMap3d)},
               // //{.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(ledsterMap3d)},
+
+              {.column = 2, .slot = 0, .pattern = new Mid::Lighthouse(cLedsterMap3d)},
+              {.column = 2, .slot = 2, .pattern = new Mid::Halo2(cLedsterMap3d)},
+              {.column = 2, .slot = 3, .pattern = new Mid::HaloOnBeat(cLedsterMap3d)},
+              {.column = 2, .slot = 4, .pattern = new Mid::SnowflakePatternLedster()},
+              {.column = 2, .slot = 6, .pattern = new Mid::PetalChase(cLedsterMap3d)},
           }),
       //new PatternInput<RGBA>(ledsterMap3d.size(), ledsterPattern),
       new CloneOutput({
@@ -144,7 +154,7 @@ void addColumnPipes(Hyperion *hyp)
           columnMap.size(),
           &hyp->hub,
           {
-               {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(columnMap3d)},
+              // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(columnMap3d)},
               // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(columnMap3d)},
               // {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
 
@@ -177,13 +187,20 @@ void addColumnPipes(Hyperion *hyp)
               // {.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(columnMap3d)},
               // {.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(columnMap3d)},
 
-              //{.column = 0, .slot = 0, .pattern = new Low::StaticGradientPattern(columnMap3d)},
-              // {.column = 0, .slot = 0, .pattern = new Low::OnBeatColumnChaseUpPattern(columnMap3d)},
-              // {.column = 0, .slot = 0, .pattern = new Low::HorizontalSin(cColumnMap3d)},
-              // {.column = 0, .slot = 0, .pattern = new Low::HorizontalSaw(cColumnMap3d)},
-              // {.column = 0, .slot = 0, .pattern = new Low::GrowShrink(cColumnMap3d)},
-              // {.column = 0, .slot = 0, .pattern = new Low::GlowPulsePattern(columnMap3d)},
-              //{.column = 0, .slot = 0, .pattern = new Low::VerticallyIsolated(cColumnMap3d)},
+              {.column = 1, .slot = 0, .pattern = new Low::StaticGradientPattern(columnMap3d)},
+              {.column = 1, .slot = 1, .pattern = new Low::OnBeatColumnChaseUpPattern(columnMap3d)},
+              {.column = 1, .slot = 2, .pattern = new Low::HorizontalSin(cColumnMap3d)},
+              {.column = 1, .slot = 3, .pattern = new Low::HorizontalSaw(cColumnMap3d)},
+              {.column = 1, .slot = 4, .pattern = new Low::GrowShrink(cColumnMap3d)},
+              {.column = 1, .slot = 5, .pattern = new Low::GlowPulsePattern(columnMap3d)},
+              {.column = 1, .slot = 6, .pattern = new Low::VerticallyIsolated(cColumnMap3d)},
+
+              {.column = 2, .slot = 0, .pattern = new Mid::Lighthouse(cColumnMap3d)},
+              {.column = 2, .slot = 1, .pattern = new Mid::Halo(cColumnMap3d)},
+              {.column = 2, .slot = 3, .pattern = new Mid::HaloOnBeat(cColumnMap3d)},
+              {.column = 2, .slot = 4, .pattern = new Mid::SnowflakePatternColumn(cColumnMap3d)},
+              {.column = 2, .slot = 5, .pattern = new Mid::TakkenChase(cColumnMap3d)},
+              // {.column = 2, .slot = 6, .pattern = new Mid::HaloChase(cColumnMap3d)},
           }),
     //new PatternInput<RGBA>(columnMap3d.size(), columnPattern),
       {480 * sizeof(RGBA),
@@ -252,10 +269,16 @@ void addHaloPipe(Hyperion *hyp)
 
 void addPaletteColumn(Hyperion *hyp){
   auto paletteColumn = new PaletteColumn(&hyp->hub,0, {
-    {.gradient = &heatmap, .primary = heatmap.get(0), .secondary = heatmap.get(127), .highlight = heatmap.get(255) },
-    {.gradient = &sunset1, .primary = sunset1.get(0), .secondary = sunset1.get(127), .highlight = sunset1.get(255) },
-    {.gradient = &sunset3, .primary = sunset3.get(0), .secondary = sunset3.get(127), .highlight = sunset3.get(255) },
-    {.gradient = &sunset4, .primary = sunset4.get(0), .secondary = sunset4.get(127), .highlight = sunset4.get(255) }
+    {.gradient = &heatmap, .primary = heatmap.get(127), .secondary = heatmap.get(200), .highlight = heatmap.get(255) },
+    {.gradient = &sunset1, .primary = sunset1.get(127), .secondary = sunset1.get(200), .highlight = sunset1.get(255) },
+    {.gradient = &sunset3, .primary = sunset3.get(127), .secondary = sunset3.get(200), .highlight = sunset3.get(255) },
+    {.gradient = &sunset4, .primary = sunset4.get(127), .secondary = sunset4.get(200), .highlight = sunset4.get(255) },
+    coralTeal,
+    //retro,
+    //candy,
+    greatBarrierReef,
+    campfire,
+    tunnel,
   });
   hyp->hub.subscribe(paletteColumn);
 }

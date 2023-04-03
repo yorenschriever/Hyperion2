@@ -1,6 +1,7 @@
 #pragma once
 #include "colours.h"
 #include "gradient.hpp"
+#include "generation/controlHub/paletteColumn.hpp"
 
 Gradient heatmap = Gradient({
     {.position = 0, .color = RGB(0, 0, 0)},        // Black
@@ -71,3 +72,82 @@ Gradient sunset8 = Gradient({
     {.position = 191, .color = RGB(216, 59, 62)}, // Light red
     {.position = 255, .color = RGB(203, 22, 16)}  // Dark red
 });
+
+
+PaletteColumn::Palette tunnel{
+    .gradient = new Gradient({
+        {.position = 0, .color = RGB(0x03A688)},  
+        {.position = 63, .color = RGB(0x026873)}, 
+        {.position = 127, .color = RGB(0x011F26)},
+        {.position = 255, .color = RGB(0x025E73)},
+
+    }),
+    .primary = RGB(0x03A688),
+    .secondary = RGB(0xF2668B),
+    .highlight = RGB(255,255,255)
+};
+
+PaletteColumn::Palette campfire{
+    .gradient = new Gradient({
+        {.position = 0, .color = RGB(0x014040)},  
+        {.position = 63, .color = RGB(0x02735E)}, 
+        {.position = 127, .color = RGB(0x03A678)},
+        {.position = 255, .color = RGB(0xF27405)},
+
+    }),
+    .primary = RGB(0x014040),
+    .secondary = RGB(0x731702),
+    .highlight = RGB(255,255,255)
+};
+
+PaletteColumn::Palette greatBarrierReef{
+    .gradient = new Gradient({
+        {.position = 0,   .color = RGB(0x023059)},  
+        {.position = 63,  .color = RGB(0x0487D9)}, 
+        {.position = 127, .color = RGB(0x049DD9)},
+        {.position = 255, .color = RGB(0x04B2D9)},
+
+    }),
+    .primary = RGB(0x023059),
+    .secondary = RGB(0x04D9D9),
+    .highlight = RGB(255,255,255)
+};
+
+PaletteColumn::Palette candy{
+    .gradient = new Gradient({
+        {.position = 0,   .color = RGB(0xD90452)},  
+        {.position = 63,  .color = RGB(0xF205B3)}, 
+        {.position = 127, .color = RGB(0xF2AE30)},
+        {.position = 255, .color = RGB(0xF28D35)},
+
+    }),
+    .primary =   RGB(0xD90452),
+    .secondary = RGB(0xF26835),
+    .highlight = RGB(255,255,255)
+};
+
+PaletteColumn::Palette retro{
+    .gradient = new Gradient({
+        {.position = 0,   .color = RGB(0x662400)},  
+        {.position = 63,  .color = RGB(0xB33F00)}, 
+        {.position = 200, .color = RGB(0xFF6B1A)},
+        {.position = 255, .color = RGB(0x006663)},
+
+    }),
+    .primary =   RGB(0x662400),
+    .secondary = RGB(0x00B3AD),
+    .highlight = RGB(255,255,255)
+};
+
+PaletteColumn::Palette coralTeal{
+    .gradient = new Gradient({
+        {.position = 0,   .color = RGB(0x3F7C85)},  
+        {.position = 63,  .color = RGB(0x00CCBF)}, 
+        {.position = 200, .color = RGB(0x72F2EB)},
+        {.position = 255, .color = RGB(0x747E7E)},
+
+    }),
+    .primary =   RGB(0x3F7C85),
+    .secondary = RGB(0xFF5F5D),
+    .highlight = RGB(255,255,255)
+};
