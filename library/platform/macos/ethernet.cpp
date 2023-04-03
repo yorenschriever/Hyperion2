@@ -8,8 +8,10 @@
 #include <netinet/in.h> 
 #include <string.h> 
 #include <arpa/inet.h>
+#include <net/if_dl.h>
 
 static const char *TAG = "ETH";
+uint8_t Ethernet::mac[6] = {0,0,0,0,0,0};
 
 void Ethernet::initialize()
 {
@@ -54,11 +56,27 @@ IPAddress Ethernet::getIp()
             // inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
             // printf("%s IP Address %s\n", ifa->ifa_name, addressBuffer); 
             ip6 = (struct sockaddr_in6 *)ifa->ifa_addr;
-        } 
+        } else if (ifa->ifa_addr->sa_family == AF_LINK) {
+            struct sockaddr_dl* sdl = (struct sockaddr_dl *)ifa->ifa_addr;
+            //unsigned char mac[6];
+            //todo this only works on mac, not on linux.
+            //also, there is no guarantee that this will pick the correct mac address
+            if (6 == sdl->sdl_alen) {
+                memcpy(mac, LLADDR(sdl), sdl->sdl_alen);
+                //Log::info(TAG,"mac  : %02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            }
+      }
     }
     if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
 
     return IPAddress(ip4,ip6);
+}
+
+uint8_t* Ethernet::getMac()
+{
+    getIp();
+    //Log::info(TAG,"mac2  : %02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    return mac;
 }
 
 bool Ethernet::isConnected()

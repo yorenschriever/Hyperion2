@@ -6,9 +6,7 @@
 bool Midi::initialized = false;
 std::vector<MidiDevice *> Midi::devices;
 std::map<std::string, std::string> Midi::name_pairs;
-Midi::DeviceCreatedDestroyedCallback Midi::cb_created;
-Midi::DeviceCreatedDestroyedCallback Midi::cb_destroyed;
-void *Midi::callbackUserData = 0;
+std::vector<Midi::DeviceCreatedDestroyedEntry> Midi::callbacks;
 
 void Midi::initialize()
 {

@@ -3,14 +3,13 @@
 #include "utils.hpp"
 #include <set>
 
-using TempoTaskType = void (*)();
-
 class AbstractTempo;
 
 class Tempo
 {
 public:
-    static void AddSource(AbstractTempo *source);
+    static void AddSource(AbstractTempo *source);    
+    static void RemoveSource(AbstractTempo *source);
 
     static int GetBeatNumber();
 
@@ -30,13 +29,11 @@ public:
 private:
     
     static std::set<AbstractTempo *> sources;
-    static std::set<TempoTaskType> tasks;
     static bool threadStarted;
-    static TempoTaskType broadcastTask;
 
+    static void startTaskThread();
     static void TempoTask(void *param);
     static AbstractTempo *getActive();
-    static void registerTask(TempoTaskType task);
 
     static int phraseOffset;
 };

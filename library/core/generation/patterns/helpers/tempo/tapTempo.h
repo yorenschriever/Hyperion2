@@ -9,17 +9,9 @@ class TapTempo : public AbstractTempo
 {
 
 public:
-    static TapTempo *getInstance()
-    {
-        static TapTempo instance;
-        return &instance;
-    }
-
-    TempoTaskType Initialize() override
-    {
-        sourceName = "Tap";
-        return TapTempoTask;
-    }
+    TapTempo(){
+        sourceName="Tap";
+    };
 
     void Stop()
     {
@@ -78,30 +70,24 @@ public:
 
 private:
     const int tapTimeout = 1000000; // if no tap is detected for tapTimeout us, the next tap will be interpreted as a new tap session
-    int period = DEFAULT_PERIOD;     // default at 125BPM
+    int period = DEFAULT_PERIOD;     
     unsigned long startingpoint;
     unsigned long lastTap;
     unsigned long firstTap;
     int tapCount;
-
-    // private constructors, singleton
-    TapTempo() : AbstractTempo() {}
-    TapTempo(TapTempo const &);       // Don't Implement
-    void operator=(TapTempo const &); // Don't implement
 
     bool isTapping()
     {
         return (Utils::micros() - lastTap) < tapTimeout;
     }
 
-    static void TapTempoTask()
+    void TempoTask() override
     {
-        TapTempo *instance = TapTempo::getInstance();
-        if (!instance->validSignal || instance->period == 0)
+        if (!validSignal || period == 0)
             return;
 
-        int newBeatNr = (Utils::micros() - instance->startingpoint) / instance->period;
-        if (newBeatNr != instance->beatNumber)
-            instance->beat(newBeatNr, instance->period / 1000);
+        int newBeatNr = (Utils::micros() - startingpoint) / period;
+        if (newBeatNr != beatNumber)
+            beat(newBeatNr, period / 1000);
     }
 };

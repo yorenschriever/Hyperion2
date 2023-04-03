@@ -1,7 +1,7 @@
 #pragma once
 #include "abstractTempo.h"
-#include "utils.hpp"
 #include "log.hpp"
+#include "utils.hpp"
 
 #define DEFAULT_PERIOD 0 // default off
 
@@ -9,46 +9,38 @@ class ConstantTempo : public AbstractTempo
 {
 
 public:
-    static ConstantTempo *getInstance()
+    ConstantTempo(int bpm)
     {
-        static ConstantTempo instance;
-        return &instance;
-    }
-
-    TempoTaskType Initialize() override
-    {
+        setBpm(bpm);
         sourceName = "Constant";
-        return ConstantTempoTask;
     }
 
     void setBpm(int bpm)
     {
-        period = 60000000/bpm;
+        period = 60000000 / bpm;
         startingpoint = Utils::micros();
         validSignal = true;
     }
 
+    friend class Tempo;
+
 private:
-    int period = DEFAULT_PERIOD;     
+    int period = DEFAULT_PERIOD;
     unsigned long startingpoint;
-    
-    // private constructors, singleton
-    ConstantTempo() : AbstractTempo() {}
-    ConstantTempo(ConstantTempo const &);       // Don't Implement
-    void operator=(ConstantTempo const &); // Don't implement
+    const char *TAG = "CONSTANT_TEMPO";
 
-    static void ConstantTempoTask()
+    void TempoTask() override
     {
+        Log::info(TAG, "constant tempo task");
 
-        ConstantTempo *instance = ConstantTempo::getInstance();
-        if (!instance->validSignal || instance->period == 0)
+        if (!validSignal || period == 0)
             return;
 
-        int newBeatNr = (Utils::micros() - instance->startingpoint) / instance->period;
+        int newBeatNr = (Utils::micros() - startingpoint) / period;
 
-        // Log::info("ConstantTempo","ConstantTempoTask: %d", newBeatNr);
+        Log::info(TAG, "ConstantTempoTask: %d", newBeatNr);
 
-        if (newBeatNr != instance->beatNumber)
-            instance->beat(newBeatNr, instance->period / 1000, false); //use the beat locally, but don't broadcast it.
+        if (newBeatNr != beatNumber)
+            beat(newBeatNr, period / 1000, false); // use the beat locally, but don't broadcast it.
     }
 };

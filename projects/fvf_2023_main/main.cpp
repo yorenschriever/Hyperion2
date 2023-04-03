@@ -53,6 +53,10 @@ auto serv = WebServer::createInstance();
 
 int main()
 {
+
+  //Log::info("test","ip=%d",IPAddress::fromUint32(1234567).toUint32());
+  Log::info("test","mac%d",Ethernet::getMac());
+
   auto hyp = new Hyperion();
 
   hyp->hub.params.primaryColour = RGB(255, 0, 255);
@@ -65,8 +69,7 @@ int main()
   //addHaloPipe(hyp);
   addPaletteColumn(hyp);
 
-  Tempo::AddSource(ConstantTempo::getInstance());
-  ConstantTempo::getInstance()->setBpm(120);
+  //Tempo::AddSource(new ConstantTempo(120));
 
   hyp->hub.buttonPressed(0,0);
 
@@ -156,7 +159,7 @@ void addColumnPipes(Hyperion *hyp)
           columnMap.size(),
           &hyp->hub,
           {
-              // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(columnMap3d)},
+               {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(columnMap3d)},
               // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(columnMap3d)},
               // {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
 
@@ -196,8 +199,6 @@ void addColumnPipes(Hyperion *hyp)
               // {.column = 0, .slot = 0, .pattern = new Low::GrowShrink(cColumnMap3d)},
               // {.column = 0, .slot = 0, .pattern = new Low::GlowPulsePattern(columnMap3d)},
               //{.column = 0, .slot = 0, .pattern = new Low::VerticallyIsolated(cColumnMap3d)},
-
-              //{.column=0, .slot=0, .pattern=new TestPattern()}
           }),
     //new PatternInput<RGBA>(columnMap3d.size(), columnPattern),
       {480 * sizeof(RGBA),

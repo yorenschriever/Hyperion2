@@ -121,6 +121,15 @@ public:
         return std::string(addrstr);
     }
 
+    uint32_t toUint32()
+    {
+        if (!hasip4)
+            return 0;
+        uint32_t result = 0;
+        result = ntohl(*((uint32_t *)&(ip4.sin_addr)));
+        return result;
+    }
+
     bool isValid() { return hasip4 || hasip6; }
 
     friend class Socket;

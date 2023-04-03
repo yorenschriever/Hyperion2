@@ -65,7 +65,7 @@ private:
     if (!listener)
       return;
 
-    if (message->size() == 1 && message->at(0) > 0xF8)
+    if (message->size() == 1 && message->at(0) >= 0xF8)
     {
       listener->onSystemRealtime(message->at(0));
       return;
@@ -96,6 +96,6 @@ private:
       }
     }
 
-    Log::error("MIDI", "Unknown message");
+    Log::error("MIDI", "Unknown message. size=%d, byte0=%x",message->size(),message->at(0));
   }
 };
