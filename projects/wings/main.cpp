@@ -32,8 +32,7 @@ int main()
   addWingsPipe(hyp);
   addPaletteColumn(hyp);
 
-  Tempo::AddSource(ConstantTempo::getInstance());
-  ConstantTempo::getInstance()->setBpm(120);
+  Tempo::AddSource(new ConstantTempo(120));
 
   hyp->start();
 

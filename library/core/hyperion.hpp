@@ -2,6 +2,7 @@
 #include "core/generation/controllers/midiController.hpp"
 #include "core/generation/controllers/midiControllerFactory.hpp"
 #include "core/generation/patterns/helpers/tempo/tapTempo.h"
+#include "core/generation/patterns/helpers/tempo/midiClockTempo.h"
 #include "core/generation/patterns/helpers/tempo/tempo.h"
 #include "platform/includes/ethernet.hpp"
 #include "platform/includes/log.hpp"
@@ -23,8 +24,8 @@ public:
         setup_network();
         setup_rotary();
         setup_display();
-        setup_tempo();
         setup_midi();
+        setup_tempo();
 
         Log::info("HYP", "starting outputs");
         for (Pipe *pipe : pipes)
@@ -85,10 +86,10 @@ private:
     virtual void setup_tempo()
     {
         // add tempo sources in order of importance. first has highest priority
-        //  Tempo::AddSource(ProDJLinkTempo::getInstance());
-        //  Tempo::AddSource(MidiClockTempo::getInstance());
-        //  Tempo::AddSource(TapTempo::getInstance());
-        //  Tempo::AddSource(UdpTempo::getInstance());
+        // Tempo::AddSource(ProDJLinkTempo::getInstance());
+        // Tempo::AddSource(MidiClockTempo::getInstance());
+        // Tempo::AddSource(TapTempo::getInstance());
+        // Tempo::AddSource(UdpTempo::getInstance());
 
         // Midi::Initialize();
         // Midi::onNoteOn([](uint8_t ch, uint8_t note, uint8_t velocity) {
@@ -100,6 +101,27 @@ private:
 
         // Rotary::onPress([]() { TapTempo::getInstance()->Tap(); });
         // Rotary::onLongPress([]() { TapTempo::getInstance()->Stop(); });
+
+        Midi::initialize();
+        Midi::onDeviceCreatedDestroyed(
+            [](MidiDevice *device, std::string name, void *userData)
+            {
+                auto hyp = (Hyperion *)userData;
+                auto midiTempo = new MidiClockTempo();
+                hyp->midiClockTempos.insert({device, midiTempo});
+                Tempo::AddSource(midiTempo);
+                device->addMidiListener(midiTempo);
+            },
+            [](MidiDevice *device, std::string name, void *userData)
+            {
+                auto hyp = (Hyperion *)userData;
+                auto midiTempo = hyp->midiClockTempos[device];
+                Tempo::RemoveSource(midiTempo);
+                hyp->midiClockTempos.erase(device);
+                device->removeMidiListener(midiTempo);
+                delete midiTempo;
+            },
+            this);
     }
 
     virtual void setup_midi()
@@ -111,12 +133,17 @@ private:
                 auto hyp = (Hyperion *)userData;
                 auto controller = MidiControllerFactory::create(device, name, &hyp->hub);
                 hyp->midiControllers.insert({device, std::move(controller)});
+
+                auto midiTempo = new MidiClockTempo();
+                Tempo::AddSource(midiTempo);
+                device->addMidiListener(midiTempo);
+
             },
             [](MidiDevice *device, std::string name, void *userData)
             {
                 auto hyp = (Hyperion *)userData;
                 //because midiControllers contains a smart pointer to the midiDevice
-                //it will automatically delete the device
+                //this will also automatically delete the device
                 hyp->midiControllers.erase(device);
             },
             this);
@@ -208,5 +235,5 @@ private:
 
     std::vector<Pipe *> pipes;
     std::map<MidiDevice *, std::unique_ptr<MidiController>> midiControllers;
-    // MidiControllerFactory *midiControllerFactory;
+    std::map<MidiDevice *, MidiClockTempo*> midiClockTempos;
 };

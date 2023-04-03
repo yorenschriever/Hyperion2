@@ -13,4 +13,8 @@ public:
     static bool isConnecting();
 
     static IPAddress getIp();
+    static uint8_t* getMac();
+
+private:
+    static uint8_t mac[6];
 };

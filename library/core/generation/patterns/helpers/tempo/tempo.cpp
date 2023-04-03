@@ -3,7 +3,9 @@
 #include "tempo.h"
 //#include "udpTempo.h"
 #include "abstractTempo.h"
+#include "log.hpp"
 
+static const char* TAG = "TEMPO";
 
 void Tempo::BroadcastBeat(AbstractTempo *source)
 {
@@ -15,7 +17,12 @@ void Tempo::BroadcastBeat(AbstractTempo *source)
 void Tempo::AddSource(AbstractTempo *source)
 {
     sources.insert(source);
-    registerTask(source->Initialize());
+    startTaskThread();
+}
+
+void Tempo::RemoveSource(AbstractTempo *source)
+{
+    sources.erase(source);
 }
 
 int Tempo::GetBeatNumber()
@@ -74,19 +81,16 @@ void Tempo::TempoTask(void *param)
 {
     while (true)
     {
-        for (auto &&task : tasks)
-            task();
+        for (auto source : sources)
+            source->TempoTask();
         Thread::sleep(1);
     }
 }
 
-void Tempo::registerTask(TempoTaskType task)
+void Tempo::startTaskThread()
 {
-    if (task == nullptr)
-        return;
-
-    tasks.insert(task);
     if (!threadStarted){
+        // Log::info(TAG, "Create tempo task");
         Thread::create(TempoTask, "TempoTask", Thread::Purpose::control, 5000,nullptr,1);
         threadStarted = true;
     }
@@ -103,6 +107,5 @@ void Tempo::AlignPhrase()
 }
 
 std::set<AbstractTempo *> Tempo::sources;
-std::set<TempoTaskType> Tempo::tasks;
 bool Tempo::threadStarted = false;
 int Tempo::phraseOffset = 0;

@@ -3,11 +3,11 @@
 #include "utils.hpp"
 #include "tempo.h"
 
+class Tempo;
+
 class AbstractTempo
 {
 public:
-    virtual TempoTaskType Initialize() = 0;
-    
     int GetBeatNumber() { return beatNumber; }
 
     //time in ms
@@ -20,6 +20,7 @@ public:
 
     const char* Name() { return sourceName; }
 
+    friend class Tempo;
 protected:
     int beatNumber=-1;
     int timeBetweenBeats;
@@ -27,6 +28,8 @@ protected:
     unsigned long timeOfSecondToLastBeat;
     const char * sourceName="";
     bool validSignal=false;
+
+    virtual void TempoTask() {}
 
     void beat()
     {
