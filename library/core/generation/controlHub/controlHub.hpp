@@ -36,7 +36,7 @@ private:
 public:
     void buttonPressed(int columnIndex, int slotIndex)
     {
-        // Log::info(TAG, "button pressed %d %d", columnIndex, slotIndex);
+        //Log::info(TAG, "button pressed %d %d", columnIndex, slotIndex);
 
         auto slot = findSlot(columnIndex, slotIndex);
         if (slot == NULL)

@@ -60,14 +60,15 @@ private:
   static void callback(double delta_time, std::vector<unsigned char> *message, void *userData)
   {
     auto instance = (MidiDeviceMacos *)userData;
-    auto listener = instance->listener;
+    auto listeners = instance->listeners;
 
-    if (!listener)
+    if (listeners.size()==0)
       return;
 
     if (message->size() == 1 && message->at(0) >= 0xF8)
     {
-      listener->onSystemRealtime(message->at(0));
+      for (auto listener: listeners)
+        listener->onSystemRealtime(message->at(0));
       return;
     }
 
@@ -79,19 +80,22 @@ private:
 
       if (message_type == MIDI_NOTE_ON && message->at(1) < MIDI_NUMBER_OF_NOTES)
       {
-        listener->onNoteOn(channel, message->at(1), message->at(2));
+        for (auto listener: listeners)
+          listener->onNoteOn(channel, message->at(1), message->at(2));
         return;
       }
 
       if (message_type == MIDI_NOTE_OFF && message->at(1) < MIDI_NUMBER_OF_NOTES)
       {
-        listener->onNoteOff(channel, message->at(1), message->at(2));
+        for (auto listener: listeners)
+          listener->onNoteOff(channel, message->at(1), message->at(2));
         return;
       }
 
       if (message_type == MIDI_CONTROLLER_CHANGE && message->at(1) < MIDI_NUMBER_OF_CONTROLLERS)
       {
-        listener->onControllerChange(channel, message->at(1), message->at(2));
+        for (auto listener: listeners)
+          listener->onControllerChange(channel, message->at(1), message->at(2));
         return;
       }
     }

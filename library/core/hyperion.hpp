@@ -133,11 +133,6 @@ private:
                 auto hyp = (Hyperion *)userData;
                 auto controller = MidiControllerFactory::create(device, name, &hyp->hub);
                 hyp->midiControllers.insert({device, std::move(controller)});
-
-                auto midiTempo = new MidiClockTempo();
-                Tempo::AddSource(midiTempo);
-                device->addMidiListener(midiTempo);
-
             },
             [](MidiDevice *device, std::string name, void *userData)
             {

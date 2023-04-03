@@ -111,6 +111,13 @@ public:
         this->B = B;
     }
 
+    RGB(uint32_t hex)
+    {
+        this->R = (hex >> 16) & 0xFF;
+        this->G = (hex >> 8) & 0xFF;
+        this->B = hex & 0xFF;
+    }
+
     inline void ApplyLut(LUT *lut)
     {
         R = lut->luts[0 % lut->Dimension][R];
