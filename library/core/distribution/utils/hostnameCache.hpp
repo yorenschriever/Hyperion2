@@ -1,8 +1,8 @@
 #pragma once
 
 #include "platform/includes/ipAddress.hpp"
-#include "platform/includes/utils.hpp"
 #include "platform/includes/thread.hpp"
+#include "platform/includes/utils.hpp"
 #include <map>
 #include <string>
 
@@ -28,7 +28,7 @@ public:
         auto cacheHit = it->second;
         if (!cacheHit.found)
         {
-            if ((Utils::millis() - cacheHit.updated) < 5*1000)
+            if ((Utils::millis() - cacheHit.updated) < 5 * 1000)
             {
                 // last hostname query returned nothing, and was less than 5 seconds ago. Do not ask again yet
                 // Log::info("HOSTNAME_CACHE","less than 5 sec. waiting");
@@ -41,20 +41,18 @@ public:
             return NULL;
         }
 
-        if (Utils::millis() - cacheHit.updated > 60*1000)
+        if (Utils::millis() - cacheHit.updated > 60 * 1000)
         {
             // entry is older than 1 minute, refresh
             // Log::info("HOSTNAME_CACHE", "refreshing hostname cache item for %s", hostname);
             cache.find(hostname)->second.updated = Utils::millis();
             Thread::create(resolveTask, "ResolveTask", Thread::Purpose::network, 3000, (void *)hostname, 0);
         }
-        
-        if (!cacheHit.found)
-            return NULL;
 
-        //Log::info("HOSTNAME_CACHE","return cached ip %s",cacheHit.ip.toString().c_str());
+        // Log::info("HOSTNAME_CACHE","return cached ip %s",cacheHit.ip.toString().c_str());
         return &it->second.ip;
     }
+
 private:
     struct CacheItem
     {
@@ -78,6 +76,7 @@ private:
             item->second.ip = IPAddress::fromHostname(hostname);
             item->second.updated = Utils::millis();
             item->second.found = item->second.ip.isValid();
+            // Log::info("HOSTNAME_CACHE","resolved %s", hostname);
         }
 
         Thread::destroy();

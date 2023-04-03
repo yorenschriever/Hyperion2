@@ -334,7 +334,7 @@ namespace Ledster
         const int numSegments = 36;
         const int segmentSize = 10;
         int averagePeriod;
-        float precision;
+        float precision = 1;
         LFO<T> lfo = LFO<T>();
         Permute perm = Permute(36);
 
@@ -350,6 +350,9 @@ namespace Ledster
         {
             if (!active)
                 return;
+
+            lfo.setPulseWidth(params->getAmount(0,0.5));
+            lfo.setPeriod(params->getVelocity(10000,500));
 
             for (int ribbe = 0; ribbe < numSegments; ribbe++)
             {
