@@ -201,7 +201,7 @@ namespace Low
 
                 float distanceAsRatio = 1 - distance / lfoSize ;
 
-                pixels[index] = params->gradient->get(distanceAsRatio * 255); // * distanceAsRatio * transition.getValue();
+                pixels[index] = params->gradient->get(distanceAsRatio * 255) * distanceAsRatio * transition.getValue();
             }
         }
     };

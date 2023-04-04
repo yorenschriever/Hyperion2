@@ -31,12 +31,12 @@ public:
 private:
     std::vector<Column> columns;
     std::vector<IHubController *> controllers;
-    const char* TAG = "CONTROL_HUB";
+    const char *TAG = "CONTROL_HUB";
 
 public:
     void buttonPressed(int columnIndex, int slotIndex)
     {
-        //Log::info(TAG, "button pressed %d %d", columnIndex, slotIndex);
+        // Log::info(TAG, "button pressed %d %d", columnIndex, slotIndex);
 
         auto slot = findSlot(columnIndex, slotIndex);
         if (slot == NULL)
@@ -181,9 +181,11 @@ public:
             controller->onHubOffsetChange(offset);
     }
 
-    void subscribe(IHubController *controller)
+    void subscribe(IHubController *controller, bool sendCurrentStatus = false)
     {
         controllers.push_back(controller);
+        if (sendCurrentStatus)
+            this->sendCurrentStatus(controller);
     }
 
     void unsubscribe(IHubController *controller)
@@ -191,25 +193,55 @@ public:
         controllers.erase(std::remove(controllers.begin(), controllers.end(), controller), controllers.end());
     }
 
-    void expandTo(unsigned int minColumns, unsigned int minRows)
+    void sendCurrentStatus(IHubController *controller)
     {
-        for (int i = columns.size(); i <= minColumns; i++)
+        Log::info(TAG, "sending current status");
+        for (int columnIndex = 0; columnIndex < columns.size(); columnIndex++)
+        {
+            auto column = columns[columnIndex];
+            for (int slotIndex = 0; slotIndex < column.slots.size(); slotIndex++)
+            {
+                auto slot = column.slots[slotIndex];
+                controller->onHubSlotActiveChange(columnIndex, slotIndex, slot.activated);
+                Log::info(TAG, "sending current status2");
+            }
+            controller->onHubColumnDimChange(columnIndex, column.dim);
+        }
+        controller->onHubMasterDimChange(masterDim);
+
+        // todo also send params?
+    }
+
+    void expandTo(unsigned int minColumns, unsigned int minRows, bool expandAllColumns = false)
+    {
+        for (int i = columns.size() ; i <= minColumns; i++)
         {
             columns.push_back(Column());
-            //Log::info(TAG,"added column. column size = %d", columns.size());
+            // Log::info(TAG,"added column. column size = %d", columns.size());
         }
 
-        for (int i = 0; i < columns.size(); i++)
+        if (!expandAllColumns)
         {
-            for (int j = columns[i].slots.size(); j <= minRows; j++)
+            for (int j = columns[minColumns].slots.size(); j <= minRows; j++)
             {
-                columns[i].slots.push_back(Slot());
-                //Log::info(TAG,"added slot. columns.lots size = %d", columns[i].slots.size());
+                columns[minColumns].slots.push_back(Slot());
+                // Log::info(TAG,"added slot. columns.lots size = %d", columns[i].slots.size());
+            }
+        }
+        else
+        {
+            for (int i = 0; i < columns.size(); i++)
+            {
+                for (int j = columns[i].slots.size(); j <= minRows; j++)
+                {
+                    columns[i].slots.push_back(Slot());
+                    // Log::info(TAG,"added slot. columns.lots size = %d", columns[i].slots.size());
+                }
             }
         }
 
-        // for (int i = 0; i < columns.size(); i++)
-        //     Log::info(TAG,"column %d has %d slots", i, columns[i].slots.size());
+        for (int i = 0; i < columns.size(); i++)
+            Log::info(TAG,"column %d has %d slots", i, columns[i].slots.size());
     }
 
     Slot *findSlot(int columnIndex, int slotIndex) &

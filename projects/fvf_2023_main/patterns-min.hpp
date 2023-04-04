@@ -205,7 +205,7 @@ namespace Min
                 {
                     float fadePosition = fade[column].getValue(radii[column][i] * velocity);
                     RGBA color = params->getPrimaryColour();
-                    pixels[i] += color * fadePosition; // * transition.getValue();
+                    pixels[i] += color * fadePosition * transition.getValue();
                 }
             }
         }
@@ -213,9 +213,6 @@ namespace Min
 
     class LineLaunch : public Pattern<RGBA>
     {
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
         FadeDown fade = FadeDown(50, WaitAtEnd);
         BeatWatcher watcher = BeatWatcher();
         PixelMap3d map;
@@ -235,13 +232,12 @@ namespace Min
                 fade.reset();
 
             float velocity = 100; // params->getVelocity(600, 100);
-            // float density = 481./width;
 
             for (int i = 0; i < width; i++)
             {
                 float fadePosition = fade.getValue((1 + map[i].z) * velocity);
                 RGBA color = params->getHighlightColour();
-                pixels[i] += color * fadePosition; // * transition.getValue();
+                pixels[i] += color * fadePosition;
             }
         }
     };

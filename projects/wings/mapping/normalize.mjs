@@ -20,8 +20,15 @@ let content = 'PixelMap wingMap = {\n'
 for (let mirror = -1; mirror<2; mirror += 2)
 {
     for (let i = 0; i < scaled.length / 2; i++) {
-        const p1 = scaled[i];
-        const p2 = scaled[clickPoints.length - 1 - i];
+        let p1 = scaled[i];
+        let p2 = scaled[clickPoints.length - 1 - i];
+        
+        if (i%2==0)
+        {
+            const tmp = p1;
+            p1=p2;
+            p2=tmp;
+        }
 
 
         for (let j = 0; j < 60; j++) {
