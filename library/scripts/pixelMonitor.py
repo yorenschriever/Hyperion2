@@ -17,7 +17,8 @@ window = pyglet.window.Window(resizable=True)
 dotsize = 1/200 #1/250
 
 batchCircles = pyglet.graphics.Batch()
-batchLabels = pyglet.graphics.Batch()
+batchSomeLabels = pyglet.graphics.Batch()
+batchAllLabels = pyglet.graphics.Batch()
 
 for pixelSetIndex, pixelSet in enumerate(pixelMap):
     pixelSet['circles'] = []
@@ -25,6 +26,7 @@ for pixelSetIndex, pixelSet in enumerate(pixelMap):
 
     for i, position in enumerate(pixelSet['positions']):
         pixelSet['circles'].append(pyglet.shapes.Circle(x=0, y=0, radius=5, color=(50, 50, 50),batch=batchCircles))
+        batchLabels = batchSomeLabels if i%60==0 else batchAllLabels
         pixelSet['labels'].append(pyglet.text.Label(str(i),font_size=10,
                             anchor_x='center', anchor_y='center', batch=batchLabels))
 
@@ -59,7 +61,8 @@ def on_resize(width, height):
 def on_draw():
     window.clear()
     batchCircles.draw()
-    # batchLabels.draw();
+    batchSomeLabels.draw()
+    # batchAllLabels.draw();
     # line1.draw()
     # line2.draw()
     

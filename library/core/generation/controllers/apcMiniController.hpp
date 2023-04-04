@@ -5,6 +5,7 @@
 #include "log.hpp"
 #include "midiController.hpp"
 #include "platform/includes/midi-device.hpp"
+#include "thread.hpp"
 
 class ApcMiniController : public MidiController
 {
@@ -15,7 +16,7 @@ private:
     const int WIDTH = 8;
     const int HEIGHT = 8;
 
-    const int FADER0_CONTROLLER_NUMBER = 48; 
+    const int FADER0_CONTROLLER_NUMBER = 48;
     const int MASTER_DIM_FADER_CONTROLLER_NUMBER = 56;
 
     const int MIDI_CHANNEL = 0;
@@ -33,7 +34,7 @@ private:
         int column = note % WIDTH;
         int row = HEIGHT - 1 - note / WIDTH;
 
-        //Log::info("APCMINI", "keypress %d %d (%d %d)", note, isOn, column, row);
+        // Log::info("APCMINI", "keypress %d %d (%d %d)", note, isOn, column, row);
 
         if (isOn)
             hub->buttonPressed(column, row);
@@ -47,17 +48,22 @@ public:
         this->hub = hub;
         this->midi = midi;
 
-        hub->subscribe(this);
         midi->addMidiListener(this);
 
-        //Log::info("APCMINI", "apcmini constructor");
+        clearAll();
+        Thread::sleep(200);
+        hub->subscribe(this, true);
+
+        // Log::info("APCMINI", "apcmini constructor");
+        
     }
 
-    ~ApcMiniController(){
+    ~ApcMiniController()
+    {
         hub->unsubscribe(this);
         midi->removeMidiListener(this);
 
-        //Log::info("APCMINI", "apcmini destructor");
+        // Log::info("APCMINI", "apcmini destructor");
     }
 
     void onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override
@@ -71,7 +77,7 @@ public:
 
     void onControllerChange(uint8_t channel, uint8_t controller, uint8_t value) override
     {
-        //Log::info("APCMINI", "onControllerChange %d %d", controller, value);
+        // Log::info("APCMINI", "onControllerChange %d %d", controller, value);
 
         if (controller == MASTER_DIM_FADER_CONTROLLER_NUMBER)
         {
@@ -88,12 +94,20 @@ public:
 
     void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) override
     {
-        //Log::info("APCMINI", "slot active change %d %d %d", columnIndex, slotIndex, active);
+        // Log::info("APCMINI", "slot active change %d %d %d", columnIndex, slotIndex, active);
         int note = (HEIGHT - 1 - slotIndex) * WIDTH + columnIndex;
         if (note < 0 || note > WIDTH * HEIGHT)
             return;
         midi->sendNoteOn(MIDI_CHANNEL, note, active ? GREEN : OFF);
     }
+
+    void clearAll()
+    {
+        for (int x = 0; x < WIDTH; x++)
+            for (int y = 0; y < HEIGHT; y++)
+                onHubSlotActiveChange(x, y, false);
+    }
+
     void onHubColumnDimChange(int columnIndex, uint8_t dim) override {}
     void onHubMasterDimChange(uint8_t dim) override {}
     void onHubVelocityChange(float velocity) override {}

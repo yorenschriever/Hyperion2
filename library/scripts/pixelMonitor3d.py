@@ -48,8 +48,8 @@ def on_resize(width, height):
 
     fov = 5 if far else 80
     window.projection = Mat4.perspective_projection(window.aspect_ratio, z_near=0.1, z_far=255, fov=fov)
-    glViewport(0, 0, width, height)
-    # glViewport(0, 0, width*2, height*2)
+    # glViewport(0, 0, width, height)
+    glViewport(0, 0, width*2, height*2)
     return pyglet.event.EVENT_HANDLED
 
 def update(dt):

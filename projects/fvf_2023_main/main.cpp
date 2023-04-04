@@ -309,6 +309,8 @@ void addHaloPipe(Hyperion *hyp)
               // //{.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(ledsterMap3d)},
               // //{.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(ledsterMap3d)},
 
+              {.column = 2, .slot = 0, .pattern = new Mid::Lighthouse(cHaloMap3d)},
+
               {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
               {.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
               {.column = 4, .slot = 2, .pattern = new Min::SegmentChasePattern()},
