@@ -172,6 +172,9 @@ class PixelGlitchPattern : public Pattern<RGBA>
 template <class T>
 class ClivePattern : public Pattern<RGBA>
 {
+            Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
     int numSegments;
     int averagePeriod;
     float precision;
@@ -190,14 +193,14 @@ public:
 
     inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
     {
-        if (!active)
+                if (!transition.Calculate(active))
             return;
 
         for (int index = 0; index < width; index++)
         {
             int permutedQuantized = perm.at[index * numSegments / width] * width / numSegments;
             int interval = averagePeriod + permutedQuantized * (averagePeriod * precision) / width;
-            pixels[index] += params->getSecondaryColour() * lfo.getValue(0, interval);
+            pixels[index] += params->getSecondaryColour() * lfo.getValue(0, interval) * transition.getValue();
         }
     }
 };
@@ -392,25 +395,25 @@ public:
 
         float velocity = params->getVelocity(600, 100);
         fade.duration = params->getSize(250,20);
+        RGBA color = params->getHighlightColour();
 
         for (int i = 0; i < width; i++)
-        {
-            float fadePosition = fade.getValue((0.8 - map[i].y) * velocity);
-            RGBA color = params->getHighlightColour();
-            pixels[i] += color * fadePosition;
-        }
+            pixels[i] += color * fade.getValue((0.8 - map[i].y) * velocity);
     }
 };
 
 class SegmentChasePattern : public Pattern<RGBA>
 {
+        Transition transition = Transition(
+        200, Transition::none, 0,
+        1000, Transition::none, 0);
     Permute perm;
     LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(5000);
 
 public:
     inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
     {
-        if (!active)
+        if (!transition.Calculate(active))
             return;
 
         int segmentSize = 60;
@@ -434,7 +437,7 @@ public:
             {
                 float lfoVal = lfo.getValue(float(j) / lfoWidth + float(randomSegment) / numSegments + float(segment));
                 RGBA col = params->gradient->get(lfoVal * 255) * lfoVal;
-                pixels[segment * segmentSize + j] = col;
+                pixels[segment * segmentSize + j] = col * transition.getValue();
             }
         }
     }
@@ -597,7 +600,7 @@ public:
     class GrowingStrobePattern : public Pattern<RGBA>
     {
         PixelMap::Polar map;
-        FadeDown fade = FadeDown(5000, WaitAtEnd);
+        FadeDown fade = FadeDown(2000, WaitAtEnd);
 
     public:
         GrowingStrobePattern(PixelMap::Polar map)
@@ -618,7 +621,7 @@ public:
 
             for (int i = 0; i < map.size(); i++)
             {
-                float conePos = map[i].r;
+                float conePos = Utils::rescale(map[i].r,0,1,0.4,1.5);
                 if (directionUp && conePos < fade.getValue())
                     continue;
                 if (!directionUp && 1. - conePos < fade.getValue())
@@ -764,6 +767,9 @@ public:
     template <class T>
     class RibbenClivePattern : public Pattern<RGBA>
     {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
         const int segmentSize = 60;
         int averagePeriod;
         float precision;
@@ -780,7 +786,7 @@ public:
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
-            if (!active)
+            if (!transition.Calculate(active))
                 return;
 
             bool isLedster = width == 481;
@@ -808,7 +814,7 @@ public:
                 // int randomSegment = perm.at[segment];
                 // RGBA col = params->getPrimaryColour() * lfo.getValue(float(randomSegment)/numSegments);
                 int interval = averagePeriod + perm.at[segment] * (averagePeriod * precision) / numSegments;
-                RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval);
+                RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval) * transition.getValue();
                 for (int j = 0; j < segmentSize; j++)
                     pixels[segment * segmentSize + j] = col;
             }
