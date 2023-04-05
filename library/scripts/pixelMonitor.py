@@ -61,7 +61,7 @@ def on_resize(width, height):
 def on_draw():
     window.clear()
     batchCircles.draw()
-    batchSomeLabels.draw()
+    # batchSomeLabels.draw()
     # batchAllLabels.draw();
     # line1.draw()
     # line2.draw()

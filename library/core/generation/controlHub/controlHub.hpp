@@ -195,7 +195,7 @@ public:
 
     void sendCurrentStatus(IHubController *controller)
     {
-        Log::info(TAG, "sending current status");
+        // Log::info(TAG, "sending current status");
         for (int columnIndex = 0; columnIndex < columns.size(); columnIndex++)
         {
             auto column = columns[columnIndex];
@@ -203,7 +203,7 @@ public:
             {
                 auto slot = column.slots[slotIndex];
                 controller->onHubSlotActiveChange(columnIndex, slotIndex, slot.activated);
-                Log::info(TAG, "sending current status2");
+                // Log::info(TAG, "sending current status2");
             }
             controller->onHubColumnDimChange(columnIndex, column.dim);
         }
@@ -242,6 +242,32 @@ public:
 
         for (int i = 0; i < columns.size(); i++)
             Log::info(TAG,"column %d has %d slots", i, columns[i].slots.size());
+    }
+
+    void setFlash(int columnIndex, int slotIndex, bool flash=true)
+    {
+        auto slot = findSlot(columnIndex, slotIndex);
+        if (!slot){
+            Log::error(TAG,"Cannot set slot to flash mode");
+            return;
+        }
+        slot->flash = flash;
+    }
+
+    void setFlashColumn(int columnIndex, bool flash=true)
+    {
+        auto column = findColumn(columnIndex);
+        for(auto& slot: column->slots)
+            slot.flash = flash;
+    }
+
+    void setFlashRow(int rowIndex, bool flash=true)
+    {
+        for(auto& column: columns)
+        {
+            if (column.slots.size() > rowIndex)
+                column.slots[rowIndex].flash = flash;
+        }
     }
 
     Slot *findSlot(int columnIndex, int slotIndex) &
