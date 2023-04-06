@@ -69,10 +69,10 @@ void addWingsPipe(Hyperion *hyp)
           wingMap.size(),
           &hyp->hub,
           {
-              {.column = 1, .slot = 0, .pattern = new PaletteTester(ledsterMap)},
+              //{.column = 1, .slot = 7, .pattern = new PaletteTester(ledsterMap)},
 
               // static
-              //{.column = 1, .slot = 0, .pattern = new HorizontalGradientPattern(wingMap)},
+              {.column = 1, .slot = 0, .pattern = new HorizontalGradientPattern(wingMap)},
               {.column = 1, .slot = 1, .pattern = new RadialGradientPattern(pWingMap)},
 
               // 
