@@ -472,6 +472,36 @@ public:
     }
 };
 
+class PaletteTester : public Pattern<RGBA>
+{
+    PixelMap map;
+
+public:
+    PaletteTester(PixelMap map)
+    {
+        this->map = map;
+    }
+
+    inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    {
+        if (!active) return;
+
+        for (int index = 0; index < std::min(width, (int)map.size()); index++)
+        {
+            if (map[index].y > 0.7) 
+                pixels[index] = params->getHighlightColour();
+            else if (map[index].y > 0.6) 
+                pixels[index] = params->getSecondaryColour();
+            else if (map[index].y > 0.5) 
+                pixels[index] = params->getPrimaryColour();
+            else
+                pixels[index] = params->gradient->get(Utils::rescale(map[index].x,0,255,-1,1));
+        }
+    }
+};
+
+
+
     class Lighthouse : public Pattern<RGBA>
     {
         Transition transition = Transition(

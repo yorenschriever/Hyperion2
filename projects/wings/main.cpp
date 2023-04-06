@@ -17,6 +17,8 @@
 #include "palettes.hpp"
 #include "patterns.hpp"
 
+#include "../ledster/mapping/ledsterMap.hpp"
+
 void addWingsPipe(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
 
@@ -41,6 +43,7 @@ int main()
   Tempo::AddSource(new ConstantTempo(120));
 
   hyp->hub.buttonPressed(0, 0);
+  hyp->hub.buttonPressed(1, 0);
 
   hyp->start();
 
@@ -66,8 +69,10 @@ void addWingsPipe(Hyperion *hyp)
           wingMap.size(),
           &hyp->hub,
           {
+              {.column = 1, .slot = 0, .pattern = new PaletteTester(ledsterMap)},
+
               // static
-              {.column = 1, .slot = 0, .pattern = new HorizontalGradientPattern(wingMap)},
+              //{.column = 1, .slot = 0, .pattern = new HorizontalGradientPattern(wingMap)},
               {.column = 1, .slot = 1, .pattern = new RadialGradientPattern(pWingMap)},
 
               // 
@@ -139,15 +144,22 @@ void addWingsPipe(Hyperion *hyp)
 
 void addPaletteColumn(Hyperion *hyp)
 {
-  auto paletteColumn = new PaletteColumn(&hyp->hub, 0, std::vector<PaletteColumn::Palette>{coralTeal,
-                                                                                           // retro,
-                                                                                           // candy,
-                                                                                           greatBarrierReef,
-                                                                                           campfire,
-                                                                                           tunnel,
-                                                                                           {.gradient = &heatmap, .primary = heatmap.get(127), .secondary = heatmap.get(200), .highlight = heatmap.get(255)},
-                                                                                           {.gradient = &sunset1, .primary = sunset1.get(127), .secondary = sunset1.get(200), .highlight = sunset1.get(255)},
-                                                                                           {.gradient = &sunset3, .primary = sunset3.get(127), .secondary = sunset3.get(200), .highlight = sunset3.get(255)},
-                                                                                           {.gradient = &sunset4, .primary = sunset4.get(127), .secondary = sunset4.get(200), .highlight = sunset4.get(255)}});
+  auto paletteColumn = new PaletteColumn(&hyp->hub, 0, std::vector<PaletteColumn::Palette>{
+    //coralTeal,
+    salmonOnIce,
+    // retro,
+    // candy,
+    greatBarrierReef,
+    //blueOrange,
+    campfire,
+    tunnel,
+    {.gradient = &heatmap, .primary = heatmap.get(127), .secondary = heatmap.get(200), .highlight = heatmap.get(255)},
+    {.gradient = &sunset1, .primary = sunset1.get(127), .secondary = sunset1.get(200), .highlight = sunset1.get(255)},
+    purpleGreen,
+    //{.gradient = &sunset3, .primary = sunset3.get(127), .secondary = sunset3.get(200), .highlight = sunset3.get(255)},
+    //{.gradient = &sunset4, .primary = sunset4.get(127), .secondary = sunset4.get(200), .highlight = sunset4.get(255)}
+    pinkSunset
+    });
+
   hyp->hub.subscribe(paletteColumn);
 }

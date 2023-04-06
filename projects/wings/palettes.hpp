@@ -3,6 +3,12 @@
 #include "gradient.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
 
+RGB darken(RGB col, uint8_t dim){
+    RGB result = col;
+    result.dim(dim);
+    return result;
+}
+
 Gradient heatmap = Gradient({
     {.position = 0, .color = RGB(0, 0, 0)},        // Black
     {.position = 128, .color = RGB(255, 0, 0)},    // Red
@@ -148,5 +154,60 @@ PaletteColumn::Palette coralTeal{
     }),
     .primary =   RGB(0x3F7C85),
     .secondary = RGB(0xFF5F5D),
+    .highlight = RGB(255,255,255)
+};
+
+PaletteColumn::Palette pinkSunset{
+    .gradient = new Gradient({
+        {.position = 0,   .color = RGB(0x6B1B5A)},  
+        {.position = 63,  .color = RGB(0xB90852)}, 
+        {.position = 200, .color = RGB(0xE7083F)},
+        {.position = 255, .color = RGB(0xF62D2A)},
+
+    }),
+    .primary =   RGB(0xB90852),
+    .secondary = RGB(0xF7AF02),
+    .highlight = RGB(255,255,255)
+};
+
+PaletteColumn::Palette salmonOnIce{
+    .gradient = new Gradient({
+        {.position = 0,   .color = darken(RGB(0x3F464D),100)}, 
+        {.position = 100, .color = darken(RGB(0x2186C4),150)},  
+        {.position = 180, .color = darken(RGB(0x2186C4),250)}, 
+        {.position = 190, .color = darken(RGB(0xFFF6E6),230)},  
+        {.position = 200, .color = darken(RGB(0x2186C4),50)}, 
+        {.position = 250, .color = RGB(0x7ECEFC)},
+        {.position = 255, .color = RGB(0xFFF6E6)},
+
+    }),
+    .primary =   RGB(0x3F464D),
+    .secondary = RGB(0xFF8066),
+    .highlight = RGB(255,255,255)
+};
+
+PaletteColumn::Palette blueOrange{
+    .gradient = new Gradient({
+        {.position = 0,   .color = RGB(0x0249DA)},  
+        {.position = 63,  .color = RGB(0x0387D7)}, 
+        {.position = 100, .color = RGB(0x039CC2)},
+        {.position = 255, .color = RGB(0xF24603)},
+
+    }),
+    .primary =   RGB(0x0387D7),
+    .secondary = RGB(0xF47502),
+    .highlight = RGB(255,255,255)
+};
+
+PaletteColumn::Palette purpleGreen{
+    .gradient = new Gradient({
+        {.position = 0,   .color = RGB(0x720EBF)},  
+        {.position = 63,  .color = RGB(0xff0950)}, 
+        {.position = 100, .color = darken(RGB(0xc913FF),100)},
+        {.position = 200, .color = RGB(0x260580)},
+        {.position = 255, .color = RGB(0x8911E5)},
+    }),
+    .primary =   RGB(0xFF00FF),
+    .secondary = RGB(0x3EB200),
     .highlight = RGB(255,255,255)
 };
