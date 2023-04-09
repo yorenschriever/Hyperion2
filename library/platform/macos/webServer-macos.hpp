@@ -1,9 +1,8 @@
 #pragma once
-#include "webServer.hpp"
-
-#include "server-certificate.hpp"
-
 #include "log.hpp"
+#include "server-certificate.hpp"
+#include "webServer.hpp"
+#include "webServerResponseBuilder.hpp"
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/beast/core.hpp>
@@ -25,37 +24,35 @@ namespace net = boost::asio;      // from <boost/asio.hpp>
 namespace ssl = boost::asio::ssl; // from <boost/asio/ssl.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
-
-//class Webserver;
-
 class WebServerMacOs : public WebServer
 {
 public:
-    WebServerMacOs(int port)
+    WebServerMacOs(std::string root, int port)
     {
-        start_server(port);
+        auto const doc_root = std::make_shared<std::string>(root);
+        std::thread{std::bind(
+                        &start_server,
+                        port,
+                        &paths,
+                        doc_root)}
+            .detach();
     }
 
-    void addPath(std::string path, uint8_t *content, int size) override
+    void addPath(std::string path, WebServerResponseBuilder *builder) override
     {
-        paths[path] = {
-            .content = content,
-            .size = size};
+        paths[path] = builder;
+        // Log::info(TAG, "added path %s", path.c_str());
     }
-
-    //friend class WebServer;
 
 private:
-    typedef struct
-    {
-        uint8_t *content;
-        int size;
-    } ContentSize;
-
     static const char *TAG;
-    std::map<std::string, ContentSize> paths;
 
-    void start_server(int portArg)
+    std::map<std::string, WebServerResponseBuilder *> paths;
+
+    static void start_server(
+        int portArg,
+        std::map<std::string, WebServerResponseBuilder *> *paths,
+        std::shared_ptr<std::string const> const &doc_root)
     {
         try
         {
@@ -88,9 +85,8 @@ private:
                                 &do_session,
                                 std::move(socket),
                                 std::ref(ctx),
-                                paths
-                                // doc_root
-                                )}
+                                doc_root,
+                                paths)}
                     .detach();
             }
         }
@@ -105,8 +101,8 @@ private:
     static void do_session(
         tcp::socket &socket,
         ssl::context &ctx,
-        // std::shared_ptr<std::string const> const &doc_root
-        std::map<std::string, ContentSize> paths)
+        std::shared_ptr<std::string const> const &doc_root,
+        std::map<std::string, WebServerResponseBuilder *> *paths)
     {
         beast::error_code ec;
 
@@ -140,7 +136,7 @@ private:
             // Handle request
             http::message_generator msg =
                 handle_request(
-                    //*doc_root,
+                    *doc_root,
                     paths,
                     std::move(req));
 
@@ -178,8 +174,8 @@ private:
     template <class Body, class Allocator>
     static http::message_generator
     handle_request(
-        // beast::string_view doc_root,
-        std::map<std::string, ContentSize> paths,
+        beast::string_view doc_root,
+        std::map<std::string, WebServerResponseBuilder *> *paths,
         http::request<Body, http::basic_fields<Allocator>> &&req)
     {
         // Returns a bad request response
@@ -232,102 +228,92 @@ private:
             req.target().find("..") != beast::string_view::npos)
             return bad_request("Illegal request-target");
 
-        if (paths.find(req.target()) == paths.end())
+        auto str_target = std::string(req.target());
+        if (paths->count(str_target) > 0)
         {
-            return not_found(req.target());
+            // Log::info(TAG, "path found with WebServerResponseBuilder");
+
+            http::response<http::buffer_body> res;
+
+            res.result(http::status::ok);
+            res.version(11);
+            res.set(http::field::server, "Beast");
+            res.set(http::field::transfer_encoding, "chunked");
+
+            std::string response_buffer;
+
+            auto const builderWriter =
+                [](char *buffer, int size, void *userData) -> void
+            {
+                auto response_buffer = (std::string *)userData;
+                response_buffer->append(buffer, size);
+            };
+
+            auto builder = (*paths)[str_target];
+            builder->build(builderWriter, (void *)&response_buffer);
+            int body_size = response_buffer.size();
+
+            res.body().data = (void *)response_buffer.c_str();
+            res.body().size = body_size;
+            res.body().more = false;
+
+            res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+            res.set(http::field::content_type, mime_type(req.target()));
+            res.content_length(body_size);
+            res.keep_alive(req.keep_alive());
+            return res;
         }
 
-        auto body = paths[req.target()];
+        // Build the path to the requested file
+        std::string path = path_cat(doc_root, req.target());
+        if (req.target().back() == '/')
+            path.append("index.html");
 
-        // // Build the path to the requested file
-        // std::string path = path_cat(doc_root, req.target());
-        // if (req.target().back() == '/')
-        //     path.append("index.html");
+        // Attempt to open the file
+        beast::error_code ec;
+        http::file_body::value_type body;
+        body.open(path.c_str(), beast::file_mode::scan, ec);
 
-        // // Attempt to open the file
-        // beast::error_code ec;
-        // http::file_body::value_type body;
-        // body.open(path.c_str(), beast::file_mode::scan, ec);
+        // Handle the case where the file doesn't exist
+        if (ec == beast::errc::no_such_file_or_directory)
+            return not_found(req.target());
 
-        // // Handle the case where the file doesn't exist
-        // if (ec == beast::errc::no_such_file_or_directory)
-        //     return not_found(req.target());
-
-        // // Handle an unknown error
-        // if (ec)
-        //     return server_error(ec.message());
-
-        // http::response_parser<http::string_body> p;
-
-        // // read headers
-        // auto buf = boost::asio::buffer(input);
-        // auto n   = p.put(buf, ec);
-        // assert(p.is_header_done());
-
-        // // read body
-        // if (!ec) {
-        //     buf += n;
-        //     n = p.put(buf, ec);
-        //     p.put_eof(ec);
-        // }
-        // if (ec)
-        //     throw boost::system::system_error(ec);
-        // assert(p.is_done());
-
-        // return p.release();
-
-        // http::response
+        // Handle an unknown error
+        if (ec)
+            return server_error(ec.message());
 
         // Cache the size since we need it after the move
-        auto const size = body.size; // body.size();
+        auto const size = body.size();
 
         // Respond to HEAD request
         if (req.method() == http::verb::head)
         {
             http::response<http::empty_body> res{http::status::ok, req.version()};
             res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-            res.set(http::field::content_type, mime_type(req.target()));
+            res.set(http::field::content_type, mime_type(path));
             res.content_length(size);
             res.keep_alive(req.keep_alive());
             return res;
         }
 
-        http::response<http::buffer_body> res;
-
-        res.result(http::status::ok);
-        // res.version(11);
-        // res.set(field::server, "Beast");
-        // res.set(field::transfer_encoding, "chunked");
-
-        // No data yet, but we set more = true to indicate
-        // that it might be coming later. Otherwise the
-        // serializer::is_done would return true right after
-        // sending the header.
-        res.body().data = body.content;
-        res.body().size = body.size;
-        res.body().more = false;
-
+        // Respond to GET request
+        http::response<http::file_body> res{
+            std::piecewise_construct,
+            std::make_tuple(std::move(body)),
+            std::make_tuple(http::status::ok, req.version())};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, mime_type(req.target()));
+        res.set(http::field::content_type, mime_type(path));
         res.content_length(size);
         res.keep_alive(req.keep_alive());
         return res;
-
-        // // Respond to GET request
-        // http::response<http::file_body> res{
-        //     std::piecewise_construct,
-        //     std::make_tuple(body.content),
-        //     std::make_tuple(http::status::ok, req.version())};
-        // res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        // res.set(http::field::content_type, mime_type(req.target()));
-        // res.content_length(size);
-        // res.keep_alive(req.keep_alive());
-        // return res;
     }
 
     static beast::string_view
     mime_type(beast::string_view path)
     {
+        if (path.ends_with("/"))
+            return "text/html";
+
         using beast::iequals;
         auto const ext = [&path]
         {
@@ -403,6 +389,31 @@ private:
         assert(p.is_done());
 
         return p.release();
+    }
+
+    static std::string
+    path_cat(
+        beast::string_view base,
+        beast::string_view path)
+    {
+        if (base.empty())
+            return std::string(path);
+        std::string result(base);
+#ifdef BOOST_MSVC
+        char constexpr path_separator = '\\';
+        if (result.back() == path_separator)
+            result.resize(result.size() - 1);
+        result.append(path.data(), path.size());
+        for (auto &c : result)
+            if (c == '/')
+                c = path_separator;
+#else
+        char constexpr path_separator = '/';
+        if (result.back() == path_separator)
+            result.resize(result.size() - 1);
+        result.append(path.data(), path.size());
+#endif
+        return result;
     }
 };
 

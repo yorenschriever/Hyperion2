@@ -2,10 +2,12 @@
 #include <inttypes.h>
 #include <string>
 
+class WebServerResponseBuilder;
+
 class WebServer
 {
 public:
-    static WebServer *createInstance(int port);
+    static WebServer *createInstance(std::string doc_root = WEBSERVER_ROOT, int port = 443);
 
-    virtual void addPath(std::string path, uint8_t* content, int size) =0 ; 
+    virtual void addPath(std::string path, WebServerResponseBuilder *builder) = 0;
 };

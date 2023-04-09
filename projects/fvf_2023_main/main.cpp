@@ -34,6 +34,8 @@
 #include <iterator>
 #include <algorithm>
 
+#include "webServerResponseBuilder.hpp"
+
 
 auto pLedsterMap = ledsterMap.toPolarRotate90();
 auto pColumnMap = columnMap.toPolarRotate90();
@@ -45,28 +47,38 @@ void addColumnPipes(Hyperion *hyp);
 void addHaloPipe(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
 
+class pixelMapJson : public WebServerResponseBuilder {
+  char buffer[256];
+  void build(WebServerResponseBuilder::Writer write, void* userData) override {
+    for(auto pixel: ledsterMap){
+      int sz = snprintf(buffer, sizeof(buffer), "{\"x\": %f, \"y\": %f}\n", pixel.x, pixel.y);
+      write(buffer, sz, userData);
+    }
+  }
+};
 
 int main()
 {
-  //httpserver();
+  Log::info("","Starting server");
 
-  auto serv = WebServer::createInstance(80);
-  uint8_t content []= "hello world";
-  serv->addPath("index.html",content,11);
-  serv->addPath("/index.html",content,11);
-  serv->addPath("/",content,11);
+  auto serv = WebServer::createInstance();
+  //uint8_t content []= "hello world";
+
+  // Log::info("","Adding paths");
+  // serv->addPath("index.html",content,11);
+  // serv->addPath("/index.html",content,11);
+  serv->addPath("/mapping.json",new pixelMapJson());
+
+  auto instance = WebsocketServer::createInstance();
+
+
+  Log::info("","Paths added");
 
   while (1)
     Thread::sleep(1000);
 }
 
-// int main()
-// {
-//   auto wss = WebsocketServer::createInstance();
 
-//   while (1)
-//     Thread::sleep(1000);
-// }
 
 
 int main2()

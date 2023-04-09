@@ -66,4 +66,6 @@ else ()
     endif()
     target_include_directories(Hyperion PUBLIC ${CMAKE_BINARY_DIR}/cert)
 
+    target_compile_definitions(Hyperion PUBLIC WEBSERVER_ROOT="$ENV{HYPERION_LIB_DIR}/scripts/web/pixelMonitor3d")
+
 endif ()
