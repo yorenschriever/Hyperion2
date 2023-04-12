@@ -127,7 +127,7 @@ void addWingsPipe(Hyperion *hyp)
 
   int ports[4] = {
       9611,
-      9695,
+      9615,
       9611,
       9615};
 
