@@ -6,6 +6,7 @@ export class Websocket {
 
     constructor(gl, buffers, scene) {
         this.buffers = buffers;
+        this.gl = gl;
 
         //TODO this is too big, but how big should it actually be? 
         this.buffer = new Uint8Array(buffers.verticesCount * 3)
@@ -18,7 +19,7 @@ export class Websocket {
             const bufferOffset = ledOffset
             ledOffset += ledsInScenePart
 
-            const socket = new WebSocket(`wss://localhost:${scenePart.port}`);
+            const socket = new WebSocket(`wss://${location.host}:${scenePart.port}`);
             this.sockets.push(socket);
             socket.onmessage = async msg => {
 
@@ -37,13 +38,17 @@ export class Websocket {
                     this.buffer[bufferIndex + 1] = view[3 * ledIndex + 1]
                     this.buffer[bufferIndex + 2] = view[3 * ledIndex + 2]
                 }
-
-                //TODO Only write to buffer every animationframe
-                gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.color);
-                gl.bufferData(gl.ARRAY_BUFFER, this.buffer, gl.STATIC_DRAW);
-               
             }
 
         })
+
+        window.requestAnimationFrame(() => this.writeBuffer());
+    }
+
+    writeBuffer() {
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffers.color);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.buffer, this.gl.STATIC_DRAW);
+
+        window.requestAnimationFrame(() => this.writeBuffer());
     }
 }

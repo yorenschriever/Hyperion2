@@ -39,14 +39,21 @@ public:
 
     void send(RemoteWebsocketClient *client, std::string msg) override
     {
-        Log::info(TAG, "sending: %s", msg.c_str());
-        auto ws = (WS *)client;
-        beast::flat_buffer buffer(msg.size());
-        auto buf = buffer.prepare(msg.size());
-        memcpy(buf.data(), msg.c_str(), msg.size());
-        buffer.commit(msg.size());
-        ws->text(true);
-        ws->write(buffer.data());
+        try
+        {
+            Log::info(TAG, "sending: %s", msg.c_str());
+            auto ws = (WS *)client;
+            beast::flat_buffer buffer(msg.size());
+            auto buf = buffer.prepare(msg.size());
+            memcpy(buf.data(), msg.c_str(), msg.size());
+            buffer.commit(msg.size());
+            ws->text(true);
+            ws->write(buffer.data());
+        }
+        catch (const std::exception &e)
+        {
+            Log::error(TAG, "Error sending: %d", e.what());
+        }
     };
 
     void sendOther(RemoteWebsocketClient *exclude, std::string msg) override
@@ -68,13 +75,20 @@ public:
 
     void send(RemoteWebsocketClient *client, uint8_t *bytes, int size) override
     {
-        auto ws = (WS *)client;
-        beast::flat_buffer buffer(size);
-        auto buf = buffer.prepare(size);
-        memcpy(buf.data(), bytes, size);
-        buffer.commit(size);
-        ws->text(false);
-        ws->write(buffer.data());
+        try
+        {
+            auto ws = (WS *)client;
+            beast::flat_buffer buffer(size);
+            auto buf = buffer.prepare(size);
+            memcpy(buf.data(), bytes, size);
+            buffer.commit(size);
+            ws->text(false);
+            ws->write(buffer.data());
+        }
+        catch (const std::exception &e)
+        {
+            Log::error(TAG, "Error sending binary: %d", e.what());
+        }
     };
 
     void sendOther(RemoteWebsocketClient *exclude, uint8_t *bytes, int size) override
@@ -186,12 +200,14 @@ private:
             // This indicates that the session was closed
             if (se.code() != websocket::error::closed)
                 Log::error(TAG, "Error: %d", se.code().message().c_str());
-            if (p_ws) server->clients.erase(p_ws);
+            if (p_ws)
+                server->clients.erase(p_ws);
         }
         catch (std::exception const &e)
         {
             Log::error(TAG, "Error: %d", e.what());
-            if (p_ws) server->clients.erase(p_ws);
+            if (p_ws)
+                server->clients.erase(p_ws);
         }
         if (p_ws)
             server->clients.erase(p_ws);
