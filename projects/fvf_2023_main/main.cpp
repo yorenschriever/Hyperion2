@@ -133,7 +133,7 @@ void addLedsterPipe(Hyperion *hyp)
               // {.column = 4, .slot = 2, .pattern = new Ledster::RibbenClivePattern<PWM>(10000,1,0.0025)},
 
               // {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
-               {.column = 0, .slot = 0, .pattern = new Ledster::ChevronsPattern(ledsterMap)},
+              // {.column = 0, .slot = 0, .pattern = new Ledster::ChevronsPattern(ledsterMap)},
               // {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(ledsterMap3d)},
               // //{.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
 
@@ -221,7 +221,7 @@ void addColumnPipes(Hyperion *hyp)
               // {.column = 4, .slot = 2, .pattern = new FWF::RibbenClivePattern<PWM>(10000,1,0.0025)},
 
               // {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
-               {.column = 0, .slot = 0, .pattern = new Ledster::ChevronsPattern(columnMap)},
+              // {.column = 0, .slot = 0, .pattern = new Ledster::ChevronsPattern(columnMap)},
               // {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(columnMap3d)},
               // // {.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
 

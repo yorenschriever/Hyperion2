@@ -13,6 +13,12 @@ main();
 //
 function main() {
   const canvas = document.querySelector("#glcanvas");
+
+  //window.onresize = () => {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  //}
+
   // Initialize the GL context
 //   const gl = WebGLDebugUtils.makeDebugContext(canvas.getContext("webgl"));
     const gl = canvas.getContext("webgl");
@@ -92,6 +98,9 @@ function main() {
 
   // Draw the scene repeatedly
   function render(now) {
+
+
+
     now *= 0.001; // convert to seconds
     deltaTime = now - then;
     then = now;
