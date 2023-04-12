@@ -139,7 +139,7 @@ function drawScene(gl, programInfo, buffers, cubeRotation) {
   // Tell WebGL how to pull out the colors from the color buffer
   // into the vertexColor attribute.
   function setColorAttribute(gl, buffers, programInfo) {
-    const numComponents = 4;
+    const numComponents = 3;
     const type = gl.UNSIGNED_BYTE;
     const normalize = true;
     const stride = 0;

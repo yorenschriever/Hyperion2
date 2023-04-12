@@ -1,8 +1,7 @@
 #pragma once
 #include "log.hpp"
-#include "platform/includes/midi-device.hpp"
 #include "server-certificate.hpp"
-
+#include "websocketServer.hpp"
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/beast/core.hpp>
@@ -12,6 +11,7 @@
 #include <cstdlib>
 #include <functional>
 #include <iostream>
+#include <set>
 #include <string>
 #include <thread>
 
@@ -25,17 +25,84 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 class WebsocketServerMacOs : public WebsocketServer
 {
 public:
-    // static WebsocketServer *createInstance();
+    using WS = websocket::stream<beast::ssl_stream<tcp::socket &>>;
 
-    // using WebsocketMessageHandler = void (*)(RemoteWebsocketClient *client, WebsocketServer *server, std::string);
-
-    WebsocketServerMacOs()
+    WebsocketServerMacOs(unsigned short port)
     {
+        std::thread{std::bind(
+                        &start_server,
+                        this, port)}
+            .detach();
+    }
 
+    ~WebsocketServerMacOs() = default;
+
+    void send(RemoteWebsocketClient *client, std::string msg) override
+    {
+        Log::info(TAG, "sending: %s", msg.c_str());
+        auto ws = (WS *)client;
+        beast::flat_buffer buffer(msg.size());
+        auto buf = buffer.prepare(msg.size());
+        memcpy(buf.data(), msg.c_str(), msg.size());
+        buffer.commit(msg.size());
+        ws->text(true);
+        ws->write(buffer.data());
+    };
+
+    void sendOther(RemoteWebsocketClient *exclude, std::string msg) override
+    {
+        auto ws_exclude = (WS *)exclude;
+        for (auto ws : clients)
+        {
+            if (ws == ws_exclude)
+                continue;
+            send(ws, msg);
+        }
+    };
+
+    void sendAll(std::string msg) override
+    {
+        for (auto ws : clients)
+            send(ws, msg);
+    };
+
+    void send(RemoteWebsocketClient *client, uint8_t *bytes, int size) override
+    {
+        auto ws = (WS *)client;
+        beast::flat_buffer buffer(size);
+        auto buf = buffer.prepare(size);
+        memcpy(buf.data(), bytes, size);
+        buffer.commit(size);
+        ws->text(false);
+        ws->write(buffer.data());
+    };
+
+    void sendOther(RemoteWebsocketClient *exclude, uint8_t *bytes, int size) override
+    {
+        auto ws_exclude = (WS *)exclude;
+        for (auto ws : clients)
+        {
+            if (ws == ws_exclude)
+                continue;
+            send(ws, bytes, size);
+        }
+    };
+
+    void sendAll(uint8_t *bytes, int size) override
+    {
+        for (auto ws : clients)
+            send(ws, bytes, size);
+    };
+
+    int connectionCount() override { return clients.size(); };
+
+private:
+    static void start_server(WebsocketServerMacOs *server, unsigned short port)
+    {
         try
         {
             auto const address = net::ip::make_address("0.0.0.0");
-            auto const port = static_cast<unsigned short>(std::atoi("8085"));
+            auto const port_ = static_cast<unsigned short>(port);
 
             // The io_context is required for all I/O
             net::io_context ioc{1};
@@ -47,7 +114,7 @@ public:
             load_server_certificate(ctx);
 
             // The acceptor receives incoming connections
-            tcp::acceptor acceptor{ioc, {address, port}};
+            tcp::acceptor acceptor{ioc, {address, port_}};
             for (;;)
             {
                 // This will receive the new connection
@@ -60,41 +127,28 @@ public:
                 std::thread(
                     &do_session,
                     std::move(socket),
-                    std::ref(ctx))
+                    std::ref(ctx),
+                    server)
                     .detach();
             }
         }
         catch (const std::exception &e)
         {
-            std::cerr << "Error: " << e.what() << std::endl;
+            Log::error(TAG, "Error: %d", e.what());
         }
     }
 
-    void send(RemoteWebsocketClient *client, std::string msg) override{};
-    void sendOther(RemoteWebsocketClient *exclude, std::string msg) override{};
-    void sendAll(std::string msg) override{};
-
-    int connectionCount() override { return 0; };
-    // void onMessage(WebsocketMessageHandler handler)
-    // {
-    //     this->handler = handler;
-    // }
-
-    int readMessage(uint8_t *buffer) override { return 0; };
-
-    // void setRxBufferSize(int size)
-    // {
-    //     maxBufferSize = size;
-    // }
-
-private:
     static void
-    do_session(tcp::socket socket, ssl::context &ctx)
+    do_session(tcp::socket socket, ssl::context &ctx, WebsocketServerMacOs *server)
     {
+        WS *p_ws = nullptr;
         try
         {
             // Construct the websocket stream around the socket
-            websocket::stream<beast::ssl_stream<tcp::socket &>> ws{socket, ctx};
+            WS ws{socket, ctx};
+
+            p_ws = &ws;
+            server->clients.insert(p_ws);
 
             // Perform the SSL handshake
             ws.next_layer().handshake(ssl::stream_base::server);
@@ -119,24 +173,33 @@ private:
                 // Read a message
                 ws.read(buffer);
 
-                // Echo the message back
-                ws.text(ws.got_text());
-                ws.write(buffer.data());
+                auto str = beast::buffers_to_string(buffer.data());
+
+                if (server->handler != nullptr)
+                    server->handler(p_ws, server, str);
+
+                Log::info(TAG, "received %s", str.c_str());
             }
         }
         catch (beast::system_error const &se)
         {
             // This indicates that the session was closed
             if (se.code() != websocket::error::closed)
-                std::cerr << "Error: " << se.code().message() << std::endl;
+                Log::error(TAG, "Error: %d", se.code().message().c_str());
+            if (p_ws) server->clients.erase(p_ws);
         }
         catch (std::exception const &e)
         {
-            std::cerr << "Error: " << e.what() << std::endl;
+            Log::error(TAG, "Error: %d", e.what());
+            if (p_ws) server->clients.erase(p_ws);
         }
+        if (p_ws)
+            server->clients.erase(p_ws);
     }
-    // protected:
-    //     WebsocketMessageHandler handler = NULL;
-    //     std::deque<std::string *> bufferedMessages = std::deque<std::string *>();
-    //     int maxBufferSize = 5;
+
+private:
+    std::set<WS *> clients;
+    static const char *TAG;
 };
+
+const char *WebsocketServerMacOs::TAG = "WEBSOCKET_SERVER";

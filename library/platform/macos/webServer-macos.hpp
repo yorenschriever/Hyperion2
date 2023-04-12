@@ -38,6 +38,8 @@ public:
             .detach();
     }
 
+    ~WebServerMacOs() = default;
+
     void addPath(std::string path, WebServerResponseBuilder *builder) override
     {
         paths[path] = builder;
