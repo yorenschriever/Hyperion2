@@ -27,6 +27,10 @@ Close your terminal (and reopen if you still need it)
 - brew link --force openssl
 - download boost (https://www.boost.org/users/download/), place it somewhere on your disk and update the path in ~/.zprofile
 
+- on old mac i had to set
+export OPENSSL_ROOT_DIR=/usr/local/opt/openssl@3
+and reopen the shell
+
 ## Espressif devices
 
 - Install esp idf following this
