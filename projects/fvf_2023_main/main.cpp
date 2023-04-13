@@ -39,6 +39,7 @@
 #include <algorithm>
 
 #include "webServerResponseBuilder.hpp"
+#include "generation/controlHub/websocketController.hpp"
 
 
 auto pLedsterMap = ledsterMap.toPolarRotate90();
@@ -74,6 +75,8 @@ int main()
   addLedsterPipe(hyp);
   addHaloPipe(hyp);
   addPaletteColumn(hyp);
+
+  hyp->hub.subscribe(new WebsocketController(&hyp->hub));
 
   Tempo::AddSource(new ConstantTempo(120));
 

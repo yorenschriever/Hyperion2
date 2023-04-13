@@ -14,6 +14,7 @@
 #include <set>
 #include <string>
 #include <thread>
+#include <stdarg.h>
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
@@ -73,6 +74,65 @@ public:
             send(ws, msg);
     };
 
+
+    void send(RemoteWebsocketClient *client, const char* message, ...) override
+    {
+        try
+        {
+            char s_buf[255];
+            va_list args;
+            va_start(args, message);
+            int sz = vsnprintf(s_buf, sizeof(s_buf), message, args);
+            va_end(args);
+
+
+            Log::info(TAG, "sending: %s", s_buf);
+            auto ws = (WS *)client;
+            beast::flat_buffer buffer(sz);
+            auto buf = buffer.prepare(sz);
+            memcpy(buf.data(), s_buf, sz);
+            buffer.commit(sz);
+            ws->text(true);
+            ws->write(buffer.data());
+        }
+        catch (const std::exception &e)
+        {
+            Log::error(TAG, "Error sending: %d", e.what());
+        }
+    };
+
+    void sendOther(RemoteWebsocketClient *exclude, const char* message, ...) override
+    {
+        char s_buf[255];
+        va_list args;
+        va_start(args, message);
+        int sz = vsnprintf(s_buf, sizeof(s_buf), message, args);
+        va_end(args);
+
+        auto ws_exclude = (WS *)exclude;
+        for (auto ws : clients)
+        {
+            if (ws == ws_exclude)
+                continue;
+            send(ws, s_buf);
+        }
+    };
+
+    void sendAll(const char* message, ...) override
+    {
+        char s_buf[255];
+        va_list args;
+        va_start(args, message);
+        int sz = vsnprintf(s_buf, sizeof(s_buf), message, args);
+        va_end(args);
+
+        for (auto ws : clients)
+            send(ws, s_buf);
+
+        
+    };
+
+
     void send(RemoteWebsocketClient *client, uint8_t *bytes, int size) override
     {
         try
@@ -87,7 +147,7 @@ public:
         }
         catch (const std::exception &e)
         {
-            Log::error(TAG, "Error sending binary: %d", e.what());
+            Log::error(TAG, "Error sending binary: %s", e.what());
         }
     };
 
@@ -148,7 +208,7 @@ private:
         }
         catch (const std::exception &e)
         {
-            Log::error(TAG, "Error: %d", e.what());
+            Log::error(TAG, "Error: %s", e.what());
         }
     }
 
@@ -190,7 +250,7 @@ private:
                 auto str = beast::buffers_to_string(buffer.data());
 
                 if (server->handler != nullptr)
-                    server->handler(p_ws, server, str);
+                    server->handler(p_ws, server, str, server->userData);
 
                 Log::info(TAG, "received %s", str.c_str());
             }
@@ -199,13 +259,13 @@ private:
         {
             // This indicates that the session was closed
             if (se.code() != websocket::error::closed)
-                Log::error(TAG, "Error: %d", se.code().message().c_str());
+                Log::error(TAG, "Error: %s", se.code().message().c_str());
             if (p_ws)
                 server->clients.erase(p_ws);
         }
         catch (std::exception const &e)
         {
-            Log::error(TAG, "Error: %d", e.what());
+            Log::error(TAG, "Error: %s", e.what());
             if (p_ws)
                 server->clients.erase(p_ws);
         }

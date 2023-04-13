@@ -240,8 +240,8 @@ public:
             }
         }
 
-        for (int i = 0; i < columns.size(); i++)
-            Log::info(TAG,"column %d has %d slots", i, columns[i].slots.size());
+        // for (int i = 0; i < columns.size(); i++)
+        //    Log::info(TAG,"column %d has %d slots", i, columns[i].slots.size());
     }
 
     void setFlash(int columnIndex, int slotIndex, bool flash=true)

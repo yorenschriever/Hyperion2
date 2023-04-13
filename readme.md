@@ -23,9 +23,9 @@ Close your terminal (and reopen if you still need it)
 - brew install python3
 - pip3 install pyglet
 
-- brew install openssl
+- brew install openssl (i use version stable 3.1.0)
 - brew link --force openssl
-- download boost (https://www.boost.org/users/download/), place it somewhere on your disk and update the path in ~/.zprofile
+- download boost (https://www.boost.org/users/download/), place it somewhere on your disk and update the path in ~/.zprofile i use version 1_81_0
 
 - on old mac i had to set
 export OPENSSL_ROOT_DIR=/usr/local/opt/openssl@3

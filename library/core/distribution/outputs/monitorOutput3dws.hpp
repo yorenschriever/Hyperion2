@@ -83,7 +83,7 @@ public:
     void begin() override
     {
         WebsocketOutput::begin();
-        server->addPath("/mapping.json",&pixelMapJson);
+        server->addPath("/pixelMonitor3d/mapping.json",&pixelMapJson);
         //todo, handle case when different servers are passed for different instances
         pixelMapJson.begin();
     }

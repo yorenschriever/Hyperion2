@@ -20,7 +20,7 @@ if (${ESP_PLATFORM})
             "platform/${TARGET}" 
             "platform/${TARGET}/misc"
             "core/generation/patterns/helpers/tempo"
-
+            "misc"
     )
 
     target_compile_options(${COMPONENT_LIB} PUBLIC "-Wno-maybe-uninitialized")
@@ -33,6 +33,7 @@ else ()
 
     file(GLOB_RECURSE CORE_SRC CONFIGURE_DEPENDS
         "${CORE_SRC_DIR}/*.cpp"
+        "misc/*.cpp"
     )
 
     add_library(Hyperion ${PLATFORM_SRC} ${CORE_SRC})
@@ -66,6 +67,6 @@ else ()
     endif()
     target_include_directories(Hyperion PUBLIC ${CMAKE_BINARY_DIR}/cert)
 
-    target_compile_definitions(Hyperion PUBLIC WEBSERVER_ROOT="$ENV{HYPERION_LIB_DIR}/scripts/web/pixelMonitor3d")
+    target_compile_definitions(Hyperion PUBLIC WEBSERVER_ROOT="$ENV{HYPERION_LIB_DIR}/scripts/web")
 
 endif ()

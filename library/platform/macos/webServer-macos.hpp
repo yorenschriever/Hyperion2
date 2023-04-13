@@ -94,9 +94,7 @@ private:
         }
         catch (const std::exception &e)
         {
-            std::cerr << "Error: " << e.what() << std::endl;
-            Log::error(TAG, e.what());
-            // return EXIT_FAILURE;
+            Log::error(TAG, "Error: %s",e.what());
         }
     }
 
