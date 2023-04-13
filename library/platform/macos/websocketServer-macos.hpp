@@ -42,7 +42,7 @@ public:
     {
         try
         {
-            Log::info(TAG, "sending: %s", msg.c_str());
+            //Log::info(TAG, "sending: %s", msg.c_str());
             auto ws = (WS *)client;
             beast::flat_buffer buffer(msg.size());
             auto buf = buffer.prepare(msg.size());
@@ -86,7 +86,7 @@ public:
             va_end(args);
 
 
-            Log::info(TAG, "sending: %s", s_buf);
+            //Log::info(TAG, "sending: %s", s_buf);
             auto ws = (WS *)client;
             beast::flat_buffer buffer(sz);
             auto buf = buffer.prepare(sz);
@@ -252,7 +252,7 @@ private:
                 if (server->handler != nullptr)
                     server->handler(p_ws, server, str, server->userData);
 
-                Log::info(TAG, "received %s", str.c_str());
+                //Log::info(TAG, "received %s", str.c_str());
             }
         }
         catch (beast::system_error const &se)
