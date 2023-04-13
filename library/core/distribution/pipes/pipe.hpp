@@ -11,7 +11,7 @@
 class Pipe
 {
 private:
-    static const int bufferSize = 1500 * 4;
+    static const int bufferSize = 1500 * 4 * 6;
     static uint8_t buffer[bufferSize];
 
     virtual int transfer(uint8_t *data, int length, Output *out)

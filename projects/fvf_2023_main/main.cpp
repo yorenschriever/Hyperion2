@@ -1,5 +1,6 @@
 #include "colours.h"
 #include "core/distribution/inputs/inputSplitter.hpp"
+#include "core/distribution/inputs/inputSlicer.hpp"
 #include "core/distribution/inputs/patternInput.hpp"
 #include "core/distribution/outputs/cloneOutput.hpp"
 #include "core/distribution/outputs/monitorOutput.hpp"
@@ -170,8 +171,8 @@ void addColumnPipes(Hyperion *hyp)
   // Generate 1 pattern, and split it up in six outputs,
   // because UDPOutput (and therefore MonitorOutput) are limited by a
   // maximum transfer size of 2*1440 bytes
-  auto splitInput = new InputSplitter(
-      new ControlHubInput<RGBA>(
+  
+    auto columnsInput = new ControlHubInput<RGBA>(
           columnMap.size(),
           &hyp->hub,
           {
@@ -242,20 +243,26 @@ void addColumnPipes(Hyperion *hyp)
               {.column = 5, .slot = 4, .pattern = new Max::ChevronsPattern(columnMap3d)},
               {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(columnMap3d)},
 
-          }),
+          });
+
+    auto splitInput = new InputSlicer(
+      columnsInput,
       // new PatternInput<RGBA>(columnMap3d.size(), columnPattern),
-      {360 * sizeof(RGBA),
-       120 * sizeof(RGBA),
-       360 * sizeof(RGBA),
-       120 * sizeof(RGBA),
-       360 * sizeof(RGBA),
-       120 * sizeof(RGBA),
-       360 * sizeof(RGBA),
-       120 * sizeof(RGBA),
-       360 * sizeof(RGBA),
-       120 * sizeof(RGBA),
-       360 * sizeof(RGBA),
-       120 * sizeof(RGBA)},
+      {
+       {0 * sizeof(RGBA), 360 * sizeof(RGBA)},
+       {360 * sizeof(RGBA), 120 * sizeof(RGBA)},
+       {480 * sizeof(RGBA), 360 * sizeof(RGBA)},
+       {840 * sizeof(RGBA), 120 * sizeof(RGBA)},
+       {960 * sizeof(RGBA), 360 * sizeof(RGBA)},
+       {1320 * sizeof(RGBA), 120 * sizeof(RGBA)},
+       {1440 * sizeof(RGBA), 360 * sizeof(RGBA)},
+       {1800 * sizeof(RGBA), 120 * sizeof(RGBA)},
+       {1920 * sizeof(RGBA), 360 * sizeof(RGBA)},
+       {2280 * sizeof(RGBA), 120 * sizeof(RGBA)},
+       {2400 * sizeof(RGBA), 360 * sizeof(RGBA)},
+       {2760 * sizeof(RGBA), 120 * sizeof(RGBA)},
+       {0, 6*8*60 * sizeof(RGBA)}
+      },
       true);
 
   auto splitMap = PixelMapSplitter3d(
@@ -304,17 +311,25 @@ void addColumnPipes(Hyperion *hyp)
     9614, //geel punt
   };
 
-  for (int i = 0; i < splitInput->size(); i++)
+  for (int i = 0; i < splitInput->size()-1; i++)
   {
     auto pipe = new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(i),
-        new CloneOutput({
-          new MonitorOutput3dws(splitMap.getMap(i), serv),
+        //new CloneOutput({
+          //new MonitorOutput3dws(splitMap.getMap(i), serv),
           //new MonitorOutput3d(splitMap.getMap(i)),
           new UDPOutput(hosts[i], ports[i], 60)
-        }));
+        //})
+        );
     hyp->addPipe(pipe);
   }
+
+  hyp->addPipe(
+    new ConvertPipe<RGBA, RGB>(
+        splitInput->getInput(12),
+        new MonitorOutput3dws(columnMap3d, serv)
+    )
+  );
 }
 
 void addHaloPipe(Hyperion *hyp)
