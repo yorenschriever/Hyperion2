@@ -4,6 +4,7 @@
 #include "core/distribution/outputs/cloneOutput.hpp"
 #include "core/distribution/outputs/monitorOutput.hpp"
 #include "core/distribution/outputs/monitorOutput3d.hpp"
+#include "core/distribution/outputs/monitorOutput3dws.hpp"
 #include "core/distribution/outputs/udpOutput.hpp"
 #include "core/distribution/pipes/convertPipe.hpp"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"
@@ -14,6 +15,7 @@
 #include "core/hyperion.hpp"
 #include "distribution/inputs/controlHubInput.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
+#include "generation/controlHub/websocketController.hpp"
 #include "ledsterPatterns.hpp"
 #include "mapping/columnMap.hpp"
 #include "mapping/columnMap3d.hpp"
@@ -23,12 +25,18 @@
 #include "palettes.hpp"
 #include "patterns-hi.hpp"
 #include "patterns-low.hpp"
+#include "patterns-max.hpp"
 #include "patterns-mid.hpp"
 #include "patterns-min.hpp"
-#include "patterns-max.hpp"
 #include "patterns.hpp"
 #include "patterns3d.hpp"
 #include "platform/includes/thread.hpp"
+#include "webServer.hpp"
+#include "webServerResponseBuilder.hpp"
+#include "websocketServer.hpp"
+#include <algorithm>
+#include <iostream>
+#include <iterator>
 
 auto pLedsterMap = ledsterMap.toPolarRotate90();
 auto pColumnMap = columnMap.toPolarRotate90();
@@ -42,12 +50,10 @@ void addColumnPipes(Hyperion *hyp);
 void addHaloPipe(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
 
+auto serv = WebServer::createInstance();
+
 int main()
 {
-
-  // Log::info("test","ip=%d",IPAddress::fromUint32(1234567).toUint32());
-  Log::info("test", "mac%d", Ethernet::getMac());
-
   auto hyp = new Hyperion();
 
   hyp->hub.params.primaryColour = RGB(255, 0, 255);
@@ -60,35 +66,16 @@ int main()
   addHaloPipe(hyp);
   addPaletteColumn(hyp);
 
+  hyp->hub.subscribe(new WebsocketController(&hyp->hub));
+
   Tempo::AddSource(new ConstantTempo(120));
 
   hyp->hub.buttonPressed(0, 0);
-  //hyp->hub.buttonPressed(4, 0);
 
   hyp->start();
   while (1)
     Thread::sleep(1000);
 }
-
-// auto ledsterPattern = new FWF::RibbenFasePattern();
-// auto columnPattern = new FWF::RibbenFasePattern();
-
-// auto ledsterPattern = new FWF::SegmentChasePattern();
-// auto columnPattern = new FWF::SegmentChasePattern();
-
-// auto ledsterPattern = new FWF::SegmentChasePattern(); //X
-// auto columnPattern = new FWF::OnBeatColumnFadePattern();
-
-// auto ledsterPattern = new FWF3D::OnBeatColumnChaseUpPattern(ledsterMap3d); //X
-// auto columnPattern = new FWF3D::OnBeatColumnChaseUpPattern(columnMap3d);
-
-// auto ledsterPattern = new FWF3D::GrowingCirclesPattern(ledsterMap3d); //X
-// auto columnPattern = new FWF3D::GrowingCirclesPattern(columnMap3d);
-
-// auto ledsterPattern = new FWF3D::LineLaunch(ledsterMap3d); //X
-// auto columnPattern = new FWF3D::LineLaunch(columnMap3d);
-
-// auto columnPattern = new Low::StaticGradientPattern(columnMap3d);
 
 void addLedsterPipe(Hyperion *hyp)
 {
@@ -118,7 +105,7 @@ void addLedsterPipe(Hyperion *hyp)
               // {.column = 4, .slot = 2, .pattern = new Ledster::RibbenClivePattern<PWM>(10000,1,0.0025)},
 
               // {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
-              // {.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(ledsterMap)},
+              // {.column = 0, .slot = 0, .pattern = new Ledster::ChevronsPattern(ledsterMap)},
               // {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(ledsterMap3d)},
               // //{.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
 
@@ -166,8 +153,7 @@ void addLedsterPipe(Hyperion *hyp)
               {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(ledsterMap3d)},
 
           }),
-      // new PatternInput<RGBA>(ledsterMap3d.size(), ledsterPattern),
-      new CloneOutput({new MonitorOutput3d(ledsterMap3d),
+      new CloneOutput({new MonitorOutput3dws(ledsterMap3d, serv),
                        new UDPOutput("hyperslave1.local", 9611, 60)}));
   hyp->addPipe(ledsterPipe);
 }
@@ -203,7 +189,7 @@ void addColumnPipes(Hyperion *hyp)
               // {.column = 4, .slot = 2, .pattern = new FWF::RibbenClivePattern<PWM>(10000,1,0.0025)},
 
               // {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
-              // {.column = 5, .slot = 1, .pattern = new Ledster::ChevronsPattern(columnMap)},
+              // {.column = 0, .slot = 0, .pattern = new Ledster::ChevronsPattern(columnMap)},
               // {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(columnMap3d)},
               // // {.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
 
@@ -264,7 +250,8 @@ void addColumnPipes(Hyperion *hyp)
   {
     auto pipe = new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(i),
-        new MonitorOutput3d(splitMap.getMap(i)));
+        new MonitorOutput3dws(splitMap.getMap(i), serv));
+    // new MonitorOutput3d(splitMap.getMap(i)));
     hyp->addPipe(pipe);
   }
 }
@@ -326,7 +313,7 @@ void addHaloPipe(Hyperion *hyp)
               {.column = 5, .slot = 4, .pattern = new Max::ChevronsPattern(haloMap3d)},
               {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(haloMap3d)},
           }),
-      new MonitorOutput3d(haloMap3d));
+      new MonitorOutput3dws(haloMap3d, serv));
   hyp->addPipe(haloPipe);
 }
 

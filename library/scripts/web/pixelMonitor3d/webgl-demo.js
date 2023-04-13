@@ -1,6 +1,7 @@
 import { initBuffers } from "./init-buffers.js";
 import { drawScene } from "./draw-scene.js";
 import { Websocket } from "./websocket.js";
+import scene from "./mapping.json" assert { type: "json" };
 
 let cubeRotation = 0.0;
 let deltaTime = 0;
@@ -12,6 +13,12 @@ main();
 //
 function main() {
   const canvas = document.querySelector("#glcanvas");
+
+  //window.onresize = () => {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  //}
+
   // Initialize the GL context
 //   const gl = WebGLDebugUtils.makeDebugContext(canvas.getContext("webgl"));
     const gl = canvas.getContext("webgl");
@@ -81,9 +88,9 @@ function main() {
 
   // Here's where we call the routine that builds all the
   // objects we'll be drawing.
-  const buffers = initBuffers(gl);
+  const buffers = initBuffers(gl, scene);
 
-  const websocket = new Websocket(gl, buffers);
+  const websocket = new Websocket(gl, buffers, scene);
 
   let then = 0;
 
@@ -91,6 +98,9 @@ function main() {
 
   // Draw the scene repeatedly
   function render(now) {
+
+
+
     now *= 0.001; // convert to seconds
     deltaTime = now - then;
     then = now;

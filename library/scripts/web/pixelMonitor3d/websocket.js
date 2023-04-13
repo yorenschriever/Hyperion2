@@ -1,48 +1,54 @@
-export  class Websocket{
+export class Websocket {
     buffers;
     gl;
-    time=0;
     buffer;
+    sockets = []
 
-    constructor(gl, buffers){
+    constructor(gl, buffers, scene) {
         this.buffers = buffers;
-        const colors = Array(buffers.verticesCount).fill([0,0,0,255]).flat();
-        this.buffer = new Uint8Array(colors)
+        this.gl = gl;
 
-        setInterval(()=>{
+        //TODO this is too big, but how big should it actually be? 
+        this.buffer = new Uint8Array(buffers.verticesCount * 3)
 
-            this.time += 1;
-            let h = this.hue(this.time % 255);
+        let ledOffset = 0;
 
-            for(let i=0;i<buffers.verticesCount;i++){
-                this.buffer[4*i+0] = h[0]
-                this.buffer[4*i+1] = h[1]
-                this.buffer[4*i+2] = h[2]
-            }
+        scene.forEach(scenePart => {
+            const ledsInScenePart = scenePart.positions.length;
             
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.color);
-            gl.bufferData(gl.ARRAY_BUFFER, this.buffer, gl.STATIC_DRAW);
-        
-        },1000/60);
+            const bufferOffset = ledOffset
+            ledOffset += ledsInScenePart
+
+            const socket = new WebSocket(`wss://${location.host}:${scenePart.port}`);
+            this.sockets.push(socket);
+            socket.onmessage = async msg => {
+
+                const ab = await msg.data.arrayBuffer()
+                const view = new Uint8Array(ab)
+
+                const ledsReceived = ab.byteLength / 3;
+                
+                //TODO magic const, better calculate
+                const indicesPerLed = 15;
+
+                for (let i = 0; i < ledsReceived * indicesPerLed; i++) {
+                    const ledIndex = Math.floor(i / indicesPerLed);
+                    const bufferIndex = 3 * i + 3* indicesPerLed * bufferOffset
+                    this.buffer[bufferIndex + 0] = view[3 * ledIndex + 0]
+                    this.buffer[bufferIndex + 1] = view[3 * ledIndex + 1]
+                    this.buffer[bufferIndex + 2] = view[3 * ledIndex + 2]
+                }
+            }
+
+        })
+
+        window.requestAnimationFrame(() => this.writeBuffer());
     }
 
+    writeBuffer() {
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffers.color);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.buffer, this.gl.STATIC_DRAW);
 
-    hue(phase)
-    {
-        let WheelPos = 255 - phase;
-        if (WheelPos < 85)
-        {
-            return [(255 - WheelPos * 3), 0, (WheelPos * 3)];
-        }
-        else if (WheelPos < 170)
-        {
-            WheelPos -= 85;
-            return [0, (WheelPos * 3), (255 - WheelPos * 3)];
-        }
-        else
-        {
-            WheelPos -= 170;
-            return [(WheelPos * 3), (255 - WheelPos * 3), 0];
-        }
+        window.requestAnimationFrame(() => this.writeBuffer());
     }
 }

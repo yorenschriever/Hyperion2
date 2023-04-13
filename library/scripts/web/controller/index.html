@@ -1,0 +1,125 @@
+<style>
+    body {
+        background-color: #000;
+    }
+
+    .controller {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .column {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .slot {
+        width: 100px;
+        height: 100px;
+        margin: 8px;
+        transition: background-color .2s ease-in;
+        background-color: #333;
+    }
+
+    .active {
+        background-color: green;
+    }
+</style>
+<script type="module">
+    import { html, render, useState, useEffect, createContext, useRef, useContext } from './preact-standalone.js'
+
+    const set = (obj, path, value) => {
+        if (!path || path == "") return value;
+
+        const steps = path.split(".");
+        const step = steps[0];
+        const remainingSteps = steps.slice(1).join(".");
+
+        if (Array.isArray(obj)) {
+            const index = parseInt(step);
+            const result = [...obj];
+            result[index] = set(obj[index], remainingSteps, value);
+            return result;
+        } else if (typeof (obj) === "object") {
+            const result = { ...obj };
+            result[step] = set(obj[step], remainingSteps, value);
+            return result;
+        } else {
+            console.error('unknown obj', obj, typeof (obj))
+        }
+    }
+
+    let initialState = {
+        //TODO detect size automatically
+        columns: Array(8).fill({
+            slots: Array(8).fill({
+                active: false
+            })
+        })
+    }
+
+    const SendMessage = createContext();
+
+    const App = (props) => {
+        const [state, setState] = useState(initialState);
+        const socketRef = useRef();
+
+        useEffect(() => {
+            socketRef.current = new WebSocket(`wss://${location.host}:9800`);
+            socketRef.current.onmessage = wsmsg => {
+                const msg = JSON.parse(wsmsg.data);
+                if (msg.type == "onHubSlotActiveChange") {
+                    setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.active`, Boolean(msg.active)))
+                }
+            }
+            return () => socketRef.current.close();
+        }, [])
+
+        const send = (msg) => {
+            //console.log('sending', msg)
+            socketRef.current.send(msg)
+        }
+
+        return html`
+        <${SendMessage.Provider} value=${send}>
+            <${Controller} state=${state} />
+        </${SendMessage.Provider}>`;
+    }
+
+    const Controller = ({ state }) => {
+        //console.log({state})
+        return html`
+        <div class="controller">
+            ${state.columns.map((column, columnIndex) => html`<${Column} column=${column} columnIndex=${columnIndex}/>`)}
+        </div>`;
+    }
+
+    const Column = ({ column, columnIndex }) => html`
+        <div class="column">
+            ${column.slots.map((slot,slotIndex) => html`<${Slot} slot=${slot} columnIndex=${columnIndex} slotIndex=${slotIndex}/>`)}
+        </div>`;
+
+    const Slot = ({ slot, columnIndex, slotIndex }) => {
+        const sender = useContext(SendMessage);
+
+        const handlePressed  = () => {
+            sender(`{"type":"buttonPressed", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}}`)
+        }
+
+        const handleReleased = () => {
+            sender(`{"type":"buttonReleased", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}}`)
+        }
+
+        return html`
+        <div 
+            class="slot ${slot.active ? "active" : ""}" 
+            onmousedown=${handlePressed}
+            onmouseup=${handleReleased}
+            ontouchstart=${(event)=>{handlePressed(); event.preventDefault();}}
+            ontouchend=${(event)=>{handleReleased(); event.preventDefault();}}
+            >
+        </div>`;
+    }
+
+    render(html`<${App} name="World" />`, document.body);
+</script>

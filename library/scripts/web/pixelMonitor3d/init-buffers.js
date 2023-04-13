@@ -1,6 +1,4 @@
-import {points as scene} from "./points.js";
-
-function initBuffers(gl) {
+function initBuffers(gl, scene) {
 
     //console.log(scene)
 
@@ -43,7 +41,7 @@ function initBuffers(gl) {
     //const indexBuffer = initIndexBuffer(gl);
 
     const colorBuffer = gl.createBuffer();
-    const colors = Array(sphere.vertices.length).fill([0,0,255,255]).flat();
+    const colors = Array(sphere.vertices.length).fill([0,0,255]).flat();
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(colors), gl.STATIC_DRAW);
 
@@ -63,7 +61,7 @@ function initBuffers(gl) {
     //const vertices = [];
     //const normals = [];
   
-    const r = 0.02;
+    const r = 0.01;
     const stacks = 2;
     const sectors = 4;
     const startVertex = target.vertices.length/3;
