@@ -28,6 +28,7 @@
 #include "patterns-max.hpp"
 #include "patterns-mid.hpp"
 #include "patterns-min.hpp"
+#include "patterns-test.hpp"
 #include "patterns.hpp"
 #include "patterns3d.hpp"
 #include "platform/includes/thread.hpp"
@@ -84,6 +85,8 @@ void addLedsterPipe(Hyperion *hyp)
           ledsterMap.size(),
           &hyp->hub,
           {
+            {.column = 0, .slot = 0, .pattern = new TestPatterns::ShowStarts(271)},
+
               // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(ledsterMap3d)},
               // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(ledsterMap3d)},
               // {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
@@ -153,8 +156,12 @@ void addLedsterPipe(Hyperion *hyp)
               {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(ledsterMap3d)},
 
           }),
-      new CloneOutput({new MonitorOutput3dws(ledsterMap3d, serv),
-                       new UDPOutput("hyperslave1.local", 9611, 60)}));
+
+      new CloneOutput({
+        new MonitorOutput3dws(ledsterMap3d, serv),
+        //new MonitorOutput3d(ledsterMap3d),
+        new UDPOutput("ledster.local", 9611, 60)
+      }));
   hyp->addPipe(ledsterPipe);
 }
 
@@ -168,6 +175,8 @@ void addColumnPipes(Hyperion *hyp)
           columnMap.size(),
           &hyp->hub,
           {
+              {.column = 0, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+
               // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(columnMap3d)},
               // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(columnMap3d)},
               // {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
@@ -235,23 +244,75 @@ void addColumnPipes(Hyperion *hyp)
 
           }),
       // new PatternInput<RGBA>(columnMap3d.size(), columnPattern),
-      {480 * sizeof(RGBA),
-       480 * sizeof(RGBA),
-       480 * sizeof(RGBA),
-       480 * sizeof(RGBA),
-       480 * sizeof(RGBA),
-       480 * sizeof(RGBA)},
+      {360 * sizeof(RGBA),
+       120 * sizeof(RGBA),
+       360 * sizeof(RGBA),
+       120 * sizeof(RGBA),
+       360 * sizeof(RGBA),
+       120 * sizeof(RGBA),
+       360 * sizeof(RGBA),
+       120 * sizeof(RGBA),
+       360 * sizeof(RGBA),
+       120 * sizeof(RGBA),
+       360 * sizeof(RGBA),
+       120 * sizeof(RGBA)},
       true);
 
   auto splitMap = PixelMapSplitter3d(
-      &columnMap3d, {480, 480, 480, 480, 480, 480});
+      &columnMap3d, {
+                        360,
+                        120,
+                        360,
+                        120,
+                        360,
+                        120,
+                        360,
+                        120,
+                        360,
+                        120,
+                        360,
+                        120,
+                    });
+
+  const char* hosts[] = {
+    "hyperslave1.local", //rode kolom
+    "hyperslave1.local", //rode punt
+    "hyperslave1.local", //groene kolom
+    "hyperslave1.local", //groene punt
+    "hyperslave2.local", //blauwe kolom
+    "hyperslave2.local", //blauwe punt
+    "hyperslave2.local", //azuur kolom
+    "hyperslave2.local", //azuur punt
+    "hyperslave3.local", //paars kolom
+    "hyperslave3.local", //paars punt
+    "hyperslave3.local", //geel kolom
+    "hyperslave3.local", //geel punt
+  };
+
+  const unsigned short ports[] = {
+    9611, //rode kolom
+    9612, //rode punt
+    9613, //groene kolom
+    9614, //groene punt
+    9611, //blauwe kolom
+    9612, //blauwe punt
+    9613, //azuur kolom
+    9614, //azuur punt
+    9611, //paars kolom
+    9612, //paars punt
+    9613, //geel kolom
+    9614, //geel punt
+  };
 
   for (int i = 0; i < splitInput->size(); i++)
   {
     auto pipe = new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(i),
-        new MonitorOutput3dws(splitMap.getMap(i), serv));
-    // new MonitorOutput3d(splitMap.getMap(i)));
+        new CloneOutput({
+          new MonitorOutput3dws(splitMap.getMap(i), serv),
+          //new MonitorOutput3d(splitMap.getMap(i)),
+          new UDPOutput(hosts[i], ports[i], 60)
+        }));
     hyp->addPipe(pipe);
   }
 }
@@ -263,6 +324,8 @@ void addHaloPipe(Hyperion *hyp)
           ledsterMap.size(),
           &hyp->hub,
           {
+              {.column = 0, .slot = 0, .pattern = new TestPatterns::ShowStarts(100)},
+
               // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(haloMap3d)},
               // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(haloMap3d)},
               // {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
@@ -313,7 +376,12 @@ void addHaloPipe(Hyperion *hyp)
               {.column = 5, .slot = 4, .pattern = new Max::ChevronsPattern(haloMap3d)},
               {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(haloMap3d)},
           }),
-      new MonitorOutput3dws(haloMap3d, serv));
+
+      new CloneOutput({
+        new MonitorOutput3dws(haloMap3d, serv),
+        //new MonitorOutput3d(haloMap3d),
+        new UDPOutput("hyperslave4.local", 9611, 60)
+      }));
   hyp->addPipe(haloPipe);
 }
 

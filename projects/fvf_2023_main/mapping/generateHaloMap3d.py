@@ -6,10 +6,11 @@ points = []
 scale = 0.284
 heightInMeters = 2.5
 height = heightInMeters * scale - 0.4
+numleds = 100
 
-for i in range(50):
-    x = -4 + cos(float(i)/50*2*pi)
-    y = 0 + sin(float(i)/50*2*pi)
+for i in range(numleds):
+    x = -4 + cos(float(i)/numleds*2*pi)
+    y = 0 + sin(float(i)/numleds*2*pi)
     points.append({'x': -y*scale, 'y': height, 'z': x*scale})
 
 print('number of leds: ', len(points))
