@@ -30,6 +30,7 @@ namespace Max
             this->map = map;
             this->lfo = LFO<SawDown>(1000);
             this->lfoColour = LFO<Square>(1000);
+            this->name = "Chevrons";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -67,6 +68,7 @@ namespace Max
             this->map = map.toCylindricalRotate90();
             this->lfo = LFO<SawDown>(1000);
             this->lfoColour = LFO<Square>(1000);
+            this->name = "Chevrons cone";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -104,6 +106,7 @@ namespace Max
         {
             this->map = map.toCylindricalRotate90();
             this->perm = Permute(map.size());
+            this->name = "Radial glitter fade";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -164,6 +167,7 @@ namespace Max
         AngularFadePattern(PixelMap3d map)
         {
             this->map = map.toCylindricalRotate90();
+            this->name = "Angular fade";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -204,6 +208,7 @@ namespace Max
         GrowingStrobePattern(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Growing strobe";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -243,6 +248,7 @@ namespace Max
         RadialFadePattern(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Radial fade";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override

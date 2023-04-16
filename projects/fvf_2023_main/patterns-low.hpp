@@ -25,6 +25,7 @@ namespace Low
         StaticGradientPattern(PixelMap3d map)
         {
             this->map = map;
+            this->name = "Static gradient";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -65,6 +66,7 @@ namespace Low
         {
             this->map = map;
             this->perm = Permute(map.size());
+            this->name = "On beat column chase up";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -112,6 +114,7 @@ namespace Low
         HorizontalSin(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Horizontal sin";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -145,6 +148,7 @@ namespace Low
         HorizontalSaw(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Horzontal saw";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -177,6 +181,7 @@ namespace Low
         GrowShrink(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Grow shrink";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -217,6 +222,7 @@ namespace Low
         GlowPulsePattern(PixelMap3d map)
         {
             this->map = map;
+            this->name = "Glow pulse";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -251,6 +257,7 @@ namespace Low
         VerticallyIsolated(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Vertically isolated";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override

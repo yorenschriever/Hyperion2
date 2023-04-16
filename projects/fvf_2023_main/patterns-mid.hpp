@@ -25,6 +25,7 @@ namespace Mid
         Lighthouse(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Lighthouse";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -56,6 +57,7 @@ namespace Mid
         Halo(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Halo";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -86,6 +88,7 @@ namespace Mid
         Halo2(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Halo 2";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -123,6 +126,7 @@ namespace Mid
         HaloOnBeat(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Halo on beat";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -188,6 +192,10 @@ namespace Mid
             1000, Transition::none, 0);
 
     public:
+        SnowflakePatternLedster(){
+            this->name = "Snowflake";
+        }
+
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
             if (!transition.Calculate(active))
@@ -230,6 +238,7 @@ namespace Mid
         SnowflakePatternColumn(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Snowflake";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -260,6 +269,7 @@ namespace Mid
         TakkenChase(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name = "Takkenchase";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -299,6 +309,7 @@ namespace Mid
         PetalChase(PixelMap3d::Cylindrical map)
         {
             this->map = map;
+            this->name="Petal chase";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override

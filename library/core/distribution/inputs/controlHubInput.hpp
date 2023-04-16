@@ -48,6 +48,8 @@ public:
         { 
             hub->expandTo(i->column, i->slot);
         }
+
+        setNames();
     }
 
     //simplified version of the constructor, where all patterns are added to a single column in the control hub
@@ -59,6 +61,8 @@ public:
             slotPatterns.push_back({.column = column, .slot = slotIndex++, .pattern = pattern});
         }
         ControlHubInput(length, hub, slotPatterns);
+
+        setNames();
     }
 
     void begin() override
@@ -122,4 +126,12 @@ private:
 
     std::vector<SlotPattern> slotPatterns;
     ControlHub *hub;
+
+    void setNames()
+    {
+        for (auto slotPattern: slotPatterns)
+        {
+            hub->findSlot(slotPattern.column, slotPattern.slot)->name = slotPattern.pattern->name;;
+        }
+    }
 };

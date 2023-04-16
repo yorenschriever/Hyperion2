@@ -28,6 +28,7 @@ namespace Min
             this->averagePeriod = averagePeriod;
             this->precision = precision;
             this->lfo.setPulseWidth(pulsewidth);
+            this->name = "Ribben clive";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -77,6 +78,10 @@ namespace Min
         FadeDown fade = FadeDown(2400, WaitAtEnd);
 
     public:
+        RibbenFlashPattern() {
+            this->name = "Ribben flash";
+        }
+
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
             if (!active)
@@ -116,6 +121,10 @@ namespace Min
         LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(5000);
 
     public:
+        SegmentChasePattern(){
+            this->name = "Segment chase";
+        }
+
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
             if (!active)
@@ -183,6 +192,7 @@ namespace Min
                                { return sqrt(pow(pos.x - xc, 2) + pow(pos.y - yc, 2) + pow(pos.z - zc, 2)); });
             }
             this->perm = Permute(map.size());
+            this->name = "Growing circles";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -221,6 +231,7 @@ namespace Min
         LineLaunch(PixelMap3d map)
         {
             this->map = map;
+            this->name = "Line launch";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -249,6 +260,10 @@ namespace Min
         Transition transition;
 
     public:
+        GlowPulsePattern(){
+            this->name = "Glow pulse";
+        }
+        
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
             if (!transition.Calculate(active))

@@ -17,8 +17,8 @@ function main() {
 
 
   // Initialize the GL context
-   const gl = WebGLDebugUtils.makeDebugContext(canvas.getContext("webgl"));
-   // const gl = canvas.getContext("webgl");
+   //const gl = WebGLDebugUtils.makeDebugContext(canvas.getContext("webgl"));
+    const gl = canvas.getContext("webgl");
 
     window.onresize = () => {
       canvas.width  = window.innerWidth;

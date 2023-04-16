@@ -15,14 +15,14 @@ public:
         bool activated = false;
         bool flash = false;
         bool releaseColumn = true;
-        char name[20] = "";
+        std::string name = "";
     };
 
     struct Column
     {
         std::vector<Slot> slots;
         uint8_t dim = 255;
-        char name[20] = "";
+        std::string name = "";
     };
 
     uint8_t masterDim = 255;
@@ -203,9 +203,11 @@ public:
             {
                 auto slot = column.slots[slotIndex];
                 controller->onHubSlotActiveChange(columnIndex, slotIndex, slot.activated);
+                controller->onHubSlotNameChange(columnIndex, slotIndex, slot.name);
                 // Log::info(TAG, "sending current status2");
             }
             controller->onHubColumnDimChange(columnIndex, column.dim);
+            controller->onHubColumnNameChange(columnIndex, column.name);
         }
         controller->onHubMasterDimChange(masterDim);
 

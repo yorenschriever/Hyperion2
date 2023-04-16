@@ -71,12 +71,32 @@ public:
     }",
                         dim);
     }
-    void onHubVelocityChange(float velocity) override {}
-    void onHubAmountChange(float amount) override {}
-    void onHubIntensityChange(float intensity) override {}
-    void onHubVariantChange(float variant) override {}
-    void onHubSizeChange(float size) override {}
-    void onHubOffsetChange(float offset) override {}
+
+
+  void onHubSlotNameChange(int columnIndex, int slotIndex, std::string name) override {
+        socket->sendAll("{\
+        \"type\":\"onHubSlotNameChange\",\
+        \"columnIndex\":%d,\
+        \"slotIndex\":%d,\
+        \"name\":\"%s\"\
+    }",
+                        columnIndex, slotIndex, name.c_str());
+  }
+  void onHubColumnNameChange(int columnIndex, std::string name) override {
+        socket->sendAll("{\
+        \"type\":\"onHubColumnNameChange\",\
+        \"columnIndex\":%d,\
+        \"name\":\"%s\"\
+    }",
+                        columnIndex, name.c_str());
+  }
+
+    // void onHubVelocityChange(float velocity) override {}
+    // void onHubAmountChange(float amount) override {}
+    // void onHubIntensityChange(float intensity) override {}
+    // void onHubVariantChange(float variant) override {}
+    // void onHubSizeChange(float size) override {}
+    // void onHubOffsetChange(float offset) override {}
 
 private:
     ControlHub *hub;

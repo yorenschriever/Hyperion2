@@ -22,6 +22,10 @@ namespace Hi
         LFO<SawDownShort> lfo = LFO<SawDownShort>(2000);
 
     public:
+        SnakePattern(){
+            this->name = "Snake";
+        }
+
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
             lfo.setPeriod(params->getVelocity(10000, 500));
@@ -58,6 +62,7 @@ namespace Hi
         XY(PixelMap3d map)
         {
             this->map = map;
+            this->name="XY";
         }
 
         inline float softEdge(float dist, float size)
@@ -107,6 +112,10 @@ namespace Hi
         LFO<SawDown> lfo = LFO<SawDown>(600);
 
     public:
+        PetalRotatePattern(){
+            this->name = "Petal Rotate";
+        }
+
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))
@@ -135,6 +144,10 @@ namespace Hi
         BeatWatcher watcher = BeatWatcher();
 
     public:
+        HexBeatPattern(){
+            this->name = "Hex beat";
+        }
+
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             if (!transition.Calculate(active))

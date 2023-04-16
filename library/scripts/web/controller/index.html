@@ -14,11 +14,19 @@
     }
 
     .slot {
-        width: 100px;
-        height: 100px;
-        margin: 8px;
+        width: 80px;
+        height: 80px;
+        margin: 6px;
         transition: background-color .2s ease-in;
         background-color: #333;
+
+        color: #aaa;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size: 12pt;
+        padding: 3pt;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .active {
@@ -34,6 +42,7 @@
         padding: 3pt
     }
 </style>
+<title>Controller - Hyperion</title>
 <script type="module">
     import { html, render, useState, useEffect, createContext, useRef, useContext } from './preact-standalone.js'
 
@@ -59,11 +68,13 @@
     }
 
     const defaultColumn = {
-        slots: []
+        slots: [],
+        name: "default column name"
     }
 
     const defaultSlot = {
-        active:false
+        active:false,
+        name: "default slot name"
     }
 
     const initialState = {
@@ -82,13 +93,13 @@
             const resizeController = (columnIndex, slotIndex) => 
             {
                 setState(state => {
-                    if (state.columns.length > columnIndex)
+                    if (columnIndex === undefined || state.columns.length > columnIndex)
                         return state;
 
                     return set(state, `columns.${columnIndex}`, defaultColumn)
                 })
                 setState(state => {
-                    if (state.columns[columnIndex].slots.length > slotIndex)
+                    if (slotIndex === undefined || state.columns[columnIndex].slots.length > slotIndex)
                         return state;
 
                     return set(state, `columns.${columnIndex}.slots.${slotIndex}`, defaultSlot)
@@ -107,6 +118,11 @@
                     if (msg.type == "onHubSlotActiveChange") {
                         //console.log('onHubSlotActiveChange', msg)
                         setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.active`, Boolean(msg.active)))
+                    }
+
+                    if (msg.type == "onHubSlotNameChange") {
+                        //console.log('onHubSlotActiveChange', msg)
+                        setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.name`, msg.name))
                     }
                 }
 
@@ -181,12 +197,13 @@
 
         return html`
         <div 
-            class="slot ${slot?.active ? "active" : ""}" 
+            class="slot ${slot.active ? "active" : ""}" 
             onmousedown=${handlePressed}
             onmouseup=${handleReleased}
             ontouchstart=${(event)=>{handlePressed(); event.preventDefault();}}
             ontouchend=${(event)=>{handleReleased(); event.preventDefault();}}
             >
+            ${slot.name}
         </div>`;
     }
 

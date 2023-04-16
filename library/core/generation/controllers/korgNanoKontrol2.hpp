@@ -99,14 +99,14 @@ public:
     }
 
     void onSystemRealtime(uint8_t message) override {}
-    void onHubColumnDimChange(int columnIndex, uint8_t dim) override {}
-    void onHubMasterDimChange(uint8_t dim) override {}
-    void onHubVelocityChange(float velocity) override {}
-    void onHubAmountChange(float amount) override {}
-    void onHubIntensityChange(float intensity) override {}
-    void onHubVariantChange(float variant) override {}
-    void onHubSizeChange(float size) override {}
-    void onHubOffsetChange(float offset) override {}
+    // void onHubColumnDimChange(int columnIndex, uint8_t dim) override {}
+    // void onHubMasterDimChange(uint8_t dim) override {}
+    // void onHubVelocityChange(float velocity) override {}
+    // void onHubAmountChange(float amount) override {}
+    // void onHubIntensityChange(float intensity) override {}
+    // void onHubVariantChange(float variant) override {}
+    // void onHubSizeChange(float size) override {}
+    // void onHubOffsetChange(float offset) override {}
     void onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override {}
     void onNoteOff(uint8_t channel, uint8_t note, uint8_t velocity) override {}
 };

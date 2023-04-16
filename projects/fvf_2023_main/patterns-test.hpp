@@ -19,6 +19,7 @@ namespace TestPatterns
         int segmentSize;
         ShowStarts(int segmentSize){
             this->segmentSize = segmentSize;
+            this->name = "Show starts";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override

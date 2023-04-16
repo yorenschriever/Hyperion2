@@ -108,12 +108,12 @@ public:
                 onHubSlotActiveChange(x, y, false);
     }
 
-    void onHubColumnDimChange(int columnIndex, uint8_t dim) override {}
-    void onHubMasterDimChange(uint8_t dim) override {}
-    void onHubVelocityChange(float velocity) override {}
-    void onHubAmountChange(float amount) override {}
-    void onHubIntensityChange(float intensity) override {}
-    void onHubVariantChange(float variant) override {}
-    void onHubSizeChange(float size) override {}
-    void onHubOffsetChange(float offset) override {}
+    // void onHubColumnDimChange(int columnIndex, uint8_t dim) override {}
+    // void onHubMasterDimChange(uint8_t dim) override {}
+    // void onHubVelocityChange(float velocity) override {}
+    // void onHubAmountChange(float amount) override {}
+    // void onHubIntensityChange(float intensity) override {}
+    // void onHubVariantChange(float variant) override {}
+    // void onHubSizeChange(float size) override {}
+    // void onHubOffsetChange(float offset) override {}
 };

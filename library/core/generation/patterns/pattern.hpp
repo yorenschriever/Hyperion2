@@ -10,6 +10,7 @@
 #include "helpers/transition.h"
 #include "helpers/watcher.h"
 #include <inttypes.h>
+#include <string>
 
 template <class T_COLOUR>
 class Pattern
@@ -26,5 +27,7 @@ public:
     // width = number of pixels
     // active = is the pattern activated
     virtual void Calculate(T_COLOUR *frameBuffer, int width, bool active, Params *params){}
+
+    std::string name; 
 };
 
