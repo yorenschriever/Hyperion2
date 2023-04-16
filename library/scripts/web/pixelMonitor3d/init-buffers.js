@@ -46,13 +46,42 @@ function initBuffers(gl, scene) {
     gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(colors), gl.STATIC_DRAW);
 
 
+    //////grid
+
+    let grid = {vertices:[], normals:[], indices:[]}
+    draw_grid(grid, -0.45)
+
+    const gridPositionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, gridPositionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(grid.vertices), gl.STATIC_DRAW);
+
+    const gridIndexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gridIndexBuffer);
+    gl.bufferData(
+      gl.ELEMENT_ARRAY_BUFFER,
+      new Uint16Array(grid.indices),
+      gl.STATIC_DRAW
+    );
+
+    const gridColorBuffer = gl.createBuffer();
+    const gridColors = Array(sphere.vertices.length).fill([50,50,50]).flat();
+    gl.bindBuffer(gl.ARRAY_BUFFER, gridColorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(gridColors), gl.STATIC_DRAW);
+
+
+
     return {
       position: positionBuffer,
       color: colorBuffer,
       indices: indexBuffer,
       //normals: normalBuffer,
       indicesCount: sphere.indices.length,
-      verticesCount: sphere.vertices.length
+      verticesCount: sphere.vertices.length,
+
+      gridPosition: gridPositionBuffer,
+      gridColor: gridColorBuffer,
+      gridIndices: gridIndexBuffer,
+      gridIndicesCount: grid.indices.length,
     };
   }
   
@@ -101,6 +130,34 @@ function initBuffers(gl, scene) {
     }
   
     //return {vertices, normals, indices};
+  }
+
+  function draw_grid(target, gridz=0)
+  {
+    const slices = 10
+    const normal = [0,1,0]
+
+    for (let j=0; j<  slices+1; j++)
+    {
+        for (let i=0; i< slices+1; i++){
+            const x = -1 + 2*i/slices
+            const y = gridz
+            const z = -1 + 2*j/slices
+            //vertices.extend([x,y,z]) 
+            target.vertices.push(x,y,z);
+            target.normals.push(...normal);
+        }
+    }
+
+    for (let j=0; j< slices; j++){
+      for (let i=0; i< slices; i++){
+            const row1 = j * (slices+1)
+            const row2 = (j+1) * (slices+1)
+
+            target.indices.push(row1+i, row1+i+1, row1+i+1, row2+i+1)
+            target.indices.push(row2+i+1, row2+i, row2+i, row1+i)
+      }
+    }
   }
 
 export { initBuffers };

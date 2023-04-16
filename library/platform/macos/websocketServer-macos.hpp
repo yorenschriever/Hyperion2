@@ -239,6 +239,9 @@ private:
             // Accept the websocket handshake
             ws.accept();
 
+            if (server->connectionHandler != nullptr)
+                 server->connectionHandler(p_ws, server, server->connectionUserData);
+
             for (;;)
             {
                 // This buffer will hold the incoming message

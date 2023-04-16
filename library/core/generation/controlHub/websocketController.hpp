@@ -16,6 +16,13 @@ public:
         //Log::info(TAG, "Created WebsocketController");
         socket = WebsocketServer::createInstance(9800);
         socket->onMessage(handler, (void*) this);
+        socket->onConnect(connectionHandler, (void*) this);
+    }
+
+    static void connectionHandler(RemoteWebsocketClient *client, WebsocketServer *server, void* userData)
+    {
+        auto *instance = (WebsocketController*) userData;
+        instance->hub->sendCurrentStatus(instance);
     }
 
     static void handler(RemoteWebsocketClient *client, WebsocketServer *server, std::string msg, void* userData)

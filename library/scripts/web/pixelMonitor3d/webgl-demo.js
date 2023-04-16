@@ -14,14 +14,20 @@ main();
 function main() {
   const canvas = document.querySelector("#glcanvas");
 
-  //window.onresize = () => {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-  //}
+
 
   // Initialize the GL context
-//   const gl = WebGLDebugUtils.makeDebugContext(canvas.getContext("webgl"));
-    const gl = canvas.getContext("webgl");
+   const gl = WebGLDebugUtils.makeDebugContext(canvas.getContext("webgl"));
+   // const gl = canvas.getContext("webgl");
+
+    window.onresize = () => {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    }
+
+    window.onresize()
 
   // Only continue if WebGL is available and working
   if (gl === null) {

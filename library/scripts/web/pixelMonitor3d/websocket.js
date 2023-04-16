@@ -2,7 +2,6 @@ export class Websocket {
     buffers;
     gl;
     buffer;
-    sockets = []
 
     constructor(gl, buffers, scene) {
         this.buffers = buffers;
@@ -19,27 +18,44 @@ export class Websocket {
             const bufferOffset = ledOffset
             ledOffset += ledsInScenePart
 
-            const socket = new WebSocket(`wss://${location.host}:${scenePart.port}`);
-            this.sockets.push(socket);
-            socket.onmessage = async msg => {
+            const createSocket = () => {
 
-                const ab = await msg.data.arrayBuffer()
-                const view = new Uint8Array(ab)
+                const socket = new WebSocket(`wss://${location.host}:${scenePart.port}`);
+            
+                socket.onmessage = async msg => {
 
-                const ledsReceived = ab.byteLength / 3;
-                
-                //TODO magic const, better calculate
-                const indicesPerLed = 15;
+                    const ab = await msg.data.arrayBuffer()
+                    const view = new Uint8Array(ab)
 
-                for (let i = 0; i < ledsReceived * indicesPerLed; i++) {
-                    const ledIndex = Math.floor(i / indicesPerLed);
-                    const bufferIndex = 3 * i + 3* indicesPerLed * bufferOffset
-                    this.buffer[bufferIndex + 0] = view[3 * ledIndex + 0]
-                    this.buffer[bufferIndex + 1] = view[3 * ledIndex + 1]
-                    this.buffer[bufferIndex + 2] = view[3 * ledIndex + 2]
+                    const ledsReceived = ab.byteLength / 3;
+                    
+                    //TODO magic const, better calculate
+                    const indicesPerLed = 15;
+
+                    for (let i = 0; i < ledsReceived * indicesPerLed; i++) {
+                        const ledIndex = Math.floor(i / indicesPerLed);
+                        const bufferIndex = 3 * i + 3* indicesPerLed * bufferOffset
+                        this.buffer[bufferIndex + 0] = view[3 * ledIndex + 0]
+                        this.buffer[bufferIndex + 1] = view[3 * ledIndex + 1]
+                        this.buffer[bufferIndex + 2] = view[3 * ledIndex + 2]
+                    }
                 }
+
+                socket.onclose = (e) => {
+                    console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+                    setTimeout(() => {
+                        createSocket()
+                    }, 1000);
+                };
+                
+                socket.onerror = (err) => {
+                    console.error('Socket encountered error: ', err.message, 'Closing socket');
+                    socket.close();
+                };
+
             }
 
+            createSocket()
         })
 
         window.requestAnimationFrame(() => this.writeBuffer());
