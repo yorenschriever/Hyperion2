@@ -1,6 +1,6 @@
 #include "colours.h"
-#include "core/distribution/inputs/inputSplitter.hpp"
 #include "core/distribution/inputs/inputSlicer.hpp"
+#include "core/distribution/inputs/inputSplitter.hpp"
 #include "core/distribution/inputs/patternInput.hpp"
 #include "core/distribution/outputs/cloneOutput.hpp"
 #include "core/distribution/outputs/monitorOutput.hpp"
@@ -58,11 +58,6 @@ int main()
 {
   auto hyp = new Hyperion();
 
-  hyp->hub.params.primaryColour = RGB(255, 0, 255);
-  hyp->hub.params.secondaryColour = RGB(50, 50, 50);
-  hyp->hub.params.highlightColour = RGB(250, 250, 250);
-  hyp->hub.params.gradient = &heatmap;
-
   addColumnPipes(hyp);
   addLedsterPipe(hyp);
   addHaloPipe(hyp);
@@ -72,6 +67,7 @@ int main()
 
   Tempo::AddSource(new ConstantTempo(120));
 
+  // select first palette
   hyp->hub.buttonPressed(0, 0);
 
   hyp->start();
@@ -86,7 +82,7 @@ void addLedsterPipe(Hyperion *hyp)
           ledsterMap.size(),
           &hyp->hub,
           {
-            {.column = 0, .slot = 0, .pattern = new TestPatterns::ShowStarts(271)},
+              {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(271)},
 
               // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(ledsterMap3d)},
               // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(ledsterMap3d)},
@@ -158,11 +154,9 @@ void addLedsterPipe(Hyperion *hyp)
 
           }),
 
-      new CloneOutput({
-        new MonitorOutput3dws(ledsterMap3d, serv),
-        //new MonitorOutput3d(ledsterMap3d),
-        new UDPOutput("ledster.local", 9611, 60)
-      }));
+      new CloneOutput({new MonitorOutput3dws(ledsterMap3d, serv),
+                       // new MonitorOutput3d(ledsterMap3d),
+                       new UDPOutput("ledster.local", 9611, 60)}));
   hyp->addPipe(ledsterPipe);
 }
 
@@ -171,98 +165,97 @@ void addColumnPipes(Hyperion *hyp)
   // Generate 1 pattern, and split it up in six outputs,
   // because UDPOutput (and therefore MonitorOutput) are limited by a
   // maximum transfer size of 2*1440 bytes
-  
-    auto columnsInput = new ControlHubInput<RGBA>(
-          columnMap.size(),
-          &hyp->hub,
-          {
-              {.column = 0, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
 
-              // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(columnMap3d)},
-              // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(columnMap3d)},
-              // {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
+  auto columnsInput = new ControlHubInput<RGBA>(
+      columnMap.size(),
+      &hyp->hub,
+      {
+          {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
 
-              // {.column = 1, .slot = 0, .pattern = new FWF::SquareGlitchPattern(columnMap)},
-              // {.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(pColumnMap)},
-              // {.column = 1, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
+          // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(columnMap3d)},
+          // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(columnMap3d)},
+          // {.column = 0, .slot = 2, .pattern = new FWF::GlowPulsePattern()},
 
-              // {.column = 2, .slot = 0, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
-              // {.column = 2, .slot = 1, .pattern = new FWF::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
-              // {.column = 2, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
+          // {.column = 1, .slot = 0, .pattern = new FWF::SquareGlitchPattern(columnMap)},
+          // {.column = 1, .slot = 1, .pattern = new FWF::GrowingStrobePattern(pColumnMap)},
+          // {.column = 1, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
 
-              // {.column = 3, .slot = 0, .pattern = new FWF::RibbenClivePattern<SoftSquare>(40000)},
-              // {.column = 3, .slot = 1, .pattern = new FWF::RibbenClivePattern<SawDown>(500)},
-              // {.column = 3, .slot = 2, .pattern = new FWF::RibbenClivePattern<SinFast>(3000)},
+          // {.column = 2, .slot = 0, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
+          // {.column = 2, .slot = 1, .pattern = new FWF::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
+          // {.column = 2, .slot = 2, .pattern = new Mapped::HorizontalGradientPattern(columnMap)},
 
-              // {.column = 4, .slot = 0, .pattern = new FWF::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
-              // {.column = 4, .slot = 1, .pattern = new FWF::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
-              // {.column = 4, .slot = 2, .pattern = new FWF::RibbenClivePattern<PWM>(10000,1,0.0025)},
+          // {.column = 3, .slot = 0, .pattern = new FWF::RibbenClivePattern<SoftSquare>(40000)},
+          // {.column = 3, .slot = 1, .pattern = new FWF::RibbenClivePattern<SawDown>(500)},
+          // {.column = 3, .slot = 2, .pattern = new FWF::RibbenClivePattern<SinFast>(3000)},
 
-              // {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
-              // {.column = 0, .slot = 0, .pattern = new Ledster::ChevronsPattern(columnMap)},
-              // {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(columnMap3d)},
-              // // {.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
+          // {.column = 4, .slot = 0, .pattern = new FWF::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.15)},
+          // {.column = 4, .slot = 1, .pattern = new FWF::RibbenClivePattern<LFOPause<SawDown>>(10000,1,0.15)},
+          // {.column = 4, .slot = 2, .pattern = new FWF::RibbenClivePattern<PWM>(10000,1,0.0025)},
 
-              // {.column = 6, .slot = 0, .pattern = new FWF::RibbenFadePattern()},
-              // {.column = 6, .slot = 1, .pattern = new FWF::SegmentChasePattern()},
-              // {.column = 6, .slot = 2, .pattern = new FWF::OnBeatColumnFadePattern()},
+          // {.column = 5, .slot = 0, .pattern = new FWF::RibbenFlashPattern()},
+          // {.column = 0, .slot = 0, .pattern = new Ledster::ChevronsPattern(columnMap)},
+          // {.column = 5, .slot = 2, .pattern = new FWF3D::ChevronsConePattern(columnMap3d)},
+          // // {.column = 5, .slot = 2, .pattern = new Ledster::PixelGlitchPattern()},
 
-              // {.column = 7, .slot = 0, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(columnMap3d)},
-              // {.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(columnMap3d)},
-              // {.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(columnMap3d)},
+          // {.column = 6, .slot = 0, .pattern = new FWF::RibbenFadePattern()},
+          // {.column = 6, .slot = 1, .pattern = new FWF::SegmentChasePattern()},
+          // {.column = 6, .slot = 2, .pattern = new FWF::OnBeatColumnFadePattern()},
 
-              {.column = 1, .slot = 0, .pattern = new Low::StaticGradientPattern(columnMap3d)},
-              {.column = 1, .slot = 1, .pattern = new Low::OnBeatColumnChaseUpPattern(columnMap3d)},
-              {.column = 1, .slot = 2, .pattern = new Low::HorizontalSin(cColumnMap3d)},
-              {.column = 1, .slot = 3, .pattern = new Low::HorizontalSaw(cColumnMap3d)},
-              {.column = 1, .slot = 4, .pattern = new Low::GrowShrink(cColumnMap3d)},
-              {.column = 1, .slot = 5, .pattern = new Low::GlowPulsePattern(columnMap3d)},
-              {.column = 1, .slot = 6, .pattern = new Low::VerticallyIsolated(cColumnMap3d)},
+          // {.column = 7, .slot = 0, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(columnMap3d)},
+          // {.column = 7, .slot = 1, .pattern = new FWF3D::GrowingCirclesPattern(columnMap3d)},
+          // {.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(columnMap3d)},
 
-              {.column = 2, .slot = 0, .pattern = new Mid::Lighthouse(cColumnMap3d)},
-              {.column = 2, .slot = 1, .pattern = new Mid::Halo(cColumnMap3d)},
-              {.column = 2, .slot = 3, .pattern = new Mid::HaloOnBeat(cColumnMap3d)},
-              {.column = 2, .slot = 4, .pattern = new Mid::SnowflakePatternColumn(cColumnMap3d)},
-              {.column = 2, .slot = 5, .pattern = new Mid::TakkenChase(cColumnMap3d)},
-              // {.column = 2, .slot = 6, .pattern = new Mid::HaloChase(cColumnMap3d)},
+          {.column = 1, .slot = 0, .pattern = new Low::StaticGradientPattern(columnMap3d)},
+          {.column = 1, .slot = 1, .pattern = new Low::OnBeatColumnChaseUpPattern(columnMap3d)},
+          {.column = 1, .slot = 2, .pattern = new Low::HorizontalSin(cColumnMap3d)},
+          {.column = 1, .slot = 3, .pattern = new Low::HorizontalSaw(cColumnMap3d)},
+          {.column = 1, .slot = 4, .pattern = new Low::GrowShrink(cColumnMap3d)},
+          {.column = 1, .slot = 5, .pattern = new Low::GlowPulsePattern(columnMap3d)},
+          {.column = 1, .slot = 6, .pattern = new Low::VerticallyIsolated(cColumnMap3d)},
 
-              {.column = 3, .slot = 1, .pattern = new Hi::XY(columnMap3d)},
+          {.column = 2, .slot = 0, .pattern = new Mid::Lighthouse(cColumnMap3d)},
+          {.column = 2, .slot = 1, .pattern = new Mid::Halo(cColumnMap3d)},
+          {.column = 2, .slot = 3, .pattern = new Mid::HaloOnBeat(cColumnMap3d)},
+          {.column = 2, .slot = 4, .pattern = new Mid::SnowflakePatternColumn(cColumnMap3d)},
+          {.column = 2, .slot = 5, .pattern = new Mid::TakkenChase(cColumnMap3d)},
+          // {.column = 2, .slot = 6, .pattern = new Mid::HaloChase(cColumnMap3d)},
 
-              {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
-              {.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
-              {.column = 4, .slot = 2, .pattern = new Min::SegmentChasePattern()},
-              {.column = 4, .slot = 3, .pattern = new Min::LineLaunch(columnMap3d)},
-              {.column = 4, .slot = 4, .pattern = new Min::GrowingCirclesPattern(columnMap3d)},
-              {.column = 4, .slot = 5, .pattern = new Min::GlowPulsePattern()},
-              //{.column = 4, .slot = 5, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(columnMap3d)},
+          {.column = 3, .slot = 1, .pattern = new Hi::XY(columnMap3d)},
 
-              {.column = 5, .slot = 0, .pattern = new Max::RadialGlitterFadePattern(columnMap3d)},
-              {.column = 5, .slot = 1, .pattern = new Max::AngularFadePattern(columnMap3d)},
-              {.column = 5, .slot = 2, .pattern = new Max::GrowingStrobePattern(cColumnMap3d)},
-              {.column = 5, .slot = 3, .pattern = new Max::RadialFadePattern(cColumnMap3d)},
-              {.column = 5, .slot = 4, .pattern = new Max::ChevronsPattern(columnMap3d)},
-              {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(columnMap3d)},
+          {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
+          {.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
+          {.column = 4, .slot = 2, .pattern = new Min::SegmentChasePattern()},
+          {.column = 4, .slot = 3, .pattern = new Min::LineLaunch(columnMap3d)},
+          {.column = 4, .slot = 4, .pattern = new Min::GrowingCirclesPattern(columnMap3d)},
+          {.column = 4, .slot = 5, .pattern = new Min::GlowPulsePattern()},
+          //{.column = 4, .slot = 5, .pattern = new FWF3D::OnBeatColumnChaseUpPattern(columnMap3d)},
 
-          });
+          {.column = 5, .slot = 0, .pattern = new Max::RadialGlitterFadePattern(columnMap3d)},
+          {.column = 5, .slot = 1, .pattern = new Max::AngularFadePattern(columnMap3d)},
+          {.column = 5, .slot = 2, .pattern = new Max::GrowingStrobePattern(cColumnMap3d)},
+          {.column = 5, .slot = 3, .pattern = new Max::RadialFadePattern(cColumnMap3d)},
+          {.column = 5, .slot = 4, .pattern = new Max::ChevronsPattern(columnMap3d)},
+          {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(columnMap3d)},
 
-    auto splitInput = new InputSlicer(
+      });
+
+  auto splitInput = new InputSlicer(
       columnsInput,
       // new PatternInput<RGBA>(columnMap3d.size(), columnPattern),
       {
-       {0 * sizeof(RGBA), 360 * sizeof(RGBA)},
-       {360 * sizeof(RGBA), 120 * sizeof(RGBA)},
-       {480 * sizeof(RGBA), 360 * sizeof(RGBA)},
-       {840 * sizeof(RGBA), 120 * sizeof(RGBA)},
-       {960 * sizeof(RGBA), 360 * sizeof(RGBA)},
-       {1320 * sizeof(RGBA), 120 * sizeof(RGBA)},
-       {1440 * sizeof(RGBA), 360 * sizeof(RGBA)},
-       {1800 * sizeof(RGBA), 120 * sizeof(RGBA)},
-       {1920 * sizeof(RGBA), 360 * sizeof(RGBA)},
-       {2280 * sizeof(RGBA), 120 * sizeof(RGBA)},
-       {2400 * sizeof(RGBA), 360 * sizeof(RGBA)},
-       {2760 * sizeof(RGBA), 120 * sizeof(RGBA)},
-       {0, 6*8*60 * sizeof(RGBA)}
-      },
+          {0 * sizeof(RGBA), 360 * sizeof(RGBA)},
+          {360 * sizeof(RGBA), 120 * sizeof(RGBA)},
+          {480 * sizeof(RGBA), 360 * sizeof(RGBA)},
+          {840 * sizeof(RGBA), 120 * sizeof(RGBA)},
+          {960 * sizeof(RGBA), 360 * sizeof(RGBA)},
+          {1320 * sizeof(RGBA), 120 * sizeof(RGBA)},
+          {1440 * sizeof(RGBA), 360 * sizeof(RGBA)},
+          {1800 * sizeof(RGBA), 120 * sizeof(RGBA)},
+          {1920 * sizeof(RGBA), 360 * sizeof(RGBA)},
+          {2280 * sizeof(RGBA), 120 * sizeof(RGBA)},
+          {2400 * sizeof(RGBA), 360 * sizeof(RGBA)},
+          {2760 * sizeof(RGBA), 120 * sizeof(RGBA)},
+          {0, 6 * 8 * 60 * sizeof(RGBA)}},
       true);
 
   auto splitMap = PixelMapSplitter3d(
@@ -281,55 +274,43 @@ void addColumnPipes(Hyperion *hyp)
                         120,
                     });
 
-  const char* hosts[] = {
-    "hyperslave1.local", //rode kolom
-    "hyperslave1.local", //rode punt
-    "hyperslave1.local", //groene kolom
-    "hyperslave1.local", //groene punt
-    "hyperslave2.local", //blauwe kolom
-    "hyperslave2.local", //blauwe punt
-    "hyperslave2.local", //azuur kolom
-    "hyperslave2.local", //azuur punt
-    "hyperslave3.local", //paars kolom
-    "hyperslave3.local", //paars punt
-    "hyperslave3.local", //geel kolom
-    "hyperslave3.local", //geel punt
+  typedef struct
+  {
+    const char *host;
+    const unsigned short port;
+  } Slave;
+  Slave slaves[] = {
+      {.host = "hyperslave1.local", .port = 9611}, // rode kolom
+      {.host = "hyperslave1.local", .port = 9612}, // rode punt
+      {.host = "hyperslave1.local", .port = 9613}, // groene kolom
+      {.host = "hyperslave1.local", .port = 9614}, // groene punt
+      {.host = "hyperslave2.local", .port = 9611}, // blauwe kolom
+      {.host = "hyperslave2.local", .port = 9612}, // blauwe punt
+      {.host = "hyperslave2.local", .port = 9613}, // azuur kolom
+      {.host = "hyperslave2.local", .port = 9614}, // azuur punt
+      {.host = "hyperslave3.local", .port = 9611}, // paars kolom
+      {.host = "hyperslave3.local", .port = 9612}, // paars punt
+      {.host = "hyperslave3.local", .port = 9613}, // geel kolom
+      {.host = "hyperslave3.local", .port = 9614}, // geel punt
   };
 
-  const unsigned short ports[] = {
-    9611, //rode kolom
-    9612, //rode punt
-    9613, //groene kolom
-    9614, //groene punt
-    9611, //blauwe kolom
-    9612, //blauwe punt
-    9613, //azuur kolom
-    9614, //azuur punt
-    9611, //paars kolom
-    9612, //paars punt
-    9613, //geel kolom
-    9614, //geel punt
-  };
-
-  for (int i = 0; i < splitInput->size()-1; i++)
+  for (int i = 0; i < splitInput->size() - 1; i++)
   {
     auto pipe = new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(i),
-        //new CloneOutput({
-          //new MonitorOutput3dws(splitMap.getMap(i), serv),
-          //new MonitorOutput3d(splitMap.getMap(i)),
-          new UDPOutput(hosts[i], ports[i], 60)
+        // new CloneOutput({
+        // new MonitorOutput3dws(splitMap.getMap(i), serv),
+        // new MonitorOutput3d(splitMap.getMap(i)),
+        new UDPOutput(slaves[i].host, slaves[i].port, 60)
         //})
-        );
+    );
     hyp->addPipe(pipe);
   }
 
   hyp->addPipe(
-    new ConvertPipe<RGBA, RGB>(
-        splitInput->getInput(12),
-        new MonitorOutput3dws(columnMap3d, serv)
-    )
-  );
+      new ConvertPipe<RGBA, RGB>(
+          splitInput->getInput(12),
+          new MonitorOutput3dws(columnMap3d, serv)));
 }
 
 void addHaloPipe(Hyperion *hyp)
@@ -339,7 +320,7 @@ void addHaloPipe(Hyperion *hyp)
           ledsterMap.size(),
           &hyp->hub,
           {
-              {.column = 0, .slot = 0, .pattern = new TestPatterns::ShowStarts(100)},
+              {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(100)},
 
               // {.column = 0, .slot = 0, .pattern = new FWF3D::RadialGlitterFadePattern(haloMap3d)},
               // {.column = 0, .slot = 1, .pattern = new FWF3D::AngularFadePattern(haloMap3d)},
@@ -392,27 +373,26 @@ void addHaloPipe(Hyperion *hyp)
               {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(haloMap3d)},
           }),
 
-      new CloneOutput({
-        new MonitorOutput3dws(haloMap3d, serv),
-        //new MonitorOutput3d(haloMap3d),
-        new UDPOutput("hyperslave4.local", 9611, 60)
-      }));
+      new CloneOutput({new MonitorOutput3dws(haloMap3d, serv),
+                       // new MonitorOutput3d(haloMap3d),
+                       new UDPOutput("hyperslave4.local", 9611, 60)}));
   hyp->addPipe(haloPipe);
 }
 
 void addPaletteColumn(Hyperion *hyp)
 {
-  auto paletteColumn = new PaletteColumn(&hyp->hub, 0, {
-                                                           {.gradient = &heatmap, .primary = heatmap.get(127), .secondary = heatmap.get(200), .highlight = heatmap.get(255)},
-                                                           {.gradient = &sunset1, .primary = sunset1.get(127), .secondary = sunset1.get(200), .highlight = sunset1.get(255)},
-                                                           {.gradient = &sunset3, .primary = sunset3.get(127), .secondary = sunset3.get(200), .highlight = sunset3.get(255)},
-                                                           {.gradient = &sunset4, .primary = sunset4.get(127), .secondary = sunset4.get(200), .highlight = sunset4.get(255)},
-                                                           coralTeal,
-                                                           // retro,
-                                                           // candy,
-                                                           greatBarrierReef,
-                                                           campfire,
-                                                           tunnel,
-                                                       });
+  auto paletteColumn = new PaletteColumn(
+      &hyp->hub,
+      0,
+      {
+          heatmap,
+          sunset1,
+          sunset3,
+          sunset4,
+          coralTeal,
+          greatBarrierReef,
+          campfire,
+          tunnel
+      });
   hyp->hub.subscribe(paletteColumn);
 }

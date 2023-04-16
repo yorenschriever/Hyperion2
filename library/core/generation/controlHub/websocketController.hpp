@@ -91,13 +91,6 @@ public:
                         columnIndex, name.c_str());
   }
 
-    // void onHubVelocityChange(float velocity) override {}
-    // void onHubAmountChange(float amount) override {}
-    // void onHubIntensityChange(float intensity) override {}
-    // void onHubVariantChange(float variant) override {}
-    // void onHubSizeChange(float size) override {}
-    // void onHubOffsetChange(float offset) override {}
-
 private:
     ControlHub *hub;
     std::unique_ptr<WebsocketServer> socket;

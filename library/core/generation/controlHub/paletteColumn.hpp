@@ -10,17 +10,21 @@ public:
   struct Palette
   {
     Gradient *gradient;
-    RGBA primary ;
+    RGBA primary;
     RGBA secondary;
     RGBA highlight;
+    std::string name;
   };
 
   PaletteColumn(ControlHub *hub, int columnIndex, std::vector<Palette> palettes)
   {
     this->hub = hub;
     this->columnIndex = columnIndex;
-    this->hub->expandTo(columnIndex, palettes.size());
+    this->hub->expandTo(columnIndex, palettes.size()-1);
     this->palettes = palettes;
+
+    for (int i = 0; i < palettes.size(); i++)
+      hub->findSlot(columnIndex, i)->name = palettes[i].name;
   }
 
   void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) override
@@ -37,17 +41,6 @@ public:
     hub->params.secondaryColour = palettes[slotIndex].secondary;
     hub->params.highlightColour = palettes[slotIndex].highlight;
   }
-
-  // void onHubColumnDimChange(int columnIndex, uint8_t dim) override {}
-  // void onHubMasterDimChange(uint8_t dim) override {}
-  // void onHubVelocityChange(float velocity) override {}
-  // void onHubAmountChange(float amount) override {}
-  // void onHubIntensityChange(float intensity) override {}
-  // void onHubVariantChange(float variant) override {}
-  // void onHubSizeChange(float size) override {}
-  // void onHubOffsetChange(float offset) override {}
-  // void onHubSlotNameChange(int columnIndex, int slotIndex, std::string name) {};
-  // void onHubColumnNameChange(int columnIndex, std::string name) {};
 
 private:
   ControlHub *hub;
