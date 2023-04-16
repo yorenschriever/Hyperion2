@@ -1,2 +1,29 @@
-<a href="/pixelMonitor3d/">Pixelmonitor3d</a><br/>
-<a href="/controller/">Web controller</a>
+<html>
+    <head>
+        <link rel="stylesheet" href="controller/controller.css">
+        <style>
+            #monitor {
+                position:absolute;
+                right:16px;
+                top:16px;
+                /* border-radius: 8px; */
+                width: 50%;
+                height: 50%;
+                resize:both;
+                border: 1px solid #444;
+            }
+        </style>
+        </link>
+        <title>Controller - Hyperion</title>
+        <script type="module">
+            import { ControllerApp } from "./controller/controller.js"
+            import { html, render } from './controller/preact-standalone.js'
+
+            render(html`<${ControllerApp}/>`, document.getElementById('controller'));
+        </script>
+    </head>
+    <body>
+        <div id="controller"></div>
+        <iframe src="./monitor/index.html" id="monitor"></iframe>
+    </body>
+</html>

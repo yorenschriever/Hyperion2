@@ -1,0 +1,42 @@
+body {
+    background-color: #111;
+}
+
+.controller {
+    display: flex;
+    flex-direction: row;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.slot {
+    width: 80px;
+    height: 80px;
+    margin: 6px;
+    transition: background-color .2s ease-in;
+    background-color: #333;
+
+    color: #ccc;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 12pt;
+    padding: 3pt;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.active {
+    background-color: green;
+}
+
+.controllerState {
+    position: absolute;
+    background-color: red;
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 12pt;
+    padding: 3pt
+}
