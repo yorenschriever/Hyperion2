@@ -23,16 +23,18 @@ const set = (obj, path, value) => {
 
 const defaultColumn = {
     slots: [],
+    dim:255,
     name: "default column name"
 }
 
 const defaultSlot = {
-    active:false,
+    active: false,
     name: "default slot name"
 }
 
 const initialState = {
-    columns: []
+    columns: [],
+    masterDim:255
 }
 
 const SendMessage = createContext();
@@ -44,8 +46,7 @@ export const ControllerApp = (props) => {
 
     useEffect(() => {
 
-        const resizeController = (columnIndex, slotIndex) => 
-        {
+        const resizeController = (columnIndex, slotIndex) => {
             setState(state => {
                 if (columnIndex === undefined || state.columns.length > columnIndex)
                     return state;
@@ -70,13 +71,13 @@ export const ControllerApp = (props) => {
                 resizeController(msg.columnIndex, msg.slotIndex)
 
                 if (msg.type == "onHubSlotActiveChange") {
-                    //console.log('onHubSlotActiveChange', msg)
                     setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.active`, Boolean(msg.active)))
-                }
-
-                if (msg.type == "onHubSlotNameChange") {
-                    //console.log('onHubSlotActiveChange', msg)
+                } else if (msg.type == "onHubSlotNameChange") {
                     setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.name`, msg.name))
+                } else if (msg.type=="onHubColumnDimChange"){
+                    setState(state => set(state, `columns.${msg.columnIndex}.dim`, msg.dim))
+                } else if (msg.type == "onHubMasterDimChange"){
+                    setState(state => set(state, `masterDim`, msg.dim))
                 }
             }
 
@@ -87,7 +88,7 @@ export const ControllerApp = (props) => {
                     createSocket()
                 }, 1000);
             };
-            
+
             socket.onerror = (err) => {
                 setSocketState(socket.readyState);
                 console.error('Socket encountered error: ', err.message, 'Closing socket');
@@ -118,30 +119,30 @@ export const ControllerApp = (props) => {
     </${SendMessage.Provider}>`;
 }
 
-const SocketState = ({socketState}) => {
-    if (socketState==WebSocket.OPEN) return
-    //const states = ["Connecting","Open","Closing","Closed"];
-    //return html`<div class="controllerState">${states[socketState]}</div>`
+const SocketState = ({ socketState }) => {
+    if (socketState == WebSocket.OPEN) return
     return html`<div class="controllerState">Reconnecting ...</div>`
 }
 
 const Controller = ({ state }) => {
-    //console.log({state})
     return html`
     <div class="controller">
         ${state.columns.map((column, columnIndex) => html`<${Column} column=${column} columnIndex=${columnIndex}/>`)}
+        <${MasterDimFader} value=${state.masterDim}/>   
     </div>`;
 }
 
 const Column = ({ column, columnIndex }) => html`
     <div class="column">
-        ${column.slots.map((slot,slotIndex) => html`<${Slot} slot=${slot} columnIndex=${columnIndex} slotIndex=${slotIndex}/>`)}
-    </div>`;
+    <${DimFader} column=${column} columnIndex=${columnIndex}/>    
+    ${column.slots.map((slot, slotIndex) => html`<${Slot} slot=${slot} columnIndex=${columnIndex} slotIndex=${slotIndex}/>`)}
+    </div>
+    `;
 
 const Slot = ({ slot, columnIndex, slotIndex }) => {
     const sender = useContext(SendMessage);
 
-    const handlePressed  = () => {
+    const handlePressed = () => {
         sender(`{"type":"buttonPressed", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}}`)
     }
 
@@ -154,9 +155,33 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
         class="slot ${slot.active ? "active" : ""}" 
         onmousedown=${handlePressed}
         onmouseup=${handleReleased}
-        ontouchstart=${(event)=>{handlePressed(); event.preventDefault();}}
-        ontouchend=${(event)=>{handleReleased(); event.preventDefault();}}
+        ontouchstart=${(event) => { handlePressed(); event.preventDefault(); }}
+        ontouchend=${(event) => { handleReleased(); event.preventDefault(); }}
         >
         ${slot.name}
     </div>`;
+}
+
+const DimFader = ({column, columnIndex}) => {
+    const sender = useContext(SendMessage);
+
+    const handleChange = (e) => {
+        sender(`{"type":"columnDimChange", "columnIndex":${columnIndex}, "dim": ${e.target.value}}`)
+    }
+
+    return html`
+        <input type="range" min="1" max="255" value=${column.dim} class="fader" oninput=${handleChange}/>
+    `
+}
+
+const MasterDimFader = ({value}) => {
+    const sender = useContext(SendMessage);
+
+    const handleChange = (e) => {
+        sender(`{"type":"masterDimChange", "masterDim": ${e.target.value}}`)
+    }
+
+    return html`
+        <input type="range" min="1" max="255" value=${value} class="fader" oninput=${handleChange}/>
+    `
 }

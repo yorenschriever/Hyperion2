@@ -42,3 +42,9 @@ body {
     font-size: 12pt;
     padding: 3pt
 }
+
+.fader {
+    -webkit-appearance: slider-vertical;
+    width:80px;
+    height:160px;
+}

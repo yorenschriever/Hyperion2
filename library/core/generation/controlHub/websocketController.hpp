@@ -1,44 +1,58 @@
 #pragma once
 #include "IHubController.hpp"
 #include "controlHub.hpp"
+#include "misc/simpleson/json.h"
 #include "platform/includes/log.hpp"
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
 #include "platform/includes/websocketServer.hpp"
-#include "misc/simpleson/json.h"
 
 class WebsocketController : public IHubController
 {
 public:
     WebsocketController(ControlHub *hub)
     {
-        this->hub=hub;
-        //Log::info(TAG, "Created WebsocketController");
+        this->hub = hub;
+        // Log::info(TAG, "Created WebsocketController");
         socket = WebsocketServer::createInstance(9800);
-        socket->onMessage(handler, (void*) this);
-        socket->onConnect(connectionHandler, (void*) this);
+        socket->onMessage(handler, (void *)this);
+        socket->onConnect(connectionHandler, (void *)this);
     }
 
-    static void connectionHandler(RemoteWebsocketClient *client, WebsocketServer *server, void* userData)
+    static void connectionHandler(RemoteWebsocketClient *client, WebsocketServer *server, void *userData)
     {
-        auto *instance = (WebsocketController*) userData;
+        auto *instance = (WebsocketController *)userData;
         instance->hub->sendCurrentStatus(instance);
     }
 
-    static void handler(RemoteWebsocketClient *client, WebsocketServer *server, std::string msg, void* userData)
+    static void handler(RemoteWebsocketClient *client, WebsocketServer *server, std::string msg, void *userData)
     {
-        auto *instance = (WebsocketController*) userData;
+        auto *instance = (WebsocketController *)userData;
         json::jobject parsed = json::jobject::parse(msg);
         std::string type = parsed["type"];
-        int columnIndex = parsed["columnIndex"];
-        int slotIndex = parsed["slotIndex"];
-        //Log::info("WebsocketController", "handling message: ", type.c_str());
-        //Log::info("WebsocketController", "columnIndex %d, slotIndex:%d ", columnIndex, slotIndex);
 
-        if (type.compare("buttonPressed") == 0){
-            instance->hub->buttonPressed(columnIndex,slotIndex);
-        } else if (type.compare("buttonReleased") == 0) {
-            instance->hub->buttonReleased(columnIndex,slotIndex);
+        if (type.compare("buttonPressed") == 0)
+        {
+            int columnIndex = parsed["columnIndex"];
+            int slotIndex = parsed["slotIndex"];
+            instance->hub->buttonPressed(columnIndex, slotIndex);
+        }
+        else if (type.compare("buttonReleased") == 0)
+        {
+            int columnIndex = parsed["columnIndex"];
+            int slotIndex = parsed["slotIndex"];
+            instance->hub->buttonReleased(columnIndex, slotIndex);
+        }
+        else if (type.compare("columnDimChange") == 0)
+        {
+            int columnIndex = parsed["columnIndex"];
+            int dim = parsed["dim"];
+            instance->hub->dim(columnIndex, dim);
+        }
+        else if (type.compare("masterDimChange") == 0)
+        {
+            int dim = parsed["masterDim"];
+            instance->hub->setMasterDim(dim);
         }
     }
 
@@ -72,8 +86,8 @@ public:
                         dim);
     }
 
-
-  void onHubSlotNameChange(int columnIndex, int slotIndex, std::string name) override {
+    void onHubSlotNameChange(int columnIndex, int slotIndex, std::string name) override
+    {
         socket->sendAll("{\
         \"type\":\"onHubSlotNameChange\",\
         \"columnIndex\":%d,\
@@ -81,15 +95,16 @@ public:
         \"name\":\"%s\"\
     }",
                         columnIndex, slotIndex, name.c_str());
-  }
-  void onHubColumnNameChange(int columnIndex, std::string name) override {
+    }
+    void onHubColumnNameChange(int columnIndex, std::string name) override
+    {
         socket->sendAll("{\
         \"type\":\"onHubColumnNameChange\",\
         \"columnIndex\":%d,\
         \"name\":\"%s\"\
     }",
                         columnIndex, name.c_str());
-  }
+    }
 
 private:
     ControlHub *hub;
