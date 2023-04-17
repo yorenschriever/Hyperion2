@@ -37,13 +37,13 @@ namespace Max
             if (!transition.Calculate(active))
                 return;
 
-            float amount = params->getIntensity(0.25, 4);
+            float amount = params->getAmount(0.25, 4);
             lfo.setPeriod(params->getVelocity(2000, 500));
-            lfoColour.setPeriod(params->getVariant(2000, 500));
+            lfoColour.setPeriod(params->getOffset(2000, 500));
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
-                float dir = map[index].z > 0 ? 1:-1;
+                float dir = (map[index].z > 0 || map[index].y > 0.44) ? 1:-1;
                 float phase = (0.5 * abs(map[index].x) - map[index].z + map[index].y * dir) * amount;
                 auto col = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 pixels[index] += col * lfo.getValue(phase) * transition.getValue();
@@ -75,9 +75,9 @@ namespace Max
             if (!transition.Calculate(active))
                 return;
 
-            float amount = params->getIntensity(0.25, 4);
+            float amount = params->getAmount(0.25, 4);
             lfo.setPeriod(params->getVelocity(2000, 500));
-            lfoColour.setPeriod(params->getVariant(2000, 500));
+            lfoColour.setPeriod(params->getOffset(2000, 500));
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
@@ -96,15 +96,19 @@ namespace Max
             200, Transition::none, 0,
             1000, Transition::none, 0);
         PixelMap3d::Cylindrical map;
-        FadeDown fade = FadeDown(200, WaitAtEnd);
+        FadeDown fade1 = FadeDown(200, WaitAtEnd);
+        FadeDown fade2 = FadeDown(200, WaitAtEnd);
         BeatWatcher watcher = BeatWatcher();
-        Permute perm;
+        Permute perm1;
+        Permute perm2;
+        int fadeNr =0;
 
     public:
         RadialGlitterFadePattern(PixelMap3d::Cylindrical map)
         {
             this->map = map;
-            this->perm = Permute(map.size());
+            this->perm1 = Permute(map.size());
+            this->perm2 = Permute(map.size());
             this->name = "Radial glitter fade";
         }
 
@@ -113,14 +117,21 @@ namespace Max
             if (!transition.Calculate(active))
                 return;
 
-            fade.duration = params->getIntensity(500, 100);
+            fade1.duration = params->getIntensity(500, 100);
+            fade2.duration = params->getIntensity(500, 100);
 
             // timeline.FrameStart();
             // if (timeline.Happened(0))
             if (watcher.Triggered())
             {
-                fade.reset();
-                perm.permute();
+                fadeNr = (fadeNr+1)%2;
+                if (fadeNr==0){
+                    fade1.reset();
+                    perm1.permute();
+                } else {
+                    fade2.reset();
+                    perm2.permute();
+                }
             }
 
             float velocity = params->getVelocity(600, 100);
@@ -138,9 +149,12 @@ namespace Max
                 //     fade.duration *= 4;
 
                 float density = 481. / width;
-                fade.duration = 100; // trail + perm.at[i] / (density * map.size()/ 10);
-                if (perm.at[i] < density * map.size() / 10)
-                    fade.duration *= perm.at[i] * 4 / (density * map.size() / 10);
+                fade1.duration = 100; // trail + perm.at[i] / (density * map.size()/ 10);
+                fade2.duration = 100; 
+                if (perm1.at[i] < density * map.size() / 10)
+                    fade1.duration *= perm1.at[i] * 4 / (density * map.size() / 10);
+                if (perm2.at[i] < density * map.size() / 10)
+                    fade2.duration *= perm2.at[i] * 4 / (density * map.size() / 10);
 
                 float conePos = fromCenter ? 
                     // vanaf midden
@@ -148,9 +162,13 @@ namespace Max
                     // vanaf de knik beide kanten op
                     (1-(map[i].r + map[i].z)/2);
 
-                float fadePosition = fade.getValue(conePos * velocity);
-                RGBA color = params->gradient->get(fadePosition * 255);
-                pixels[i] = color * fadePosition * (1.5 - map[i].r) * transition.getValue();
+                float fadePosition1 = fade1.getValue(conePos * velocity);
+                RGBA color1 = params->gradient->get(fadePosition1 * 255);
+                pixels[i] = color1 * fadePosition1 * (1.5 - map[i].r) * transition.getValue();
+
+                float fadePosition2 = fade2.getValue(conePos * velocity);
+                RGBA color2 = params->gradient->get(fadePosition2 * 255);
+                pixels[i] += color2 * fadePosition2 * (1.5 - map[i].r) * transition.getValue();
             }
         }
     };

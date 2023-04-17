@@ -224,9 +224,7 @@ private:
         {
             // Construct the websocket stream around the socket
             WS ws{socket, ctx};
-
             p_ws = &ws;
-            server->insertClient(p_ws);
 
             // Perform the SSL handshake
             ws.next_layer().handshake(ssl::stream_base::server);
@@ -239,10 +237,11 @@ private:
                             std::string(BOOST_BEAST_VERSION_STRING) +
                                 " websocket-server-sync-ssl");
                 }));
-
+ 
             // Accept the websocket handshake
             ws.accept();
 
+            server->insertClient(p_ws);
             if (server->connectionHandler != nullptr)
                 server->connectionHandler(p_ws, server, server->connectionUserData);
             

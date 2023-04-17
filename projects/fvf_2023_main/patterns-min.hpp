@@ -15,6 +15,7 @@ namespace Min
     template <class T>
     class RibbenClivePattern : public Pattern<RGBA>
     {
+        Transition transition;
         const int segmentSize = 60;
         int averagePeriod;
         float precision;
@@ -32,7 +33,7 @@ namespace Min
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
-            if (!active)
+            if (!transition.Calculate(active))
                 return;
 
             bool isLedster = width == 481;
@@ -53,14 +54,14 @@ namespace Min
             // }
 
             lfo.setPulseWidth(params->getAmount(0.1, 1));
-            // lfo.setPeriod(params->getVelocity(10000,500));
+            //lfo.setPeriod(params->getVelocity(10000,500));
 
             for (int segment = 0; segment < numSegments; segment++)
             {
                 // int randomSegment = perm.at[segment];
                 // RGBA col = params->getPrimaryColour() * lfo.getValue(float(randomSegment)/numSegments);
                 int interval = averagePeriod + perm.at[segment] * (averagePeriod * precision) / numSegments;
-                RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval);
+                RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval) * transition.getValue();
                 for (int j = 0; j < segmentSize; j++)
                     if (isLedster)
                         pixels[LedsterShapes::ribben[segment][j]] += col;
@@ -72,6 +73,7 @@ namespace Min
 
     class RibbenFlashPattern : public Pattern<RGBA>
     {
+        Transition transition;
         Permute perm;
         BeatWatcher watcher = BeatWatcher();
         FadeDown fade = FadeDown(2400, WaitAtEnd);
@@ -83,7 +85,7 @@ namespace Min
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
-            if (!active)
+            if (!transition.Calculate(active))
                 return;
 
             bool isLedster = width == 481;
@@ -103,7 +105,7 @@ namespace Min
 
             for (int ribbe = 0; ribbe < numVisible; ribbe++)
             {
-                RGBA col = params->getPrimaryColour() * fade.getValue();
+                RGBA col = params->getPrimaryColour() * fade.getValue() * transition.getValue();
                 if (isLedster)
                     for (int j = 0; j < segmentSize; j++)
                         pixels[LedsterShapes::ribben[perm.at[ribbe]][j]] += col;
@@ -116,6 +118,7 @@ namespace Min
 
     class SegmentChasePattern : public Pattern<RGBA>
     {
+        Transition transition;
         Permute perm;
         LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(5000);
 
@@ -126,7 +129,7 @@ namespace Min
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
-            if (!active)
+            if (!transition.Calculate(active))
                 return;
 
             bool isLedster = width == 481;
@@ -135,9 +138,9 @@ namespace Min
 
             perm.setSize(numSegments);
 
-            float pulseWidth = 0.5;
-            float factor = 10; // 1-50;
-            lfo.setPeriod(500 * factor);
+            float pulseWidth = params->getSize(0.25,1);
+            float factor = params->getAmount(50,1); //10; // 1-50;
+            lfo.setPeriod(params->getVelocity(2000,200) * factor);
             lfo.setPulseWidth(pulseWidth / factor);
             float lfoWidth = segmentSize * factor;
 
@@ -150,7 +153,7 @@ namespace Min
                 for (int j = 0; j < segmentSize; j++)
                 {
                     float lfoVal = lfo.getValue(float(j) / lfoWidth + float(randomSegment) / numSegments + float(segment));
-                    RGBA col = params->gradient->get(lfoVal * 255) * lfoVal;
+                    RGBA col = params->gradient->get(lfoVal * 255) * lfoVal * transition.getValue();
                     if (isLedster)
                         pixels[LedsterShapes::ribben[segment][j]] += col;
                     else
@@ -205,7 +208,10 @@ namespace Min
                 fade[pos].reset();
             }
 
-            float velocity = 200; // params->getVelocity(600, 100);
+            float velocity = params->getVelocity(1000, 100);
+            for(int i=0;i<6;i++)
+                fade[i].duration = params->getSize(400,50)*velocity/1000;
+            
             // float density = 481./width;
 
             for (int i = 0; i < width; i++)
@@ -303,8 +309,8 @@ namespace Min
 
             lfo.setPeriod(params->getVelocity(5000,300));
             int amount = params->getAmount(1,3);
-            float size = params->getSize(0.01,0.1) * amount;
             float curliness = params->getVariant(0.5,3);
+            float size = params->getSize(0.01,0.1) * amount + curliness/24;
             
             for (int i = 0; i < width; i++)
             {
@@ -312,7 +318,15 @@ namespace Min
                 //while (spiral < 0) spiral += 1;
                 //while (spiral > 1) spiral -= 1;
                 float pos = abs(spiral - lfo.getPhase());
-                while(pos > 1) pos -= 1;
+
+                //for some reason pos can become very large. so large that  subtracting 1 
+                //fall withing the rounding accuracy, and the loop below becomes an infinite loop.
+                //pos is never expected to be bigger than only a few units, so if we some something else,
+                //i just ignore this frame.
+                if (pos > 10) return;
+                while(pos > 1) {
+                    pos -= 1;
+                }
                 float fadePosition = softEdge(pos, size, 0.06);
                 RGBA color = params->gradient->get(255 - 255 * map[i].r);
 

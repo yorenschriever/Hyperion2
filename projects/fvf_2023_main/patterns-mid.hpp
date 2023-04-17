@@ -251,7 +251,7 @@ namespace Mid
                 if (map[index].z < 0.44)
                     continue;
 
-                pixels[index] = params->getPrimaryColour() * Utils::rescale(map[index].r, 0, 1, 1.02, 1.15);
+                pixels[index] = params->getPrimaryColour() * transition.getValue() * Utils::rescale(map[index].r, 0, 1, 1.02, 1.15);
             }
         }
     };
@@ -268,7 +268,7 @@ namespace Mid
         TakkenChase(PixelMap3d::Cylindrical map)
         {
             this->map = map;
-            this->name = "Takkenchase";
+            this->name = "Takken chase";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override

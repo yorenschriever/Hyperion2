@@ -68,7 +68,7 @@ int main()
     // select first palette
     hyp->hub.buttonPressed(0, 0);
 
-    hyp->hub.buttonPressed(2, 8);
+    //hyp->hub.buttonPressed(2, 8);
 
     hyp->hub.findColumn(0)->name = "Palette";
     hyp->hub.findColumn(1)->name = "Low";
@@ -130,16 +130,16 @@ void addLedsterPipe(Hyperion *hyp)
                 // //{.column = 7, .slot = 2, .pattern = new FWF3D::LineLaunch(ledsterMap3d)},
 
                 {.column = 2, .slot = 0, .pattern = new Mid::Lighthouse(cLedsterMap3d)},
-                {.column = 2, .slot = 2, .pattern = new Mid::Halo2(cLedsterMap3d)},
-                {.column = 2, .slot = 3, .pattern = new Mid::HaloOnBeat(cLedsterMap3d)},
-                {.column = 2, .slot = 4, .pattern = new Mid::SnowflakePatternLedster()},
-                {.column = 2, .slot = 6, .pattern = new Mid::PetalChase(cLedsterMap3d)},
+                {.column = 2, .slot = 2, .pattern = new Mid::HaloOnBeat(cLedsterMap3d)},
+                {.column = 2, .slot = 3, .pattern = new Mid::SnowflakePatternLedster()},
+                {.column = 2, .slot = 5, .pattern = new Mid::PetalChase(cLedsterMap3d)},
 
                 {.column = 3, .slot = 0, .pattern = new Hi::SnakePattern()}, // TODO generate pattern
-                {.column = 3, .slot = 1, .pattern = new Hi::XY(ledsterMap3d)},
-                {.column = 3, .slot = 2, .pattern = new Hi::PetalRotatePattern()},
-                {.column = 3, .slot = 3, .pattern = new Hi::HexBeatPattern()},
-                {.column = 3, .slot = 4, .pattern = new Hi::DotBeatPattern(cLedsterMap3d)},
+                {.column = 3, .slot = 1, .pattern = new Mid::Halo2(cLedsterMap3d)},
+                {.column = 3, .slot = 2, .pattern = new Hi::XY(ledsterMap3d)},
+                {.column = 3, .slot = 3, .pattern = new Hi::PetalRotatePattern()},
+                {.column = 3, .slot = 4, .pattern = new Hi::HexBeatPattern()},
+                {.column = 3, .slot = 5, .pattern = new Hi::DotBeatPattern(cLedsterMap3d)},
 
                 // {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000,1,0.25)},
                 // {.column = 4, .slot = 1, .pattern = new Min::RibbenClivePattern<SoftSquare>(40000)},
@@ -173,6 +173,7 @@ void addLedsterPipe(Hyperion *hyp)
                 {.column = 7, .slot = 4, .pattern = new Flash::PixelGlitchPattern()},
                 {.column = 7, .slot = 5, .pattern = new Flash::PetalGlitchPattern()},
                 {.column = 7, .slot = 6, .pattern = new Flash::StrobeHighlightPattern()},
+                {.column = 7, .slot = 7, .pattern = new Max::GrowingStrobePattern(cLedsterMap3d)},
 
             }),
 
@@ -239,15 +240,15 @@ void addColumnPipes(Hyperion *hyp)
 
             {.column = 2, .slot = 0, .pattern = new Mid::Lighthouse(cColumnMap3d)},
             {.column = 2, .slot = 1, .pattern = new Mid::Halo(cColumnMap3d)},
-            {.column = 2, .slot = 3, .pattern = new Mid::HaloOnBeat(cColumnMap3d)},
-            {.column = 2, .slot = 4, .pattern = new Mid::SnowflakePatternColumn(cColumnMap3d)},
-            {.column = 2, .slot = 5, .pattern = new Mid::TakkenChase(cColumnMap3d)},
+            {.column = 2, .slot = 2, .pattern = new Mid::HaloOnBeat(cColumnMap3d)},
+            {.column = 2, .slot = 3, .pattern = new Mid::SnowflakePatternColumn(cColumnMap3d)},
+            {.column = 2, .slot = 4, .pattern = new Mid::TakkenChase(cColumnMap3d)},
             //{.column = 2, .slot = 6, .pattern = new Mid::HaloChase(cColumnMap3d)},
-            {.column = 2, .slot = 7, .pattern = new Mid::DoubleFlash(cColumnMap3d)},
-            {.column = 2, .slot = 8, .pattern = new Mid::FireworksPattern(columnMap3d)},
+            {.column = 2, .slot = 6, .pattern = new Mid::DoubleFlash(cColumnMap3d)},
+            {.column = 2, .slot = 7, .pattern = new Mid::FireworksPattern(columnMap3d)},
 
-            {.column = 3, .slot = 1, .pattern = new Hi::XY(columnMap3d)},
-            {.column = 3, .slot = 4, .pattern = new Hi::DotBeatPattern(cColumnMap3d)},
+            {.column = 3, .slot = 2, .pattern = new Hi::XY(columnMap3d)},
+            {.column = 3, .slot = 5, .pattern = new Hi::DotBeatPattern(cColumnMap3d)},
 
             {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
             {.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
@@ -271,6 +272,7 @@ void addColumnPipes(Hyperion *hyp)
             {.column = 7, .slot = 3, .pattern = new Flash::StrobePattern()},
             {.column = 7, .slot = 4, .pattern = new Flash::PixelGlitchPattern()},
             {.column = 7, .slot = 6, .pattern = new Flash::StrobeHighlightPattern()},
+            {.column = 7, .slot = 7, .pattern = new Max::GrowingStrobePattern(cColumnMap3d)},
 
         });
 
@@ -392,8 +394,8 @@ void addHaloPipe(Hyperion *hyp)
 
                 {.column = 2, .slot = 0, .pattern = new Mid::Lighthouse(cHaloMap3d)},
 
-                {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
-                {.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
+                //{.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
+                //{.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
                 {.column = 4, .slot = 2, .pattern = new Min::SegmentChasePattern()},
                 {.column = 4, .slot = 3, .pattern = new Min::LineLaunch(haloMap3d)},
                 {.column = 4, .slot = 4, .pattern = new Min::GrowingCirclesPattern(haloMap3d)},
@@ -414,6 +416,7 @@ void addHaloPipe(Hyperion *hyp)
                 {.column = 7, .slot = 3, .pattern = new Flash::StrobePattern()},
                 {.column = 7, .slot = 4, .pattern = new Flash::PixelGlitchPattern()},
                 {.column = 7, .slot = 6, .pattern = new Flash::StrobeHighlightPattern()},
+                {.column = 7, .slot = 7, .pattern = new Max::GrowingStrobePattern(cHaloMap3d)},
             }),
 
         new CloneOutput({new MonitorOutput3dws(haloMap3d, serv),

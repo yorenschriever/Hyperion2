@@ -122,7 +122,7 @@ namespace Low
                 return;
 
             lfo.setPeriod(params->getVelocity(5000,500));
-            lfo.setPulseWidth(params->getSize(0.06,1));
+            lfo.setPulseWidth(params->getSize(0.03,0.5));
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
