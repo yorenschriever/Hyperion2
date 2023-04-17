@@ -4,7 +4,6 @@
 #include "generation/patterns/helpers/interval.h"
 #include "generation/patterns/helpers/timeline.h"
 #include "generation/pixelMap.hpp"
-#include "ledsterPatterns.hpp"
 #include "ledsterShapes.hpp"
 #include "mappingHelpers.hpp"
 #include <math.h>
@@ -12,16 +11,15 @@
 
 namespace Hi
 {
-
     class SnakePattern : public Pattern<RGBA>
     {
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        //LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(2000);
-        LFO<SawDownShort> lfo = LFO<SawDownShort>(2000);
+        LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(2000);
 
     public:
+        public:
         SnakePattern(){
             this->name = "Snake";
         }
@@ -31,23 +29,17 @@ namespace Hi
             lfo.setPeriod(params->getVelocity(10000, 500));
             lfo.setSkew(params->getIntensity());
             lfo.setPulseWidth(params->getSize(0.33, 1));
-            int amount = 1;// params->getAmount(1,8) ;
-
-            // lfo.setSkew(0.5);
-            // lfo.setPulseWidth(1);
-            // int variant = 5;
+            int amount = params->getAmount() * 7 + 1;
 
             if (!transition.Calculate(active))
                 return;
 
             for (int i = 0; i < LedsterShapes::snake.size(); i++)
             {
-                auto color = params->getSecondaryColour();
-                pixels[LedsterShapes::snake[i]] = color * lfo.getValue((float)i / LedsterShapes::snake.size() * amount) * transition.getValue();
+                pixels[LedsterShapes::snake[i]] += params->getSecondaryColour() * lfo.getValue((float)i / LedsterShapes::snake.size() * amount) * transition.getValue();
             }
         }
     };
-
 
     class XY : public Pattern<RGBA>
     {
@@ -65,22 +57,11 @@ namespace Hi
             this->name="XY";
         }
 
-        inline float softEdge(float dist, float size)
-        {
-            float edgeSize = 0.03;
-            if (dist > size) return 0;
-            
-            if (dist < size - edgeSize) return 1;
-            
-            return (size-dist) / edgeSize;
-        }
-
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
             if (!transition.Calculate(active))
                 return;
-
-            
+ 
             auto col = params->getSecondaryColour() * transition.getValue();
             float size = params->getSize(0.01,0.03);
             lfoX.setPeriod(params->getVelocity(4*20000,2000));
@@ -170,5 +151,50 @@ namespace Hi
             }
         }
     };
+
+class DotBeatPattern : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        PixelMap3d::Cylindrical map;
+        FadeDown fade = FadeDown(200, WaitAtEnd);
+        BeatWatcher watcher = BeatWatcher();
+        //Permute perm;
+
+    public:
+        DotBeatPattern(PixelMap3d::Cylindrical map)
+        {
+            this->map = map;
+            //this->perm = Permute(map.size());
+            this->name = "Dot beat";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            fade.duration = params->getIntensity(500, 100);
+
+            if (watcher.Triggered())
+                fade.reset();
+
+            for (int i = 0; i < map.size(); i++)
+            {
+                if (map[i].z<0.44)
+                    continue;;
+
+                float radius = fade.getValue()*1.2;
+                if (map[i].r > radius)
+                    continue;
+
+                RGBA color = params->gradient->get(radius * 255);
+                float dim = map[i].r / radius;
+                pixels[i] = color * dim * transition.getValue();   
+            }
+        }
+    };
+
 
 }

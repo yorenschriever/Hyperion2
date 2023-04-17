@@ -211,12 +211,13 @@ public:
         }
         controller->onHubMasterDimChange(masterDim);
 
-        controller->onHubAmountChange(params.amount);
-        controller->onHubIntensityChange(params.intensity);
-        controller->onHubOffsetChange(params.offset);
-        controller->onHubSizeChange(params.size);
-        controller->onHubVariantChange(params.variant);
         controller->onHubVelocityChange(params.velocity);
+        controller->onHubAmountChange(params.amount);
+        controller->onHubSizeChange(params.size);
+        controller->onHubOffsetChange(params.offset);
+        controller->onHubVariantChange(params.variant);
+        controller->onHubIntensityChange(params.intensity);
+        
     }
 
     void expandTo(unsigned int minColumns, unsigned int minRows, bool expandAllColumns = false)

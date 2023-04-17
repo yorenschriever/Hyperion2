@@ -5,7 +5,6 @@
 #include "generation/patterns/helpers/interval.h"
 #include "generation/patterns/helpers/timeline.h"
 #include "generation/pixelMap.hpp"
-#include "ledsterPatterns.hpp"
 #include "ledsterShapes.hpp"
 #include "mappingHelpers.hpp"
 #include <math.h>
@@ -63,9 +62,9 @@ namespace Max
         FadeDown fade1 = FadeDown(1400, WaitAtEnd);
 
     public:
-        ChevronsConePattern(PixelMap3d map)
+        ChevronsConePattern(PixelMap3d::Cylindrical map)
         {
-            this->map = map.toCylindricalRotate90();
+            this->map = map;
             this->lfo = LFO<SawDown>(1000);
             this->lfoColour = LFO<Square>(1000);
             this->name = "Chevrons cone";
@@ -102,9 +101,9 @@ namespace Max
         Permute perm;
 
     public:
-        RadialGlitterFadePattern(PixelMap3d map)
+        RadialGlitterFadePattern(PixelMap3d::Cylindrical map)
         {
-            this->map = map.toCylindricalRotate90();
+            this->map = map;
             this->perm = Permute(map.size());
             this->name = "Radial glitter fade";
         }
@@ -127,6 +126,7 @@ namespace Max
             float velocity = params->getVelocity(600, 100);
             // float trail = params->getIntensity(0,1) * density;
             // float trail = params->getIntensity(0, 200);
+            float fromCenter = params->getVariant() >= 0.5;
 
             for (int i = 0; i < map.size(); i++)
             {
@@ -142,10 +142,11 @@ namespace Max
                 if (perm.at[i] < density * map.size() / 10)
                     fade.duration *= perm.at[i] * 4 / (density * map.size() / 10);
 
-                // vanaf de knik beide kanten op
-                // float conePos = 1-(map[i].r + map[i].z)/2;
-                // vanaf midden
-                float conePos = 0.5 + (map[i].r - map[i].z) / 2;
+                float conePos = fromCenter ? 
+                    // vanaf midden
+                    (0.5 + (map[i].r - map[i].z) / 2) :
+                    // vanaf de knik beide kanten op
+                    (1-(map[i].r + map[i].z)/2);
 
                 float fadePosition = fade.getValue(conePos * velocity);
                 RGBA color = params->gradient->get(fadePosition * 255);
@@ -164,9 +165,9 @@ namespace Max
         BeatWatcher watcher = BeatWatcher();
 
     public:
-        AngularFadePattern(PixelMap3d map)
+        AngularFadePattern(PixelMap3d::Cylindrical map)
         {
-            this->map = map.toCylindricalRotate90();
+            this->map = map;
             this->name = "Angular fade";
         }
 
@@ -272,5 +273,5 @@ namespace Max
         }
     };
 
-    
+   
 };

@@ -4,7 +4,6 @@
 #include "generation/patterns/helpers/interval.h"
 #include "generation/patterns/helpers/timeline.h"
 #include "generation/pixelMap.hpp"
-#include "ledsterPatterns.hpp"
 #include "ledsterShapes.hpp"
 #include "mappingHelpers.hpp"
 #include <math.h>
@@ -64,7 +63,7 @@ namespace Min
                 RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval);
                 for (int j = 0; j < segmentSize; j++)
                     if (isLedster)
-                        pixels[Ledster::ribben[segment][j]] += col;
+                        pixels[LedsterShapes::ribben[segment][j]] += col;
                     else
                         pixels[segment * segmentSize + j] = col;
             }
@@ -107,7 +106,7 @@ namespace Min
                 RGBA col = params->getPrimaryColour() * fade.getValue();
                 if (isLedster)
                     for (int j = 0; j < segmentSize; j++)
-                        pixels[Ledster::ribben[perm.at[ribbe]][j]] += col;
+                        pixels[LedsterShapes::ribben[perm.at[ribbe]][j]] += col;
                 else
                     for (int j = 0; j < segmentSize; j++)
                         pixels[perm.at[ribbe] * segmentSize + j] += col;
@@ -280,6 +279,44 @@ namespace Min
                 if (index % density2 != 0)
                     continue;
                 pixels[perm.at[index]] = params->getHighlightColour() * lfo.getValue(float(index) / width) * transition.getValue(index, width);
+            }
+        }
+    };
+
+    class SpiralPattern : public Pattern<RGBA>
+    {
+        Transition transition = Transition();
+        PixelMap3d::Cylindrical map;
+        LFO<SinFast> lfo;
+
+    public:
+        SpiralPattern(PixelMap3d::Cylindrical map)
+        {
+            this->map = map;
+            this->name = "Spiral";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            lfo.setPeriod(params->getVelocity(5000,300));
+            int amount = params->getAmount(1,3);
+            float size = params->getSize(0.01,0.1) * amount;
+            float curliness = params->getVariant(0.5,3);
+            
+            for (int i = 0; i < width; i++)
+            {
+                float spiral = amount * (around(map[i].th) + map[i].r * curliness) + fromBottom(map[i].z);
+                //while (spiral < 0) spiral += 1;
+                //while (spiral > 1) spiral -= 1;
+                float pos = abs(spiral - lfo.getPhase());
+                while(pos > 1) pos -= 1;
+                float fadePosition = softEdge(pos, size, 0.06);
+                RGBA color = params->gradient->get(255 - 255 * map[i].r);
+
+                pixels[i] = color * fadePosition * transition.getValue();
             }
         }
     };

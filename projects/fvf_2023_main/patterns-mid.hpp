@@ -4,7 +4,6 @@
 #include "generation/patterns/helpers/interval.h"
 #include "generation/patterns/helpers/timeline.h"
 #include "generation/pixelMap.hpp"
-#include "ledsterPatterns.hpp"
 #include "ledsterShapes.hpp"
 #include "mappingHelpers.hpp"
 #include <math.h>
@@ -141,7 +140,7 @@ namespace Mid
             }
 
             float duration = params->getVelocity(2000, 100);
-            for (int i=0;i<4;i++)
+            for (int i = 0; i < 4; i++)
                 fade[i].duration = duration;
 
             auto col = params->getPrimaryColour() * transition.getValue();
@@ -152,13 +151,13 @@ namespace Mid
                 for (int index = 0; index < std::min(width, (int)map.size()); index++)
                 {
                     if (map[index].z < 0.44)
-                         continue;
+                        continue;
                     pixels[index] = col * fade[0].getValue();
                 }
                 return;
             }
 
-            //ledster
+            // ledster
             for (auto petal : LedsterShapes::petals)
             {
                 for (int j = 18; j < 37; j++)
@@ -192,7 +191,8 @@ namespace Mid
             1000, Transition::none, 0);
 
     public:
-        SnowflakePatternLedster(){
+        SnowflakePatternLedster()
+        {
             this->name = "Snowflake";
         }
 
@@ -256,7 +256,6 @@ namespace Mid
         }
     };
 
-
     class TakkenChase : public Pattern<RGBA>
     {
         Transition transition = Transition(
@@ -277,16 +276,15 @@ namespace Mid
             if (!transition.Calculate(active))
                 return;
 
-            int amount = params->getAmount(1,12);
+            int amount = params->getAmount(1, 12);
             lfo.setPeriod(params->getVelocity(5000, 500));
             lfo.setPulseWidth(params->getSize(0.06, 0.5));
-            
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
-                //skip the vertical beams. this pattern uses only the horizontal and angled ones
+                // skip the vertical beams. this pattern uses only the horizontal and angled ones
                 int angle = around(map[index].th) * 3600;
-                if ((angle+300) % 600 == 0)
+                if ((angle + 300) % 600 == 0)
                     continue;
 
                 float lfoVal = lfo.getValue(-amount * around(map[index].th));
@@ -295,7 +293,6 @@ namespace Mid
             }
         }
     };
-
 
     class PetalChase : public Pattern<RGBA>
     {
@@ -309,7 +306,7 @@ namespace Mid
         PetalChase(PixelMap3d::Cylindrical map)
         {
             this->map = map;
-            this->name="Petal chase";
+            this->name = "Petal chase";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -317,7 +314,7 @@ namespace Mid
             if (!transition.Calculate(active))
                 return;
 
-            int amount1 = params->getAmount(1,12);
+            int amount1 = params->getAmount(1, 12);
             lfo1.setPeriod(params->getVelocity(5000, 500));
             lfo1.setPulseWidth(params->getSize(0.06, 0.5));
 
@@ -329,7 +326,126 @@ namespace Mid
                 float lfoVal1 = lfo1.getValue(-amount1 * around(map[index].th));
                 RGBA color1 = params->gradient->get(lfoVal1 * 255);
 
-                pixels[index] = color1 * lfoVal1  * transition.getValue();
+                pixels[index] = color1 * lfoVal1 * transition.getValue();
+            }
+        }
+    };
+
+    class DoubleFlash : public Pattern<RGBA>
+    {
+        // Transition transition = Transition(
+        //     200, Transition::none, 0,
+        //     1000, Transition::none, 0);
+        PixelMap3d::Cylindrical map;
+        // LFO<LFOPause<SawDown>> lfo1;
+        Timeline timeline = Timeline();
+        BeatWatcher watcher;
+
+    public:
+        DoubleFlash(PixelMap3d::Cylindrical map)
+        {
+            this->map = map;
+            this->name = "Double flash 2/4";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            timeline.FrameStart();
+
+            if (watcher.Triggered() && Tempo::GetBeatNumber() % 4 == 2)
+                timeline.reset();
+
+            if (!timeline.Happened(0) && !timeline.Happened(100))
+                return;
+
+            for (int i = 0; i < width; i++)
+            {
+                if (map[i].z < 0.44)
+                    continue;
+                pixels[i] = params->getHighlightColour();
+            }
+        }
+    };
+
+    class FireworksPattern : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        FadeDown fade[6] = {
+            FadeDown(200, WaitAtEnd),
+            FadeDown(200, WaitAtEnd),
+            FadeDown(200, WaitAtEnd),
+            FadeDown(200, WaitAtEnd),
+            FadeDown(200, WaitAtEnd),
+            FadeDown(200, WaitAtEnd)};
+        std::vector<float> radii[6];
+        BeatWatcher watcher = BeatWatcher();
+        // PixelMap3d::Cylindrical map;
+        Permute perm;
+        int pos = 0;
+
+    public:
+        FireworksPattern(PixelMap3d map)
+        {
+            // this->map = map.toCylindricalRotate90();
+            for (int i = 0; i < 6; i++)
+            {
+                float xc = cos(float(i) / 6 * 2 * M_PI);
+                float yc = 0.30;
+                float zc = sin(float(i) / 6 * 2 * M_PI);
+                std::transform(map.begin(), map.end(), std::back_inserter(radii[i]), [xc, yc, zc](PixelPosition3d pos) -> float
+                               { return sqrt(pow(pos.x - xc, 2) + pow(pos.y - yc, 2) + pow(pos.z - zc, 2)); });
+            }
+            this->perm = Permute(map.size());
+            this->name = "Fireworks 0/4";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int amount = params->getAmount(0,4);
+
+            int beatDivisions[] = {8,4,2,1,1};
+            int beatDivision = beatDivisions[(int)params->getIntensity(0,4)];
+            if (watcher.Triggered() && Tempo::GetBeatNumber() % beatDivision == 0)
+            {
+                pos = (pos + 1) % 6;
+                if (amount ==3 || amount==4)
+                    for (int i = 0; i < 6; i++) 
+                        fade[i].reset();
+                else if (amount == 2)
+                    for (int i = 0; i < 3; i++) 
+                        fade[(i * 2 + pos )%6].reset();
+                else if (amount == 1)
+                    for (int i = 0; i < 2; i++) 
+                        fade[(i * 3 + pos )%6].reset();
+                else if (amount == 0)
+                        fade[pos].reset();
+            }
+
+            float velocity = params->getVelocity(4000,750); 
+            for (int i = 0; i < 6; i++)
+                fade[i].duration = params->getSize(100, 500);
+
+            float size = params->getSize(0.1,0.5);
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int column = 0; column < 6; column++)
+                {
+                    if (radii[column][i] > size)
+                        continue;
+                    float fadePosition = fade[column].getValue(radii[column][i] * velocity);
+                    float fadeRatio = 1. - (radii[column][i] / size);
+                    RGBA color = params->gradient->get(255 * fadeRatio) * fadeRatio;
+                    pixels[i] += color * fadePosition * transition.getValue();
+                }
             }
         }
     };

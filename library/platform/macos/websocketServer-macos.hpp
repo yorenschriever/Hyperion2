@@ -15,6 +15,9 @@
 #include <string>
 #include <thread>
 #include <stdarg.h>
+#include <mutex>
+#include "thread.hpp"
+#include "utils.hpp"
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
@@ -197,6 +200,7 @@ private:
                 // Block until we get a connection
                 acceptor.accept(socket);
 
+                Thread::sleep(Utils::random(0,100));
                 // Launch the session, transferring ownership of the socket
                 std::thread(
                     &do_session,
@@ -208,7 +212,7 @@ private:
         }
         catch (const std::exception &e)
         {
-            Log::error(TAG, "Error: %s", e.what());
+            Log::error(TAG, "Error 3: %s", e.what());
         }
     }
 
@@ -222,7 +226,7 @@ private:
             WS ws{socket, ctx};
 
             p_ws = &ws;
-            server->clients.insert(p_ws);
+            server->insertClient(p_ws);
 
             // Perform the SSL handshake
             ws.next_layer().handshake(ssl::stream_base::server);
@@ -240,8 +244,8 @@ private:
             ws.accept();
 
             if (server->connectionHandler != nullptr)
-                 server->connectionHandler(p_ws, server, server->connectionUserData);
-
+                server->connectionHandler(p_ws, server, server->connectionUserData);
+            
             for (;;)
             {
                 // This buffer will hold the incoming message
@@ -262,23 +266,35 @@ private:
         {
             // This indicates that the session was closed
             if (se.code() != websocket::error::closed)
-                Log::error(TAG, "Error: %s", se.code().message().c_str());
-            if (p_ws)
-                server->clients.erase(p_ws);
+                Log::error(TAG, "Error 1: %s", se.code().message().c_str());
+            server->removeClient(p_ws);
         }
         catch (std::exception const &e)
         {
-            Log::error(TAG, "Error: %s", e.what());
-            if (p_ws)
-                server->clients.erase(p_ws);
+            Log::error(TAG, "Error 2: %s", e.what());
+            server->removeClient(p_ws);
         }
-        if (p_ws)
-            server->clients.erase(p_ws);
+        server->removeClient(p_ws);
     }
 
 private:
     std::set<WS *> clients;
     static const char *TAG;
+    std::mutex mtx;
+
+    void insertClient(WS * client){
+        mtx.lock();
+        clients.insert(client);
+        mtx.unlock();
+    }
+
+    void removeClient(WS * client){
+        if (!client)
+            return;
+        mtx.lock();
+        clients.erase(client);
+        mtx.unlock();
+    }
 };
 
 const char *WebsocketServerMacOs::TAG = "WEBSOCKET_SERVER";

@@ -25,3 +25,12 @@ float fromMid(PixelMap3d::CylindricalPixelPosition pos)
         //staand
         return Utils::rescale(pos.z,0,1,0,.45);
 }
+
+inline float softEdge(float dist, float size, float edgeSize = 0.03)
+{
+    if (dist > size) return 0;
+    
+    if (dist < size - edgeSize) return 1;
+    
+    return (size-dist) / edgeSize;
+}

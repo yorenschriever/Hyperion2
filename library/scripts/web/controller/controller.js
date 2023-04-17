@@ -62,11 +62,13 @@ export const ControllerApp = (props) => {
             })
         }
 
+        let backoff = 1000
         const createSocket = () => {
             const socket = new WebSocket(`wss://${location.host}:9800`);
             setSocketState(socket.readyState);
 
             socket.onmessage = wsmsg => {
+                backoff = 250;
                 const msg = JSON.parse(wsmsg.data);
 
                 resizeController(msg.columnIndex, msg.slotIndex)
@@ -87,13 +89,13 @@ export const ControllerApp = (props) => {
             }
 
             socket.onclose = (e) => {
-                setSocketState(socket.readyState);
-                console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+                backoff = Math.min(backoff * 2,15000)
+                console.log(`Socket is closed. Reconnect will be attempted in ${backoff} milliseconds.`, e.reason);
                 setTimeout(() => {
                     createSocket()
-                }, 1000);
+                }, backoff);
             };
-
+            
             socket.onerror = (err) => {
                 setSocketState(socket.readyState);
                 console.error('Socket encountered error: ', err.message, 'Closing socket');

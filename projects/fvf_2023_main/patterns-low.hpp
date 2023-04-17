@@ -4,7 +4,6 @@
 #include "generation/patterns/helpers/interval.h"
 #include "generation/patterns/helpers/timeline.h"
 #include "generation/pixelMap.hpp"
-#include "ledsterPatterns.hpp"
 #include <math.h>
 #include <vector>
 #include "mappingHelpers.hpp"
@@ -276,4 +275,42 @@ namespace Low
             }
         }
     };
+
+     class RotatingRingsPattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        PixelMap3d::Cylindrical map;
+        LFO<Sin> ring1;
+        LFO<Sin> ring2;
+
+    public:
+        RotatingRingsPattern(PixelMap3d::Cylindrical map)
+        {
+            this->map = map;
+            this->name = "Rotating rings";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
+
+            auto col1 = params->getPrimaryColour() * transition.getValue();
+            auto col2 = params->getSecondaryColour() * transition.getValue();
+            float size = params->getSize(0.01,0.1);
+            float zoffset = params->getVariant(0,-0.2);
+            ring1.setPeriod(params->getVelocity(20000,2000));
+            ring2.setPeriod(params->getVelocity(14000,1400));
+
+            for (int index = 0; index < width; index++)
+            {
+                float z_norm = zoffset+2*fromTop(map[index].z);
+                float offset = around(map[index].th) * params->getOffset();
+
+                pixels[index] = col1 * softEdge(abs(z_norm - ring1.getValue(offset)), size);
+                pixels[index] += col2 * softEdge(abs(z_norm - ring2.getValue(offset)), size);
+            }
+        }
+    };
+
 }

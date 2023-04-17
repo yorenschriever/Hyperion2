@@ -4,8 +4,6 @@
 #include "generation/patterns/helpers/interval.h"
 #include "generation/patterns/helpers/timeline.h"
 #include "generation/pixelMap.hpp"
-#include "ledsterPatterns.hpp"
-#include "ledsterShapes.hpp"
 #include "mappingHelpers.hpp"
 #include <math.h>
 #include <vector>
