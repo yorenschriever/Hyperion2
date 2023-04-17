@@ -384,14 +384,12 @@ namespace Mid
             FadeDown(200, WaitAtEnd)};
         std::vector<float> radii[6];
         BeatWatcher watcher = BeatWatcher();
-        // PixelMap3d::Cylindrical map;
         Permute perm;
         int pos = 0;
 
     public:
         FireworksPattern(PixelMap3d map)
         {
-            // this->map = map.toCylindricalRotate90();
             for (int i = 0; i < 6; i++)
             {
                 float xc = cos(float(i) / 6 * 2 * M_PI);
@@ -401,7 +399,7 @@ namespace Mid
                                { return sqrt(pow(pos.x - xc, 2) + pow(pos.y - yc, 2) + pow(pos.z - zc, 2)); });
             }
             this->perm = Permute(map.size());
-            this->name = "Fireworks 0/4";
+            this->name = "Fireworks";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override

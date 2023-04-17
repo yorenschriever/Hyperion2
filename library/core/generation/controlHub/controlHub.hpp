@@ -14,7 +14,7 @@ public:
     {
         bool activated = false;
         bool flash = false;
-        bool releaseColumn = true;
+        bool releaseColumn = false;
         std::string name = "";
     };
 
@@ -252,7 +252,7 @@ public:
         //    Log::info(TAG,"column %d has %d slots", i, columns[i].slots.size());
     }
 
-    void setFlash(int columnIndex, int slotIndex, bool flash=true)
+    void setFlash(int columnIndex, int slotIndex, bool flash=true, bool releaseColumn=false)
     {
         auto slot = findSlot(columnIndex, slotIndex);
         if (!slot){
@@ -260,21 +260,26 @@ public:
             return;
         }
         slot->flash = flash;
+        slot->releaseColumn = releaseColumn;
     }
 
-    void setFlashColumn(int columnIndex, bool flash=true)
+    void setFlashColumn(int columnIndex, bool flash=true, bool releaseColumn=false)
     {
         auto column = findColumn(columnIndex);
-        for(auto& slot: column->slots)
+        for(auto& slot: column->slots){
             slot.flash = flash;
+            slot.releaseColumn = releaseColumn;
+        }
     }
 
-    void setFlashRow(int rowIndex, bool flash=true)
+    void setFlashRow(int rowIndex, bool flash=true, bool releaseColumn=false)
     {
         for(auto& column: columns)
         {
-            if (column.slots.size() > rowIndex)
+            if (column.slots.size() > rowIndex){
                 column.slots[rowIndex].flash = flash;
+                column.slots[rowIndex].releaseColumn = releaseColumn;
+            }
         }
     }
 

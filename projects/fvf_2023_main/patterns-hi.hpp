@@ -36,7 +36,8 @@ namespace Hi
 
             for (int i = 0; i < LedsterShapes::snake.size(); i++)
             {
-                pixels[LedsterShapes::snake[i]] += params->getSecondaryColour() * lfo.getValue((float)i / LedsterShapes::snake.size() * amount) * transition.getValue();
+                float lfoVal = lfo.getValue((float)i / LedsterShapes::snake.size() * amount);
+                pixels[LedsterShapes::snake[i]] += params->gradient->get(255 * lfoVal) * lfoVal * transition.getValue();
             }
         }
     };
@@ -105,7 +106,7 @@ namespace Hi
             lfo.setPeriod(params->getVelocity(1000,400));
             float phase = params->getVariant(45,45*2);
 
-            auto col = params->getSecondaryColour() * transition.getValue();
+            auto col = params->getPrimaryColour() * transition.getValue();
             for (auto petal : LedsterShapes::petals)
             {
                 for (int j = 0; j < 45; j++)

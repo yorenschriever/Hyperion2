@@ -18,15 +18,13 @@ export class Websocket {
             const bufferOffset = ledOffset
             ledOffset += ledsInScenePart
 
-            let backoff = 1000;
+            let backoff = 500;
             let delay=0;
             const createSocket =  () => {
-                //await new Promise(resolve => setTimeout(resolve, (delay++)*10));
-
                 let socket = new WebSocket(`wss://${location.host}:${scenePart.port}`);
             
                 socket.onmessage = async msg => {
-                    backoff = 1000;
+                    backoff = 500;
 
                     const ab = await msg.data.arrayBuffer()
                     const view = new Uint8Array(ab)
@@ -46,7 +44,7 @@ export class Websocket {
                 }
 
                 socket.onclose = (e) => {
-                    backoff = Math.min(backoff * 1,15000)
+                    backoff = Math.min(backoff * 1.5,15000)
                     delay=0;
                     console.log(`Socket is closed. Reconnect will be attempted in ${backoff} milliseconds.`, e.reason);
                     setTimeout(() => {

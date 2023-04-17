@@ -272,7 +272,7 @@ namespace Max
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
-            fade.duration = params->getIntensity(500, 120);
+            fade.duration = params->getSize(500, 120);
             int velocity = params->getVelocity(500, 50);
 
             if (!transition.Calculate(active))
