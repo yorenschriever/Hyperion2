@@ -41,4 +41,24 @@ namespace TestPatterns
         }
     };
 
+    class OneColor : public Pattern<RGBA>
+    {
+    public:
+        RGBA color;
+        OneColor(RGBA color, const char* name){
+            this->color = color;
+            this->name = name;
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            for(int i=0;i<width;i++){
+                pixels[i] = color;
+            }
+        }
+    };
+
 }

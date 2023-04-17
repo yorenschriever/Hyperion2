@@ -79,7 +79,7 @@ int main()
     hyp->hub.findColumn(8)->name = "Debug";
 
     hyp->hub.setFlashColumn(7);
-    hyp->hub.setFlashColumn(0,false,true);
+    hyp->hub.setFlashColumn(0, false, true);
 
     hyp->start();
     while (1)
@@ -105,7 +105,7 @@ void addLedsterPipe(Hyperion *hyp)
                 {.column = 3, .slot = 4, .pattern = new Hi::HexBeatPattern()},
                 {.column = 3, .slot = 5, .pattern = new Hi::DotBeatPattern(cLedsterMap3d)},
 
-                {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
+                {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast> >(10000, 1, 0.15)},
                 {.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
                 {.column = 4, .slot = 2, .pattern = new Min::SegmentChasePattern()},
                 {.column = 4, .slot = 3, .pattern = new Min::LineLaunch(ledsterMap3d)},
@@ -130,11 +130,16 @@ void addLedsterPipe(Hyperion *hyp)
                 {.column = 7, .slot = 7, .pattern = new Max::GrowingStrobePattern(cLedsterMap3d)},
 
                 {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(271)},
+                {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+                {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+                {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+                {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+                {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
             }),
 
         new CloneOutput({new MonitorOutput3dws(ledsterMap3d, serv),
                          // new MonitorOutput3d(ledsterMap3d),
-                         new UDPOutput("ledster.local", 9611, 60)}));
+                         new UDPOutput("ledsterstandalone.local", 9611, 60)}));
     hyp->addPipe(ledsterPipe);
 }
 
@@ -168,7 +173,7 @@ void addColumnPipes(Hyperion *hyp)
             {.column = 3, .slot = 2, .pattern = new Hi::XY(columnMap3d)},
             {.column = 3, .slot = 5, .pattern = new Hi::DotBeatPattern(cColumnMap3d)},
 
-            {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
+            {.column = 4, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast> >(10000, 1, 0.15)},
             {.column = 4, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
             {.column = 4, .slot = 2, .pattern = new Min::SegmentChasePattern()},
             {.column = 4, .slot = 3, .pattern = new Min::LineLaunch(columnMap3d)},
@@ -192,6 +197,11 @@ void addColumnPipes(Hyperion *hyp)
             {.column = 7, .slot = 7, .pattern = new Max::GrowingStrobePattern(cColumnMap3d)},
 
             {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
         });
 
     auto splitInput = new InputSlicer(
@@ -285,6 +295,11 @@ void addHaloPipe(Hyperion *hyp)
                 {.column = 7, .slot = 7, .pattern = new Max::GrowingStrobePattern(cHaloMap3d)},
 
                 {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(100)},
+                {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+                {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+                {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+                {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+                {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
             }),
 
         new CloneOutput({new MonitorOutput3dws(haloMap3d, serv),
