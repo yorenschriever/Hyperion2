@@ -70,6 +70,17 @@ int main()
   // select first palette
   hyp->hub.buttonPressed(0, 0);
 
+  hyp->hub.findColumn(0)->name = "Palette";
+  hyp->hub.findColumn(1)->name = "Low";
+  hyp->hub.findColumn(2)->name = "Mid";
+  hyp->hub.findColumn(3)->name = "Hi";
+  hyp->hub.findColumn(4)->name = "All";
+  hyp->hub.findColumn(5)->name = "Timed";
+  hyp->hub.findColumn(6)->name = "Halo";
+  hyp->hub.findColumn(7)->name = "Flash";
+  hyp->hub.findColumn(8)->name = "Debug";
+
+
   hyp->start();
   while (1)
     Thread::sleep(1000);

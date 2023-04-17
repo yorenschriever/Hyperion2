@@ -23,18 +23,19 @@ const set = (obj, path, value) => {
 
 const defaultColumn = {
     slots: [],
-    dim:255,
-    name: "default column name"
+    dim: 255,
+    name: ""
 }
 
 const defaultSlot = {
     active: false,
-    name: "default slot name"
+    name: ""
 }
 
 const initialState = {
     columns: [],
-    masterDim:255
+    masterDim: 255,
+    params: { }
 }
 
 const SendMessage = createContext();
@@ -74,10 +75,14 @@ export const ControllerApp = (props) => {
                     setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.active`, Boolean(msg.active)))
                 } else if (msg.type == "onHubSlotNameChange") {
                     setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.name`, msg.name))
-                } else if (msg.type=="onHubColumnDimChange"){
+                } else if (msg.type == "onHubColumnDimChange") {
                     setState(state => set(state, `columns.${msg.columnIndex}.dim`, msg.dim))
-                } else if (msg.type == "onHubMasterDimChange"){
+                } else if (msg.type == "onHubMasterDimChange") {
                     setState(state => set(state, `masterDim`, msg.dim))
+                } else if (msg.type == "onHubParamChange") {
+                    setState(state => set(state, `params.${msg.param}`, msg.value))
+                } else if (msg.type == "onHubColumnNameChange") {
+                    setState(state => set(state, `columns.${msg.columnIndex}.name`, msg.name))
                 }
             }
 
@@ -126,14 +131,22 @@ const SocketState = ({ socketState }) => {
 
 const Controller = ({ state }) => {
     return html`
-    <div class="controller">
+    <div class="columns">
         ${state.columns.map((column, columnIndex) => html`<${Column} column=${column} columnIndex=${columnIndex}/>`)}
-        <${MasterDimFader} value=${state.masterDim}/>   
-    </div>`;
+        <div class="column">
+            <div class="columnHeader">Master</div>
+            <${MasterDimFader} value=${state.masterDim}/> 
+        </div> 
+    </div>
+    <div class="columns">
+        ${Object.entries(state.params).map(([name, value]) => html`<${ParamFader} name=${name} value=${value}/>`)}
+    </div>
+`;
 }
 
 const Column = ({ column, columnIndex }) => html`
     <div class="column">
+    <div class="columnHeader">${column.name}</div>
     <${DimFader} column=${column} columnIndex=${columnIndex}/>    
     ${column.slots.map((slot, slotIndex) => html`<${Slot} slot=${slot} columnIndex=${columnIndex} slotIndex=${slotIndex}/>`)}
     </div>
@@ -162,7 +175,7 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
     </div>`;
 }
 
-const DimFader = ({column, columnIndex}) => {
+const DimFader = ({ column, columnIndex }) => {
     const sender = useContext(SendMessage);
 
     const handleChange = (e) => {
@@ -170,11 +183,11 @@ const DimFader = ({column, columnIndex}) => {
     }
 
     return html`
-        <input type="range" min="1" max="255" value=${column.dim} class="fader" oninput=${handleChange}/>
+        <input type="range" min="0" max="255" value=${column.dim} class="fader" oninput=${handleChange}/>
     `
 }
 
-const MasterDimFader = ({value}) => {
+const MasterDimFader = ({ value }) => {
     const sender = useContext(SendMessage);
 
     const handleChange = (e) => {
@@ -182,6 +195,21 @@ const MasterDimFader = ({value}) => {
     }
 
     return html`
-        <input type="range" min="1" max="255" value=${value} class="fader" oninput=${handleChange}/>
+        <input type="range" min="0" max="255" value=${value} class="fader" oninput=${handleChange}/>
+    `
+}
+
+const ParamFader = ({ name, value }) => {
+    const sender = useContext(SendMessage);
+
+    const handleChange = (e) => {
+        sender(`{"type":"paramChange", \"param\": \"${name}\", "value": ${e.target.value}}`)
+    }
+
+    return html`
+        <div class="faderContainer">
+            <div class="columnHeader">${name}</div>
+            <input type="range" min="0" max="255" value=${value} class="fader param" oninput=${handleChange}/>
+        </div>
     `
 }

@@ -3,12 +3,19 @@
         <link rel="stylesheet" href="controller/controller.css">
         <style>
             #monitor {
-                position:absolute;
+                /* position:absolute;
                 right:16px;
                 bottom:16px;
-                /* border-radius: 8px; */
+                / * border-radius: 8px; * /
                 width: 50%;
                 height: 50%;
+                resize:both;
+                border: 1px solid #444; */
+
+                /* position: absolute; */
+                right:16px;
+                width: 640;
+                height: 480;
                 resize:both;
                 border: 1px solid #444;
             }
@@ -23,7 +30,8 @@
         </script>
     </head>
     <body>
-        <div id="controller"></div>
+        
         <iframe src="./monitor/index.html" id="monitor"></iframe>
+        <div id="controller"></div>
     </body>
 </html>

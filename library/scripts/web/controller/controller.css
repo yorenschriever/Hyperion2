@@ -1,10 +1,18 @@
+* {
+    padding:0;
+    margin:0;
+    box-sizing: border-box;
+}
+    
 body {
     background-color: #111;
+    margin: 8px;
 }
 
-.controller {
+.columns {
     display: flex;
     flex-direction: row;
+    margin: 8px;
 }
 
 .column {
@@ -21,7 +29,7 @@ body {
 
     color: #ccc;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 12pt;
+    font-size: 10pt;
     padding: 3pt;
 
     overflow: hidden;
@@ -39,12 +47,38 @@ body {
     background-color: red;
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 12pt;
-    padding: 3pt
+    font-size: 10pt;
 }
 
 .fader {
     -webkit-appearance: slider-vertical;
     width:80px;
     height:160px;
+    margin: 8px;
+}
+
+.param {
+
+}
+
+.faderContainer {
+    filter: hue-rotate(90deg);
+}
+
+.columnHeader {
+    /* display: flex; */
+    /* flex-direction: column; */
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 10pt;
+    /* padding: 3pt; */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width:80px;
+    text-align: center;
+    margin: 6px;
+    
+    
+
 }

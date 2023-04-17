@@ -211,7 +211,12 @@ public:
         }
         controller->onHubMasterDimChange(masterDim);
 
-        // todo also send params?
+        controller->onHubAmountChange(params.amount);
+        controller->onHubIntensityChange(params.intensity);
+        controller->onHubOffsetChange(params.offset);
+        controller->onHubSizeChange(params.size);
+        controller->onHubVariantChange(params.variant);
+        controller->onHubVelocityChange(params.velocity);
     }
 
     void expandTo(unsigned int minColumns, unsigned int minRows, bool expandAllColumns = false)
