@@ -345,6 +345,12 @@ void addPaletteColumn(Hyperion *hyp)
 
             retro,
             candy,
+
+            sunset2,
+            sunset5,
+            sunset6,
+            sunset7,
+            sunset8,
         });
     hyp->hub.subscribe(paletteColumn);
 }

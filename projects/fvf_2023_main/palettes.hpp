@@ -37,7 +37,7 @@ PaletteColumn::Palette sunset1{
     .primary = RGB(78, 150, 212),
     .secondary = RGB(205, 0, 226),
     .highlight = RGB(255, 255, 255),
-    .name = "sunset1"};
+    .name = "Sunset 1"};
 
 PaletteColumn::Palette sunset3{
     .gradient = new Gradient({
@@ -49,7 +49,7 @@ PaletteColumn::Palette sunset3{
     .primary = RGB(32, 80, 118),
     .secondary = RGB(200, 180, 50),
     .highlight = RGB(255, 255, 255),
-    .name = "sunset3"};
+    .name = "Sunset 3"};
 
 PaletteColumn::Palette sunset4{
     .gradient = new Gradient({
@@ -61,49 +61,73 @@ PaletteColumn::Palette sunset4{
     .primary = RGB(100, 40, 0),
     .secondary = RGB(60, 130, 197),
     .highlight = RGB(255, 255, 255),
-    .name = "sunset4"};
+    .name = "Sunset 4"};
 
 // Some sunset color approximated from https://digitalsynopsis.com/design/sunrise-sunset-photos-sky-series-eric-cahan/
 
-/*
-Gradient sunset2 = Gradient({
+
+PaletteColumn::Palette sunset2{
+    .gradient = new Gradient({
   {.position  =  0, .color = RGB(   43,  0, 50)},  // Dark purple
   {.position  =127, .color = RGB(  129,  0,140)},  // Lighter purple
   {.position  =190, .color = RGB(  230,  0,255)},  // Bright purple
-  {.position  =255, .color = RGB(   25,111,213)}; // Light blue
-*/
+  {.position  =255, .color = RGB(   25,111,213)} // Light blue
+    }),
+    .primary = RGB(  129,  0,140),
+    .secondary = RGB(   25,111,213),
+    .highlight = RGB(255, 255, 255),
+    .name = "Sunset 2"};
 
-Gradient sunset5 = Gradient({
+PaletteColumn::Palette sunset5{
+    .gradient = new Gradient({
     {.position = 0, .color = RGB(40, 0, 50)},       // Dark purple
     {.position = 150, .color = RGB(197, 70, 196)},  // Washed pink
     {.position = 200, .color = RGB(247, 170, 200)}, // Light washed pink
     {.position = 255, .color = RGB(237, 136, 80)}   // Orange
-});
+    }),
+    .primary = RGB(247, 170, 200),
+    .secondary = RGB(237, 136, 80),
+    .highlight = RGB(255, 255, 255),
+    .name = "Sunset 5"};
 
-Gradient sunset6 = Gradient({
+
+PaletteColumn::Palette sunset6{
+    .gradient = new Gradient({
     {.position = 0, .color = RGB(40, 0, 50)},      // Dark purple
     {.position = 150, .color = RGB(230, 0, 255)},  // Light purple
     {.position = 210, .color = RGB(247, 170, 50)}, // Light Orange
     {.position = 255, .color = RGB(120, 60, 0)}    // Dark Orange
-});
+    }),
+    .primary = RGB(230, 0, 255),
+    .secondary =  RGB(120, 60, 0),
+    .highlight = RGB(255, 255, 255),
+    .name = "Sunset 6"};
 
-/*
-Gradient sunset7 = Gradient({
+PaletteColumn::Palette sunset7{
+    .gradient = new Gradient({
   {.position  =  0, .color = RGB(   76, 55, 98)},  // Dark purple
   {.position  = 63, .color = RGB(   123, 66,123)}, // Light purple
   {.position  =127, .color = RGB(  194, 61, 92)},  // Light purple / red
   {.position  =191, .color = RGB(  216, 59, 62)},  // Light red
-  {.position  =255, .color = RGB(  203, 44, 33)}}; // Dark red
-});
-*/
+  {.position  =255, .color = RGB(  203, 44, 33)} // Dark red
+    }),
+    .primary = RGB(   76, 55, 98),
+    .secondary =  RGB(  216, 59, 62),
+    .highlight = RGB(255, 255, 255),
+    .name = "Sunset 7"};
 
-Gradient sunset8 = Gradient({
+PaletteColumn::Palette sunset8{
+    .gradient = new Gradient({
     {.position = 0, .color = RGB(60, 20, 80)},    // Dark purple
     {.position = 63, .color = RGB(100, 33, 123)}, // Light purple
     {.position = 127, .color = RGB(160, 30, 70)}, // Light purple / red
     {.position = 191, .color = RGB(216, 59, 62)}, // Light red
     {.position = 255, .color = RGB(203, 22, 16)}  // Dark red
-});
+    }),
+    .primary = RGB(100, 33, 123),
+    .secondary =   RGB(216, 59, 62),
+    .highlight = RGB(255, 255, 255),
+    .name = "Sunset 8"};
 
 PaletteColumn::Palette tunnel{
     .gradient = new Gradient({
@@ -155,7 +179,7 @@ PaletteColumn::Palette candy{
     .primary = RGB(0xD90452),
     .secondary = RGB(0xF26835),
     .highlight = RGB(255, 255, 255),
-    .name = "candy"};
+    .name = "Candy"};
 
 PaletteColumn::Palette retro{
     .gradient = new Gradient({
@@ -168,7 +192,7 @@ PaletteColumn::Palette retro{
     .primary = RGB(0x662400),
     .secondary = RGB(0x00B3AD),
     .highlight = RGB(255, 255, 255),
-    .name = "retro"};
+    .name = "Retro"};
 
 PaletteColumn::Palette coralTeal{
     .gradient = new Gradient({
@@ -181,7 +205,7 @@ PaletteColumn::Palette coralTeal{
     .primary = RGB(0x3F7C85),
     .secondary = RGB(0xFF5F5D),
     .highlight = RGB(255, 255, 255),
-    .name = "coralTeal"};
+    .name = "Coral teal"};
 
 PaletteColumn::Palette pinkSunset{
     .gradient = new Gradient({
