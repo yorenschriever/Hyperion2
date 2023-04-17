@@ -29,6 +29,7 @@
 #include "patterns-max.hpp"
 #include "patterns-mid.hpp"
 #include "patterns-min.hpp"
+#include "patterns-halo.hpp"
 #include "patterns-test.hpp"
 #include "platform/includes/thread.hpp"
 #include "webServer.hpp"
@@ -268,7 +269,7 @@ void addHaloPipe(Hyperion *hyp)
 {
     auto haloPipe = new ConvertPipe<RGBA, RGB>(
         new ControlHubInput<RGBA>(
-            ledsterMap.size(),
+            haloMap3d.size(),
             &hyp->hub,
             {
                 {.column = 2, .slot = 0, .pattern = new Mid::Lighthouse(cHaloMap3d)},
@@ -285,6 +286,14 @@ void addHaloPipe(Hyperion *hyp)
                 {.column = 5, .slot = 3, .pattern = new Max::RadialFadePattern(cHaloMap3d)},
                 {.column = 5, .slot = 4, .pattern = new Max::ChevronsPattern(haloMap3d)},
                 {.column = 5, .slot = 5, .pattern = new Max::ChevronsConePattern(cHaloMap3d)},
+
+                {.column = 6, .slot = 0, .pattern = new Halo::PrimaryColorPattern()},
+                {.column = 6, .slot = 1, .pattern = new Halo::SecondaryColorPattern()},
+                {.column = 6, .slot = 2, .pattern = new Halo::SinChasePattern()},
+                {.column = 6, .slot = 3, .pattern = new Halo::SawChasePattern()},
+                {.column = 6, .slot = 4, .pattern = new Halo::SinAllPattern()},
+                {.column = 6, .slot = 5, .pattern = new Halo::StrobePattern()},
+
 
                 {.column = 7, .slot = 0, .pattern = new Flash::FadingNoisePattern()},
                 {.column = 7, .slot = 1, .pattern = new Flash::SquareGlitchPattern(haloMap3d)},

@@ -133,8 +133,14 @@ namespace Min
                 return;
 
             bool isLedster = width == 481;
+            bool isHalo = width==100;
             int segmentSize = isLedster ? 10 : 60;
             int numSegments = isLedster ? 36 : width / segmentSize;
+
+            if (isHalo){
+                segmentSize = 100;
+                numSegments = 1;
+            }
 
             perm.setSize(numSegments);
 
