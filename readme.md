@@ -19,6 +19,14 @@ Add these lines to include path of vscode plugin "microsoft c/c++ extension". (a
 ```
 Close your terminal (and reopen if you still need it)
 
+## Linux WSL
+- Brew https://linux.how2shout.com/install-brew-on-wsl-windows-subsystem-for-linux/ 
+- brew install cmake
+- brew install jack
+- brew install gcc
+- sudo apt-get install libasound2-dev
+
+
 ## Mac
 - brew install python3
 - pip3 install pyglet
