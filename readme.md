@@ -20,12 +20,26 @@ Add these lines to include path of vscode plugin "microsoft c/c++ extension". (a
 Close your terminal (and reopen if you still need it)
 
 ## Linux WSL
-- Brew https://linux.how2shout.com/install-brew-on-wsl-windows-subsystem-for-linux/ 
-- brew install cmake
-- brew install jack
-- brew install gcc
-- sudo apt-get install libasound2-dev
+Check this link for information on configuring brew for WSL on Windows: https://linux.how2shout.com/install-brew-on-wsl-windows-subsystem-for-linux/ 
+```
+brew install cmake
+brew install jack
+brew install gcc
+sudo apt-get install libasound2-dev
+sudo apt install libssl-dev # For openssl 3.1.0
+```
+download boost (https://www.boost.org/users/download/), place it somewhere on your disk and update the path in ~/.zprofile i use version 1_81_0
+```
+wget https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.zip -O $HOME/boost_1_81_0.zip
+unzip $HOME/boost_1_81_0.zip
+rm $HOME/boost_1_81_0.zip
+echo 'export BOOST_DIR="$HOME/boost_1_81_0"' >> ~/.bash_profile
 
+cd ./library/scripts/certificate
+./generate.sh
+```
+TODO : Fix include error: ./Hyperion2/library/platform/macos/ethernet.cpp:11:10: fatal error: net/if_dl.h: No such file or directory
+sudo cp ./library/platform/linux/if_dl.h /usr/include/net/if_dl.h
 
 ## Mac
 - brew install python3
