@@ -26,14 +26,15 @@ body {
     .controller {
         grid-template-rows: auto max-content;
         grid-template-areas:
-                   "activation "
-                   "params";
+                  "params" 
+                  "activation "
+                   ;
     }
 
     /* TODO: instead of hardcoded 450, derive the height */
-    .slots {
+    /* .slots {
         max-height: calc(100vh - 450px);
-    }
+    } */
 }
 
 .activation {
