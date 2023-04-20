@@ -133,24 +133,32 @@ const SocketState = ({ socketState }) => {
 
 const Controller = ({ state }) => {
     return html`
-    <div class="columns">
-        ${state.columns.map((column, columnIndex) => html`<${Column} column=${column} columnIndex=${columnIndex}/>`)}
-        <div class="column">
-            <div class="columnHeader">Master</div>
-            <${MasterDimFader} value=${state.masterDim}/> 
-        </div> 
-    </div>
-    <div class="columns">
-        ${Object.entries(state.params).map(([name, value]) => html`<${ParamFader} name=${name} value=${value}/>`)}
+    <div class="controller">
+
+        <div class="params columns">
+            ${Object.entries(state.params).map(([name, value]) => html`<${ParamFader} name=${name} value=${value}/>`)}
+        </div>
+
+        <div class="activation columns">
+            ${state.columns.map((column, columnIndex) => html`<${Column} column=${column} columnIndex=${columnIndex}/>`)}
+            <div class="column">
+                <div class="columnHeader">Master</div>
+                <${MasterDimFader} value=${state.masterDim}/> 
+            </div> 
+        </div>
+    
+
     </div>
 `;
 }
 
 const Column = ({ column, columnIndex }) => html`
     <div class="column">
-    <div class="columnHeader">${column.name}</div>
-    <${DimFader} column=${column} columnIndex=${columnIndex}/>    
-    ${column.slots.map((slot, slotIndex) => html`<${Slot} slot=${slot} columnIndex=${columnIndex} slotIndex=${slotIndex}/>`)}
+        <div class="columnHeader">${column.name}</div>
+        <${DimFader} column=${column} columnIndex=${columnIndex}/>   
+        <div class="slots">
+            ${column.slots.map((slot, slotIndex) => html`<${Slot} slot=${slot} columnIndex=${columnIndex} slotIndex=${slotIndex}/>`)}
+        </div>
     </div>
     `;
 

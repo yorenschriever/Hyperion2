@@ -136,6 +136,7 @@ void addLedsterPipe(Hyperion *hyp)
                 {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
                 {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
                 {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+                {.column = 8, .slot = 6, .pattern = new TestPatterns::Gradient(10)},
             }),
 
         new CloneOutput({new MonitorOutput3dws(ledsterMap3d, serv),
@@ -203,6 +204,7 @@ void addColumnPipes(Hyperion *hyp)
             {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
             {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
             {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = 8, .slot = 6, .pattern = new TestPatterns::Gradient(120)},
         });
 
     auto splitInput = new InputSlicer(
@@ -309,11 +311,12 @@ void addHaloPipe(Hyperion *hyp)
                 {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
                 {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
                 {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+                {.column = 8, .slot = 6, .pattern = new TestPatterns::Gradient(100)},
             }),
 
         new CloneOutput({new MonitorOutput3dws(haloMap3d, serv),
                          // new MonitorOutput3d(haloMap3d),
-                         new UDPOutput("hyperslave4.local", 9611, 60)}));
+                         new UDPOutput("haloslave.local", 9611, 60)}));
     hyp->addPipe(haloPipe);
 }
 

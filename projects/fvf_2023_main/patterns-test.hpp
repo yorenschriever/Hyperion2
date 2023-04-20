@@ -15,7 +15,8 @@ namespace TestPatterns
     {
     public:
         int segmentSize;
-        ShowStarts(int segmentSize){
+        ShowStarts(int segmentSize)
+        {
             this->segmentSize = segmentSize;
             this->name = "Mapping starts";
         }
@@ -26,17 +27,18 @@ namespace TestPatterns
                 return;
 
             RGBA colors[6] = {
-                RGBA(255,0,0,  255),
-                RGBA(0,255,0,  255),
-                RGBA(0,0,255,  255),
-                RGBA(0,255,255,255),
-                RGBA(255,0,255,255),
-                RGBA(255,255,0,255),
+                RGBA(255, 0, 0, 255),
+                RGBA(0, 255, 0, 255),
+                RGBA(0, 0, 255, 255),
+                RGBA(0, 255, 255, 255),
+                RGBA(255, 0, 255, 255),
+                RGBA(255, 255, 0, 255),
             };
 
-            for(int i=0;i<width;i++){
-                if (i%segmentSize < 20)
-                    pixels[i] = colors[i/480] * (1.-(((float)(i%segmentSize))/20.));
+            for (int i = 0; i < width; i++)
+            {
+                if (i % segmentSize < 20)
+                    pixels[i] = colors[i / 480] * (1. - (((float)(i % segmentSize)) / 20.));
             }
         }
     };
@@ -45,7 +47,8 @@ namespace TestPatterns
     {
     public:
         RGBA color;
-        OneColor(RGBA color, const char* name){
+        OneColor(RGBA color, const char *name)
+        {
             this->color = color;
             this->name = name;
         }
@@ -55,10 +58,36 @@ namespace TestPatterns
             if (!active)
                 return;
 
-            for(int i=0;i<width;i++){
+            for (int i = 0; i < width; i++)
+            {
                 pixels[i] = color;
             }
         }
     };
 
+
+
+    class Gradient : public Pattern<RGBA>
+    {
+    public:
+        int segmentSize;
+        Gradient(int segmentSize)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Gradient";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            for (int i = 0; i < width; i++)
+            {
+                int pos = i % segmentSize;
+                int gradientPos = pos * 255 / segmentSize;
+                pixels[i] = params->gradient->get(gradientPos);
+            }
+        }
+    };
 }

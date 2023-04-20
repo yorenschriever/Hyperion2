@@ -9,6 +9,41 @@ body {
     margin: 8px;
 }
 
+.controller {
+    display:grid;
+    height:100vh;
+    width:100vw;
+}
+
+@media (orientation: landscape) {
+    .controller {
+        grid-template-columns: auto max-content;
+        grid-template-areas: "activation params";
+    }
+}
+  
+@media (orientation: portrait) {
+    .controller {
+        grid-template-rows: auto max-content;
+        grid-template-areas:
+                   "activation "
+                   "params";
+    }
+
+    /* TODO: instead of hardcoded 450, derive the height */
+    .slots {
+        max-height: calc(100vh - 450px);
+    }
+}
+
+.activation {
+    grid-area: activation;
+}
+
+.params {
+    grid-area: params;
+} 
+
 .columns {
     display: flex;
     flex-direction: row;
@@ -16,14 +51,19 @@ body {
 }
 
 .column {
-    display: flex;
-    flex-direction: column;
+    margin:6px;
+    width: 80px;
+}
+
+.slots {
+    overflow-y:auto;
+    overflow-x: hidden;
 }
 
 .slot {
     width: 80px;
     height: 80px;
-    margin: 6px;
+    margin-bottom: 12px;
     transition: background-color .2s ease-in;
     background-color: #333;
 
@@ -36,6 +76,7 @@ body {
     text-overflow: ellipsis;
 
     cursor: pointer;
+    user-select: none;
 }
 
 .active {
@@ -51,38 +92,33 @@ body {
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 10pt;
-
 }
 
 .fader {
     -webkit-appearance: slider-vertical;
-    width:80px;
+    width:100%;
     height:160px;
-    margin: 8px;
+    margin-bottom: 12px; 
 }
 
-.param {
-
-}
 
 .faderContainer {
+    display: flex;
+    flex-direction: column;
+    margin:6px;
+    width: 80px;
     filter: hue-rotate(90deg);
 }
 
 .columnHeader {
-    /* display: flex; */
-    /* flex-direction: column; */
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 10pt;
-    /* padding: 3pt; */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width:80px;
     text-align: center;
-    margin: 6px;
-    
-    
-
+    margin-bottom: 6px;  
+    user-select: none;
 }
