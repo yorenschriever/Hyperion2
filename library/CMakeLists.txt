@@ -52,6 +52,10 @@ else ()
     set(RTMIDI_BUILD_TESTING OFF)
     add_subdirectory($ENV{HYPERION_LIB_DIR}/platform/${TARGET}/rtmidi "rtmidi")
     target_link_libraries(Hyperion PUBLIC rtmidi OpenSSL::SSL)
+    target_link_libraries(rtmidi PUBLIC asound pthread)
+    #target_link_libraries(rtmidi PUBLIC jack)
+    #target_compile_definitions(rtmidi PUBLIC __UNIX_JACK__)
+
     target_include_directories(Hyperion PUBLIC $ENV{HYPERION_LIB_DIR}/platform/${TARGET}/rtmidi)
     target_include_directories(Hyperion PRIVATE $ENV{BOOST_DIR})
 

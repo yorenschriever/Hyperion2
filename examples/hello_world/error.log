@@ -1,0 +1,792 @@
+lennard@LAPTOP-Lennard:~/CodeProjects/Hyperion2/examples/hello_world$ build macos
+Hyperion lib dir /home/lennard/CodeProjects/Hyperion2/library
+Target: macos
+-- Building: Hyperion
+-- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+-- Compiling with support for: alsa
+-- Configuring done (2.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/lennard/CodeProjects/Hyperion2/examples/hello_world/build/macos
+[ 16%] Built target rtmidi
+[ 22%] Building CXX object hyperion/CMakeFiles/Hyperion.dir/platform/macos/webServer.cpp.o
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:370:53: error: ‘std::string_view’ has not been declared
+  370 |     http::response<http::string_body> do_parse(std::string_view input)
+      |                                                     ^~~~~~~~~~~
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp: In member function ‘boost::beast::http::response<boost::beast::http::basic_string_body<char> > WebServerMacOs::do_parse(int)’:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: error: no matching function for call to ‘buffer(int&)’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:996:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(PodType (&)[N])’
+  996 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:996:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘PodType [N]’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1010:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(PodType (&)[N], std::size_t)’
+ 1010 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1010:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘PodType [N]’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1027:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const PodType (&)[N])’
+ 1027 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1027:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const PodType [N]’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1041:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const PodType (&)[N], std::size_t)’
+ 1041 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1041:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const PodType [N]’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1130:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(boost::array<PodType, N>&)’
+ 1130 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1130:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘boost::array<PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1145:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(boost::array<PodType, N>&, std::size_t)’
+ 1145 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1145:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘boost::array<PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1162:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(boost::array<const PodType, N>&)’
+ 1162 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1162:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘boost::array<const PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1176:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(boost::array<const PodType, N>&, std::size_t)’
+ 1176 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1176:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘boost::array<const PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1195:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const boost::array<PodType, N>&)’
+ 1195 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1195:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const boost::array<PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1209:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const boost::array<PodType, N>&, std::size_t)’
+ 1209 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1209:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const boost::array<PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1228:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(std::array<_Tp, _Nm>&)’
+ 1228 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1228:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::array<_Tp, _Nm>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1242:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(std::array<_Tp, _Nm>&, std::size_t)’
+ 1242 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1242:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::array<_Tp, _Nm>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1259:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(std::array<const PodType, N>&)’
+ 1259 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1259:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::array<const PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1273:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(std::array<const PodType, N>&, std::size_t)’
+ 1273 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1273:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::array<const PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1290:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const std::array<_Tp, _Nm>&)’
+ 1290 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1290:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::array<_Tp, _Nm>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1304:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const std::array<_Tp, _Nm>&, std::size_t)’
+ 1304 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1304:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::array<_Tp, _Nm>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1326:55: note: candidate: ‘template<class PodType, class Allocator> boost::asio::mutable_buffers_1 boost::asio::buffer(std::vector<_Tp, _Alloc>&)’
+ 1326 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1326:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::vector<_Tp, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1350:55: note: candidate: ‘template<class PodType, class Allocator> boost::asio::mutable_buffers_1 boost::asio::buffer(std::vector<_Tp, _Alloc>&, std::size_t)’
+ 1350 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1350:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::vector<_Tp, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1376:53: note: candidate: ‘template<class PodType, class Allocator> boost::asio::const_buffers_1 boost::asio::buffer(const std::vector<_Tp, _Alloc>&)’
+ 1376 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1376:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::vector<_Tp, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1400:53: note: candidate: ‘template<class PodType, class Allocator> boost::asio::const_buffers_1 boost::asio::buffer(const std::vector<_Tp, _Alloc>&, std::size_t)’
+ 1400 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1400:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::vector<_Tp, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1424:55: note: candidate: ‘template<class Elem, class Traits, class Allocator> boost::asio::mutable_buffers_1 boost::asio::buffer(std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&)’
+ 1424 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1424:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1448:55: note: candidate: ‘template<class Elem, class Traits, class Allocator> boost::asio::mutable_buffers_1 boost::asio::buffer(std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&, std::size_t)’
+ 1448 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1448:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1471:53: note: candidate: ‘template<class Elem, class Traits, class Allocator> boost::asio::const_buffers_1 boost::asio::buffer(const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&)’
+ 1471 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1471:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1494:53: note: candidate: ‘template<class Elem, class Traits, class Allocator> boost::asio::const_buffers_1 boost::asio::buffer(const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&, std::size_t)’
+ 1494 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1494:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1565:55: note: candidate: ‘template<class T> boost::asio::mutable_buffers_1 boost::asio::buffer(T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<(! std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value), boost::asio::defaulted_constraint>::type)’
+ 1565 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1565:55: note:   template argument deduction/substitution failed:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp: In substitution of ‘template<class T> boost::asio::mutable_buffers_1 boost::asio::buffer(T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<(! std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value), boost::asio::defaulted_constraint>::type) [with T = int]’:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39:   required from here
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1576:10: error: ‘int’ is not a class, struct, or union type
+ 1576 |       >::value,
+      |          ^~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1595:55: note: candidate: ‘template<class T> boost::asio::mutable_buffers_1 boost::asio::buffer(T&, std::size_t, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<(! std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value), boost::asio::defaulted_constraint>::type)’
+ 1595 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1595:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   candidate expects 4 arguments, 1 provided
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1624:53: note: candidate: ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value, boost::asio::defaulted_constraint>::type)’
+ 1624 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1624:53: note:   template argument deduction/substitution failed:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp: In substitution of ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value, boost::asio::defaulted_constraint>::type) [with T = int]’:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39:   required from here
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1624:53: error: ‘int’ is not a class, struct, or union type
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1654:53: note: candidate: ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(T&, std::size_t, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value, boost::asio::defaulted_constraint>::type)’
+ 1654 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1654:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   candidate expects 4 arguments, 1 provided
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1683:53: note: candidate: ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(const T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::const_iterator>::value, boost::asio::defaulted_constraint>::type)’
+ 1683 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1683:53: note:   template argument deduction/substitution failed:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp: In substitution of ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(const T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::const_iterator>::value, boost::asio::defaulted_constraint>::type) [with T = int]’:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39:   required from here
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1683:53: error: ‘int’ is not a class, struct, or union type
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1705:53: note: candidate: ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(const T&, std::size_t, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::const_iterator>::value, boost::asio::defaulted_constraint>::type)’
+ 1705 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1705:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   candidate expects 3 arguments, 1 provided
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:911:55: note: candidate: ‘boost::asio::mutable_buffers_1 boost::asio::buffer(const boost::asio::mutable_buffer&)’
+  911 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:912:27: note:   no known conversion for argument 1 from ‘int’ to ‘const boost::asio::mutable_buffer&’
+  912 |     const mutable_buffer& b) BOOST_ASIO_NOEXCEPT
+      |     ~~~~~~~~~~~~~~~~~~~~~~^
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:924:55: note: candidate: ‘boost::asio::mutable_buffers_1 boost::asio::buffer(const boost::asio::mutable_buffer&, std::size_t)’
+  924 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:924:55: note:   candidate expects 2 arguments, 1 provided
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:942:53: note: candidate: ‘boost::asio::const_buffers_1 boost::asio::buffer(const boost::asio::const_buffer&)’
+  942 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:943:25: note:   no known conversion for argument 1 from ‘int’ to ‘const boost::asio::const_buffer&’
+  943 |     const const_buffer& b) BOOST_ASIO_NOEXCEPT
+      |     ~~~~~~~~~~~~~~~~~~~~^
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:955:53: note: candidate: ‘boost::asio::const_buffers_1 boost::asio::buffer(const boost::asio::const_buffer&, std::size_t)’
+  955 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:955:53: note:   candidate expects 2 arguments, 1 provided
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:972:55: note: candidate: ‘boost::asio::mutable_buffers_1 boost::asio::buffer(void*, std::size_t)’
+  972 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:972:55: note:   candidate expects 2 arguments, 1 provided
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:982:53: note: candidate: ‘boost::asio::const_buffers_1 boost::asio::buffer(const void*, std::size_t)’
+  982 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:982:53: note:   candidate expects 2 arguments, 1 provided
+In file included from /home/lennard/boost_1_81_0/boost/asio/detail/buffer_sequence_adapter.hpp:22,
+                 from /home/lennard/boost_1_81_0/boost/asio/detail/reactive_socket_service.hpp:27,
+                 from /home/lennard/boost_1_81_0/boost/asio/basic_socket.hpp:38,
+                 from /home/lennard/boost_1_81_0/boost/asio/basic_socket_acceptor.hpp:20,
+                 from /home/lennard/boost_1_81_0/boost/asio/ip/tcp.hpp:19,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:6,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:278:34: note: candidate: ‘boost::asio::mutable_registered_buffer boost::asio::buffer(const boost::asio::mutable_registered_buffer&)’
+  278 | inline mutable_registered_buffer buffer(
+      |                                  ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:279:38: note:   no known conversion for argument 1 from ‘int’ to ‘const boost::asio::mutable_registered_buffer&’
+  279 |     const mutable_registered_buffer& b) BOOST_ASIO_NOEXCEPT
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:285:32: note: candidate: ‘boost::asio::const_registered_buffer boost::asio::buffer(const boost::asio::const_registered_buffer&)’
+  285 | inline const_registered_buffer buffer(
+      |                                ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:286:36: note:   no known conversion for argument 1 from ‘int’ to ‘const boost::asio::const_registered_buffer&’
+  286 |     const const_registered_buffer& b) BOOST_ASIO_NOEXCEPT
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:292:34: note: candidate: ‘boost::asio::mutable_registered_buffer boost::asio::buffer(const boost::asio::mutable_registered_buffer&, std::size_t)’
+  292 | inline mutable_registered_buffer buffer(
+      |                                  ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:292:34: note:   candidate expects 2 arguments, 1 provided
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:299:32: note: candidate: ‘boost::asio::const_registered_buffer boost::asio::buffer(const boost::asio::const_registered_buffer&, std::size_t)’
+  299 | inline const_registered_buffer buffer(
+      |                                ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:299:32: note:   candidate expects 2 arguments, 1 provided
+gmake[2]: *** [hyperion/CMakeFiles/Hyperion.dir/build.make:188: hyperion/CMakeFiles/Hyperion.dir/platform/macos/webServer.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:173: hyperion/CMakeFiles/Hyperion.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+lennard@LAPTOP-Lennard:~/CodeProjects/Hyperion2/examples/hello_world$ build macos >> ./error.log
+Hyperion lib dir /home/lennard/CodeProjects/Hyperion2/library
+Target: macos
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:370:53: error: ‘std::string_view’ has not been declared
+  370 |     http::response<http::string_body> do_parse(std::string_view input)
+      |                                                     ^~~~~~~~~~~
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp: In member function ‘boost::beast::http::response<boost::beast::http::basic_string_body<char> > WebServerMacOs::do_parse(int)’:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: error: no matching function for call to ‘buffer(int&)’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:996:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(PodType (&)[N])’
+  996 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:996:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘PodType [N]’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1010:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(PodType (&)[N], std::size_t)’
+ 1010 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1010:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘PodType [N]’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1027:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const PodType (&)[N])’
+ 1027 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1027:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const PodType [N]’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1041:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const PodType (&)[N], std::size_t)’
+ 1041 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1041:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const PodType [N]’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1130:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(boost::array<PodType, N>&)’
+ 1130 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1130:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘boost::array<PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1145:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(boost::array<PodType, N>&, std::size_t)’
+ 1145 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1145:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘boost::array<PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1162:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(boost::array<const PodType, N>&)’
+ 1162 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1162:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘boost::array<const PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1176:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(boost::array<const PodType, N>&, std::size_t)’
+ 1176 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1176:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘boost::array<const PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1195:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const boost::array<PodType, N>&)’
+ 1195 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1195:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const boost::array<PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1209:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const boost::array<PodType, N>&, std::size_t)’
+ 1209 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1209:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const boost::array<PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1228:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(std::array<_Tp, _Nm>&)’
+ 1228 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1228:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::array<_Tp, _Nm>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1242:55: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::mutable_buffers_1 boost::asio::buffer(std::array<_Tp, _Nm>&, std::size_t)’
+ 1242 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1242:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::array<_Tp, _Nm>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1259:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(std::array<const PodType, N>&)’
+ 1259 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1259:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::array<const PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1273:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(std::array<const PodType, N>&, std::size_t)’
+ 1273 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1273:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::array<const PodType, N>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1290:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const std::array<_Tp, _Nm>&)’
+ 1290 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1290:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::array<_Tp, _Nm>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1304:53: note: candidate: ‘template<class PodType, long unsigned int N> boost::asio::const_buffers_1 boost::asio::buffer(const std::array<_Tp, _Nm>&, std::size_t)’
+ 1304 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1304:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::array<_Tp, _Nm>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1326:55: note: candidate: ‘template<class PodType, class Allocator> boost::asio::mutable_buffers_1 boost::asio::buffer(std::vector<_Tp, _Alloc>&)’
+ 1326 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1326:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::vector<_Tp, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1350:55: note: candidate: ‘template<class PodType, class Allocator> boost::asio::mutable_buffers_1 boost::asio::buffer(std::vector<_Tp, _Alloc>&, std::size_t)’
+ 1350 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1350:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::vector<_Tp, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1376:53: note: candidate: ‘template<class PodType, class Allocator> boost::asio::const_buffers_1 boost::asio::buffer(const std::vector<_Tp, _Alloc>&)’
+ 1376 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1376:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::vector<_Tp, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1400:53: note: candidate: ‘template<class PodType, class Allocator> boost::asio::const_buffers_1 boost::asio::buffer(const std::vector<_Tp, _Alloc>&, std::size_t)’
+ 1400 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1400:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::vector<_Tp, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1424:55: note: candidate: ‘template<class Elem, class Traits, class Allocator> boost::asio::mutable_buffers_1 boost::asio::buffer(std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&)’
+ 1424 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1424:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1448:55: note: candidate: ‘template<class Elem, class Traits, class Allocator> boost::asio::mutable_buffers_1 boost::asio::buffer(std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&, std::size_t)’
+ 1448 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1448:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1471:53: note: candidate: ‘template<class Elem, class Traits, class Allocator> boost::asio::const_buffers_1 boost::asio::buffer(const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&)’
+ 1471 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1471:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1494:53: note: candidate: ‘template<class Elem, class Traits, class Allocator> boost::asio::const_buffers_1 boost::asio::buffer(const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&, std::size_t)’
+ 1494 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1494:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   mismatched types ‘const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>’ and ‘int’
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1565:55: note: candidate: ‘template<class T> boost::asio::mutable_buffers_1 boost::asio::buffer(T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<(! std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value), boost::asio::defaulted_constraint>::type)’
+ 1565 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1565:55: note:   template argument deduction/substitution failed:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp: In substitution of ‘template<class T> boost::asio::mutable_buffers_1 boost::asio::buffer(T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<(! std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value), boost::asio::defaulted_constraint>::type) [with T = int]’:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39:   required from here
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1576:10: error: ‘int’ is not a class, struct, or union type
+ 1576 |       >::value,
+      |          ^~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1595:55: note: candidate: ‘template<class T> boost::asio::mutable_buffers_1 boost::asio::buffer(T&, std::size_t, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<(! std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value), boost::asio::defaulted_constraint>::type)’
+ 1595 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1595:55: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   candidate expects 4 arguments, 1 provided
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1624:53: note: candidate: ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value, boost::asio::defaulted_constraint>::type)’
+ 1624 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1624:53: note:   template argument deduction/substitution failed:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp: In substitution of ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value, boost::asio::defaulted_constraint>::type) [with T = int]’:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39:   required from here
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1624:53: error: ‘int’ is not a class, struct, or union type
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1654:53: note: candidate: ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(T&, std::size_t, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::iterator>::value, boost::asio::defaulted_constraint>::type, typename boost::asio::constraint<std::is_const<typename std::remove_reference<typename std::iterator_traits<typename T::iterator>::reference>::type>::value, boost::asio::defaulted_constraint>::type)’
+ 1654 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1654:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   candidate expects 4 arguments, 1 provided
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1683:53: note: candidate: ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(const T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::const_iterator>::value, boost::asio::defaulted_constraint>::type)’
+ 1683 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1683:53: note:   template argument deduction/substitution failed:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp: In substitution of ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(const T&, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::const_iterator>::value, boost::asio::defaulted_constraint>::type) [with T = int]’:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39:   required from here
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1683:53: error: ‘int’ is not a class, struct, or union type
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1705:53: note: candidate: ‘template<class T> boost::asio::const_buffers_1 boost::asio::buffer(const T&, std::size_t, typename boost::asio::constraint<boost::asio::is_contiguous_iterator<typename T::const_iterator>::value, boost::asio::defaulted_constraint>::type)’
+ 1705 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:1705:53: note:   template argument deduction/substitution failed:
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:376:39: note:   candidate expects 3 arguments, 1 provided
+  376 |         auto buf = boost::asio::buffer(input);
+      |                    ~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/server-certificate.hpp:13,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:3,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:911:55: note: candidate: ‘boost::asio::mutable_buffers_1 boost::asio::buffer(const boost::asio::mutable_buffer&)’
+  911 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:912:27: note:   no known conversion for argument 1 from ‘int’ to ‘const boost::asio::mutable_buffer&’
+  912 |     const mutable_buffer& b) BOOST_ASIO_NOEXCEPT
+      |     ~~~~~~~~~~~~~~~~~~~~~~^
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:924:55: note: candidate: ‘boost::asio::mutable_buffers_1 boost::asio::buffer(const boost::asio::mutable_buffer&, std::size_t)’
+  924 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:924:55: note:   candidate expects 2 arguments, 1 provided
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:942:53: note: candidate: ‘boost::asio::const_buffers_1 boost::asio::buffer(const boost::asio::const_buffer&)’
+  942 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:943:25: note:   no known conversion for argument 1 from ‘int’ to ‘const boost::asio::const_buffer&’
+  943 |     const const_buffer& b) BOOST_ASIO_NOEXCEPT
+      |     ~~~~~~~~~~~~~~~~~~~~^
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:955:53: note: candidate: ‘boost::asio::const_buffers_1 boost::asio::buffer(const boost::asio::const_buffer&, std::size_t)’
+  955 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:955:53: note:   candidate expects 2 arguments, 1 provided
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:972:55: note: candidate: ‘boost::asio::mutable_buffers_1 boost::asio::buffer(void*, std::size_t)’
+  972 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+      |                                                       ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:972:55: note:   candidate expects 2 arguments, 1 provided
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:982:53: note: candidate: ‘boost::asio::const_buffers_1 boost::asio::buffer(const void*, std::size_t)’
+  982 | BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+      |                                                     ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/buffer.hpp:982:53: note:   candidate expects 2 arguments, 1 provided
+In file included from /home/lennard/boost_1_81_0/boost/asio/detail/buffer_sequence_adapter.hpp:22,
+                 from /home/lennard/boost_1_81_0/boost/asio/detail/reactive_socket_service.hpp:27,
+                 from /home/lennard/boost_1_81_0/boost/asio/basic_socket.hpp:38,
+                 from /home/lennard/boost_1_81_0/boost/asio/basic_socket_acceptor.hpp:20,
+                 from /home/lennard/boost_1_81_0/boost/asio/ip/tcp.hpp:19,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer-macos.hpp:6,
+                 from /home/lennard/CodeProjects/Hyperion2/library/platform/macos/webServer.cpp:2:
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:278:34: note: candidate: ‘boost::asio::mutable_registered_buffer boost::asio::buffer(const boost::asio::mutable_registered_buffer&)’
+  278 | inline mutable_registered_buffer buffer(
+      |                                  ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:279:38: note:   no known conversion for argument 1 from ‘int’ to ‘const boost::asio::mutable_registered_buffer&’
+  279 |     const mutable_registered_buffer& b) BOOST_ASIO_NOEXCEPT
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:285:32: note: candidate: ‘boost::asio::const_registered_buffer boost::asio::buffer(const boost::asio::const_registered_buffer&)’
+  285 | inline const_registered_buffer buffer(
+      |                                ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:286:36: note:   no known conversion for argument 1 from ‘int’ to ‘const boost::asio::const_registered_buffer&’
+  286 |     const const_registered_buffer& b) BOOST_ASIO_NOEXCEPT
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:292:34: note: candidate: ‘boost::asio::mutable_registered_buffer boost::asio::buffer(const boost::asio::mutable_registered_buffer&, std::size_t)’
+  292 | inline mutable_registered_buffer buffer(
+      |                                  ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:292:34: note:   candidate expects 2 arguments, 1 provided
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:299:32: note: candidate: ‘boost::asio::const_registered_buffer boost::asio::buffer(const boost::asio::const_registered_buffer&, std::size_t)’
+  299 | inline const_registered_buffer buffer(
+      |                                ^~~~~~
+/home/lennard/boost_1_81_0/boost/asio/registered_buffer.hpp:299:32: note:   candidate expects 2 arguments, 1 provided
+gmake[2]: *** [hyperion/CMakeFiles/Hyperion.dir/build.make:188: hyperion/CMakeFiles/Hyperion.dir/platform/macos/webServer.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:173: hyperion/CMakeFiles/Hyperion.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2

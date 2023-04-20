@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include <string>
 #include <stdarg.h>
+#include <memory>
 
 typedef void RemoteWebsocketClient;
 

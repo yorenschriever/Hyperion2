@@ -12,7 +12,7 @@ macro(hyperion_before)
     message("Hyperion lib dir $ENV{HYPERION_LIB_DIR}")
     message("Target: ${TARGET}")
 
-    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
     set(CMAKE_CXX_FLAGS "-O2")
 

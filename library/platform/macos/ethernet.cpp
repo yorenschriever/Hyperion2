@@ -27,8 +27,8 @@ IPAddress Ethernet::getIp()
     struct ifaddrs * ifAddrStruct=NULL;
     struct ifaddrs * ifa=NULL;
     void * tmpAddrPtr=NULL;
-    sockaddr_in *ip4;
-    sockaddr_in6 *ip6;
+    sockaddr_in *ip4 =NULL;
+    sockaddr_in6 *ip6 = NULL;
 
     getifaddrs(&ifAddrStruct);
 
@@ -56,7 +56,7 @@ IPAddress Ethernet::getIp()
             // inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
             // printf("%s IP Address %s\n", ifa->ifa_name, addressBuffer); 
             ip6 = (struct sockaddr_in6 *)ifa->ifa_addr;
-        } else if (ifa->ifa_addr->sa_family == AF_LINK) {
+        } /*else if (ifa->ifa_addr->sa_family == AF_PACKET) {
             struct sockaddr_dl* sdl = (struct sockaddr_dl *)ifa->ifa_addr;
             //unsigned char mac[6];
             //todo this only works on mac, not on linux.
@@ -65,7 +65,7 @@ IPAddress Ethernet::getIp()
                 memcpy(mac, LLADDR(sdl), sdl->sdl_alen);
                 //Log::info(TAG,"mac  : %02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
             }
-      }
+      }*/
     }
     if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
 

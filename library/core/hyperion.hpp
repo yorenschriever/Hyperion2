@@ -22,10 +22,15 @@ public:
         check_safe_mode();
 
         setup_network();
+        Log::info("Hyperion", "network start");
         setup_rotary();
+        Log::info("Hyperion", "rotary start");
         setup_display();
-        setup_midi();
-        setup_tempo();
+        Log::info("Hyperion", "display start");
+       // setup_midi();
+        Log::info("Hyperion", "midi start");
+       // setup_tempo();
+        Log::info("Hyperion", "tempo start");
 
         Log::info("HYP", "starting outputs");
         for (Pipe *pipe : pipes)
@@ -36,6 +41,8 @@ public:
         Log::info("Hyperion", "starting inputs");
         for (Pipe *pipe : pipes)
             pipe->in->begin();
+        Log::info("Hyperion", "finished starting inputs");
+
 
         //Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
         Thread::create(runTask, "run", Thread::Purpose::distribution, 30000, this, 1);

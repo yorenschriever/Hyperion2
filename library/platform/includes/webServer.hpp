@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include <string>
 #include "webServerResponseBuilder.hpp"
+#include <string_view>
 
 class WebServerResponseBuilder;
 

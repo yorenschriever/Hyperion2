@@ -20,6 +20,9 @@ Add these lines to include path of vscode plugin "microsoft c/c++ extension". (a
 Close your terminal (and reopen if you still need it)
 
 ## Linux WSL
+```
+sudo apt-get install build-essential gdb
+```
 Check this link for information on configuring brew for WSL on Windows: https://linux.how2shout.com/install-brew-on-wsl-windows-subsystem-for-linux/ 
 ```
 brew install cmake
@@ -39,7 +42,37 @@ cd ./library/scripts/certificate
 ./generate.sh
 ```
 TODO : Fix include error: ./Hyperion2/library/platform/macos/ethernet.cpp:11:10: fatal error: net/if_dl.h: No such file or directory
-sudo cp ./library/platform/linux/if_dl.h /usr/include/net/if_dl.h
+```
+sudo wget https://opensource.apple.com/source/xnu/xnu-6153.81.5/bsd/net/if_dl.h -O /usr/include/net/if_dl.h
+sudo wget https://opensource.apple.com/source/xnu/xnu-344.49/bsd/sys/appleapiopts.h -O /usr/include/sys/appleapiopts.h
+```
+Install ESP-IDF
+```
+sudo apt-get install git wget flex bison gperf python3 python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+
+mkdir -p $HOME/CodeProjects/esp
+cd $HOME/CodeProjects/esp
+git clone --recursive https://github.com/espressif/esp-idf.git
+
+cd $HOME/CodeProjects/esp/esp-idf
+./install.sh all
+
+echo './export.sh' >> ~/.bash_profile
+
+```
+
+Add these lines to include path of vscode plugin "microsoft c/c++ extension". (also change the path here)
+```
+/home/lennard/CodeProjects/esp/esp-idf/**
+/home/lennard/CodeProjects/Hyperion2/library
+```
+
+Upgrade GCC version
+```
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+sudo apt-get install gcc
+```
 
 ## Mac
 - brew install python3

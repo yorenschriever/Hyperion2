@@ -1,0 +1,10 @@
+-- Building: Hyperion
+-- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+-- Compiling with support for: alsa
+-- Configuring done (1.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/lennard/CodeProjects/Hyperion2/projects/fvf_2023_main/build/macos
+[ 16%] Built target rtmidi
+[ 88%] Built target Hyperion
+[100%] Built target fvf_2023_main
+[100%] Built target link_target
