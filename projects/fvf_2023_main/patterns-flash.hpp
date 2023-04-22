@@ -63,18 +63,24 @@ namespace Flash
             if (!transition.Calculate(active))
                 return;
 
+            int numCubes = params->getSize(2, 15);
+            int numCubes3d = numCubes * numCubes * numCubes;
+            int threshold = params->getAmount(1, numCubes3d/2);
+            perm.setSize(numCubes3d);
             perm.permute();
-
-            int threshold = params->getIntensity(width * 0.01, width * 0.1);
-            int numSquares = params->getSize(2, 15);
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
-                int xquantized = (map[index].x + 1) * numSquares;
-                int yquantized = (map[index].y + 1) * numSquares;
-                int zquantized = (map[index].z + 1) * numSquares;
-                int square = xquantized + zquantized * numSquares + yquantized;
-                if (perm.at[square] > threshold / numSquares)
+                int xquantized = Utils::rescale(map[index].x,0,numCubes,-1,1);
+                int yquantized = fromBottom(map[index].y) * numCubes;
+                int zquantized = Utils::rescale(map[index].z,0,numCubes,-1,1);
+
+                int cubeIndex = 
+                    xquantized + 
+                    zquantized * numCubes +
+                    yquantized * numCubes * numCubes;
+
+                if (perm.at[cubeIndex] > threshold )
                     continue;
                 pixels[index] += params->getHighlightColour() * transition.getValue();
             }
