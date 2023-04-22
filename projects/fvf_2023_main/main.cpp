@@ -17,10 +17,8 @@
 #include "distribution/inputs/controlHubInput.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
 #include "generation/controlHub/websocketController.hpp"
-#include "mapping/columnMap.hpp"
 #include "mapping/columnMap3d.hpp"
 #include "mapping/haloMap3d.hpp"
-#include "mapping/ledsterMap.hpp"
 #include "mapping/ledsterMap3d.hpp"
 #include "palettes.hpp"
 #include "patterns-flash.hpp"
@@ -38,9 +36,11 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include "core/distribution/luts/colourCorrectionLut.hpp"
 
-auto pLedsterMap = ledsterMap.toPolarRotate90();
-auto pColumnMap = columnMap.toPolarRotate90();
+LUT *ledsterLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
+LUT *columnsLut = new ColourCorrectionLUT(1, 255, 255, 255, 255);
+LUT *haloLut = new ColourCorrectionLUT(1, 255, 255, 255, 255);
 
 auto cColumnMap3d = columnMap3d.toCylindricalRotate90();
 auto cLedsterMap3d = ledsterMap3d.toCylindricalRotate90();
@@ -91,7 +91,7 @@ void addLedsterPipe(Hyperion *hyp)
 {
     auto ledsterPipe = new ConvertPipe<RGBA, RGB>(
         new ControlHubInput<RGBA>(
-            ledsterMap.size(),
+            ledsterMap3d.size(),
             &hyp->hub,
             {
                 {.column = 2, .slot = 0, .pattern = new Mid::Lighthouse(cLedsterMap3d)},
@@ -136,12 +136,16 @@ void addLedsterPipe(Hyperion *hyp)
                 {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
                 {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
                 {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-                {.column = 8, .slot = 6, .pattern = new TestPatterns::Gradient(10)},
+                {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(10,1)},
+                {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
             }),
 
-        new CloneOutput({new MonitorOutput3dws(ledsterMap3d, serv),
-                         // new MonitorOutput3d(ledsterMap3d),
-                         new UDPOutput("ledsterstandalone.local", 9611, 60)}));
+        new CloneOutput({
+            new MonitorOutput3dws(ledsterMap3d, serv),
+            // new MonitorOutput3d(ledsterMap3d),
+            new UDPOutput("ledsterstandalone.local", 9601, 60)}
+        ),
+        ledsterLut);
     hyp->addPipe(ledsterPipe);
 }
 
@@ -152,7 +156,7 @@ void addColumnPipes(Hyperion *hyp)
     // maximum transfer size of 2*1440 bytes
 
     auto columnsInput = new ControlHubInput<RGBA>(
-        columnMap.size(),
+        columnMap3d.size(),
         &hyp->hub,
         {
             {.column = 1, .slot = 0, .pattern = new Low::StaticGradientPattern(columnMap3d)},
@@ -204,7 +208,8 @@ void addColumnPipes(Hyperion *hyp)
             {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
             {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
             {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-            {.column = 8, .slot = 6, .pattern = new TestPatterns::Gradient(120)},
+            {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(120,20)},
+            {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
         });
 
     auto splitInput = new InputSlicer(
@@ -256,7 +261,9 @@ void addColumnPipes(Hyperion *hyp)
             // new MonitorOutput3dws(splitMap.getMap(i), serv),
             // new MonitorOutput3d(splitMap.getMap(i)),
             new UDPOutput(slaves[i].host, slaves[i].port, 60)
-            //})
+            //}),
+            ,
+            columnsLut
         );
         hyp->addPipe(pipe);
     }
@@ -305,18 +312,21 @@ void addHaloPipe(Hyperion *hyp)
                 {.column = 7, .slot = 6, .pattern = new Flash::StrobeHighlightPattern()},
                 {.column = 7, .slot = 7, .pattern = new Max::GrowingStrobePattern(cHaloMap3d)},
 
-                {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(100)},
+                {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(haloMap3d.size())},
                 {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
                 {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
                 {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
                 {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
                 {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-                {.column = 8, .slot = 6, .pattern = new TestPatterns::Gradient(100)},
+                {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(81,5)},
+                {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(haloMap3d.size())},
             }),
 
-        new CloneOutput({new MonitorOutput3dws(haloMap3d, serv),
-                         // new MonitorOutput3d(haloMap3d),
-                         new UDPOutput("haloslave.local", 9611, 60)}));
+        new CloneOutput(
+            {new MonitorOutput3dws(haloMap3d, serv),
+            // new MonitorOutput3d(haloMap3d),
+            new UDPOutput("haloslave.local", 9611, 60)}
+        ), haloLut);
     hyp->addPipe(haloPipe);
 }
 

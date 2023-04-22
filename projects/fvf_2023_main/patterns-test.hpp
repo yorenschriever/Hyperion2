@@ -67,14 +67,16 @@ namespace TestPatterns
 
 
 
-    class Gradient : public Pattern<RGBA>
+    class Palette : public Pattern<RGBA>
     {
     public:
-        int segmentSize;
-        Gradient(int segmentSize)
+        int gradientSize;
+        int staticColorSize;
+        Palette(int gradientSize, int staticColorSize)
         {
-            this->segmentSize = segmentSize;
-            this->name = "Gradient";
+            this->gradientSize = gradientSize;
+            this->staticColorSize = staticColorSize;
+            this->name = "Palette";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -82,11 +84,60 @@ namespace TestPatterns
             if (!active)
                 return;
 
+            int totalSize = gradientSize + 3*staticColorSize;
+
             for (int i = 0; i < width; i++)
             {
-                int pos = i % segmentSize;
-                int gradientPos = pos * 255 / segmentSize;
-                pixels[i] = params->gradient->get(gradientPos);
+                int pos = i % totalSize;
+                if (pos < gradientSize){
+                    int gradientPos = pos * 255 / gradientSize;
+                    pixels[i] = params->gradient->get(gradientPos);
+                    continue;
+                } 
+
+                pos = pos - gradientSize;
+                if (pos < staticColorSize){
+                    pixels[i] = params->getPrimaryColour();
+                } else if (pos < 2 * staticColorSize){
+                    pixels[i] = params->getSecondaryColour();
+                } else {
+                    pixels[i] = params->getHighlightColour();
+                } 
+            }
+        }
+    };
+
+    class Gamma : public Pattern<RGBA>
+    {
+    public:
+        int gradientSize;
+        Gamma(int gradientSize)
+        {
+            this->gradientSize = gradientSize;
+            this->name = "Gamma";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            float gammaCorrection = params->getAmount(0.5,4);
+            int dimR = params->getOffset(10,255);
+            int dimG = params->getVariant(10,255);
+            int dimB = params->getIntensity(10,255);
+
+            Log::info("Gamma", "Correction parameters: gamma=%f, \tR=%d, \tG=%d, \tB=%d\t(remove existing correction first)", gammaCorrection, dimR, dimG, dimB);
+
+            for (int i = 0; i < width; i++)
+            {
+                int pos = (i % gradientSize) * 255 / gradientSize;
+                pixels[i] = RGB(
+                    pow((float)pos*dimR / 255. / 255., gammaCorrection) * 255,
+                    pow((float)pos*dimG / 255. / 255., gammaCorrection) * 255,
+                    pow((float)pos*dimB / 255. / 255., gammaCorrection) * 255
+                );
+      
             }
         }
     };
