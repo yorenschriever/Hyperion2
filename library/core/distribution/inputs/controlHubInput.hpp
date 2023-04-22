@@ -131,7 +131,18 @@ private:
     {
         for (auto slotPattern: slotPatterns)
         {
-            hub->findSlot(slotPattern.column, slotPattern.slot)->name = slotPattern.pattern->name;;
+            ControlHub::Slot* slot = hub->findSlot(slotPattern.column, slotPattern.slot);
+            auto newName = slotPattern.pattern->name;
+            if (slot->name.length() ==0){
+                //no name was given yet
+                slot->name = newName;
+            } else if (slot->name.compare(newName) == 0) {
+                //it already has the correct name
+                continue;
+            } else {
+                //multiple patterns are mapped to this slot. append the pattern name to the existing slot name
+                slot->name = slot->name + " / " + slotPattern.pattern->name;
+            }
         }
     }
 };
