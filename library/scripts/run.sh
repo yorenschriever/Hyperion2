@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #examples: 
 # ./run macos
 # ./run esp32
@@ -6,10 +8,14 @@
 #BASEDIR=$(dirname "$0")
 BASEDIR=.
 TARGET="$1"
+IS_INSIDE_CONTAINER=$2
 
 [ ! $TARGET ] && echo "no target specified" && exit 1;
 
-if [ $TARGET = 'macos' ]; then
+if [ $TARGET = 'docker' ] && [ -z "$IS_INSIDE_CONTAINER" ]; then
+    ${HYPERION_LIB_DIR}/platform/docker/run.sh $PWD
+    exit;
+elif [ $TARGET = 'macos' ] || [ $TARGET = 'docker' ]; then
     "${BASEDIR}/build/${TARGET}/app"
 
 elif [ $TARGET = 'esp32' ]; then

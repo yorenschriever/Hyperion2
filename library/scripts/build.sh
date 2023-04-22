@@ -1,11 +1,18 @@
+#!/bin/bash
+
 TARGET="$1"
+IS_INSIDE_CONTAINER=$2
 #BASEDIR=$(dirname "$0")
 BASEDIR=.
 BUILDDIR="$BASEDIR/build/${TARGET}"
 
 [ ! $TARGET ] && echo "no target specified" && exit 1;
 
-if [ $TARGET = 'macos' ]; then
+if [ $TARGET = 'docker' ] && [ -z "$IS_INSIDE_CONTAINER" ]; then
+    docker build -t hyperion ${HYPERION_LIB_DIR}/platform/docker
+    ${HYPERION_LIB_DIR}/platform/docker/build.sh $PWD
+    exit;
+elif [ $TARGET = 'macos' ] || [ $TARGET = 'docker' ]; then
     PARAM="-DTARGET=${TARGET}"
 elif [ $TARGET = 'esp32' ] || [ $TARGET = 'esp32s3' ]; then
     [ ! $IDF_PATH ] && echo "run get_idf first" && exit 1;
