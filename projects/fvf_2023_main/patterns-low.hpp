@@ -121,7 +121,7 @@ namespace Low
             if (!transition.Calculate(active))
                 return;
 
-            lfo.setPeriod(params->getVelocity(5000,500));
+            lfo.setPeriod(params->getVelocity(11000,500));
             lfo.setPulseWidth(params->getSize(0.03,0.5));
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
@@ -240,7 +240,7 @@ namespace Low
                 if (index % density != 0)
                    continue;
                 float fade = Utils::constrain_f(fromBottom(map[perm.at[index]].y - fadeSize),0,1);
-                pixels[perm.at[index]] = params->getHighlightColour() * fade * lfo.getValue(float(index)/width) * transition.getValue(index, width);
+                pixels[perm.at[index]] = params->getPrimaryColour() * fade * lfo.getValue(float(index)/width) * transition.getValue(index, width);
             }
         }
     };

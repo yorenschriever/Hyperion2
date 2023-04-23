@@ -65,7 +65,7 @@ namespace Flash
 
             int numCubes = params->getSize(2, 15);
             int numCubes3d = numCubes * numCubes * numCubes;
-            int threshold = params->getAmount(1, numCubes3d/2);
+            int threshold = params->getAmount(1, numCubes3d/5);
             perm.setSize(numCubes3d);
             perm.permute();
 
@@ -235,7 +235,7 @@ namespace Flash
                 petal = (petal + 1 + Utils::random(0, 4)) % 6;
             }
 
-            RGBA col = params->getHighlightColour() * transition.getValue();
+            RGBA col = params->getSecondaryColour() * transition.getValue();
             for (int j = 0; j < 45; j++)
                 pixels[LedsterShapes::petals[petal][j]] += col;
         }

@@ -59,7 +59,7 @@ int main()
 
     hyp->hub.subscribe(new WebsocketController(&hyp->hub));
 
-    // Tempo::AddSource(new ConstantTempo(120));
+    Tempo::AddSource(new ConstantTempo(120));
 
     // select first palette
     hyp->hub.buttonPressed(0, 0);
@@ -340,11 +340,12 @@ void addPaletteColumn(Hyperion *hyp)
             heatmap2,
             sunset2,
             retro,
+            tunnel,
+            
             sunset6,
             sunset7,
             sunset1,
             coralTeal,
-            tunnel,
             deepBlueOcean,
             redSalvation,
             plumBath,

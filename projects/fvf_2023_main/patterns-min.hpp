@@ -53,7 +53,7 @@ namespace Min
             //     }
             // }
 
-            lfo.setPulseWidth(params->getAmount(0.1, 1));
+            lfo.setPulseWidth(params->getAmount(0.1, 0.5));
             //lfo.setPeriod(params->getVelocity(10000,500));
 
             for (int segment = 0; segment < numSegments; segment++)
@@ -101,7 +101,7 @@ namespace Min
             }
 
             fade.duration = params->getVelocity(2500, 100);
-            int numVisible = params->getAmount(1, numSegments);
+            int numVisible = params->getAmount(1, numSegments/3);
 
             for (int ribbe = 0; ribbe < numVisible; ribbe++)
             {
@@ -250,7 +250,11 @@ namespace Min
             if (!active && fade.getPhase() == 1)
                 return;
 
-            if (watcher.Triggered())
+            int beatDiv = params->getIntensity(0,4);
+            if (beatDiv >3) beatDiv =3;
+            int divs[] = {8,4,2,1};
+
+            if (watcher.Triggered() && Tempo::GetBeatNumber() % divs[beatDiv]==0)
                 fade.reset();
 
             float velocity = 100; // params->getVelocity(600, 100);
@@ -258,7 +262,7 @@ namespace Min
             for (int i = 0; i < width; i++)
             {
                 float fadePosition = fade.getValue((1 + map[i].z) * velocity);
-                RGBA color = params->getHighlightColour();
+                RGBA color = params->getSecondaryColour();
                 pixels[i] += color * fadePosition;
             }
         }
@@ -291,7 +295,7 @@ namespace Min
             {
                 if (index % density2 != 0)
                     continue;
-                pixels[perm.at[index]] = params->getHighlightColour() * lfo.getValue(float(index) / width) * transition.getValue(index, width);
+                pixels[perm.at[index]] = params->getSecondaryColour() * lfo.getValue(float(index) / width) * transition.getValue(index, width);
             }
         }
     };
