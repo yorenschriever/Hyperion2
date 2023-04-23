@@ -1,4 +1,5 @@
-import { html, useState, useEffect, createContext, useRef, useContext } from './preact-standalone.js'
+import { html, useState, createContext, useContext } from './preact-standalone.js'
+import { useSocket } from './useSocket.js'
 
 const set = (obj, path, value) => {
     if (!path || path == "") return value;
@@ -42,87 +43,46 @@ const SendMessage = createContext();
 
 export const ControllerApp = (props) => {
     const [state, setState] = useState(initialState);
-    const [socketState, setSocketState] = useState(WebSocket.CLOSED);
-    const socketRef = useRef();
 
-    useEffect(() => {
+    const resizeController = (columnIndex, slotIndex) => {
+        setState(state => {
+            if (columnIndex === undefined || state.columns.length > columnIndex)
+                return state;
 
-        const resizeController = (columnIndex, slotIndex) => {
-            setState(state => {
-                if (columnIndex === undefined || state.columns.length > columnIndex)
-                    return state;
+            return set(state, `columns.${columnIndex}`, defaultColumn)
+        })
+        setState(state => {
+            if (slotIndex === undefined || state.columns[columnIndex].slots.length > slotIndex)
+                return state;
 
-                return set(state, `columns.${columnIndex}`, defaultColumn)
-            })
-            setState(state => {
-                if (slotIndex === undefined || state.columns[columnIndex].slots.length > slotIndex)
-                    return state;
-
-                return set(state, `columns.${columnIndex}.slots.${slotIndex}`, defaultSlot)
-            })
-        }
-
-        let backoff = 500
-        const createSocket = () => {
-            const socket = new WebSocket(`wss://${location.host}:9800`);
-            setSocketState(socket.readyState);
-
-            socket.onmessage = wsmsg => {
-                backoff = 500;
-                const msg = JSON.parse(wsmsg.data);
-
-                resizeController(msg.columnIndex, msg.slotIndex)
-
-                if (msg.type == "onHubSlotActiveChange") {
-                    setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.active`, Boolean(msg.active)))
-                } else if (msg.type == "onHubSlotNameChange") {
-                    setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.name`, msg.name))
-                } else if (msg.type == "onHubColumnDimChange") {
-                    setState(state => set(state, `columns.${msg.columnIndex}.dim`, msg.dim))
-                } else if (msg.type == "onHubMasterDimChange") {
-                    setState(state => set(state, `masterDim`, msg.dim))
-                } else if (msg.type == "onHubParamChange") {
-                    setState(state => set(state, `params.${msg.param}`, msg.value))
-                } else if (msg.type == "onHubColumnNameChange") {
-                    setState(state => set(state, `columns.${msg.columnIndex}.name`, msg.name))
-                }
-            }
-
-            socket.onclose = (e) => {
-                backoff = Math.min(backoff * 1.5,15000)
-                console.log(`Socket is closed. Reconnect will be attempted in ${backoff} milliseconds.`, e.reason);
-                setTimeout(() => {
-                    createSocket()
-                }, backoff);
-            };
-            
-            socket.onerror = (err) => {
-                setSocketState(socket.readyState);
-                console.error('Socket encountered error: ', err.message, 'Closing socket');
-                socket.close();
-            };
-
-            socket.onopen = () => {
-                setSocketState(socket.readyState);
-            }
-
-            socketRef.current = socket;
-
-        }
-
-        createSocket();
-        return () => socketRef.current.close();
-    }, [])
-
-    const send = (msg) => {
-        //console.log('sending', msg)
-        socketRef.current.send(msg)
+            return set(state, `columns.${columnIndex}.slots.${slotIndex}`, defaultSlot)
+        })
     }
+
+    const [socketState, send] = useSocket(9800, msg => {
+        resizeController(msg.columnIndex, msg.slotIndex)
+
+        if (msg.type == "onHubSlotActiveChange") {
+            setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.active`, Boolean(msg.active)))
+        } else if (msg.type == "onHubSlotNameChange") {
+            setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.name`, msg.name))
+        } else if (msg.type == "onHubColumnDimChange") {
+            setState(state => set(state, `columns.${msg.columnIndex}.dim`, msg.dim))
+        } else if (msg.type == "onHubMasterDimChange") {
+            setState(state => set(state, `masterDim`, msg.dim))
+        } else if (msg.type == "onHubParamChange") {
+            setState(state => set(state, `params.${msg.param}`, msg.value))
+        } else if (msg.type == "onHubColumnNameChange") {
+            setState(state => set(state, `columns.${msg.columnIndex}.name`, msg.name))
+        }
+    })
+
 
     return html`
     <${SendMessage.Provider} value=${send}>
         <${SocketState} socketState=${socketState}/>
         <${Controller} state=${state} />
+        <${Tempo}/>
     </${SendMessage.Provider}>`;
 }
 
@@ -222,4 +182,23 @@ const ParamFader = ({ name, value }) => {
             <input type="range" min="0" max="255" value=${value} class="fader param" oninput=${handleChange}/>
         </div>
     `
+}
+
+const Tempo = () => {
+    const [source, setSource] = useState();
+    useSocket(9799, msg => {
+        console.log(msg);
+
+        const element = document.getElementById("tempo"); 
+        element.classList.remove("beat"); 
+        element.classList.remove("beat1"); 
+        
+        // trigger a DOM reflow 
+        void element.offsetWidth; 
+        
+        element.classList.add((msg.beatNr % 4==0)?"beat1":"beat");
+        setSource(msg.sourceName);
+    });
+
+    return html`<div class="tempo" id="tempo">Source: ${source}</div>`
 }

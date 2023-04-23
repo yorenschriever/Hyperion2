@@ -3,6 +3,7 @@
 #include "core/generation/controllers/midiControllerFactory.hpp"
 #include "core/generation/patterns/helpers/tempo/tapTempo.h"
 #include "core/generation/patterns/helpers/tempo/midiClockTempo.h"
+#include "core/generation/patterns/helpers/tempo/websocketTempo.h"
 #include "core/generation/patterns/helpers/tempo/tempo.h"
 #include "platform/includes/ethernet.hpp"
 #include "platform/includes/log.hpp"
@@ -122,6 +123,9 @@ private:
                 delete midiTempo;
             },
             this);
+
+        auto websocketTempo = new WebsocketTempo();
+        Tempo::AddListener(websocketTempo);
     }
 
     virtual void setup_midi()
