@@ -133,12 +133,12 @@ namespace Min
                 return;
 
             bool isLedster = width == 481;
-            bool isHalo = width==100;
+            bool isHalo = width==96;
             int segmentSize = isLedster ? 10 : 60;
             int numSegments = isLedster ? 36 : width / segmentSize;
 
             if (isHalo){
-                segmentSize = 100;
+                segmentSize = width;
                 numSegments = 1;
             }
 

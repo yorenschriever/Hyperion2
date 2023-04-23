@@ -185,7 +185,7 @@ const ParamFader = ({ name, value }) => {
 }
 
 const Tempo = () => {
-    const [source, setSource] = useState();
+    const [source, setSource] = useState("[none]");
     useSocket(9799, msg => {
         console.log(msg);
 
@@ -200,5 +200,5 @@ const Tempo = () => {
         setSource(msg.sourceName);
     });
 
-    return html`<div class="tempo" id="tempo">Source: ${source}</div>`
+    return html`<div class="tempo" id="tempo">Tempo source: ${source}</div>`
 }

@@ -32,9 +32,10 @@
 #include <iterator>
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 
+//op het ook een gamma van 1.8 het mooist, maar vanwege de kleur resolutie toch 1.4 gekozen
 LUT *ledsterLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
-LUT *columnsLut = new ColourCorrectionLUT(1, 255, 255, 255, 255);
-LUT *haloLut = new ColourCorrectionLUT(1, 255, 255, 255, 255);
+LUT *columnsLut = new ColourCorrectionLUT(1, 255, 200, 200, 200);
+LUT *haloLut = nullptr; //new ColourCorrectionLUT(1, 255, 255, 255, 255);
 
 auto cColumnMap3d = columnMap3d.toCylindricalRotate90();
 auto cLedsterMap3d = ledsterMap3d.toCylindricalRotate90();
@@ -132,6 +133,7 @@ void addLedsterPipe(Hyperion *hyp)
                 {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
                 {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(10,1)},
                 {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
+                {.column = 8, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
             }),
 
         new CloneOutput({
@@ -204,6 +206,7 @@ void addColumnPipes(Hyperion *hyp)
             {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
             {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(120,20)},
             {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            {.column = 8, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
         });
 
     auto splitInput = new InputSlicer(
@@ -237,10 +240,10 @@ void addColumnPipes(Hyperion *hyp)
         {.host = "hyperslave1.local", .port = 9612}, // rode punt
         {.host = "hyperslave1.local", .port = 9613}, // groene kolom
         {.host = "hyperslave1.local", .port = 9614}, // groene punt
-        {.host = "hyperslave2.local", .port = 9611}, // blauwe kolom
-        {.host = "hyperslave2.local", .port = 9612}, // blauwe punt
-        {.host = "hyperslave2.local", .port = 9613}, // azuur kolom
-        {.host = "hyperslave2.local", .port = 9614}, // azuur punt
+        {.host = "hyperslave5.local", .port = 9611}, // blauwe kolom
+        {.host = "hyperslave5.local", .port = 9612}, // blauwe punt
+        {.host = "hyperslave5.local", .port = 9613}, // azuur kolom
+        {.host = "hyperslave5.local", .port = 9614}, // azuur punt
         {.host = "hyperslave3.local", .port = 9611}, // paars kolom
         {.host = "hyperslave3.local", .port = 9612}, // paars punt
         {.host = "hyperslave3.local", .port = 9613}, // geel kolom
@@ -313,6 +316,7 @@ void addHaloPipe(Hyperion *hyp)
                 {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
                 {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(81,5)},
                 {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(haloMap3d.size())},
+                {.column = 8, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
             }),
 
         new CloneOutput(
@@ -328,35 +332,64 @@ void addPaletteColumn(Hyperion *hyp)
     auto paletteColumn = new PaletteColumn(
         &hyp->hub,
         0,
-        {
-            heatmap,
-            sunset1,
-            sunset3,
-            sunset4,
-            coralTeal,
-            greatBarrierReef,
+        {  
+
+
+            //             heatmap,
+            // sunset1,
+            // sunset3,
+            // sunset4,
+            // coralTeal,
+            // greatBarrierReef,
+            // campfire,
+            // tunnel,
+
+            // pinkSunset,
+            // salmonOnIce,
+            // blueOrange,
+            // purpleGreen,
+            // heatmap2,
+            // peach,
+            // deepBlueOcean,
+            // redSalvation,
+            // denseWater,
+            // plumBath,
+
+            // retro,
+            // candy,
+
+            // sunset2,
+            // sunset5,
+            // sunset6,
+            // sunset7,
+            // sunset8,
+
+
             campfire,
-            tunnel,
-
             pinkSunset,
-            salmonOnIce,
-            blueOrange,
-            purpleGreen,
+            sunset8,
+            heatmap,
             heatmap2,
-            peach,
-            deepBlueOcean,
-            redSalvation,
-            denseWater,
-            plumBath,
-
-            retro,
-            candy,
-
             sunset2,
-            sunset5,
+            retro,
             sunset6,
             sunset7,
-            sunset8,
+            sunset1,
+            coralTeal,
+            tunnel,
+            deepBlueOcean,
+            redSalvation,
+            plumBath,
+            sunset4,
+            candy,
+            sunset3,
+            greatBarrierReef,
+            blueOrange,
+            peach,       
+            denseWater,
+            purpleGreen,
+            sunset5,
+            salmonOnIce,
         });
     hyp->hub.subscribe(paletteColumn);
 }
