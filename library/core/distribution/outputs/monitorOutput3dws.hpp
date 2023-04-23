@@ -8,13 +8,14 @@
 #include "platform/includes/webServerResponseBuilder.hpp"
 #include "websocketOutput.hpp"
 #include <stdarg.h>
-
+#include "log.hpp"
 
 class PixelMapJson : public WebServerResponseBuilder
 {
     
     void build(WebServerResponseBuilder::Writer writer, void *userData) override
     {
+        //Log::info("","Building mapping json. ");
         write(userData, writer, "[\n");
         int outputIndex = 0;
         for (auto output : outputs)
@@ -38,12 +39,6 @@ public:
     {
         outputs.push_back({.map = map, .port = ++port});
         return port;
-    }
-    void begin()
-    {
-        if (begun)
-            return;
-        begun = true;
     }
 
 private:
@@ -85,7 +80,6 @@ public:
         WebsocketOutput::begin();
         server->addPath("/monitor/mapping.json",&pixelMapJson);
         //todo, handle case when different servers are passed for different instances
-        pixelMapJson.begin();
     }
 
 private:

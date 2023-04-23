@@ -8,7 +8,7 @@ class WebServerResponseBuilder;
 class WebServer
 {
 public:
-    static WebServer *createInstance(std::string doc_root = WEBSERVER_ROOT, int port = 443);
+    static WebServer *createInstance(std::string doc_root = WEBSERVER_ROOT, int port = 4430);
 
     virtual ~WebServer() = default;
 

@@ -139,6 +139,9 @@ namespace Max
             // float trail = params->getIntensity(0, 200);
             float fromCenter = params->getVariant() >= 0.5;
 
+            if (perm1.at ==0 || perm2.at==0)
+                return;
+
             for (int i = 0; i < map.size(); i++)
             {
                 // fade.duration = perm.at[i] * trail; // + 100;
