@@ -5,6 +5,7 @@
 #include "stdint.h"
 #include <algorithm>
 #include <vector>
+#include "generation/patterns/helpers/params.h"
 
 class ControlHub
 {

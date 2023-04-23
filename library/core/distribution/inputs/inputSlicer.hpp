@@ -9,15 +9,16 @@
 
 
 // InputSlicer is a more advanced version of input splitter. 
-// With this class you can freely assing start and end positions
-// of each slice
+// With this class you can freely assign start and end positions
+// of each slice. This means you can also skip parts of the buffer,
+// or use parts twice.
 class InputSlicer
 {
 
 public:
     /*
     * - sourceInput is the input to distribute over the destination inputs
-    * - length is in bytes, not in lights
+    * - start and length are in bytes, not in lights
     * - if sync is on, a new frame will not be loaded until all outputs have finished sending their data.
     * This is useful when the sourceInput is an input that generates data on demand instead of listening
     * to incoming data. Without sync it would generate a new frame when any of the destination outputs
@@ -84,7 +85,7 @@ public:
         return destinationInputs.size();
     }
 
-private:
+protected:
     Input *sourceInput = NULL;
     std::vector<BufferInput *> destinationInputs;
     static const int MTU = 1500 * 4 * 6;
