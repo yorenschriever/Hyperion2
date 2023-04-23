@@ -282,6 +282,7 @@ namespace Min
 
             // float density = 481./width;
             int density2 = width / 481;
+            if (width==96) density2=10;
             lfo.setPeriod(params->getVelocity(10000, 500));
             lfo.setPulseWidth(0.1);
             perm.setSize(width);

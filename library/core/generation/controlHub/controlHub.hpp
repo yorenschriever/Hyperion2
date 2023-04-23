@@ -267,6 +267,10 @@ public:
     void setFlashColumn(int columnIndex, bool flash=true, bool releaseColumn=false)
     {
         auto column = findColumn(columnIndex);
+        if (!column){
+            Log::error(TAG,"Cannot set column to flash mode");
+            return; 
+        }
         for(auto& slot: column->slots){
             slot.flash = flash;
             slot.releaseColumn = releaseColumn;
@@ -286,11 +290,11 @@ public:
 
     Slot *findSlot(int columnIndex, int slotIndex) &
     {
-        if (columnIndex < 0 || columnIndex > columns.size() - 1)
+        if (columnIndex < 0 || columnIndex > ((int)columns.size()) - 1)
             return nullptr;
         auto column = &columns.data()[columnIndex];
 
-        if (slotIndex < 0 || slotIndex > column->slots.size() - 1)
+        if (slotIndex < 0 || slotIndex > ((int)column->slots.size()) - 1)
             return nullptr;
 
         // Log::info(TAG, "find slot %d %d", columns.size(), column->slots.size());
@@ -300,16 +304,25 @@ public:
 
     Column *findColumn(int columnIndex) &
     {
-        if (columnIndex < 0 || columnIndex > columns.size() - 1)
+        if (columnIndex < 0 || columnIndex > ((int)columns.size()) - 1)
             return nullptr;
         return &columns.data()[columnIndex];
     }
 
     Slot *findSlot(Column *column, int slotIndex) &
     {
-        if (slotIndex < 0 || slotIndex > column->slots.size() - 1)
+        if (slotIndex < 0 || slotIndex > ((int)column->slots.size()) - 1)
             return nullptr;
 
         return &column->slots.data()[slotIndex];
+    }
+
+    void setColumnName(int columnIndex, const char* name){
+        auto col = findColumn(columnIndex);
+        if (!col){
+            Log::error(TAG,"Cannot set name of column %d", columnIndex);
+            return;
+        }
+        col->name = name;
     }
 };

@@ -64,15 +64,15 @@ int main()
     // select first palette
     hyp->hub.buttonPressed(0, 0);
 
-    hyp->hub.findColumn(0)->name = "Palette";
-    hyp->hub.findColumn(1)->name = "Max";
-    hyp->hub.findColumn(2)->name = "Min";
-    hyp->hub.findColumn(3)->name = "Low";
-    hyp->hub.findColumn(4)->name = "Mid";
-    hyp->hub.findColumn(5)->name = "Hi";
-    hyp->hub.findColumn(6)->name = "Halo";
-    hyp->hub.findColumn(7)->name = "Flash";
-    hyp->hub.findColumn(8)->name = "Debug";
+    hyp->hub.setColumnName(0,"Palette");
+    hyp->hub.setColumnName(1,"Max");
+    hyp->hub.setColumnName(2,"Min");
+    hyp->hub.setColumnName(3,"Low");
+    hyp->hub.setColumnName(4,"Mid");
+    hyp->hub.setColumnName(5,"Hi");
+    hyp->hub.setColumnName(6,"Halo");
+    hyp->hub.setColumnName(7,"Flash");
+    hyp->hub.setColumnName(8,"Debug");
 
     hyp->hub.setFlashColumn(7);
     hyp->hub.setFlashColumn(0, false, true);
@@ -333,38 +333,6 @@ void addPaletteColumn(Hyperion *hyp)
         &hyp->hub,
         0,
         {  
-
-
-            //             heatmap,
-            // sunset1,
-            // sunset3,
-            // sunset4,
-            // coralTeal,
-            // greatBarrierReef,
-            // campfire,
-            // tunnel,
-
-            // pinkSunset,
-            // salmonOnIce,
-            // blueOrange,
-            // purpleGreen,
-            // heatmap2,
-            // peach,
-            // deepBlueOcean,
-            // redSalvation,
-            // denseWater,
-            // plumBath,
-
-            // retro,
-            // candy,
-
-            // sunset2,
-            // sunset5,
-            // sunset6,
-            // sunset7,
-            // sunset8,
-
-
             campfire,
             pinkSunset,
             sunset8,
