@@ -182,7 +182,14 @@ namespace Max
             200, Transition::none, 0,
             1000, Transition::none, 0);
         PixelMap3d::Cylindrical map;
-        FadeDown fade = FadeDown(200, WaitAtEnd);
+        static const int numFades = 4;
+        int fadeNr=0;
+        FadeDown fade[numFades] = {
+            FadeDown(200, WaitAtEnd),
+            FadeDown(200, WaitAtEnd),
+            FadeDown(200, WaitAtEnd),
+            FadeDown(200, WaitAtEnd)
+        };
         BeatWatcher watcher = BeatWatcher();
 
     public:
@@ -197,26 +204,35 @@ namespace Max
             if (!transition.Calculate(active))
                 return;
 
-            if (watcher.Triggered())
+            int beatDiv = params->getVariant(0,4);
+            if (beatDiv >3) beatDiv =3;
+            int divs[] = {8,4,2,1};
+
+            if (watcher.Triggered() && Tempo::GetBeatNumber() % divs[beatDiv]==0)
             {
-                fade.reset();
+                fadeNr = (fadeNr+1)%numFades;
+                fade[fadeNr].reset();
                 // perm.permute();
             }
 
             // float density = 481./width;
-            float velocity = params->getVelocity(200, 30);
-            // float trail = params->getIntensity(0, 200);
+            float velocity = params->getVelocity(1000, 30);
+            float trail = params->getSize(40, 200);
+
+            for(int f=0;f<numFades; f++){
+                fade[f].duration = trail;
+            }
 
             for (int i = 0; i < map.size(); i++)
             {
-                fade.duration = 80; // trail + perm.at[i] / (density * map.size()/ 10);
+                //fade.duration = 80; // trail + perm.at[i] / (density * map.size()/ 10);
                 // if (perm.at[i] < density * map.size()/ 10)
                 //     fade.duration *= perm.at[i] * 4 / (density * map.size()/ 10);
-
-                float fadePosition = fade.getValue(abs(map[i].th) * velocity);
-                RGBA color = params->gradient->get(255 - abs(map[i].th) / M_PI * 255);
-                pixels[i] = color * fadePosition * (map[i].r * 1.5) * transition.getValue();
-                ;
+                for(int f=0;f<numFades; f++){
+                    float fadePosition = fade[f].getValue(abs(map[i].th) * velocity);
+                    RGBA color = params->gradient->get(255 - abs(map[i].th) / M_PI * 255);
+                    pixels[i] += color * fadePosition * (map[i].r * 1.5) * transition.getValue();
+                }
             }
         }
     };

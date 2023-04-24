@@ -9,8 +9,15 @@ static const char* TAG = "TEMPO";
 
 void Tempo::BroadcastBeat(AbstractTempo *source)
 {
-    // if (getActive() != source)
-    //     return;
+    //if we got a beat from a source that is currently not 
+    //selected as the active source, we ignore it
+    if (getActive() != source)
+        return;
+
+    const char* sourceName = SourceName();
+    int bearNr = GetBeatNumber();
+    for (auto listener : listeners)
+        listener->OnBeat(bearNr, sourceName);
     // UdpTempo::getInstance()->broadcastBeat();
 }
 
@@ -23,6 +30,16 @@ void Tempo::AddSource(AbstractTempo *source)
 void Tempo::RemoveSource(AbstractTempo *source)
 {
     sources.erase(source);
+}
+
+void Tempo::AddListener(TempoListener *listener)
+{
+    listeners.insert(listener);
+}
+
+void Tempo::RemoveListener(TempoListener *listener)
+{
+    listeners.erase(listener);
 }
 
 int Tempo::GetBeatNumber()
@@ -107,5 +124,6 @@ void Tempo::AlignPhrase()
 }
 
 std::set<AbstractTempo *> Tempo::sources;
+std::set<TempoListener *> Tempo::listeners;
 bool Tempo::threadStarted = false;
 int Tempo::phraseOffset = 0;

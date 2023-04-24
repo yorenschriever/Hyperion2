@@ -91,6 +91,7 @@ body {
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 10pt;
+    z-index:100;
 }
 
 .fader {
@@ -120,4 +121,44 @@ body {
     text-align: center;
     margin-bottom: 6px;  
     user-select: none;
+}
+
+.tempo {
+    width:120px;
+    height:50px;
+    background-color: #000000;
+    position:fixed;
+    bottom:32px;
+    right:32px;
+
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 10pt;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+    padding: 6px;
+
+    z-index: 101;
+}
+
+.beat {
+    animation-name: beat;
+}
+
+.beat1 {
+    animation-name: beat1;
+}
+
+@keyframes beat {
+    from {background-color: #c00;}
+    to {background-color: #000000;}
+}
+
+@keyframes beat1 {
+    from {background-color: #ccc;}
+    to {background-color: #000000;}
 }

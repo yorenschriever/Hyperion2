@@ -141,4 +141,34 @@ namespace TestPatterns
             }
         }
     };
+
+
+    class BrightnessMatch : public Pattern<RGBA>
+    {
+    public:
+        BrightnessMatch()
+        {
+            this->name = "Brightness match";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            int dimLedster = params->getOffset(0,255);
+            int dimStokken = params->getVariant(0,255);
+            int dimHalo = params->getIntensity(0,255);
+
+            RGB color;
+            if (width==481) color = Monochrome(dimLedster);
+            else if (width==96) color = Monochrome(dimHalo);
+            else color = Monochrome(dimStokken);
+
+            Log::info("BrightnessMatch", "Brightness Correction parameters:\tLedster=%d, \tStokken=%d, \tHalo=%d\t(remove existing correction first)", dimLedster, dimStokken, dimHalo);
+
+            for (int i = 0; i < width; i++)
+                pixels[i] = color;
+        }
+    };
 }

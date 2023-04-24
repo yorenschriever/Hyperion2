@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils.hpp"
+#include "tempoListener.h"
 #include <set>
 
 class AbstractTempo;
@@ -10,6 +11,9 @@ class Tempo
 public:
     static void AddSource(AbstractTempo *source);    
     static void RemoveSource(AbstractTempo *source);
+
+    static void AddListener(TempoListener *listener);
+    static void RemoveListener(TempoListener *listener);
 
     static int GetBeatNumber();
 
@@ -29,6 +33,7 @@ public:
 private:
     
     static std::set<AbstractTempo *> sources;
+    static std::set<TempoListener *> listeners;
     static bool threadStarted;
 
     static void startTaskThread();

@@ -3,6 +3,7 @@
 #include "core/generation/controllers/midiControllerFactory.hpp"
 #include "core/generation/patterns/helpers/tempo/tapTempo.h"
 #include "core/generation/patterns/helpers/tempo/midiClockTempo.h"
+#include "core/generation/patterns/helpers/tempo/websocketTempo.h"
 #include "core/generation/patterns/helpers/tempo/tempo.h"
 #include "platform/includes/ethernet.hpp"
 #include "platform/includes/log.hpp"
@@ -37,6 +38,7 @@ public:
         for (Pipe *pipe : pipes)
             pipe->in->begin();
 
+        Log::info("Hyperion", "Initialization complete. Starting main loop");
         //Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
         Thread::create(runTask, "run", Thread::Purpose::distribution, 30000, this, 1);
     }
@@ -122,6 +124,9 @@ private:
                 delete midiTempo;
             },
             this);
+
+        auto websocketTempo = new WebsocketTempo();
+        Tempo::AddListener(websocketTempo);
     }
 
     virtual void setup_midi()

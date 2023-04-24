@@ -103,16 +103,21 @@ namespace Hi
             if (!transition.Calculate(active))
                 return;
 
-            lfo.setPeriod(params->getVelocity(1000,400));
-            float phase = params->getVariant(45,45*2);
+            lfo.setPeriod(params->getVelocity(4000,400));
+            float phase = params->getOffset(0,45);
 
-            auto col = params->getPrimaryColour() * transition.getValue();
+            //auto col = params->getPrimaryColour() * transition.getValue();
+            int petalIndex=0;
             for (auto petal : LedsterShapes::petals)
             {
                 for (int j = 0; j < 45; j++)
                 {
-                    pixels[petal[j]] += col * lfo.getValue((float)j / phase);
+                    //auto col = params->gradient->get(255 * j / 45);
+                    float lfoVal = lfo.getValue((((float)j) + phase * petalIndex/6)/45.);
+                    auto col = params->gradient->get(255 * lfoVal);
+                    pixels[petal[j]] += col * lfoVal;
                 }
+                petalIndex++;
             }
         }
     };

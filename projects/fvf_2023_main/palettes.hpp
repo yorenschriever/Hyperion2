@@ -196,7 +196,7 @@ PaletteColumn::Palette retro{
 
 PaletteColumn::Palette coralTeal{
     .gradient = new Gradient({
-        {.position = 0, .color = RGB(0x3F7C85)},
+        {.position = 0, .color = darken(RGB(0x3F7C85),255)},
         {.position = 63, .color = RGB(0x00CCBF)},
         {.position = 200, .color = RGB(0x72F2EB)},
         {.position = 255, .color = RGB(0x747E7E)},

@@ -345,7 +345,7 @@ namespace Mid
         DoubleFlash(PixelMap3d::Cylindrical map)
         {
             this->map = map;
-            this->name = "Double flash 2/4";
+            this->name = "Double flash";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -355,7 +355,11 @@ namespace Mid
 
             timeline.FrameStart();
 
-            if (watcher.Triggered() && Tempo::GetBeatNumber() % 4 == 2)
+            int beatDiv = params->getAmount(0,4);
+            if (beatDiv >3) beatDiv =3;
+            int divs[] = {8,4,2,1};
+
+            if (watcher.Triggered() && Tempo::GetBeatNumber() % divs[beatDiv] == 0)
                 timeline.reset();
 
             if (!timeline.Happened(0) && !timeline.Happened(100))
