@@ -6,6 +6,7 @@
 #include "input.hpp"
 #include "bufferInput.hpp"
 #include "utils.hpp"
+#include "inputSlicer.hpp"
 
 // InputSplitter splits the input into separate inputs that can be used in different pipelines.
 // I wrote an InputSplitter instead of an OutputSplitter, so you have multiple pipes.
@@ -25,7 +26,7 @@ public:
     * requests new data.
     * If sync is false you basically sync to the input.
     */
-    InputSplitter(Input *sourceInput, std::vector<int> lengths, bool sync = false) : InputSlicer( sourceInput, {}, sync)
+    InputSplitter(Input *sourceInput, std::vector<int> lengths, bool sync = false) : InputSlicer( sourceInput, {})
     {
         int start = 0;
         for (int length : lengths)
@@ -33,6 +34,7 @@ public:
             auto bi = new BufferInput(this->buffer + start, length);
             bi->setCallbacks(LoadData, Begin, this);
             this->destinationInputs.push_back(bi);
+            this->slices.push_back({start,length,sync});
             start += length;
         }
     }
