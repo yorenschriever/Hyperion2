@@ -8,7 +8,7 @@ class Permute
 {
 
 private:
-    int size;
+    int size=-1;
 
 public:
     int *at = 0;
@@ -22,9 +22,7 @@ public:
     {
         if (size == this->size)
             return;
-        if (at)
-            delete at;
-        at = new int[size];
+        at = (int*) realloc(at, size * sizeof(int));
         this->size = size;
 
         order();
