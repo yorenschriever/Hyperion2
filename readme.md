@@ -19,6 +19,53 @@ Add these lines to include path of vscode plugin "microsoft c/c++ extension". (a
 ```
 Close your terminal (and reopen if you still need it)
 
+## Windows
+Open powershell session from Project root folder and execute the following lines in Powershell to add the necessary variables and functions permanently to your VSCode powershell profile (if not already present)
+```
+if (! (Test-Path $profile)) {
+    $profile_content = @()
+    $profile_content += '$HYPERION_LIB_DIR = "$($PWD.Path)\library"'
+    $profile_content += '. "$($HYPERION_LIB_DIR)\platform\docker\build.ps1"'
+    $profile_content | out-file -filepath $profile -force
+    . $profile
+}
+else {
+    $AddHyperionLibDir = $true
+    $AddBuildScript = $true
+    $profile_content = get-content $profile
+    foreach ($line in $profile_content) {
+        if ($line -like '*$HYPERION_LIB_DIR = "$($PWD.Path)\library"*' ) { $AddHyperionLibDir = $false }
+        if ($line -like '*. "$($HYPERION_LIB_DIR)\platform\docker\build.ps1"*' ) { $AddBuildScript = $false }
+    }
+
+    if ($AddHyperionLibDir -eq $true) { $profile_content += '$HYPERION_LIB_DIR = "$($PWD.Path)\library"'}
+    if ($AddBuildScript -eq $true) { $profile_content += '. "$($HYPERION_LIB_DIR)\platform\docker\build.ps1"'}
+    
+    $profile_content | out-file -filepath $profile -force
+    . $profile
+}
+
+```
+now you can cd into a project folder and build an enviroment:
+
+```
+cd .\projects\fvf_2023_main
+build docker
+run docker
+
+## To fix Line ending incompatibility:
+Change line ending default from CRLF to LF
+Commit all open commits first!!
+
+```
+git config core.autocrlf false
+git rm --cached -r .         # Don’t forget the dot at the end
+git reset --hard
+```
+
+
+
+
 ## Mac
 - brew install python3
 - pip3 install pyglet
