@@ -64,7 +64,7 @@ export const ControllerApp = (props) => {
 
         let backoff = 500
         const createSocket = () => {
-            const socket = new WebSocket(`wss://${location.host}:9800`);
+            const socket = new WebSocket(`wss://${location.hostname}:9800`);
             setSocketState(socket.readyState);
 
             socket.onmessage = wsmsg => {

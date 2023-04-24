@@ -14,8 +14,8 @@ namespace TestPatterns
     class ShowStarts : public Pattern<RGBA>
     {
     public:
-        int segmentSize;
-        ShowStarts(int segmentSize)
+        int segmentSize=1;
+        ShowStarts(int segmentSize=1)
         {
             this->segmentSize = segmentSize;
             this->name = "Mapping starts";
@@ -70,8 +70,8 @@ namespace TestPatterns
     class Palette : public Pattern<RGBA>
     {
     public:
-        int gradientSize;
-        int staticColorSize;
+        int gradientSize=10;
+        int staticColorSize=10;
         Palette(int gradientSize, int staticColorSize)
         {
             this->gradientSize = gradientSize;
@@ -110,7 +110,7 @@ namespace TestPatterns
     class Gamma : public Pattern<RGBA>
     {
     public:
-        int gradientSize;
+        int gradientSize=10;
         Gamma(int gradientSize)
         {
             this->gradientSize = gradientSize;

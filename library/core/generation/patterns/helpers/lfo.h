@@ -15,7 +15,7 @@ private:
     long starting_point = Utils::millis();
     float pulseWidth = 0.5;
     float skew = 1;
-    int period;
+    int period = 1000;
 
 public:
     LFO(int period=1000)

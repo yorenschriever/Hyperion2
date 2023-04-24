@@ -34,7 +34,7 @@ private:
 
     //FadeEase ease;
     //FadeDirection direction;
-    FadeWaitPosition waitPosition;
+    FadeWaitPosition waitPosition = WaitAtStart;
 
 public:
     /***
@@ -57,7 +57,7 @@ public:
         reset();
     }
 
-    unsigned int duration;
+    unsigned int duration = 1000;
 
     float getPhase() { return getPhase(0); }
     float getPhase(int startDelay)
