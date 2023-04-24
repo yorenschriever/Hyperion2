@@ -40,6 +40,18 @@ and reopen the shell
 
 # Build and run
 
+## WSL
+Install Docker for desktop on WIndows and enable WSL 2 integration with the current WSL distro you are using. This setting can be found in the Docker for Desktop settings. Then add your user in WSL to docker group
+```
+sudo groupadd docker
+sudo usermod -aG docker lennard
+sudo chmod 666 /var/run/docker.sock
+
+# cd into your project
+cd projects/fvf_2023_main
+build docker
+```
+
 ## Mac
 
 ```
