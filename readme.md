@@ -20,30 +20,12 @@ Add these lines to include path of vscode plugin "microsoft c/c++ extension". (a
 Close your terminal (and reopen if you still need it)
 
 ## Windows
-Open powershell session from Project root folder and execute the following lines in Powershell to add the necessary variables and functions permanently to your VSCode powershell profile (if not already present)
-```
-if (! (Test-Path $profile)) {
-    $profile_content = @()
-    $profile_content += '$HYPERION_LIB_DIR = "$($PWD.Path)\library"'
-    $profile_content += '. "$($HYPERION_LIB_DIR)\platform\docker\build.ps1"'
-    $profile_content | out-file -filepath $profile -force
-    . $profile
-}
-else {
-    $AddHyperionLibDir = $true
-    $AddBuildScript = $true
-    $profile_content = get-content $profile
-    foreach ($line in $profile_content) {
-        if ($line -like '*$HYPERION_LIB_DIR = "$($PWD.Path)\library"*' ) { $AddHyperionLibDir = $false }
-        if ($line -like '*. "$($HYPERION_LIB_DIR)\platform\docker\build.ps1"*' ) { $AddBuildScript = $false }
-    }
+After cloning repository, go to File Explorer >> Security >> Add Modify permissio
 
-    if ($AddHyperionLibDir -eq $true) { $profile_content += '$HYPERION_LIB_DIR = "$($PWD.Path)\library"'}
-    if ($AddBuildScript -eq $true) { $profile_content += '. "$($HYPERION_LIB_DIR)\platform\docker\build.ps1"'}
-    
-    $profile_content | out-file -filepath $profile -force
-    . $profile
-}
+Execute the script below in Powershell to add the necessary variables and functions permanently to your VSCode powershell profile (if not already present).
+```
+# This line works from project root folder.
+& .\library\scripts\setupWindows.ps1
 
 ```
 now you can cd into a project folder and build an enviroment:
