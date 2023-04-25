@@ -325,7 +325,7 @@ void addHaloPipe(Hyperion *hyp)
         {0, int(haloMap3d.size() * sizeof(RGBA)), false}
         });
 
-    hyp->addPipe(new ConvertPipe<RGBA, RGB>(
+    hyp->addPipe(new ConvertPipe<RGBA, RBG>(
         splitInput->getInput(0),
         new UDPOutput("haloslave.local", 9611, 60),
         haloLut));
