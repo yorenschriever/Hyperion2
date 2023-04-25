@@ -24,6 +24,7 @@ public:
         std::vector<Slot> slots;
         uint8_t dim = 255;
         std::string name = "";
+        bool forcedSelection = false;
     };
 
     uint8_t masterDim = 255;
@@ -51,32 +52,43 @@ public:
 
         // Log::info(TAG, "newvalue, slotactivated %d, %d", newValue, slot->activated);
 
-        if (newValue != slot->activated)
+        if (newValue == slot->activated)
+            return;
+        
+        auto col = findColumn(columnIndex);
+        if (newValue == false && col->forcedSelection)
         {
-            if (slot->releaseColumn)
+            int numberOn=0;
+            for(auto slot : col->slots)
+                numberOn += slot.activated?1:0;
+            if (numberOn==1)
+                return;
+        }
+
+        if (slot->releaseColumn)
+        {
+            int slot_off_index = 0;
+            // for(auto slot_off : findColumn(columnIndex)->slots.data()){
+            auto column = findColumn(columnIndex);
+            for (auto slot_it = column->slots.begin(); slot_it < column->slots.end(); ++slot_it)
             {
-                int slot_off_index = 0;
-                // for(auto slot_off : findColumn(columnIndex)->slots.data()){
-                auto column = findColumn(columnIndex);
-                for (auto slot_it = column->slots.begin(); slot_it < column->slots.end(); ++slot_it)
+                if (slot_it->activated)
                 {
-                    if (slot_it->activated)
-                    {
-                        slot_it->activated = false;
-                        int slotIndex = std::distance(column->slots.begin(), slot_it);
-                        for (auto controller : controllers)
-                            controller->onHubSlotActiveChange(columnIndex, slotIndex, false);
-                    }
+                    slot_it->activated = false;
+                    int slotIndex = std::distance(column->slots.begin(), slot_it);
+                    for (auto controller : controllers)
+                        controller->onHubSlotActiveChange(columnIndex, slotIndex, false);
                 }
             }
-
-            slot->activated = newValue;
-
-            // Log::info(TAG, "onHubSlotActiveChange %d", controllers.size());
-
-            for (auto controller : controllers)
-                controller->onHubSlotActiveChange(columnIndex, slotIndex, newValue);
         }
+
+        slot->activated = newValue;
+
+        // Log::info(TAG, "onHubSlotActiveChange %d", controllers.size());
+
+        for (auto controller : controllers)
+            controller->onHubSlotActiveChange(columnIndex, slotIndex, newValue);
+    
     }
 
     void buttonReleased(int columnIndex, int slotIndex)
@@ -275,6 +287,16 @@ public:
             slot.flash = flash;
             slot.releaseColumn = releaseColumn;
         }
+    }
+
+    void setForcedSelection(int columnIndex, bool force=true)
+    {
+        auto column = findColumn(columnIndex);
+        if (!column){
+            Log::error(TAG,"Cannot set column forced selection");
+            return; 
+        }
+        column->forcedSelection = force;
     }
 
     void setFlashRow(int rowIndex, bool flash=true, bool releaseColumn=false)

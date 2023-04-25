@@ -11,7 +11,7 @@
 class MidiControllerFactory
 {
 public:
-    static std::unique_ptr<MidiController> create(MidiDevice *device, std::string name, ControlHub *hub)
+    virtual std::unique_ptr<MidiController> create(MidiDevice *device, std::string name, ControlHub *hub)
     {
         if (name.compare("APC MINI")==0)
             return std::unique_ptr<ApcMiniController>(new ApcMiniController(hub, device));
