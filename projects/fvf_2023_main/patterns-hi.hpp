@@ -115,7 +115,7 @@ namespace Hi
                     //auto col = params->gradient->get(255 * j / 45);
                     float lfoVal = lfo.getValue((((float)j) + phase * petalIndex/6)/45.);
                     auto col = params->gradient->get(255 * lfoVal);
-                    pixels[petal[j]] += col * lfoVal;
+                    pixels[petal[j]] += col * lfoVal * transition.getValue();
                 }
                 petalIndex++;
             }
