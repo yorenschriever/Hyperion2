@@ -8,7 +8,7 @@ BUILDDIR="$BASEDIR/build/${TARGET}"
 if [ $TARGET = 'macos' ]; then
     PARAM="-DTARGET=${TARGET}"
 elif [ $TARGET = 'esp32' ] || [ $TARGET = 'esp32s3' ]; then
-    [ ! $IDF_PATH ] && echo "run get_idf first" && exit 1;
+    [ ! $IDF_PATH ] && . $HOME/repos/esp-idf/export.sh; #TODO get path from variable
     PARAM="-DCMAKE_TOOLCHAIN_FILE=$IDF_PATH/tools/cmake/toolchain-${TARGET}.cmake -DTARGET=${TARGET} -GNinja"
 else 
     echo "Invalid target: ${TARGET}"

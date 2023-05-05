@@ -19,7 +19,7 @@ void RMT::begin(unsigned int port)
 
     Log::info(TAG, "Create RMT TX channel");
     rmt_tx_channel_config_t tx_chan_config = {
-        .gpio_num = pinMapping[port-1],
+        .gpio_num = (gpio_num_t) pinMapping[port-1],
         .clk_src = RMT_CLK_SRC_DEFAULT, // select source clock
         .resolution_hz = RMT_LED_STRIP_RESOLUTION_HZ,
         .mem_block_symbols = 64, // increase the block size can make the LED less flickering

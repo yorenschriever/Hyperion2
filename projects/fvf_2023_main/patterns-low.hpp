@@ -81,7 +81,6 @@ namespace Low
 
             float velocity = params->getVelocity(2000, 100);
             float tailSize = params->getSize(300,50);
-            float density = 481. / width;
 
             for (int column = 0; column < 6; column++)
             {

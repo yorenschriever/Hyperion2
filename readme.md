@@ -36,7 +36,19 @@ and reopen the shell
 - Install esp idf following this
 [Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/get-started/linux-macos-setup.html)
 
-- Add the generated export.sh to ~/.zprofile TODO check if necessary, or if running it once is enough
+- Follow these steps to checkout version 5.1
+[Documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/versions.html#updating-release-branch)
+```
+cd $IDF_PATH
+git fetch
+git checkout release/v5.1
+git pull
+git submodule update --init --recursive
+```
+
+- I had to run `python esp-idf/tools/idf_tools.py install` after the update. This was mentioned in the error messages.
+
+- If you have built projects before, and now changed the esp-idf version number, you might need to delete the build folder in your project to get rid of errors.
 
 # Build and run
 

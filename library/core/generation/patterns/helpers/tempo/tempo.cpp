@@ -107,7 +107,7 @@ void Tempo::TempoTask(void *param)
 void Tempo::startTaskThread()
 {
     if (!threadStarted){
-        // Log::info(TAG, "Create tempo task");
+        Log::info(TAG, "Create tempo task");
         Thread::create(TempoTask, "TempoTask", Thread::Purpose::control, 5000,nullptr,1);
         threadStarted = true;
     }

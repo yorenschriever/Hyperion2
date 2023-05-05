@@ -153,8 +153,6 @@ namespace Min
             for (int segment = 0; segment < numSegments; segment++)
             {
                 int randomSegment = perm.at[segment];
-                int direction = segment % 2 == 0;
-                // todo direction
 
                 for (int j = 0; j < segmentSize; j++)
                 {

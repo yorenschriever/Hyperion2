@@ -67,8 +67,6 @@ public:
 
         if (slot->releaseColumn)
         {
-            int slot_off_index = 0;
-            // for(auto slot_off : findColumn(columnIndex)->slots.data()){
             auto column = findColumn(columnIndex);
             for (auto slot_it = column->slots.begin(); slot_it < column->slots.end(); ++slot_it)
             {
