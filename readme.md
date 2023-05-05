@@ -8,9 +8,11 @@ git clone https://github.com/yorenschriever/Hyperion2.git
 Add these lines to your  ~/.zprofile (and change the path to your folder)
 ```
 export BOOST_DIR=/Users/yoren/repos/boost_1_81_0
-export HYPERION_LIB_DIR=/Users/yoren/repos/Hyperion2/library
-alias build='$HYPERION_LIB_DIR/scripts/build.sh'
-alias run='$HYPERION_LIB_DIR/scripts/run.sh'
+#export HYPERION_LIB_DIR=/Users/yoren/repos/Hyperion2/library
+#alias build='$HYPERION_LIB_DIR/scripts/build.sh'
+#alias run='$HYPERION_LIB_DIR/scripts/run.sh'
+
+/Users/yoren/repos/Hyperion2/library/scripts/export.sh
 ```
 Add these lines to include path of vscode plugin "microsoft c/c++ extension". (also change the path here)
 ```

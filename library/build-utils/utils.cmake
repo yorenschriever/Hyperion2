@@ -16,22 +16,19 @@ macro(hyperion_before)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
     set(CMAKE_CXX_FLAGS "-O2")
 
-    if (NOT ("${TARGET}" STREQUAL "macos" OR "${TARGET}" STREQUAL "docker"))
+    if (NOT ("${TARGET}" STREQUAL "macos" OR "${TARGET}" STREQUAL "linux"))
         config_esp()
     endif()
 endmacro()
 
 macro(hyperion_after)
-    if ("${TARGET}" STREQUAL "macos")
-        config_macos()
-    endif ()
-    if ("${TARGET}" STREQUAL "docker")
-        config_macos()
+    if ("${TARGET}" STREQUAL "macos" OR "${TARGET}" STREQUAL "linux")
+        config_unix()
     endif ()
 endmacro()
 
 
-macro(config_macos)
+macro(config_unix)
     add_executable(${PROJECT} "main.cpp")
 
     message("adding subdir $ENV{HYPERION_LIB_DIR}")
