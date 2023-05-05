@@ -30,8 +30,9 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include "palette-midi.hpp"
 
-// op het ook een gamma van 1.8 het mooist, maar vanwege de kleur resolutie toch 1.4 gekozen
+// op het oog is een gamma van 1.8 het mooist, maar vanwege de kleur resolutie toch 1.4 gekozen
 LUT *ledsterLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
 LUT *columnsLut = new ColourCorrectionLUT(1, 255, 200, 200, 200);
 LUT *haloLut = nullptr; // new ColourCorrectionLUT(1, 255, 255, 255, 255);
@@ -75,6 +76,9 @@ int main()
 
     hyp->hub.setFlashColumn(7);
     hyp->hub.setFlashColumn(0, false, true);
+    hyp->hub.setForcedSelection(0);
+
+    hyp->midiControllerFactory = new MidiControllerFactoryFvf();
 
     hyp->start();
     while (1)
@@ -151,9 +155,6 @@ void addLedsterPipe(Hyperion *hyp)
 
 void addColumnPipes(Hyperion *hyp)
 {
-    // Generate 1 pattern, and split it up in six outputs,
-    // because UDPOutput is limited by a maximum transfer size of 2*1440 bytes
-
     auto columnsInput = new ControlHubInput<RGBA>(
         columnMap3d.size(),
         &hyp->hub,
@@ -212,6 +213,8 @@ void addColumnPipes(Hyperion *hyp)
             {.column = 8, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
         });
 
+    // Create 1 inout and split it up in 12,
+    // because UDPOutput is limited by a maximum transfer size of 2*1440 bytes
     auto splitInput = new InputSlicer(
         columnsInput,
         {{0 * sizeof(RGBA), 360 * sizeof(RGBA), true},
@@ -370,3 +373,4 @@ void addPaletteColumn(Hyperion *hyp)
         });
     hyp->hub.subscribe(paletteColumn);
 }
+

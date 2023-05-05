@@ -1,3 +1,4 @@
+#pragma once
 #include "core/distribution/pipes/pipe.hpp"
 #include "core/generation/controllers/midiController.hpp"
 #include "core/generation/controllers/midiControllerFactory.hpp"
@@ -58,6 +59,7 @@ public:
     }
 
     ControlHub hub;
+    MidiControllerFactory *midiControllerFactory = nullptr;
 private:
     virtual void check_safe_mode()
     {
@@ -131,18 +133,22 @@ private:
 
     virtual void setup_midi()
     {
+        if (midiControllerFactory == nullptr){
+            midiControllerFactory = new MidiControllerFactory();
+        }
+
         Midi::initialize();
         Midi::onDeviceCreatedDestroyed(
             [](MidiDevice *device, std::string name, void *userData)
             {
                 auto hyp = (Hyperion *)userData;
-                auto controller = MidiControllerFactory::create(device, name, &hyp->hub);
+                auto controller = hyp->midiControllerFactory->create(device, name, &hyp->hub);
                 hyp->midiControllers.insert({device, std::move(controller)});
             },
             [](MidiDevice *device, std::string name, void *userData)
             {
                 auto hyp = (Hyperion *)userData;
-                //because midiControllers contains a smart pointer to the midiDevice
+                //because midiController contains a smart pointer to the midiDevice
                 //this will also automatically delete the device
                 hyp->midiControllers.erase(device);
             },
