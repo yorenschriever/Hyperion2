@@ -35,7 +35,7 @@ elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ]; then
 elif [ $TARGET = 'esp32' ]; then
     PORT=${2:-$(ls /dev/tty.usbserial*)}
 
-    [ ! $IDF_PATH ] && . $HOME/repos/esp-idf/export.sh; #TODO get path from variable
+    [ ! $IDF_PATH ] && . $IDF_DIR/export.sh; 
 
     cd ${BASEDIR}/build/${TARGET}
     python3 $IDF_PATH/components/esptool_py/esptool/esptool.py -p ${PORT} -b 460800 write_flash @flash_project_args

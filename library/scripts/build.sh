@@ -31,7 +31,7 @@ elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ]; then
     PARAM="-DTARGET=${TARGET}"
 
 elif [ $TARGET = 'esp32' ] || [ $TARGET = 'esp32s3' ]; then
-    [ ! $IDF_PATH ] && . $HOME/repos/esp-idf/export.sh; #TODO get path from variable
+    [ ! $IDF_PATH ] && . $IDF_DIR/export.sh; 
     PARAM="-DCMAKE_TOOLCHAIN_FILE=$IDF_PATH/tools/cmake/toolchain-${TARGET}.cmake -DTARGET=${TARGET} -GNinja"
     
 else 
