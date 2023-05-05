@@ -857,7 +857,6 @@ namespace json
 			{
 				for (size_t i = 0; i < this->source.size(); i++) if (this->source.data.at(i).first == key) return this->source.data.at(i).second;
 				throw json::invalid_key(key);
-				return "";
 			}
 
 		public:
