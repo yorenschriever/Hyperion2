@@ -29,6 +29,7 @@ class WebServerMacOs : public WebServer
 public:
     WebServerMacOs(std::string root, int port)
     {
+        Log::info(TAG, "Starting web server on port %d. root=%s", port, root.c_str());
         auto const doc_root = std::make_shared<std::string>(root);
         std::thread{std::bind(
                         &start_server,
@@ -56,6 +57,8 @@ private:
         std::map<std::string, WebServerResponseBuilder *> *paths,
         std::shared_ptr<std::string const> const &doc_root)
     {
+        //Log::info(TAG, "Starting server");
+
         try
         {
             // Check command line arguments.
@@ -104,6 +107,8 @@ private:
         std::shared_ptr<std::string const> const &doc_root,
         std::map<std::string, WebServerResponseBuilder *> *paths)
     {
+        //Log::info(TAG, "Starting session");
+
         beast::error_code ec;
 
         // Construct the stream around the socket
@@ -133,11 +138,14 @@ private:
                 return;
             }
 
+            std::string response_buffer="";
+
             // Handle request
             http::message_generator msg =
                 handle_request(
                     *doc_root,
                     paths,
+                    &response_buffer,
                     std::move(req));
 
             // Determine if we should close the connection
@@ -176,6 +184,7 @@ private:
     handle_request(
         beast::string_view doc_root,
         std::map<std::string, WebServerResponseBuilder *> *paths,
+        std::string *response_buffer,
         http::request<Body, http::basic_fields<Allocator>> &&req)
     {
         // Returns a bad request response
@@ -240,20 +249,20 @@ private:
             res.set(http::field::server, "Beast");
             res.set(http::field::transfer_encoding, "chunked");
 
-            std::string response_buffer;
-
             auto const builderWriter =
-                [](char *buffer, int size, void *userData) -> void
+                [](const char *buffer, int size, void *userData) -> void
             {
                 auto response_buffer = (std::string *)userData;
                 response_buffer->append(buffer, size);
             };
 
             auto builder = (*paths)[str_target];
-            builder->build(builderWriter, (void *)&response_buffer);
-            int body_size = response_buffer.size();
+            builder->build(builderWriter, (void *)response_buffer);
+            int body_size = response_buffer->size();
 
-            res.body().data = (void *)response_buffer.c_str();
+            //Log::info("","response = %s", response_buffer->c_str());
+
+            res.body().data = (void *)response_buffer->c_str();
             res.body().size = body_size;
             res.body().more = false;
 

@@ -21,7 +21,7 @@ export class Websocket {
             let backoff = 500;
             let delay=0;
             const createSocket =  () => {
-                let socket = new WebSocket(`wss://${location.host}:${scenePart.port}`);
+                let socket = new WebSocket(`wss://${location.hostname}:${scenePart.port}`);
             
                 socket.onmessage = async msg => {
                     backoff = 500;

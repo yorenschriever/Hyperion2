@@ -8,9 +8,11 @@ git clone https://github.com/yorenschriever/Hyperion2.git
 Add these lines to your  ~/.zprofile (and change the path to your folder)
 ```
 export BOOST_DIR=/Users/yoren/repos/boost_1_81_0
-export HYPERION_LIB_DIR=/Users/yoren/repos/Hyperion2/library
-alias build='$HYPERION_LIB_DIR/scripts/build.sh'
-alias run='$HYPERION_LIB_DIR/scripts/run.sh'
+#export HYPERION_LIB_DIR=/Users/yoren/repos/Hyperion2/library
+#alias build='$HYPERION_LIB_DIR/scripts/build.sh'
+#alias run='$HYPERION_LIB_DIR/scripts/run.sh'
+
+/Users/yoren/repos/Hyperion2/library/scripts/export.sh
 ```
 Add these lines to include path of vscode plugin "microsoft c/c++ extension". (also change the path here)
 ```
@@ -18,6 +20,35 @@ Add these lines to include path of vscode plugin "microsoft c/c++ extension". (a
 /Users/yoren/repos/Hyperion2/library
 ```
 Close your terminal (and reopen if you still need it)
+
+## Windows
+After cloning repository, go to File Explorer >> Security >> Add Modify permissio
+
+Execute the script below in Powershell to add the necessary variables and functions permanently to your VSCode powershell profile (if not already present).
+```
+# This line works from project root folder.
+& .\library\scripts\setupWindows.ps1
+
+```
+now you can cd into a project folder and build an enviroment:
+
+```
+cd .\projects\fvf_2023_main
+build docker
+run docker
+
+## To fix Line ending incompatibility:
+Change line ending default from CRLF to LF
+Commit all open commits first!!
+
+```
+git config core.autocrlf false
+git rm --cached -r .         # Don’t forget the dot at the end
+git reset --hard
+```
+
+
+
 
 ## Mac
 - brew install python3
@@ -51,6 +82,18 @@ git submodule update --init --recursive
 - If you have built projects before, and now changed the esp-idf version number, you might need to delete the build folder in your project to get rid of errors.
 
 # Build and run
+
+## WSL
+Install Docker for desktop on WIndows and enable WSL 2 integration with the current WSL distro you are using. This setting can be found in the Docker for Desktop settings. Then add your user in WSL to docker group
+```
+sudo groupadd docker
+sudo usermod -aG docker lennard
+sudo chmod 666 /var/run/docker.sock
+
+# cd into your project
+cd projects/fvf_2023_main
+build docker
+```
 
 ## Mac
 

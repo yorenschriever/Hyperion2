@@ -17,8 +17,8 @@ namespace Min
     {
         Transition transition;
         const int segmentSize = 60;
-        int averagePeriod;
-        float precision;
+        int averagePeriod=10000;
+        float precision=1;
         LFO<T> lfo = LFO<T>();
         Permute perm;
 

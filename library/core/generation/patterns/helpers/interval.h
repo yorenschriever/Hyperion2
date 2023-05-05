@@ -33,9 +33,9 @@ public:
     }
 
 protected:
-    unsigned long lastTime;
-    int currentDuration;
-    int averageInterval;
+    unsigned long lastTime =0;
+    int currentDuration = 100;
+    int averageInterval = 1000;
 };
 
 class ConstantInterval

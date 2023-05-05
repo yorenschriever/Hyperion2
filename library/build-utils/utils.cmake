@@ -12,25 +12,26 @@ macro(hyperion_before)
     message("Hyperion lib dir $ENV{HYPERION_LIB_DIR}")
     message("Target: ${TARGET}")
 
-    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
     set(CMAKE_CXX_FLAGS "-O2")
 
-    if (NOT "${TARGET}" STREQUAL "macos")
+    if (NOT ("${TARGET}" STREQUAL "macos" OR "${TARGET}" STREQUAL "linux"))
         config_esp()
     endif()
 endmacro()
 
 macro(hyperion_after)
-    if ("${TARGET}" STREQUAL "macos")
-        config_macos()
+    if ("${TARGET}" STREQUAL "macos" OR "${TARGET}" STREQUAL "linux")
+        config_unix()
     endif ()
 endmacro()
 
 
-macro(config_macos)
+macro(config_unix)
     add_executable(${PROJECT} "main.cpp")
 
+    message("adding subdir $ENV{HYPERION_LIB_DIR}")
     add_subdirectory($ENV{HYPERION_LIB_DIR} "hyperion")
     target_link_libraries(${PROJECT} PUBLIC Hyperion)
     target_include_directories(${PROJECT} PUBLIC $ENV{HYPERION_LIB_DIR})

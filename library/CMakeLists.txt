@@ -49,10 +49,14 @@ else ()
 
     find_package(OpenSSL REQUIRED)
 
-    set(RTMIDI_BUILD_TESTING OFF)
-    add_subdirectory($ENV{HYPERION_LIB_DIR}/platform/${TARGET}/rtmidi "rtmidi")
-    target_link_libraries(Hyperion PUBLIC rtmidi OpenSSL::SSL)
-    target_include_directories(Hyperion PUBLIC $ENV{HYPERION_LIB_DIR}/platform/${TARGET}/rtmidi)
+    if ("${TARGET}" STREQUAL "macos")
+        set(RTMIDI_BUILD_TESTING OFF)
+        add_subdirectory($ENV{HYPERION_LIB_DIR}/platform/${TARGET}/rtmidi "rtmidi")
+        target_include_directories(Hyperion PUBLIC $ENV{HYPERION_LIB_DIR}/platform/${TARGET}/rtmidi)
+        set(RTMIDI "rtmidi")
+    endif()
+
+    target_link_libraries(Hyperion PUBLIC ${RTMIDI} OpenSSL::SSL)
     target_include_directories(Hyperion PRIVATE $ENV{BOOST_DIR})
 
     #create header files for the certificate and key, so we can import them

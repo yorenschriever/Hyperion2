@@ -9,7 +9,7 @@ export const useSocket = (port, onMessage) =>
     useEffect(() => {
         let backoff = 500
         const createSocket = () => {
-            const socket = new WebSocket(`wss://${location.host}:${port}`);
+            const socket = new WebSocket(`wss://${location.hostname}:${port}`);
             setSocketState(socket.readyState);
 
             socket.onmessage = wsmsg => {

@@ -68,8 +68,8 @@ public:
     }
 
 protected:
-    unsigned long startingpoint;
-    int duration;
-    unsigned int startInterval;
+    unsigned long startingpoint=0;
+    int duration=1000;
+    unsigned int startInterval =0;
     unsigned int endInterval = 0;
 };
