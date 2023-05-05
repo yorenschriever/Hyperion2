@@ -65,6 +65,8 @@ and reopen the shell
 - Install esp idf following this
 [Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/get-started/linux-macos-setup.html)
 
+- Update IDF_DIR in ~/.zprofile
+
 - Follow these steps to checkout version 5.1
 [Documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/versions.html#updating-release-branch)
 ```
