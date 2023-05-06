@@ -18,15 +18,18 @@ public:
     void setBpm(int bpm)
     {
         period = 60000000 / bpm;
-        startingpoint = Utils::micros();
+        Log::info(TAG,"Setting constant tempo to %d BPM",bpm);
+        //The next 2 lines should be in reverse order, but if i do that, i get a 
+        //segfault on docker om my M1 machine. I dont understand why.
         validSignal = true;
+        startingpoint = Utils::micros();
     }
 
     friend class Tempo;
 
 private:
     int period = DEFAULT_PERIOD;
-    unsigned long startingpoint;
+    unsigned long startingpoint = -1;
     const char *TAG = "CONSTANT_TEMPO";
 
     void TempoTask() override
@@ -36,7 +39,7 @@ private:
 
         int newBeatNr = (Utils::micros() - startingpoint) / period;
 
-        //Log::info(TAG, "ConstantTempoTask: %d", newBeatNr);
+        // Log::info(TAG, "ConstantTempoTask: %d", newBeatNr);
 
         if (newBeatNr != beatNumber)
             beat(newBeatNr, period / 1000, false); // use the beat locally, but don't broadcast it.

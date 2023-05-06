@@ -10,10 +10,10 @@ int main()
 {
     auto hyp = new Hyperion();
 
-    Tempo::AddSource(new ConstantTempo(120));
-
     addHaloPipe(hyp);
     addPaletteColumn(hyp);
+
+    Tempo::AddSource(new ConstantTempo(120));
 
     // auto select first palette
     hyp->hub.buttonPressed(0, 0);
