@@ -1,7 +1,7 @@
 #include "colours.h"
 #include "core/distribution/inputs/inputSlicer.hpp"
 #include "core/distribution/luts/colourCorrectionLut.hpp"
-#include "core/distribution/outputs/monitorOutput3dws.hpp"
+#include "core/distribution/outputs/monitorOutput3d.hpp"
 #include "core/distribution/outputs/udpOutput.hpp"
 #include "core/distribution/pipes/convertPipe.hpp"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"
@@ -46,8 +46,6 @@ void addColumnPipes(Hyperion *hyp);
 void addHaloPipe(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
 
-auto serv = WebServer::createInstance();
-
 int main()
 {
     auto hyp = new Hyperion();
@@ -56,8 +54,6 @@ int main()
     addLedsterPipe(hyp);
     addHaloPipe(hyp);
     addPaletteColumn(hyp);
-
-    hyp->hub.subscribe(new WebsocketController(&hyp->hub));
 
     Tempo::AddSource(new ConstantTempo(120));
 
@@ -150,7 +146,7 @@ void addLedsterPipe(Hyperion *hyp)
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(1),
-        new MonitorOutput3dws(ledsterMap3d, serv)));
+        new MonitorOutput3d(ledsterMap3d)));
 }
 
 void addColumnPipes(Hyperion *hyp)
@@ -259,12 +255,7 @@ void addColumnPipes(Hyperion *hyp)
     {
         auto pipe = new ConvertPipe<RGBA, RGB>(
             splitInput->getInput(i),
-            // new CloneOutput({
-            // new MonitorOutput3dws(splitMap.getMap(i), serv),
-            // new MonitorOutput3d(splitMap.getMap(i)),
-            new UDPOutput(slaves[i].host, slaves[i].port, 60)
-            //}),
-            ,
+            new UDPOutput(slaves[i].host, slaves[i].port, 60),
             columnsLut);
         hyp->addPipe(pipe);
     }
@@ -272,7 +263,7 @@ void addColumnPipes(Hyperion *hyp)
     hyp->addPipe(
         new ConvertPipe<RGBA, RGB>(
             splitInput->getInput(12),
-            new MonitorOutput3dws(columnMap3d, serv)));
+            new MonitorOutput3d(columnMap3d)));
 }
 
 void addHaloPipe(Hyperion *hyp)
@@ -335,7 +326,7 @@ void addHaloPipe(Hyperion *hyp)
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(1),
-        new MonitorOutput3dws(haloMap3d, serv)));
+        new MonitorOutput3d(haloMap3d)));
 }
 
 void addPaletteColumn(Hyperion *hyp)

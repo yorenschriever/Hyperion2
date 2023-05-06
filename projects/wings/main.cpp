@@ -43,21 +43,12 @@ int main()
   Tempo::AddSource(new ConstantTempo(120));
 
   hyp->hub.buttonPressed(0, 0);
-  hyp->hub.buttonPressed(1, 7);
 
   hyp->start();
 
   while (1)
     Thread::sleep(1000);
 }
-
-#if ESP_PLATFORM
-#define OUT_COLOR GRB
-#define OUTPUT new NeopixelOutput(1)
-#else
-#define OUT_COLOR RGB
-#define OUTPUT new MonitorOutput(wingMap)
-#endif
 
 void addWingsPipe(Hyperion *hyp)
 {
@@ -69,8 +60,6 @@ void addWingsPipe(Hyperion *hyp)
           wingMap.size(),
           &hyp->hub,
           {
-              {.column = 1, .slot = 7, .pattern = new PaletteTester(ledsterMap)},
-
               // static
               {.column = 1, .slot = 0, .pattern = new HorizontalGradientPattern(wingMap)},
               {.column = 1, .slot = 1, .pattern = new RadialGradientPattern(pWingMap)},

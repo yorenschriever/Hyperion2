@@ -4,7 +4,7 @@
 using namespace std;
 
 #include "LedShape.h"
-#include "generation/patterns/helpers/palette.hpp"
+#include "core/gradient.hpp"
 #include "colours.h"
 #include <stdint.h>
 

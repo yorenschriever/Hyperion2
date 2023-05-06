@@ -38,4 +38,4 @@ public:
             start += length;
         }
     }
-}
+};

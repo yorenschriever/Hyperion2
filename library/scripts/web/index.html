@@ -2,17 +2,7 @@
     <head>
         <link rel="stylesheet" href="controller/controller.css">
         <style>
-            #monitor {
-                /* position:absolute;
-                right:16px;
-                bottom:16px;
-                / * border-radius: 8px; * /
-                width: 50%;
-                height: 50%;
-                resize:both;
-                border: 1px solid #444; */
-
-                /* position: absolute; */
+            .monitor {
                 position: fixed;
                 right:16px;
                 bottom: 16px;
@@ -27,14 +17,26 @@
         <title>Controller - Hyperion</title>
         <script type="module">
             import { ControllerApp } from "./controller/controller.js"
-            import { html, render } from './controller/preact-standalone.js'
+            import { html, render } from './common/preact-standalone.js'
 
             render(html`<${ControllerApp}/>`, document.getElementById('controller'));
+
+            import scene2d from "./monitor2d/mapping.json" assert { type: "json" };
+            import scene3d from "./monitor/mapping.json" assert { type: "json" };
+
+            const createIframe = (url) => {
+                const iframe = document.createElement("iframe");
+                iframe.src = url
+                iframe.className = "monitor"
+                document.body.appendChild(iframe)
+            }
+
+            if (scene2d.length) createIframe("./monitor2d/")
+            if (scene3d.length) createIframe("./monitor/")
+
         </script>
     </head>
-    <body>
-        
-        <iframe src="./monitor/index.html" id="monitor"></iframe>
+    <body>        
         <div id="controller"></div>
     </body>
 </html>

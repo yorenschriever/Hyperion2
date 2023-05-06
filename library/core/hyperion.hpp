@@ -1,16 +1,27 @@
 #pragma once
+#include "core/distribution/outputs/monitorOutput3d.hpp"
+#include "core/distribution/outputs/monitorOutput.hpp"
+#include "core/distribution/pipes/convertPipe.hpp"
 #include "core/distribution/pipes/pipe.hpp"
 #include "core/generation/controllers/midiController.hpp"
 #include "core/generation/controllers/midiControllerFactory.hpp"
-#include "core/generation/patterns/helpers/tempo/tapTempo.h"
+#include "core/generation/patterns/helpers/tempo/constantTempo.h"
 #include "core/generation/patterns/helpers/tempo/midiClockTempo.h"
-#include "core/generation/patterns/helpers/tempo/websocketTempo.h"
+#include "core/generation/patterns/helpers/tempo/tapTempo.h"
 #include "core/generation/patterns/helpers/tempo/tempo.h"
+#include "core/generation/patterns/helpers/tempo/websocketTempo.h"
+#include "core/generation/pixelMap.hpp"
+#include "distribution/inputs/controlHubInput.hpp"
+#include "generation/controlHub/paletteColumn.hpp"
+#include "generation/controlHub/websocketController.hpp"
 #include "platform/includes/ethernet.hpp"
 #include "platform/includes/log.hpp"
 #include "platform/includes/midi.hpp"
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
+#include "webServer.hpp"
+#include "webServerResponseBuilder.hpp"
+#include "websocketServer.hpp"
 #include <memory>
 #include <vector>
 
@@ -28,6 +39,7 @@ public:
         setup_display();
         setup_midi();
         setup_tempo();
+        setup_web();
 
         Log::info("HYP", "starting outputs");
         for (Pipe *pipe : pipes)
@@ -40,7 +52,7 @@ public:
             pipe->in->begin();
 
         Log::info("Hyperion", "Initialization complete. Starting main loop");
-        //Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
+        // Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
         Thread::create(runTask, "run", Thread::Purpose::distribution, 30000, this, 1);
     }
 
@@ -59,7 +71,9 @@ public:
     }
 
     ControlHub hub;
+    WebServer *webServer;
     MidiControllerFactory *midiControllerFactory = nullptr;
+
 private:
     virtual void check_safe_mode()
     {
@@ -133,7 +147,8 @@ private:
 
     virtual void setup_midi()
     {
-        if (midiControllerFactory == nullptr){
+        if (midiControllerFactory == nullptr)
+        {
             midiControllerFactory = new MidiControllerFactory();
         }
 
@@ -148,11 +163,22 @@ private:
             [](MidiDevice *device, std::string name, void *userData)
             {
                 auto hyp = (Hyperion *)userData;
-                //because midiController contains a smart pointer to the midiDevice
-                //this will also automatically delete the device
+                // because midiController contains a smart pointer to the midiDevice
+                // this will also automatically delete the device
                 hyp->midiControllers.erase(device);
             },
             this);
+    }
+
+    virtual void setup_web()
+    {
+        Log::info(TAG, "Setup web");
+        webServer = WebServer::createInstance();
+
+        MonitorOutput3d::addPathToServer(webServer);
+        MonitorOutput::addPathToServer(webServer);
+
+        hub.subscribe(new WebsocketController(&hub));
     }
 
     static void UpdateDisplayTask(void *parameter)
@@ -241,5 +267,6 @@ private:
 
     std::vector<Pipe *> pipes;
     std::map<MidiDevice *, std::unique_ptr<MidiController>> midiControllers;
-    std::map<MidiDevice *, MidiClockTempo*> midiClockTempos;
+    std::map<MidiDevice *, MidiClockTempo *> midiClockTempos;
+    const char *TAG = "Hyperion";
 };

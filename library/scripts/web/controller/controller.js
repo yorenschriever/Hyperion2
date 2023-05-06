@@ -1,5 +1,5 @@
-import { html, useState, createContext, useContext } from './preact-standalone.js'
-import { useSocket } from './useSocket.js'
+import { html, useState, createContext, useContext } from '../common/preact-standalone.js'
+import { useSocket } from '../common/useSocket.js'
 
 const set = (obj, path, value) => {
     if (!path || path == "") return value;
