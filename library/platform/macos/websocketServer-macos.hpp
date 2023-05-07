@@ -284,6 +284,7 @@ private:
     void insertClient(WS * client){
         mtx.lock();
         clients.insert(client);
+        //Log::info(TAG,"Websocket client connected. clients: %d",clients.size());
         mtx.unlock();
     }
 
@@ -292,6 +293,7 @@ private:
             return;
         mtx.lock();
         clients.erase(client);
+        //Log::info(TAG,"Websocket client disconnected. clients: %d",clients.size());
         mtx.unlock();
     }
 };

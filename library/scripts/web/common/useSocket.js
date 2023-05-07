@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from './preact-standalone.js'
 
-const createSocket = (port, onMessage, json, backoff, setSocketState, setSocketRef) => {
+export const createSocket = (port, onMessage, json, backoff, setSocketState, setSocketRef) => {
     const socket = new WebSocket(`wss://${location.hostname}:${port}`);
     setSocketState?.(socket.readyState);
 
@@ -16,6 +16,10 @@ const createSocket = (port, onMessage, json, backoff, setSocketState, setSocketR
     }
 
     socket.onclose = (e) => {
+        if (document.hidden){
+            console.log(`Socket is closed. Document is hidden. New socket will not be created`);
+            return;
+        }
         console.log(`Socket is closed. Reconnect will be attempted in ${backoff} milliseconds.`, e.reason);
         setTimeout(() => {
             createSocket(port, onMessage,json, Math.min(backoff * 1.5,15000),setSocketState,setSocketRef)
@@ -33,6 +37,29 @@ const createSocket = (port, onMessage, json, backoff, setSocketState, setSocketR
     }
 
     setSocketRef?.(socket);
+
+    
+    const becomesVisibleHandler = () => {
+        if (document.hidden) return; 
+
+        console.error('Document visible. Creating socket');
+        createSocket(port, onMessage,json, 500,setSocketState,setSocketRef)
+    }
+
+    const becomesInvisibleHandler = () => {
+        if (!document.hidden) return; 
+
+        console.error('Document hidden. Closing socket');
+        socket.close();
+
+        document.addEventListener("visibilitychange", becomesVisibleHandler, {once:true});
+    }
+
+    if (document.hidden){
+        document.addEventListener("visibilitychange", becomesVisibleHandler, {once:true});
+    } else {
+        document.addEventListener("visibilitychange", becomesInvisibleHandler, {once:true});
+    }
 
 }
 
