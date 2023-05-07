@@ -55,7 +55,6 @@ public:
         hub->subscribe(this, true);
 
         // Log::info("APCMINI", "apcmini constructor");
-        
     }
 
     ~ApcMiniController()
@@ -94,6 +93,10 @@ public:
 
     void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) override
     {
+        if (columnIndex < 0 || columnIndex > WIDTH - 1)
+            return;
+        if (slotIndex < 0 || slotIndex > HEIGHT - 1)
+            return;
         // Log::info("APCMINI", "slot active change %d %d %d", columnIndex, slotIndex, active);
         int note = (HEIGHT - 1 - slotIndex) * WIDTH + columnIndex;
         if (note < 0 || note > WIDTH * HEIGHT)
@@ -107,5 +110,4 @@ public:
             for (int y = 0; y < HEIGHT; y++)
                 onHubSlotActiveChange(x, y, false);
     }
-
 };

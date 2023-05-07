@@ -139,9 +139,14 @@ void addLedsterPipe(Hyperion *hyp)
         {0, int(ledsterMap3d.size() * sizeof(RGBA)), false}
     });
 
+    // hyp->addPipe(new ConvertPipe<RGBA, RGB>(
+    //     splitInput->getInput(0),
+    //     new UDPOutput("ledsterstandalone.local", 9601, 60),
+    //     ledsterLut));
+
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(0),
-        new UDPOutput("ledsterstandalone.local", 9601, 60),
+        new UDPOutput("hyperslave2.local", 9611, 60),
         ledsterLut));
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
