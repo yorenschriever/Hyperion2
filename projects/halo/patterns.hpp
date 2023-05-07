@@ -449,6 +449,7 @@ namespace ExamplePatterns
         LFO<SinFast> lfo;
         PixelMap map;
 
+        // For mapped patterns, the constructor needs to receive the map and store it in a property
         MappedPattern(PixelMap map)
         {
             this->name = "Mapped";
@@ -461,6 +462,10 @@ namespace ExamplePatterns
                 return;
 
             for (int i = 0; i < width; i++){
+                // In your pattern you can access the coordinates with map[i].x and map[i].y
+                // You should generate your maps in range [-1,1].
+                // In this example i need a phase in range [0,1], so i need to rescale the value.
+                // For here on you can use it the same way you did before
                 float phase = Utils::rescale(map[i].y, 0,1,-1,1);
                 pixels[i] = params->getPrimaryColour() * lfo.getValue(phase);
             }
