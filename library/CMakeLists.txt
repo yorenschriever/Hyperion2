@@ -34,6 +34,7 @@ else ()
     file(GLOB_RECURSE CORE_SRC CONFIGURE_DEPENDS
         "${CORE_SRC_DIR}/*.cpp"
         "misc/*.cpp"
+        "misc/*.c"
     )
 
     add_library(Hyperion ${PLATFORM_SRC} ${CORE_SRC})

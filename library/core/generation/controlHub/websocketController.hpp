@@ -1,7 +1,7 @@
 #pragma once
 #include "IHubController.hpp"
 #include "controlHub.hpp"
-#include "misc/simpleson/json.h"
+#include "misc/cjson/cJSON.h"
 #include "platform/includes/log.hpp"
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
@@ -28,37 +28,37 @@ public:
     static void handler(RemoteWebsocketClient *client, WebsocketServer *server, std::string msg, void *userData)
     {
         auto *instance = (WebsocketController *)userData;
-        json::jobject parsed = json::jobject::parse(msg);
-        std::string type = parsed["type"];
+        cJSON *parsed = cJSON_Parse(msg.c_str());
+        std::string type = cJSON_GetObjectItem(parsed,"type")->valuestring;
 
         if (type.compare("buttonPressed") == 0)
         {
-            int columnIndex = parsed["columnIndex"];
-            int slotIndex = parsed["slotIndex"];
+            int columnIndex = cJSON_GetObjectItem(parsed,"columnIndex")->valueint;
+            int slotIndex = cJSON_GetObjectItem(parsed,"slotIndex")->valueint;
             instance->hub->buttonPressed(columnIndex, slotIndex);
         }
         else if (type.compare("buttonReleased") == 0)
         {
-            int columnIndex = parsed["columnIndex"];
-            int slotIndex = parsed["slotIndex"];
+            int columnIndex = cJSON_GetObjectItem(parsed,"columnIndex")->valueint;
+            int slotIndex = cJSON_GetObjectItem(parsed,"slotIndex")->valueint;
             instance->hub->buttonReleased(columnIndex, slotIndex);
         }
         else if (type.compare("columnDimChange") == 0)
         {
-            int columnIndex = parsed["columnIndex"];
-            int dim = parsed["dim"];
+            int columnIndex = cJSON_GetObjectItem(parsed,"columnIndex")->valueint;
+            int dim = cJSON_GetObjectItem(parsed,"dim")->valueint;
             instance->hub->dim(columnIndex, dim);
         }
         else if (type.compare("masterDimChange") == 0)
         {
-            int dim = parsed["masterDim"];
+            int dim = cJSON_GetObjectItem(parsed,"masterDim")->valueint;
             instance->hub->setMasterDim(dim);
         }
 
         else if (type.compare("paramChange") == 0)
         {
-            std::string param = parsed["param"];
-            float value = ((float)((int)parsed["value"])) / 255.;
+            std::string param = cJSON_GetObjectItem(parsed,"param")->valuestring;
+            float value = cJSON_GetObjectItem(parsed,"value")->valuedouble / 255.;
 
             if (param.compare("Amount") == 0)
                 instance->hub->setAmount(value);

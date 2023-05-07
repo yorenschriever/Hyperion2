@@ -1,6 +1,8 @@
 #pragma once
-#include "core/distribution/outputs/monitorOutput3d.hpp"
+#include "core/distribution/inputs/udpInput.hpp"
 #include "core/distribution/outputs/monitorOutput.hpp"
+#include "core/distribution/outputs/monitorOutput3d.hpp"
+#include "core/distribution/outputs/udpOutput.hpp"
 #include "core/distribution/pipes/convertPipe.hpp"
 #include "core/distribution/pipes/pipe.hpp"
 #include "core/generation/controllers/midiController.hpp"
@@ -12,6 +14,7 @@
 #include "core/generation/patterns/helpers/tempo/websocketTempo.h"
 #include "core/generation/pixelMap.hpp"
 #include "distribution/inputs/controlHubInput.hpp"
+#include "distribution/outputs/neopixelOutput.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
 #include "generation/controlHub/websocketController.hpp"
 #include "platform/includes/ethernet.hpp"
@@ -28,18 +31,38 @@
 class Hyperion
 {
 public:
-    virtual void start()
+    using Config = struct
+    {
+        bool network;
+        bool rotary;
+        bool display;
+        bool midi ;
+        bool tempo ;
+        bool web ;
+    };
+
+    static const Config maximal;
+    static const Config normal;
+    static const Config minimal;
+
+    virtual void start(Config config = normal)
     {
         Log::info("Hyperion", "start");
 
         check_safe_mode();
 
-        setup_network();
-        setup_rotary();
-        setup_display();
-        setup_midi();
-        setup_tempo();
-        setup_web();
+        if (config.network)
+            setup_network();
+        if (config.rotary)
+            setup_rotary();
+        if (config.display)
+            setup_display();
+        if (config.midi)
+            setup_midi();
+        if (config.tempo)
+            setup_tempo();
+        if (config.web)
+            setup_web();
 
         Log::info("HYP", "starting outputs");
         for (Pipe *pipe : pipes)
@@ -269,4 +292,31 @@ private:
     std::map<MidiDevice *, std::unique_ptr<MidiController>> midiControllers;
     std::map<MidiDevice *, MidiClockTempo *> midiClockTempos;
     const char *TAG = "Hyperion";
+};
+
+const Hyperion::Config Hyperion::minimal = {
+    .network = true,
+    .rotary = false,
+    .display = false,
+    .midi = false,
+    .tempo = false,
+    .web = false,
+};
+
+const Hyperion::Config Hyperion::normal = {
+    .network = true,
+    .rotary = false,
+    .display = false,
+    .midi = true,
+    .tempo = true,
+    .web = true,
+};
+
+const Hyperion::Config Hyperion::maximal = {
+    .network = true,
+    .rotary = true,
+    .display = true,
+    .midi = true,
+    .tempo = true,
+    .web = true,
 };

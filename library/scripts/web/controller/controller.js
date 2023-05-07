@@ -69,7 +69,7 @@ export const ControllerApp = (props) => {
         } else if (msg.type == "onHubColumnDimChange") {
             setState(state => set(state, `columns.${msg.columnIndex}.dim`, msg.dim))
         } else if (msg.type == "onHubMasterDimChange") {
-            setState(state => set(state, `masterDim`, msg.dim))
+            setState(state => set(state, `masterDim`, msg.masterDim))
         } else if (msg.type == "onHubParamChange") {
             setState(state => set(state, `params.${msg.param}`, msg.value))
         } else if (msg.type == "onHubColumnNameChange") {

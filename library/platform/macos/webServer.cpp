@@ -1,7 +1,7 @@
 #include "webServer.hpp"
 #include "webServer-macos.hpp"
 
-WebServer* WebServer::createInstance(std::string doc_root, int port)
+WebServer* WebServer::createInstance(int port)
 {
-    return new WebServerMacOs(doc_root, port);
+    return new WebServerMacOs(WEBSERVER_ROOT, port);
 }

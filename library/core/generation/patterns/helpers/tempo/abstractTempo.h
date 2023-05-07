@@ -22,6 +22,8 @@ public:
 
     friend class Tempo;
 
+    virtual ~AbstractTempo() = default;
+
 protected:
     int beatNumber = -1;
     int timeBetweenBeats = 0;
