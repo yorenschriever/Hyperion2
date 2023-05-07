@@ -46,9 +46,9 @@ public:
      */ 
     Fade(
         //FadeEase ease, 
-        unsigned int duration, 
+        unsigned int duration = 1000, 
         //FadeDirection direction = Down, 
-        FadeWaitPosition waitPosition = WaitAtStart)
+        FadeWaitPosition waitPosition = WaitAtEnd)
     {
         //this->ease = ease;
         this->duration = duration;
@@ -101,5 +101,10 @@ public:
     void reset()
     {
         this->startingpoint = Utils::millis();
+    }
+
+    bool isFinished(int maxDelay = 0)
+    {
+        return Utils::millis() - startingpoint - maxDelay < duration;
     }
 };

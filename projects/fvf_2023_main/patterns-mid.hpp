@@ -113,10 +113,10 @@ namespace Mid
             200, Transition::none, 0,
             1000, Transition::none, 0);
         FadeDown fade[4] = {
-            FadeDown(2000, WaitAtEnd),
-            FadeDown(2000, WaitAtEnd),
-            FadeDown(2000, WaitAtEnd),
-            FadeDown(2000, WaitAtEnd)};
+            FadeDown(2000),
+            FadeDown(2000),
+            FadeDown(2000),
+            FadeDown(2000)};
         PixelMap3d::Cylindrical map;
         BeatWatcher watcher = BeatWatcher();
         int pos = 0;
@@ -380,12 +380,12 @@ namespace Mid
             200, Transition::none, 0,
             1000, Transition::none, 0);
         FadeDown fade[6] = {
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd)};
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200)};
         std::vector<float> radii[6];
         BeatWatcher watcher = BeatWatcher();
         Permute perm;

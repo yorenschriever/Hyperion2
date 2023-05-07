@@ -84,11 +84,11 @@ namespace Mapped
     {
         PixelMap map;
         Fade<Down, Linear> fades[5] = {
-            Fade<Down, Linear>(200, WaitAtEnd),
-            Fade<Down, Linear>(200, WaitAtEnd),
-            Fade<Down, Linear>(200, WaitAtEnd),
-            Fade<Down, Linear>(200, WaitAtEnd),
-            Fade<Down, Linear>(200, WaitAtEnd)};
+            Fade<Down, Linear>(200),
+            Fade<Down, Linear>(200),
+            Fade<Down, Linear>(200),
+            Fade<Down, Linear>(200),
+            Fade<Down, Linear>(200)};
         int triggerNext = 0;
         bool lastActive = false;
 

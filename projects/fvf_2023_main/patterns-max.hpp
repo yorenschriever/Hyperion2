@@ -21,7 +21,7 @@ namespace Max
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        FadeDown fade1 = FadeDown(1400, WaitAtEnd);
+        FadeDown fade1 = FadeDown(1400);
 
     public:
         ChevronsPattern(PixelMap3d map)
@@ -59,7 +59,7 @@ namespace Max
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        FadeDown fade1 = FadeDown(1400, WaitAtEnd);
+        FadeDown fade1 = FadeDown(1400);
 
     public:
         ChevronsConePattern(PixelMap3d::Cylindrical map)
@@ -96,8 +96,8 @@ namespace Max
             200, Transition::none, 0,
             1000, Transition::none, 0);
         PixelMap3d::Cylindrical map;
-        FadeDown fade1 = FadeDown(200, WaitAtEnd);
-        FadeDown fade2 = FadeDown(200, WaitAtEnd);
+        FadeDown fade1 = FadeDown(200);
+        FadeDown fade2 = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
         Permute perm1;
         Permute perm2;
@@ -185,10 +185,10 @@ namespace Max
         static const int numFades = 4;
         int fadeNr=0;
         FadeDown fade[numFades] = {
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd)
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200)
         };
         BeatWatcher watcher = BeatWatcher();
 
@@ -240,7 +240,7 @@ namespace Max
     class GrowingStrobePattern : public Pattern<RGBA>
     {
         PixelMap3d::Cylindrical map;
-        FadeDown fade = FadeDown(5000, WaitAtEnd);
+        FadeDown fade = FadeDown(5000);
 
     public:
         GrowingStrobePattern(PixelMap3d::Cylindrical map)
@@ -279,7 +279,7 @@ namespace Max
             200, Transition::none, 0,
             1000, Transition::none, 0);
         PixelMap3d::Cylindrical map;
-        FadeDown fade = FadeDown(200, WaitAtEnd);
+        FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
 
     public:

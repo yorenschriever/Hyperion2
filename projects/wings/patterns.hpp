@@ -28,7 +28,7 @@ class RadialFadePattern : public Pattern<RGBA>
         200, Transition::none, 0,
         1000, Transition::none, 0);
     PixelMap map;
-    FadeDown fade = FadeDown(200, WaitAtEnd);
+    FadeDown fade = FadeDown(200);
     std::vector<float> normalizedRadii;
     BeatWatcher watcher = BeatWatcher();
 
@@ -68,7 +68,7 @@ class ChevronsPattern : public Pattern<RGBA>
     Transition transition = Transition(
         200, Transition::none, 0,
         1000, Transition::none, 0);
-    FadeDown fade1 = FadeDown(1400, WaitAtEnd);
+    FadeDown fade1 = FadeDown(1400);
 
 public:
     ChevronsPattern(PixelMap map)
@@ -102,7 +102,7 @@ class RadialGlitterFadePattern : public Pattern<RGBA>
         200, Transition::none, 0,
         1000, Transition::none, 0);
     PixelMap map;
-    FadeDown fade = FadeDown(200, WaitAtEnd);
+    FadeDown fade = FadeDown(200);
     std::vector<float> normalizedRadii;
     // Timeline timeline = Timeline(1000);
     BeatWatcher watcher = BeatWatcher();
@@ -300,7 +300,7 @@ class StrobePattern : public Pattern<RGBA>
 
 class FlashesPattern : public Pattern<RGBA>
 {
-    FadeDown fade = FadeDown(2400, WaitAtEnd);
+    FadeDown fade = FadeDown(2400);
     BeatWatcher watcher = BeatWatcher();
 
     inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -330,7 +330,7 @@ class RadialGlitterFadePattern2 : public Pattern<RGBA>
         200, Transition::none, 0,
         1000, Transition::none, 0);
     PixelMap::Polar map;
-    FadeDown fade = FadeDown(200, WaitAtEnd);
+    FadeDown fade = FadeDown(200);
     BeatWatcher watcher = BeatWatcher();
     Permute perm;
 
@@ -375,7 +375,7 @@ public:
 
 class LineLaunch : public Pattern<RGBA>
 {
-    FadeDown fade = FadeDown(50, WaitAtEnd);
+    FadeDown fade = FadeDown(50);
     BeatWatcher watcher = BeatWatcher();
     PixelMap map;
 
@@ -596,7 +596,7 @@ public:
     //     Transition transition = Transition(
     //         200, Transition::none, 0,
     //         1000, Transition::none, 0);
-    //     FadeDown fade = FadeDown(50, WaitAtEnd);
+    //     FadeDown fade = FadeDown(50);
     //     BeatWatcher watcher = BeatWatcher();
     //     PixelMap map;
 
@@ -630,7 +630,7 @@ public:
     class GrowingStrobePattern : public Pattern<RGBA>
     {
         PixelMap::Polar map;
-        FadeDown fade = FadeDown(2000, WaitAtEnd);
+        FadeDown fade = FadeDown(2000);
 
     public:
         GrowingStrobePattern(PixelMap::Polar map)
@@ -669,7 +669,7 @@ public:
             200, Transition::none, 0,
             1000, Transition::none, 0);
         PixelMap::Polar map;
-        FadeDown fade = FadeDown(200, WaitAtEnd);
+        FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
 
     public:
@@ -742,12 +742,12 @@ public:
             200, Transition::none, 0,
             1000, Transition::none, 0);
         FadeDown fade[6] = {
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd)};
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200)};
         std::vector<float> radii[6];
         BeatWatcher watcher = BeatWatcher();
         Permute perm;

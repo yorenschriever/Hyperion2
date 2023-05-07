@@ -13,7 +13,7 @@ namespace Flash
 {
     class FadingNoisePattern : public Pattern<RGBA>
     {
-        Fade<Down, Cubic> fade = Fade<Down, Cubic>(600, WaitAtEnd);
+        Fade<Down, Cubic> fade = Fade<Down, Cubic>(600);
         Permute perm;
 
     public:
@@ -89,7 +89,7 @@ namespace Flash
 
     class FlashesPattern : public Pattern<RGBA>
     {
-        FadeDown fade = FadeDown(2400, WaitAtEnd);
+        FadeDown fade = FadeDown(2400);
         BeatWatcher watcher = BeatWatcher();
 
     public:

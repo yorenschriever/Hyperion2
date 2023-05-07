@@ -76,7 +76,7 @@ namespace Min
         Transition transition;
         Permute perm;
         BeatWatcher watcher = BeatWatcher();
-        FadeDown fade = FadeDown(2400, WaitAtEnd);
+        FadeDown fade = FadeDown(2400);
 
     public:
         RibbenFlashPattern() {
@@ -173,12 +173,12 @@ namespace Min
             200, Transition::none, 0,
             1000, Transition::none, 0);
         FadeDown fade[6] = {
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd)};
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200)};
         std::vector<float> radii[6];
         BeatWatcher watcher = BeatWatcher();
         // PixelMap3d::Cylindrical map;
@@ -232,7 +232,7 @@ namespace Min
 
     class LineLaunch : public Pattern<RGBA>
     {
-        FadeDown fade = FadeDown(50, WaitAtEnd);
+        FadeDown fade = FadeDown(50);
         BeatWatcher watcher = BeatWatcher();
         PixelMap3d map;
 

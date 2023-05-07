@@ -80,7 +80,7 @@ namespace Ledster
             200, Transition::none, 0,
             1000, Transition::none, 0);
         std::vector<float> scaledAngles;
-        FadeDown fade = FadeDown(2400, WaitAtEnd);
+        FadeDown fade = FadeDown(2400);
 
     public:
         RadarPattern(PixelMap map)
@@ -133,12 +133,12 @@ namespace Ledster
             200, Transition::none, 0,
             1000, Transition::none, 0);
         FadeDown fade[6] = {
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd)};
+            FadeDown(1400),
+            FadeDown(1400),
+            FadeDown(1400),
+            FadeDown(1400),
+            FadeDown(1400),
+            FadeDown(1400)};
         BeatWatcher watcher = BeatWatcher();
         int pos = 0;
 
@@ -235,7 +235,7 @@ namespace Ledster
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        FadeDown fade = FadeDown(200, WaitAtEnd);
+        FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
 
     public:
@@ -296,7 +296,7 @@ namespace Ledster
             200, Transition::none, 0,
             1000, Transition::none, 0);
         PixelMap map;
-        FadeDown fade = FadeDown(200, WaitAtEnd);
+        FadeDown fade = FadeDown(200);
         std::vector<float> normalizedRadii;
         BeatWatcher watcher = BeatWatcher();
 
@@ -411,7 +411,7 @@ namespace Ledster
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        FadeDown fade1 = FadeDown(1400, WaitAtEnd);
+        FadeDown fade1 = FadeDown(1400);
 
     public:
         ChevronsPattern(PixelMap map)
@@ -540,7 +540,7 @@ namespace Ledster
             200, Transition::none, 0,
             1000, Transition::none, 0);
         PixelMap map;
-        FadeDown fade = FadeDown(200, WaitAtEnd);
+        FadeDown fade = FadeDown(200);
         std::vector<float> normalizedRadii;
         //Timeline timeline = Timeline(1000);
         BeatWatcher watcher = BeatWatcher();
@@ -688,14 +688,14 @@ namespace Ledster
             1000, Transition::none, 0);
         PixelMap map;
         FadeDown fade[8] = {
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd)};
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200)};
         const int interval = 500;
         Timeline timeline = Timeline(8 * interval);
         int8_t directionsx[8] = {-1, -1, 1, 1, 0, 0, 0, 0};
@@ -809,7 +809,7 @@ namespace Ledster
 
     class FlashesPattern : public Pattern<RGBA>
     {
-        FadeDown fade = FadeDown(2400, WaitAtEnd);
+        FadeDown fade = FadeDown(2400);
         BeatWatcher watcher = BeatWatcher();
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -838,7 +838,7 @@ namespace Ledster
         const int segmentSize = 10;
         Permute perm = Permute(36);
         BeatWatcher watcher = BeatWatcher();
-        FadeDown fade = FadeDown(2400, WaitAtEnd);
+        FadeDown fade = FadeDown(2400);
 
     public:
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -899,7 +899,7 @@ namespace Ledster
             200, Transition::none, 0,
             1000, Transition::none, 0);
         PixelMap map;
-        FadeDown fade = FadeDown(200, WaitAtEnd);
+        FadeDown fade = FadeDown(200);
         std::vector<float> normalizedRadii;
         Timeline interval = Timeline(500);
 

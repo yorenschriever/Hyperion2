@@ -127,7 +127,7 @@ namespace Hi
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        FadeDown fade = FadeDown(200, WaitAtEnd);
+        FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
 
     public:
@@ -164,7 +164,7 @@ class DotBeatPattern : public Pattern<RGBA>
             200, Transition::none, 0,
             1000, Transition::none, 0);
         PixelMap3d::Cylindrical map;
-        FadeDown fade = FadeDown(200, WaitAtEnd);
+        FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
         //Permute perm;
 

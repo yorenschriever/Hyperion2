@@ -6,6 +6,12 @@
 // https://webgradients.com/
 // https://color.adobe.com/create/color-wheel
 
+// Each palette consists of:
+// - A gradient: A smooth transition between colors.
+// - A primary color: The most prominent color in the gradient
+// - A secondary color: A contrasting color
+// - A Highlight color: A bright color, contrasting 
+
 PaletteColumn::Palette heatmap{
     .gradient = new Gradient({
         {.position = 0, .color = RGB(0, 0, 0)},        // Black

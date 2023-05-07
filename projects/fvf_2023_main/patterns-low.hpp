@@ -49,12 +49,12 @@ namespace Low
             200, Transition::none, 0,
             1000, Transition::none, 0);
         FadeDown fade[6] = {
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd),
-            FadeDown(200, WaitAtEnd)};
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200),
+            FadeDown(200)};
         BeatWatcher watcher = BeatWatcher();
         PixelMap3d map;
         Permute perm;
