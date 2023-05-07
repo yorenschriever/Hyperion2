@@ -62,7 +62,24 @@ public:
     float getPhase() { return getPhase(0); }
     float getPhase(int startDelay)
     {
-        int phase = (Utils::millis() - startingpoint - startDelay);
+        unsigned long now =  Utils::millis();
+
+#if ESP_PLATFORM
+        // building with esp-idf gives me a compiler error:
+        // internal compiler error: in extract_constrain_insn, at recog.cc:2692
+        // Waiting for a fix will probably takes ages, because it needs to
+        // be fixed in gcc, and then esp-idf needs to bump to the new version.
+        // I came up with this workaround.
+        // I narrowed this error down to using the millis() function here.
+        // strangely, in LFO (which is very similar) it is working. 
+        // Here i do a modulus operator to it, so i tried it here as well. 
+        // The second operand of the operator is the biggest value 
+        // of unsigned long, so this is basically a no-op
+        now = now  % ((unsigned long)-1);
+#endif
+
+        int phase = (now - startingpoint - startDelay);
+
         if (phase < 0)
             return waitPosition;
 
