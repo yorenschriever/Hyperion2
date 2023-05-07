@@ -29,7 +29,7 @@ You only need to import the template here, and call it. You do have the option t
 
 ## 2. mapping/generateHaloMap.py
 
-This python script creates the file mapping/halomap.hpp. It contains the positions of all the leds in the installation.
+This python script creates the file mapping/haloMap.hpp. It contains the positions of all the leds in the installation.
 This file is used by the monitor to render an emulation of your installation.
 You can also use the mapping coordinates to create spatially mapped patterns. There is an example of that in patterns.hpp
 
