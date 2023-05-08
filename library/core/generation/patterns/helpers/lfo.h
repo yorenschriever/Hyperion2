@@ -48,11 +48,28 @@ public:
         if (periodArg == 0)
             return 0;
 
+        unsigned long now = Utils::millis();
+
+#if ESP_PLATFORM
+        // building with esp-idf gives me a compiler error:
+        // internal compiler error: in extract_constrain_insn, at recog.cc:2692
+        // Waiting for a fix will probably takes ages, because it needs to
+        // be fixed in gcc, and then esp-idf needs to bump to the new version.
+        // I came up with this workaround.
+        // I narrowed this error down to using the millis() function here.
+        // strangely, in here it is working, but not in Fade.
+        // In Fade i added this modulus operator trick, and it solved the problem
+        // Later the bug also occurred here in LFO, so i added the same trick.
+        // The second operand of the operator is the biggest value
+        // of unsigned long, so this is basically a no-op
+        now = now % ((unsigned long)-1);
+#endif
+
         int deltaPhaseMs = periodArg * deltaPhase;
         // Correction to make sure the phase never goes negative if deltaPhase > 1,
         // Not all plaforms handle modulus of negative numbers the same
         long correction = std::ceil(deltaPhase) * periodArg;
-        long phaseMs = (Utils::millis() - starting_point - deltaPhaseMs + correction) % periodArg;
+        long phaseMs = (now - starting_point - deltaPhaseMs + correction) % periodArg;
 
         int dutyCycleMs = periodArg * dutyCycle;
         if (phaseMs < dutyCycleMs)

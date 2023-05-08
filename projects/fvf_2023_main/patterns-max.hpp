@@ -59,14 +59,11 @@ namespace Max
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        FadeDown fade1 = FadeDown(1400);
 
     public:
         ChevronsConePattern(PixelMap3d::Cylindrical map)
         {
             this->map = map;
-            this->lfo = LFO<SawDown>(1000);
-            this->lfoColour = LFO<Square>(1000);
             this->name = "Chevrons cone";
         }
 
@@ -84,7 +81,7 @@ namespace Max
                 float conePos = 0.5 + (map[index].r - map[index].z) / 2;
 
                 float phase = conePos * amount; //(0.5 * abs(map[index].y) + map[index].x) * amount;
-                auto col = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
+                auto col = (lfoColour.getValue(phase) > 0) ? params->getSecondaryColour() : params->getPrimaryColour();
                 pixels[index] += col * lfo.getValue(phase) * transition.getValue();
             }
         }
