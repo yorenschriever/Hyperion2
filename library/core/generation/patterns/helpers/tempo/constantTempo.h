@@ -42,6 +42,6 @@ private:
         // Log::info(TAG, "ConstantTempoTask: %d", newBeatNr);
 
         if (newBeatNr != beatNumber)
-            beat(newBeatNr, period / 1000, false); // use the beat locally, but don't broadcast it.
+            beat(newBeatNr, period / 1000);
     }
 };

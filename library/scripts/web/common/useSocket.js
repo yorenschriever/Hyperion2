@@ -1,102 +1,109 @@
 
-import { useState, useEffect, useRef } from './preact-standalone.js'
+import { useEffect, useRef } from './preact-standalone.js'
 
-export const createSocket = (port, onMessage, json, backoff, setSocketState, setSocketRef) => {
-    const socket = new WebSocket(`wss://${location.hostname}:${port}`);
-    setSocketState?.(socket.readyState);
+class Socket {
 
-    socket.onmessage = wsmsg => {
-        backoff = 500;
-        if (json) {
-            const msg = JSON.parse(wsmsg.data);
-            onMessage(msg);
+    socket;
+    port;
+    onMessage;
+    onStatusChange;
+
+    reconnectInterval;
+    visibilityCallback;
+
+    constructor(port, onMessage, onStatusChange)
+    {
+        this.port = port;
+        this.onMessage = onMessage;
+        this.onStatusChange = onStatusChange;
+        
+        this.reconnectInterval = window.setInterval(() => this.fixSocket(), 2500);
+        this.visibilityCallback = this.onVisibilityChange.bind(this);
+        document.addEventListener("visibilitychange", this.visibilityCallback);
+        this.fixSocket();
+    }
+
+    fixSocket() {
+        if (this.socket && this.socket.readyState != WebSocket.CLOSED)
+            return; //everything is fine
+
+        if (document.hidden)
+            return; //don't create new socket when page is not in view
+
+        this.socket = new WebSocket(`wss://${location.hostname}:${this.port}`)
+
+        this.socket.onmessage = wsmsg => this.onMessage(wsmsg.data);
+
+        this.socket.onclose = (e) => {
+            this.onStatusChange?.(this.socket.readyState);
+            console.log(`Socket is closed. `); //Reconnect will be attempted in ${backoff} milliseconds.`, e.reason);
+        };
+        
+        this.socket.onerror = (err) => {
+            console.error('Socket encountered error: ', err, 'Closing socket');
+            this.onStatusChange?.(this.socket.readyState);
+            socket.close();
+
+            //if you enable this, also cancel it in the close() method
+            //window.setTimeout(() => this.fixSocket(), 500);
+        };
+    
+        this.socket.onopen = () => {
+            console.log(`socket is opened on port ${this.port}`)
+            this.onStatusChange?.(this.socket.readyState);
+        }
+    }
+
+    onVisibilityChange() {
+        const oldState = document.hidden;
+        //the event fires before the state is updated.
+        const willBeVisible = !oldState;
+
+        if (willBeVisible){
+            console.log('Document becoming visible. Creating socket');
+            window.setTimeout(() => this.fixSocket(), 1);
         } else {
-            onMessage(wsmsg.data)
+            console.log('Document hidden. Closing socket');
+            this.socket?.close();
         }
     }
 
-    socket.onclose = (e) => {
-        if (document.hidden){
-            console.log(`Socket is closed. Document is hidden. New socket will not be created`);
-            return;
-        }
-        console.log(`Socket is closed. Reconnect will be attempted in ${backoff} milliseconds.`, e.reason);
-        setTimeout(() => {
-            createSocket(port, onMessage,json, Math.min(backoff * 1.5,15000),setSocketState,setSocketRef)
-        }, backoff);
-    };
-    
-    socket.onerror = (err) => {
-        setSocketState?.(socket.readyState);
-        console.error('Socket encountered error: ', err.message, 'Closing socket');
-        socket.close();
-    };
-
-    socket.onopen = () => {
-        setSocketState?.(socket.readyState);
+    close()
+    {
+        document.removeEventListener("visibilitychange", this.visibilityCallback);
+        window.clearInterval(this.reconnectInterval);
+        this.socket?.close();
     }
 
-    setSocketRef?.(socket);
-
-    
-    const becomesVisibleHandler = () => {
-        if (document.hidden) return; 
-
-        console.error('Document visible. Creating socket');
-        createSocket(port, onMessage,json, 500,setSocketState,setSocketRef)
-    }
-
-    const becomesInvisibleHandler = () => {
-        if (!document.hidden) return; 
-
-        console.error('Document hidden. Closing socket');
-        socket.close();
-
-        document.addEventListener("visibilitychange", becomesVisibleHandler, {once:true});
-    }
-
-    if (document.hidden){
-        document.addEventListener("visibilitychange", becomesVisibleHandler, {once:true});
-    } else {
-        document.addEventListener("visibilitychange", becomesInvisibleHandler, {once:true});
+    send(msg)
+    {
+        this.socket?.send(msg)
     }
 
 }
 
-export const useSocket = (port, onMessage, json=true) => 
+export const createSocket = (port, onMessage) => {
+    new Socket(port, onMessage)
+}
+
+export const useSocket = (port, onMessage, setSocketState) => 
 {
-    const [socketState, setSocketState] = useState(WebSocket.CLOSED);
     const socketRef = useRef();
 
     useEffect(() => {
-        createSocket(port, onMessage, json, 500, setSocketState, newSocketRef => socketRef.current = newSocketRef);
+        socketRef.current = new Socket(port, onMessage, setSocketState);
         return () => socketRef.current.close();
-    }, [])
+    }, []);
 
     return [
-        socketState,
-        (msg) => {
-            //console.log('sending', msg)
-            socketRef.current.send(msg)
-        }
+        (msg) => socketRef.current?.send(msg)
     ]
 }
 
 export const useMonitorSockets = (scene, onMessage) => 
 {
     useEffect(() => {
-        const createdSockets = []
-        scene.forEach(scenePart => {
-            createdSockets.push(
-                createSocket(
-                    scenePart.port, 
-                    data => onMessage(scenePart, data), 
-                    false, 
-                    500, 
-                    null,
-                    null));
-        });
-        
-        return () => createdSockets.forEach(socket => socketRef.current.close());
+        const createdSockets = scene.map(scenePart => new Socket(scenePart.port, data => onMessage(scenePart, data)));
+        return () => createdSockets.forEach(socket => socket.close());
     }, [])
 }

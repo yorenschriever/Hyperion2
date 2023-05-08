@@ -1,4 +1,4 @@
-import { html, useState, createContext, useContext } from '../common/preact-standalone.js'
+import { html, useState, createContext, useContext, useCallback , useEffect} from '../common/preact-standalone.js'
 import { useSocket } from '../common/useSocket.js'
 
 const set = (obj, path, value) => {
@@ -41,10 +41,11 @@ const initialState = {
 
 const SendMessage = createContext();
 
-export const ControllerApp = (props) => {
+export const ControllerApp = () => {
     const [state, setState] = useState(initialState);
+    const [socketState, setSocketState] = useState(WebSocket.CLOSED)
 
-    const resizeController = (columnIndex, slotIndex) => {
+    const resizeController = useCallback((columnIndex, slotIndex) => {
         setState(state => {
             if (columnIndex === undefined || state.columns.length > columnIndex)
                 return state;
@@ -57,9 +58,10 @@ export const ControllerApp = (props) => {
 
             return set(state, `columns.${columnIndex}.slots.${slotIndex}`, defaultSlot)
         })
-    }
+    },[setState])
 
-    const [socketState, send] = useSocket(9800, msg => {
+    const [send] = useSocket(9800, msg => {
+        msg = JSON.parse(msg)
         resizeController(msg.columnIndex, msg.slotIndex)
 
         if (msg.type == "onHubSlotActiveChange") {
@@ -75,8 +77,7 @@ export const ControllerApp = (props) => {
         } else if (msg.type == "onHubColumnNameChange") {
             setState(state => set(state, `columns.${msg.columnIndex}.name`, msg.name))
         }
-    })
-
+    }, setSocketState)
 
     return html`
     <${SendMessage.Provider} value=${send}>
@@ -187,6 +188,7 @@ const ParamFader = ({ name, value }) => {
 const Tempo = () => {
     const [source, setSource] = useState("[none]");
     useSocket(9799, msg => {
+        msg = JSON.parse(msg)
         console.log(msg);
 
         const element = document.getElementById("tempo"); 

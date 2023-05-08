@@ -36,7 +36,7 @@ export class Websocket {
                     this.buffer[bufferIndex + 1] = view[3 * ledIndex + 1]
                     this.buffer[bufferIndex + 2] = view[3 * ledIndex + 2]
                 }  
-            }, false, 500, null, null)
+            })
         })
 
         window.requestAnimationFrame(() => this.writeBuffer());
