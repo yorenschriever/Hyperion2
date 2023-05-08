@@ -87,8 +87,7 @@ namespace Ledster
         {
             this->map = map;
             this->lfo = LFO<SawDown>(5000);
-            this->lfo.setSkew(0.25);
-            this->lfo.setPulseWidth(0.7);
+            this->lfo.setDutyCycle(0.7);
             std::transform(map.begin(), map.end(), std::back_inserter(scaledAngles), [](PixelPosition pos) -> float
                            { return (atan2(pos.y, pos.x) + M_PI) / (2 * M_PI); });
         }
@@ -96,7 +95,7 @@ namespace Ledster
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             lfo.setPeriod(params->getVelocity(10000, 1000));
-            lfo.setSkew(params->getIntensity(0.33, 1));
+            //lfo.setSkew(params->getIntensity(0.33, 1));
 
             if (!transition.Calculate(active))
                 return;
@@ -266,14 +265,14 @@ namespace Ledster
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        LFO<SawDownShort> lfo = LFO<SawDownShort>(2000);
+        LFO<SawDown> lfo = LFO<SawDown>(2000);
 
     public:
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
         {
             lfo.setPeriod(params->getVelocity(10000, 500));
-            lfo.setSkew(params->getIntensity());
-            lfo.setPulseWidth(1);
+            //lfo.setSkew(params->getIntensity());
+            lfo.setDutyCycle(1);
             int variant = params->getVariant() * 7 + 1;
 
             // lfo.setSkew(0.5);
@@ -343,7 +342,7 @@ namespace Ledster
         {
             this->averagePeriod = averagePeriod;
             this->precision = precision;
-            this->lfo.setPulseWidth(pulsewidth);
+            this->lfo.setDutyCycle(pulsewidth);
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -368,7 +367,7 @@ namespace Ledster
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        LFO<SoftSquare> lfo = LFO<SoftSquare>(2000);
+        LFO<SoftPWM> lfo = LFO<SoftPWM>(2000);
         const std::vector<uint16_t> trails[4] = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 32, 33, 59, 60, 90, 91, 125, 126, 162, 163, 195, 196, 224, 225, 249, 250, 270, 269, 268, 267, 266, 265, 264, 263, 262, 261, 260, 238, 237, 211, 210, 180, 179, 145, 144, 108, 107, 75, 74, 46, 45, 21, 20},
             {19, 18, 17, 16, 15, 14, 13, 12, 11, 31, 34, 58, 61, 89, 92, 124, 127, 161, 164, 194, 197, 223, 226, 248, 251, 252, 253, 254, 255, 256, 257, 258, 259, 239, 236, 212, 209, 181, 178, 146, 143, 109, 106, 76, 73, 47, 44, 22},
@@ -381,7 +380,7 @@ namespace Ledster
             if (!transition.Calculate(active))
                 return;
 
-            lfo.setPulseWidth(0.05);
+            lfo.setSoftEdgeWidth(0.05);
             lfo.setPeriod(params->getVelocity(4000,500));
             int amount = params->getIntensity(1,6);
 
@@ -664,7 +663,7 @@ namespace Ledster
             this->averagePeriod = averagePeriod;
             this->precision = precision;
             this->perm = Permute(numSegments);
-            this->lfo.setPulseWidth(pulsewidth);
+            this->lfo.setDutyCycle(pulsewidth);
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override

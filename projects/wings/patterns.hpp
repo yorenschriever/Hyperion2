@@ -188,7 +188,7 @@ public:
         this->averagePeriod = averagePeriod;
         this->precision = precision;
         this->perm = Permute(numSegments);
-        this->lfo.setPulseWidth(pulsewidth);
+        this->lfo.setDutyCycle(pulsewidth);
     }
 
     inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -408,7 +408,7 @@ class SegmentChasePattern : public Pattern<RGBA>
         200, Transition::none, 0,
         1000, Transition::none, 0);
     Permute perm;
-    LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(5000);
+    LFO<SawDown> lfo = LFO<SawDown>(5000);
 
 public:
     inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -424,7 +424,7 @@ public:
         float pulseWidth = 0.5;
         float factor = 10; // 1-50;
         lfo.setPeriod(500 * factor);
-        lfo.setPulseWidth(pulseWidth / factor);
+        lfo.setDutyCycle(pulseWidth / factor);
         float lfoWidth = segmentSize * factor;
 
         for (int segment = 0; segment < numSegments; segment++)
@@ -507,7 +507,7 @@ public:
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        LFO<LFOPause<NegativeCosFast>> lfo;
+        LFO<Glow> lfo;
         PixelMap::Polar map;
 
     public:
@@ -522,7 +522,7 @@ public:
                 return;
 
             lfo.setPeriod(params->getVelocity(5000, 500));
-            lfo.setPulseWidth(params->getSize(0.06, 0.5));
+            lfo.setDutyCycle(params->getSize(0.06, 0.5));
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
@@ -712,7 +712,7 @@ public:
         class GlowPulsePattern : public Pattern<RGBA>
     {
         Permute perm;
-        LFO<LFOPause<NegativeCosFast>> lfo = LFO<LFOPause<NegativeCosFast>>(10000);
+        LFO<Glow> lfo = LFO<Glow>(10000);
         Transition transition;
 
     public:
@@ -724,7 +724,7 @@ public:
             // float density = 481./width;
             int density2 = width / 481;
             lfo.setPeriod(params->getVelocity(10000, 500));
-            lfo.setPulseWidth(0.1);
+            lfo.setDutyCycle(0.1);
             perm.setSize(width);
 
             for (int index = 0; index < width; index++)
@@ -811,7 +811,7 @@ public:
         {
             this->averagePeriod = averagePeriod;
             this->precision = precision;
-            this->lfo.setPulseWidth(pulsewidth);
+            this->lfo.setDutyCycle(pulsewidth);
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -836,7 +836,7 @@ public:
             //     }
             // }
 
-            lfo.setPulseWidth(params->getAmount(0.1, 1));
+            lfo.setDutyCycle(params->getAmount(0.1, 1));
             // lfo.setPeriod(params->getVelocity(10000,500));
 
             for (int segment = 0; segment < numSegments; segment++)

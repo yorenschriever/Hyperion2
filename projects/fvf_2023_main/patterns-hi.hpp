@@ -16,7 +16,7 @@ namespace Hi
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(2000);
+        LFO<SawDown> lfo = LFO<SawDown>(2000);
 
     public:
         public:
@@ -27,8 +27,7 @@ namespace Hi
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
             lfo.setPeriod(params->getVelocity(10000, 500));
-            lfo.setSkew(params->getIntensity());
-            lfo.setPulseWidth(params->getSize(0.33, 1));
+            lfo.setDutyCycle(params->getSize(0.33, 1));
             int amount = params->getAmount() * 7 + 1;
 
             if (!transition.Calculate(active))

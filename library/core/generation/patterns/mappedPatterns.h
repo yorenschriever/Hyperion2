@@ -138,7 +138,7 @@ namespace Mapped
         {
             this->map = map;
             this->lfo = LFO<SawDown>(period);
-            this->lfo.setSkew(0.25);
+            //this->lfo.setSkew(0.25);
             std::transform(map.begin(), map.end(), std::back_inserter(scaledAngles), [](PixelPosition pos) -> float
                            { return (atan2(pos.y, pos.x) + M_PI) / (2 * M_PI); });
         }
@@ -235,8 +235,8 @@ namespace Mapped
             this->map = map;
             this->lfo = LFO<T>(period);
             this->numWaves = numWaves;
-            this->lfo.setPulseWidth(pulseWidth);
-            this->lfo.setSkew(skew);
+            this->lfo.setDutyCycle(pulseWidth);
+            //this->lfo.setSkew(skew);
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override

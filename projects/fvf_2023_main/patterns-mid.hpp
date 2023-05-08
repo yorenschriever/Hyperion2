@@ -17,7 +17,7 @@ namespace Mid
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        LFO<LFOPause<NegativeCosFast>> lfo;
+        LFO<Glow> lfo;
         PixelMap3d::Cylindrical map;
 
     public:
@@ -33,7 +33,7 @@ namespace Mid
                 return;
 
             lfo.setPeriod(params->getVelocity(5000, 500));
-            lfo.setPulseWidth(params->getSize(0.06, 0.5));
+            lfo.setDutyCycle(params->getSize(0.06, 0.5));
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
@@ -261,7 +261,7 @@ namespace Mid
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        LFO<LFOPause<SawDown>> lfo;
+        LFO<SawDown> lfo;
         PixelMap3d::Cylindrical map;
 
     public:
@@ -278,7 +278,7 @@ namespace Mid
 
             int amount = params->getAmount(1, 12);
             lfo.setPeriod(params->getVelocity(5000, 500));
-            lfo.setPulseWidth(params->getSize(0.06, 0.5));
+            lfo.setDutyCycle(params->getSize(0.06, 0.5));
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
@@ -300,7 +300,7 @@ namespace Mid
             200, Transition::none, 0,
             1000, Transition::none, 0);
         PixelMap3d::Cylindrical map;
-        LFO<LFOPause<SawDown>> lfo1;
+        LFO<SoftSawDown> lfo1;
 
     public:
         PetalChase(PixelMap3d::Cylindrical map)
@@ -316,7 +316,8 @@ namespace Mid
 
             int amount1 = params->getAmount(1, 12);
             lfo1.setPeriod(params->getVelocity(5000, 500));
-            lfo1.setPulseWidth(params->getSize(0.06, 0.5));
+            lfo1.setDutyCycle(params->getSize(0.06, 0.5));
+            lfo1.setSoftEdgeWidth(0.1);
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
@@ -333,11 +334,7 @@ namespace Mid
 
     class DoubleFlash : public Pattern<RGBA>
     {
-        // Transition transition = Transition(
-        //     200, Transition::none, 0,
-        //     1000, Transition::none, 0);
         PixelMap3d::Cylindrical map;
-        // LFO<LFOPause<SawDown>> lfo1;
         Timeline timeline = Timeline();
         BeatWatcher watcher;
 

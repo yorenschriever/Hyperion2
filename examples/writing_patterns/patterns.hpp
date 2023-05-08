@@ -246,6 +246,39 @@ namespace ExamplePatterns
         }
     };
 
+    class LFOAntiAlias : public Pattern<RGBA>
+    {
+    public:
+
+        // You can use soft shapes like SoftPWM, SoftSawUp, SoftSawDown to take 
+        // off the hard edges when you use LFO to create a spatial wave.
+        LFO<SoftPWM> lfo;
+
+        LFOAntiAlias()
+        {
+            this->name = "LFO anti alias";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            lfo.setPeriod(10000);
+            lfo.setDutyCycle(0.5);
+            // A good value for the soft edge width is 1 pixel distance,
+            // which is equal to the smallest value to pass as deltaPhase
+            // to lfo.getValue(). so, in most cases: 1/width
+            // Try with a higher value, eg 0.25 so see adn exaggerated effect
+            lfo.setSoftEdgeWidth(1./width);
+
+            for (int i = 0; i < width; i++){
+                float phase = float(i)/width;
+                pixels[i] = params->getPrimaryColour() * lfo.getValue(phase);
+            }
+        }
+    };
+
     class FadePattern : public Pattern<RGBA>
     {
     public:
@@ -429,12 +462,45 @@ namespace ExamplePatterns
             // but you can rescale it by providing a min and max argument.
 
             lfo.setPeriod(params->getVelocity(5000,500));
-            lfo.setPulseWidth(params->getSize(0.1,0.9));
+            lfo.setDutyCycle(params->getSize(0.1,0.9));
             int amount = params->getAmount(1,4);
 
             for (int i = 0; i < width; i++){
                 float phase = float(i)/width;
                 pixels[i] = params->getPrimaryColour() * lfo.getValue(amount * phase);
+            }
+        }
+    };
+
+    class LFOGlow : public Pattern<RGBA>
+    {
+    public:
+
+        // NegativeCosFast works nice in combination with duty cycle. 
+        // So nice that i gave it an alias: Glow
+        LFO<Glow> lfo;
+        // Use permute to randomize the pixel order
+        Permute permute;
+
+        LFOGlow()
+        {
+            this->name = "LFO glow";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            permute.setSize(width);
+
+            lfo.setPeriod(params->getVelocity(5000,500));
+            lfo.setDutyCycle(params->getAmount(0.1,1));
+
+            for (int i = 0; i < width; i++){
+                float phase = float(i)/width;
+                int randomizedPixelIndex = permute.at[i];
+                pixels[randomizedPixelIndex] = params->getPrimaryColour() * lfo.getValue(phase);
             }
         }
     };

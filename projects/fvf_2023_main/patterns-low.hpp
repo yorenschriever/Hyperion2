@@ -105,7 +105,7 @@ namespace Low
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        LFO<LFOPause<NegativeCosFast>> lfo;
+        LFO<Glow> lfo;
         PixelMap3d::Cylindrical map;
 
     public:
@@ -121,7 +121,7 @@ namespace Low
                 return;
 
             lfo.setPeriod(params->getVelocity(11000,500));
-            lfo.setPulseWidth(params->getSize(0.03,0.5));
+            lfo.setDutyCycle(params->getSize(0.03,0.5));
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
             {
@@ -139,7 +139,7 @@ namespace Low
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        LFO<LFOPause<SawDown>> lfo;
+        LFO<SawDown> lfo;
         PixelMap3d::Cylindrical map;
 
     public:
@@ -155,7 +155,7 @@ namespace Low
                 return;
 
             lfo.setPeriod(params->getVelocity(5000,500));
-            lfo.setPulseWidth(params->getSize(0.06,1));
+            lfo.setDutyCycle(params->getSize(0.06,1));
             bool orientationHorizontal = params->getVariant() > 0.5;
 
             for (int index = 0; index < std::min(width, (int)map.size()); index++)
@@ -212,7 +212,7 @@ namespace Low
     class GlowPulsePattern : public Pattern<RGBA>
     {
         Permute perm;
-        LFO<LFOPause<NegativeCosFast>> lfo = LFO<LFOPause<NegativeCosFast>>(10000);
+        LFO<Glow> lfo = LFO<Glow>(10000);
         Transition transition;
         PixelMap3d map;
 
@@ -230,7 +230,7 @@ namespace Low
 
             int density = width/481;
             lfo.setPeriod(params->getVelocity(10000,500));
-            lfo.setPulseWidth(params->getAmount(0.05,0.5));
+            lfo.setDutyCycle(params->getAmount(0.05,0.5));
             float fadeSize = params->getSize(0,0.75)-0.5;
             perm.setSize(width);
 

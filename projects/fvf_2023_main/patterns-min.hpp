@@ -27,7 +27,7 @@ namespace Min
         {
             this->averagePeriod = averagePeriod;
             this->precision = precision;
-            this->lfo.setPulseWidth(pulsewidth);
+            this->lfo.setDutyCycle(pulsewidth);
             this->name = "Ribben clive";
         }
 
@@ -53,7 +53,7 @@ namespace Min
             //     }
             // }
 
-            lfo.setPulseWidth(params->getAmount(0.1, 0.5));
+            lfo.setDutyCycle(params->getAmount(0.1, 0.5));
             //lfo.setPeriod(params->getVelocity(10000,500));
 
             for (int segment = 0; segment < numSegments; segment++)
@@ -120,7 +120,7 @@ namespace Min
     {
         Transition transition;
         Permute perm;
-        LFO<LFOPause<SawDown>> lfo = LFO<LFOPause<SawDown>>(5000);
+        LFO<SawDown> lfo = LFO<SawDown>(5000);
 
     public:
         SegmentChasePattern(){
@@ -147,7 +147,7 @@ namespace Min
             float pulseWidth = params->getSize(0.25,1);
             float factor = params->getAmount(50,1); //10; // 1-50;
             lfo.setPeriod(params->getVelocity(2000,200) * factor);
-            lfo.setPulseWidth(pulseWidth / factor);
+            lfo.setDutyCycle(pulseWidth / factor);
             float lfoWidth = segmentSize * factor;
 
             for (int segment = 0; segment < numSegments; segment++)
@@ -269,7 +269,7 @@ namespace Min
     class GlowPulsePattern : public Pattern<RGBA>
     {
         Permute perm;
-        LFO<LFOPause<NegativeCosFast>> lfo = LFO<LFOPause<NegativeCosFast>>(10000);
+        LFO<Glow> lfo = LFO<Glow>(10000);
         Transition transition;
 
     public:
@@ -286,7 +286,7 @@ namespace Min
             int density2 = width / 481;
             if (width==96) density2=10;
             lfo.setPeriod(params->getVelocity(10000, 500));
-            lfo.setPulseWidth(0.1);
+            lfo.setDutyCycle(0.1);
             perm.setSize(width);
 
             for (int index = 0; index < width; index++)

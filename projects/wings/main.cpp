@@ -75,9 +75,9 @@ void addWingsPipe(Hyperion *hyp)
               {.column = 3, .slot = 2, .pattern = new AngularFadePattern(pWingMap)},
 
               // 
-              {.column = 4, .slot = 0, .pattern = new RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
-              {.column = 4, .slot = 1, .pattern = new ClivePattern<LFOPause<SawDown>>(32, 1000, 1, 0.1)},
-              {.column = 4, .slot = 2, .pattern = new ClivePattern<SoftSquare>(32)},
+              {.column = 4, .slot = 0, .pattern = new RibbenClivePattern<Glow>(10000, 1, 0.15)},
+              {.column = 4, .slot = 1, .pattern = new ClivePattern<SawDown>(32, 1000, 1, 0.1)},
+              {.column = 4, .slot = 2, .pattern = new ClivePattern<SoftPWM>(32, 1000, 1, 0.5)},
 
               // 
               {.column = 5, .slot = 0, .pattern = new SegmentChasePattern()},

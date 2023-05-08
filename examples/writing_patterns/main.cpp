@@ -71,13 +71,15 @@ void addHaloPipe(Hyperion *hyp)
             {.column = 2, .slot = 0, .pattern = new ExamplePatterns::LFOPattern()},
             {.column = 2, .slot = 1, .pattern = new ExamplePatterns::LFOChase()},
             {.column = 2, .slot = 2, .pattern = new ExamplePatterns::LFOChaseGradient()},
-            {.column = 2, .slot = 3, .pattern = new ExamplePatterns::FadePattern()},
-            {.column = 2, .slot = 4, .pattern = new ExamplePatterns::FadeChasePattern()},
-            {.column = 2, .slot = 5, .pattern = new ExamplePatterns::FadeFinishPattern()},
-            {.column = 2, .slot = 6, .pattern = new ExamplePatterns::TransitionPattern()},
-            {.column = 2, .slot = 7, .pattern = new ExamplePatterns::PermutePattern()},
+            {.column = 2, .slot = 3, .pattern = new ExamplePatterns::LFOAntiAlias()},
+            {.column = 2, .slot = 4, .pattern = new ExamplePatterns::FadePattern()},
+            {.column = 2, .slot = 5, .pattern = new ExamplePatterns::FadeChasePattern()},
+            {.column = 2, .slot = 6, .pattern = new ExamplePatterns::FadeFinishPattern()},
+            {.column = 2, .slot = 7, .pattern = new ExamplePatterns::TransitionPattern()},
+            {.column = 2, .slot = 8, .pattern = new ExamplePatterns::PermutePattern()},
 
             {.column = 3, .slot = 0, .pattern = new ExamplePatterns::ParamsPattern()},
+            {.column = 3, .slot = 1, .pattern = new ExamplePatterns::LFOGlow()},
 
             {.column = 4, .slot = 0, .pattern = new ExamplePatterns::MappedPattern(haloMap)},
         });

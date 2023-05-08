@@ -63,7 +63,7 @@ namespace Halo
     {
 
         Transition transition;
-        LFO<LFOPause<NegativeCosFast>> lfo;
+        LFO<Glow> lfo;
 
     public:
         SinChasePattern()
@@ -76,7 +76,7 @@ namespace Halo
             if (!transition.Calculate(active))
                 return;
 
-            lfo.setPulseWidth(params->getSize(0.1,1));
+            lfo.setDutyCycle(params->getSize(0.1,1));
             lfo.setPeriod(params->getVelocity(4000,500));
             int amount = params->getAmount(1,5);
 
@@ -92,7 +92,7 @@ namespace Halo
     {
 
         Transition transition;
-        LFO<LFOPause<SawDown>> lfo;
+        LFO<SawDown> lfo;
 
     public:
         SawChasePattern()
@@ -105,7 +105,7 @@ namespace Halo
             if (!transition.Calculate(active))
                 return;
 
-            lfo.setPulseWidth(params->getSize(0.1,1));
+            lfo.setDutyCycle(params->getSize(0.1,1));
             lfo.setPeriod(params->getVelocity(4000,500));
             int amount = params->getAmount(1,5);
             int variantParam = std::min((int)params->getVariant(1,3),2);

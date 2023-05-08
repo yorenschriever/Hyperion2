@@ -94,7 +94,7 @@ void addLedsterPipe(Hyperion *hyp)
             {.column = 1, .slot = 4, .pattern = new Max::AngularFadePattern(cLedsterMap3d)},
             {.column = 1, .slot = 5, .pattern = new Max::GrowingStrobePattern(cLedsterMap3d)},
 
-            {.column = 2, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
+            {.column = 2, .slot = 0, .pattern = new Min::RibbenClivePattern<Glow>(10000, 1, 0.15)},
             {.column = 2, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
             {.column = 2, .slot = 2, .pattern = new Min::GrowingCirclesPattern(ledsterMap3d)},
             {.column = 2, .slot = 3, .pattern = new Min::SpiralPattern(cLedsterMap3d)},
@@ -167,7 +167,7 @@ void addColumnPipes(Hyperion *hyp)
             {.column = 1, .slot = 4, .pattern = new Max::AngularFadePattern(cColumnMap3d)},
             {.column = 1, .slot = 5, .pattern = new Max::GrowingStrobePattern(cColumnMap3d)},
 
-            {.column = 2, .slot = 0, .pattern = new Min::RibbenClivePattern<LFOPause<NegativeCosFast>>(10000, 1, 0.15)},
+            {.column = 2, .slot = 0, .pattern = new Min::RibbenClivePattern<Glow>(10000, 1, 0.15)},
             {.column = 2, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
             {.column = 2, .slot = 2, .pattern = new Min::GrowingCirclesPattern(columnMap3d)},
             {.column = 2, .slot = 3, .pattern = new Min::SpiralPattern(cColumnMap3d)},
