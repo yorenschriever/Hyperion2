@@ -328,11 +328,13 @@ namespace ExamplePatterns
 
             for (int i = 0; i < width; i++){
                 // It is also easy to change this fade into a chase by providing an argument to getValue. 
-                // This time the argument is the number of milliseconds to delay the fade.
-                // (NB: i am considering to change this to a faction of the duration, so you pass a number in the range 0-1, to get a delay of 0-duration. That way is it closer to how lfo is working)
+                // this parameter is similar to the phase paramater in lfo:
+                // if you pass 0, all pixels will start fading immediately
+                // if you pass 1, the pixel will start after waiting 1 duration
+                // if you pass 2, the pixel will start after 2 fade durations, etc..
+                // In other words: the bigger the value: the slower the movement
                 float phase = ((float)i)/width;
-                int maxDelay = 500;
-                pixels[i] = params->getPrimaryColour() * fade.getValue(maxDelay * phase);
+                pixels[i] = params->getPrimaryColour() * fade.getValue(0.5 * phase);
             }
         }
     };
@@ -350,8 +352,8 @@ namespace ExamplePatterns
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
-            int maxDelay = 500;
-
+            float velocity = 2;
+            
             // In this example, we wait for the fade animation to finished before stopping the pattern.
             // This makes the transition a little bit nicer.
 
@@ -359,13 +361,15 @@ namespace ExamplePatterns
             if (active && watcher.Triggered())
                 fade.reset();
 
-            //if the fade is finished we can stop rendering
-            if (fade.isFinished(maxDelay))
+            // If the fade is finished we can stop rendering
+            // You need to pass the max phase delay here, so it can correct for the start of the most delayed fade.
+            // in this case: velocity * width / width = velocity
+            if (fade.isFinished(velocity))
                 return;
 
             for (int i = 0; i < width; i++){
                 float phase = ((float)i)/width;
-                pixels[i] = params->getPrimaryColour() * fade.getValue(maxDelay * phase);
+                pixels[i] = params->getPrimaryColour() * fade.getValue(velocity * phase);
             }
         }
     };
@@ -501,6 +505,44 @@ namespace ExamplePatterns
                 float phase = float(i)/width;
                 int randomizedPixelIndex = permute.at[i];
                 pixels[randomizedPixelIndex] = params->getPrimaryColour() * lfo.getValue(phase);
+            }
+        }
+    };
+
+    class FadeChase : public Pattern<RGBA>
+    {
+    public:
+        FadeDown fade;
+        BeatWatcher watcher;
+
+        FadeChase()
+        {
+            this->name = "Fade chase";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            if (watcher.Triggered())
+                fade.reset();
+
+            // When using fade to create spatial patterns, you can use setChaseLength
+            // to help you set the duration.
+            // First calculate the max startDelay based on the velocity.
+            // maxDelay is used in the argument of fade.getValue(), but also in setChaseLength.
+            // Because we have an array of pixels that start one after another, we visualize this
+            // as a moving chase. The length of the tail is determined by the time it takes the
+            // fade to fade out and the amount the chase has 'moved forward'. 
+            // The tail length is therefore dependent on maxDelay and the duration.
+            // setChaseLength will help you set the tail length
+            float maxDelay = params->getVelocity(2000,500);
+            fade.setTailLength(params->getSize(0,2), maxDelay);
+
+            for (int i = 0; i < width; i++) {
+                float phase = float(i)/width;
+                pixels[i] = params->getPrimaryColour() * fade.getValue(phase * maxDelay);
             }
         }
     };
