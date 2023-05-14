@@ -1,29 +1,30 @@
 #pragma once
 #include "abstractTempo.h"
 #include "log.hpp"
-#include "utils.hpp"
+#include "platform/includes/webServer.hpp"
 #include "platform/includes/websocketServer.hpp"
+#include "utils.hpp"
 
 class WebsocketTempo : public AbstractTempo, public TempoListener
 {
 
 public:
-    WebsocketTempo()
+    WebsocketTempo(WebServer *server)
     {
         sourceName = "Browser Tap";
-        socket= WebsocketServer::createInstance(9799);
-        //Todo implement tapping from browser
-        //socket->onMessage(handler, (void *)this);
-        //socket->onConnect(connectionHandler, (void *)this);
-
+        socket = WebsocketServer::createInstance(server, "/ws/tempo");
+        // Todo implement tapping from browser
+        // socket->onMessage(handler, (void *)this);
+        // socket->onConnect(connectionHandler, (void *)this);
     }
 
-    void OnBeat(int beatNr, const char* sourceName) override {
+    void OnBeat(int beatNr, const char *sourceName) override
+    {
         socket->sendAll("{\
             \"beatNr\": %d,\
             \"sourceName\": \"%s\"\
         }",
-            beatNr, sourceName);
+                        beatNr, sourceName);
     }
 
     friend class Tempo;

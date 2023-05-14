@@ -1,5 +1,5 @@
+#pragma once
 #include "websocketServer.hpp"
-
 #include "esp_eth.h"
 #include "esp_netif.h"
 #include "log.hpp"
@@ -14,16 +14,15 @@
 #include <nvs_flash.h>
 #include <set>
 #include <sys/param.h>
+#include "webServer-esp.hpp"
 
-#include "hyperion.crt.h"
-#include "hyperion.key.h"
 
 class WebsocketServerEsp : public WebsocketServer
 {
 public:
-    WebsocketServerEsp(unsigned short port)
+    WebsocketServerEsp(WebServerEsp *server, const char * path)
     {
-        start_wss_server(port);
+        start_wss_server(server,path);
     }
 
     ~WebsocketServerEsp() = default;
@@ -93,7 +92,7 @@ public:
         char s_buf[255];
         va_list args;
         va_start(args, message);
-        int sz = vsnprintf(s_buf, sizeof(s_buf), message, args);
+        vsnprintf(s_buf, sizeof(s_buf), message, args);
         va_end(args);
 
         auto ws_exclude = (RemoteWebsocketClientEsp *)exclude;
@@ -110,7 +109,7 @@ public:
         char s_buf[255];
         va_list args;
         va_start(args, message);
-        int sz = vsnprintf(s_buf, sizeof(s_buf), message, args);
+        vsnprintf(s_buf, sizeof(s_buf), message, args);
         va_end(args);
 
         for (auto ws : clients)
@@ -122,7 +121,7 @@ public:
 
         auto client2 = (RemoteWebsocketClientEsp *)client;
 
-        // Log::info(TAG, "sending: binary to fd %d", client2->fd);
+        //Log::info(TAG, "sending: binary to fd %d. number of clients: %d", client2->fd, client2->server->clients.size());
 
         httpd_ws_frame_t ws_pkt;
         memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
@@ -153,43 +152,38 @@ public:
     int connectionCount() override { return clients.size(); };
 
 private:
-    httpd_handle_t start_wss_server(unsigned short port)
+    httpd_handle_t start_wss_server(WebServerEsp *server, const char* path)
     {
-        httpd_handle_t server = NULL;
         Log::info(TAG, "Starting wss server");
 
-        httpd_ssl_config_t conf = HTTPD_SSL_CONFIG_DEFAULT();
-        conf.httpd.max_open_sockets = max_clients;
-        conf.httpd.global_user_ctx = this;
-        conf.httpd.open_fn = wss_open_fd;
-        conf.httpd.close_fn = wss_close_fd;
-        conf.port_secure = port;
-        conf.port_insecure = 82;
 
-        conf.servercert = HYPERION_CERT;
-        conf.servercert_len = HYPERION_CERT_SIZE + 1;
-        conf.prvtkey_pem = HYPERION_KEY;
-        conf.prvtkey_len = HYPERION_KEY_SIZE + 1;
-        conf.httpd.ctrl_port = port + 5000;
-
-        Log::info(TAG, "Starting HTTP Server for websocket on port: '%d' (%d)", conf.port_secure, conf.port_insecure);
-        esp_err_t ret = httpd_ssl_start(&server, &conf);
-        if (ESP_OK != ret)
-        {
-            Log::error(TAG, "Error starting server!");
-            return NULL;
-        }
-
-        // Log::info(TAG, "Registering URI handlers");
-        httpd_register_uri_handler(server, &ws);
+        ws.uri = path;
+        ws.user_ctx = this;
+        Log::info(TAG, "Registering URI handler for %s", path);
+        httpd_register_uri_handler(server->server, &ws);
         return server;
     }
 
     static esp_err_t ws_handler(httpd_req_t *req)
     {
+        WebsocketServerEsp *server = (WebsocketServerEsp *)req->user_ctx;
+        int sockfd = httpd_req_to_sockfd(req);
+
         if (req->method == HTTP_GET)
         {
-            Log::info(TAG, "Handshake done, the new connection was opened");
+            //Log::info(TAG, "Handshake done, the new connection was opened");
+
+            Log::info(TAG, "New WS client connected hd=%d,  fd=%d, path = %s", (int)req->handle, sockfd, server->ws.uri);
+
+            auto client = new RemoteWebsocketClientEsp;
+            client->hd = req->handle;
+            client->fd = sockfd;
+            client->server = server;
+            server->clients.insert(client);
+
+            if (server->connectionHandler != nullptr)
+                server->connectionHandler((RemoteWebsocketClient *)sockfd, server, server->connectionUserData);
+
             return ESP_OK;
         }
         httpd_ws_frame_t ws_pkt;
@@ -211,7 +205,7 @@ private:
             buf = (uint8_t *)calloc(1, ws_pkt.len + 1);
             if (buf == NULL)
             {
-                ESP_LOGE(TAG, "Failed to calloc memory for buf");
+                Log::error(TAG, "Failed to calloc memory for buf");
                 return ESP_ERR_NO_MEM;
             }
             ws_pkt.payload = buf;
@@ -219,7 +213,7 @@ private:
             ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
             if (ret != ESP_OK)
             {
-                ESP_LOGE(TAG, "httpd_ws_recv_frame failed with %d", ret);
+                Log::error(TAG, "httpd_ws_recv_frame failed with %d", ret);
                 free(buf);
                 return ret;
             }
@@ -227,6 +221,12 @@ private:
 
         if (ws_pkt.type == HTTPD_WS_TYPE_CLOSE)
         {
+            Log::info(TAG, "client disconnected %d. number of clients before disconnect: %d", sockfd, server->clients.size());
+
+            auto client = server->findClient(req->handle, sockfd);
+            server->clients.erase(client);
+            delete client;
+
             // Response CLOSE packet with no payload to peer
             ws_pkt.len = 0;
             ws_pkt.payload = NULL;
@@ -239,9 +239,7 @@ private:
         {
             // Log::info(TAG, "Received packet with message: %s. hd=%d, fd=%d", ws_pkt.payload, (int)req->handle, httpd_req_to_sockfd(req));
 
-            WebsocketServerEsp *server = (WebsocketServerEsp *)httpd_get_global_user_ctx(req->handle); // req->user_ctx;
-
-            auto client = server->findClient(req->handle, httpd_req_to_sockfd(req));
+            auto client = server->findClient(req->handle, sockfd);
 
             if (server->handler != nullptr)
                 server->handler(client, server, std::string((const char *)ws_pkt.payload, ws_pkt.len), server->userData);
@@ -251,46 +249,6 @@ private:
         return ESP_OK;
     }
 
-    static esp_err_t wss_open_fd(httpd_handle_t hd, int sockfd)
-    {
-        Log::info(TAG, "New client connected hd=%d,  fd=%d", (int)hd, sockfd);
-        WebsocketServerEsp *server = (WebsocketServerEsp *)httpd_get_global_user_ctx(hd);
-
-        auto client = new RemoteWebsocketClientEsp;
-        client->hd = hd;
-        client->fd = sockfd;
-        client->server = server;
-        server->clients.insert(client);
-
-        if (server->connectionHandler != nullptr)
-            // TODO: thread is maybe bit heavy.. but we have to wait for this function to return before sending websocket data..
-            // is there another way?
-            Thread::create(connectionHandlerTask, "ws_conn_hdl", Thread::Purpose::control, 30000, client, 1);
-        // server->connectionHandler((RemoteWebsocketClient *)sockfd, server, server->connectionUserData);
-        return ESP_OK;
-    }
-
-    static void connectionHandlerTask(void *param)
-    {
-        auto client = (RemoteWebsocketClientEsp *)param;
-        // wait for the handshake to complete before sending init data
-        // TODO actually test and wait
-        Thread::sleep(500);
-        client->server->connectionHandler((RemoteWebsocketClient *)client->fd, client->server, client->server->connectionUserData);
-        Thread::destroy();
-    }
-
-    static void wss_close_fd(httpd_handle_t hd, int sockfd)
-    {
-        WebsocketServerEsp *server = (WebsocketServerEsp *)httpd_get_global_user_ctx(hd);
-        Log::info(TAG, "client disconnected %d. number of clients before disconnect: %d", sockfd, server->clients.size());
-
-        auto client = server->findClient(hd, sockfd);
-        server->clients.erase(client);
-        delete client;
-
-        // Log::info(TAG, "number of clients after disconnect: %d", server->clients.size());
-    }
 
     RemoteWebsocketClientEsp *findClient(httpd_handle_t hd, int fd)
     {
@@ -308,20 +266,17 @@ private:
         return *result;
     }
 
-    static const httpd_uri_t ws;
-    static const char *TAG;
-    static const size_t max_clients;
-
-    std::set<RemoteWebsocketClientEsp *> clients;
-};
-
-const httpd_uri_t WebsocketServerEsp::ws = {
+    httpd_uri_t ws = {
     .uri = "/",
     .method = HTTP_GET,
     .handler = WebsocketServerEsp::ws_handler,
     .user_ctx = NULL,
     .is_websocket = true,
-    .handle_ws_control_frames = true};
+    .handle_ws_control_frames = true,
+    .supported_subprotocol = nullptr};
+    std::set<RemoteWebsocketClientEsp *> clients;
+
+    static const char *TAG;
+};
 
 const char *WebsocketServerEsp::TAG = "wss_server";
-const size_t WebsocketServerEsp::max_clients = 4;

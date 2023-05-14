@@ -24,7 +24,7 @@ int main()
   auto pipe = new Pipe(
     new UDPInput(4445),
     //new UDPOutput("localhost",4446,60)
-    new MonitorOutput(freakMap)
+    new MonitorOutput(&hyp->webServer,freakMap)
   );
 
   hyp->addPipe(pipe);

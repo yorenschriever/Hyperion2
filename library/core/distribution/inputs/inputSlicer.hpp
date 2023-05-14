@@ -6,7 +6,7 @@
 #include "input.hpp"
 #include "bufferInput.hpp"
 #include "utils.hpp"
-#include "pipe.hpp"
+#include "core/distribution/pipes/pipe.hpp"
 
 // InputSlicer is a more advanced version of input splitter. 
 // With this class you can freely assign start and end positions
@@ -77,7 +77,7 @@ public:
             }
         }
 
-        auto len = instance->sourceInput->loadData(instance->buffer, MTU);
+        auto len = instance->sourceInput->loadData(instance->buffer, Pipe::bufferSize);
         if (len > 0)
         {   
             for (auto di : instance->destinationInputs)
@@ -101,7 +101,6 @@ protected:
     Input *sourceInput = NULL;
     std::vector<BufferInput *> destinationInputs;
     std::vector<Slice> slices;
-    //static const int MTU = 1500 * 4 * 6;
     uint8_t buffer[Pipe::bufferSize];
     bool begun = false;
 };

@@ -36,7 +36,7 @@ int main()
 #define OUTPUT new NeopixelOutput(1)
 #else
 #define OUT_COLOR RGB
-#define OUTPUT new MonitorOutput(ledsterMap)
+#define OUTPUT new MonitorOutput(&hyp->webServer,ledsterMap)
 #endif
 
 void addLedsterPipe(Hyperion *hyp)

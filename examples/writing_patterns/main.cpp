@@ -87,7 +87,7 @@ void addHaloPipe(Hyperion *hyp)
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         input,
-        new MonitorOutput(haloMap)));
+        new MonitorOutput(&hyp->webServer,haloMap)));
 }
 
 void addPaletteColumn(Hyperion *hyp)

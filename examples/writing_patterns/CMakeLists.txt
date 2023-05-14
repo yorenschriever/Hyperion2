@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # The name of your project
-set(PROJECT halo)
+set(PROJECT writing_patterns_example)
 
 include($ENV{HYPERION_LIB_DIR}/build-utils/utils.cmake)
 

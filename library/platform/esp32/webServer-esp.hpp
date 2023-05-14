@@ -24,6 +24,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
+#include <cstring>
 
 /* Max length a file path can have on storage */
 #define FILE_PATH_MAX (ESP_VFS_PATH_MAX + CONFIG_SPIFFS_OBJ_NAME_LEN)
@@ -117,8 +118,6 @@ private:
         strlcpy(server_data->base_path, base_path, sizeof(server_data->base_path));
         server_data->paths = &paths;
 
-        httpd_handle_t server = NULL;
-
         httpd_ssl_config_t config = HTTPD_SSL_CONFIG_DEFAULT();
         // bin2hex does not include the null terminator in the size, but esp-idf expects it, therefore i add +1 to the size
         config.servercert = HYPERION_CERT;
@@ -129,7 +128,7 @@ private:
         /* Use the URI wildcard matching function in order to
          * allow the same handler to respond to multiple different
          * target URIs which match the wildcard scheme */
-        config.httpd.uri_match_fn = httpd_uri_match_wildcard;
+        config.httpd.uri_match_fn = wildcard_non_websocket;
 
         config.port_secure = port;
 
@@ -145,10 +144,28 @@ private:
             .uri = "/*", // Match all URIs of type /path/to/file
             .method = HTTP_GET,
             .handler = download_get_handler,
-            .user_ctx = server_data // Pass server data as context
+            .user_ctx = server_data, // Pass server data as context
+
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+
         };
         httpd_register_uri_handler(server, &file_download);
+
         return ESP_OK;
+    }
+
+    static bool wildcard_non_websocket(const char *templ, const char *uri, size_t len)
+    {
+        // This matches matches /ws/ exactly, so they can be matched with the registered 
+        // websockets. For other urls is does a pattern match, so we can match * 
+        // for all files in the filesystem.
+        if (len >= 4 && strncmp(uri,"/ws/",4)==0){
+            //requested url is of a websocket. do not use template matching
+            return strlen(templ) == len && strncmp(templ,uri,len)==0;
+        }
+        return httpd_uri_match_wildcard(templ, uri, len);
     }
 
     static esp_err_t download_get_handler(httpd_req_t *req)
@@ -300,11 +317,29 @@ private:
         return dest + base_pathlen;
     }
 
+    // static esp_err_t wss_open_fd(httpd_handle_t hd, int sockfd){
+    //     //if (ws_open) return ws_open(hd, sockfd);
+    //     return ESP_OK;
+    // }
+    // static void wss_close_fd(httpd_handle_t hd, int sockfd){
+    //    // if (ws_close) return ws_close(hd, sockfd);
+    // }
+
     static const char *TAG;
+    static struct file_server_data *server_data;
 
     std::map<std::string, WebServerResponseBuilder *> paths;
-    static struct file_server_data *server_data;
+
+public:
+    httpd_handle_t server = NULL;
+
+    // static httpd_open_func_t ws_open;
+    // static httpd_close_func_t ws_close;
+
+    //friend class WebsocketServerEsp;
 };
 
-const char *WebServerEsp::TAG = "WEBSERVER";
-struct file_server_data *WebServerEsp::server_data = nullptr;
+
+
+// const char *WebServerEsp::TAG = "WEBSERVER";
+// struct file_server_data *WebServerEsp::server_data = nullptr;

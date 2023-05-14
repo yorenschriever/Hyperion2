@@ -59,10 +59,10 @@ public:
             setup_display();
         if (config.midi)
             setup_midi();
-        if (config.tempo)
-            setup_tempo();
         if (config.web)
             setup_web();
+        if (config.tempo)
+            setup_tempo();
 
         Log::info("HYP", "starting outputs");
         for (Pipe *pipe : pipes)
@@ -164,9 +164,8 @@ private:
             },
             this);
 
-        //temporarily disabled to test websockets one at a time, enable again
-        //auto websocketTempo = new WebsocketTempo();
-        //Tempo::AddListener(websocketTempo);
+        auto websocketTempo = new WebsocketTempo(this->webServer);
+        Tempo::AddListener(websocketTempo);
     }
 
     virtual void setup_midi()
@@ -199,10 +198,7 @@ private:
         Log::info(TAG, "Setup web");
         webServer = WebServer::createInstance();
 
-        MonitorOutput3d::addPathToServer(webServer);
-        MonitorOutput::addPathToServer(webServer);
-
-        hub.subscribe(new WebsocketController(&hub));
+        hub.subscribe(new WebsocketController(&hub, webServer));
     }
 
     static void UpdateDisplayTask(void *parameter)

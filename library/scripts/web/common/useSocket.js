@@ -4,20 +4,20 @@ import { useEffect, useRef } from './preact-standalone.js'
 class Socket {
 
     socket;
-    port;
+    path;
     onMessage;
     onStatusChange;
 
     reconnectInterval;
     visibilityCallback;
 
-    constructor(port, onMessage, onStatusChange)
+    constructor(path, onMessage, onStatusChange)
     {
-        this.port = port;
+        this.path = path;
         this.onMessage = onMessage;
         this.onStatusChange = onStatusChange;
         
-        //this.reconnectInterval = window.setInterval(() => this.fixSocket(), 2500);
+        this.reconnectInterval = window.setInterval(() => this.fixSocket(), 2500);
         this.visibilityCallback = this.onVisibilityChange.bind(this);
         document.addEventListener("visibilitychange", this.visibilityCallback);
         this.fixSocket();
@@ -30,7 +30,7 @@ class Socket {
         if (document.hidden)
             return; //don't create new socket when page is not in view
 
-        this.socket = new WebSocket(`wss://${location.hostname}:${this.port}`)
+        this.socket = new WebSocket(`wss://${location.host}${this.path}`)
 
         this.socket.onmessage = wsmsg => this.onMessage(wsmsg.data);
 
@@ -49,7 +49,7 @@ class Socket {
         };
     
         this.socket.onopen = () => {
-            console.log(`socket is opened on port ${this.port}`)
+            console.log(`socket is opened on path ${this.path}`)
             this.onStatusChange?.(this.socket.readyState);
         }
     }
@@ -82,16 +82,16 @@ class Socket {
 
 }
 
-export const createSocket = (port, onMessage) => {
-    new Socket(port, onMessage)
+export const createSocket = (path, onMessage) => {
+    new Socket(path, onMessage)
 }
 
-export const useSocket = (port, onMessage, setSocketState) => 
+export const useSocket = (path, onMessage, setSocketState) => 
 {
     const socketRef = useRef();
 
     useEffect(() => {
-        socketRef.current = new Socket(port, onMessage, setSocketState);
+        socketRef.current = new Socket(path, onMessage, setSocketState);
         return () => socketRef.current.close();
     }, []);
 
@@ -103,7 +103,7 @@ export const useSocket = (port, onMessage, setSocketState) =>
 export const useMonitorSockets = (scene, onMessage) => 
 {
     useEffect(() => {
-        const createdSockets = scene.map(scenePart => new Socket(scenePart.port, data => onMessage(scenePart, data)));
+        const createdSockets = scene.map(scenePart => new Socket(scenePart.path, data => onMessage(scenePart, data)));
         return () => createdSockets.forEach(socket => socket.close());
     }, [])
 }

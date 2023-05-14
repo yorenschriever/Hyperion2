@@ -6,15 +6,16 @@
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
 #include "platform/includes/websocketServer.hpp"
+#include "platform/includes/webServer.hpp"
 
 class WebsocketController : public IHubController
 {
 public:
-    WebsocketController(ControlHub *hub)
+    WebsocketController(ControlHub *hub, WebServer *server)
     {
         this->hub = hub;
         // Log::info(TAG, "Created WebsocketController");
-        socket = WebsocketServer::createInstance(9800);
+        socket = WebsocketServer::createInstance(server,"/ws/controller");
         socket->onMessage(handler, (void *)this);
         socket->onConnect(connectionHandler, (void *)this);
     }
@@ -73,6 +74,8 @@ public:
             else if (param.compare("Velocity") == 0)
                 instance->hub->setVelocity(value);
         }
+
+        cJSON_Delete(parsed);
     }
 
     void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) override

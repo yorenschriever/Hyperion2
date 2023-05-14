@@ -4,13 +4,14 @@
 #include <string>
 #include <stdarg.h>
 #include <memory>
+#include "webServer.hpp"
 
 typedef void RemoteWebsocketClient;
 
 class WebsocketServer
 {
 public:
-    static std::unique_ptr<WebsocketServer> createInstance(unsigned short port);
+    static std::unique_ptr<WebsocketServer> createInstance(WebServer *server, const char * path);
 
     using WebsocketMessageHandler = void (*)(RemoteWebsocketClient *client, WebsocketServer *server, std::string, void* userData);
     using WebsocketConnectionHandler = void (*)(RemoteWebsocketClient *client, WebsocketServer *server, void* userData);

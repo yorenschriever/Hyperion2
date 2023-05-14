@@ -151,7 +151,7 @@ void addLedsterPipe(Hyperion *hyp)
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(1),
-        new MonitorOutput3d(ledsterMap3d)));
+        new MonitorOutput3d(&hyp->webServer,ledsterMap3d)));
 }
 
 void addColumnPipes(Hyperion *hyp)
@@ -268,7 +268,7 @@ void addColumnPipes(Hyperion *hyp)
     hyp->addPipe(
         new ConvertPipe<RGBA, RGB>(
             splitInput->getInput(12),
-            new MonitorOutput3d(columnMap3d)));
+            new MonitorOutput3d(&hyp->webServer,columnMap3d)));
 }
 
 void addHaloPipe(Hyperion *hyp)
@@ -331,7 +331,7 @@ void addHaloPipe(Hyperion *hyp)
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(1),
-        new MonitorOutput3d(haloMap3d)));
+        new MonitorOutput3d(&hyp->webServer,haloMap3d)));
 }
 
 void addPaletteColumn(Hyperion *hyp)

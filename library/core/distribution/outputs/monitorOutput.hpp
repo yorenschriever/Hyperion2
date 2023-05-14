@@ -8,6 +8,7 @@
 #include "platform/includes/webServerResponseBuilder.hpp"
 #include "websocketOutput.hpp"
 #include <stdarg.h>
+#include <string>
 
 class PixelMapJson : public WebServerResponseBuilder
 {
@@ -20,7 +21,7 @@ class PixelMapJson : public WebServerResponseBuilder
         for (auto output : outputs)
         {
             write(userData, writer, "  {\n");
-            write(userData, writer, "    \"port\": %d,\n", output.port);
+            write(userData, writer, "    \"path\": \"/ws/monitor%d\",\n", output.mapIndex);
             write(userData, writer, "    \"positions\": [\n");
             int index = 0;
             for (auto pixel : output.map)
@@ -36,20 +37,20 @@ class PixelMapJson : public WebServerResponseBuilder
 public:
     unsigned int addOutput(PixelMap map)
     {
-        outputs.push_back({.map = map, .port = ++port});
-        return port;
+        outputs.push_back({.map = map, .mapIndex = ++mapIndex});
+        return mapIndex;
     }
 
 private:
     struct PixelMonitorOutput
     {
         PixelMap map;
-        unsigned int port;
+        unsigned int mapIndex;
     };
 
     std::vector<PixelMonitorOutput> outputs;
     bool begun;
-    unsigned int port = 9750;
+    unsigned int mapIndex = 0;
     char buffer[100];
 
     void write(void *userData, WebServerResponseBuilder::Writer writer, const char *message, ...)
@@ -62,28 +63,27 @@ private:
     }
 };
 
-// MonitorOutput displays the led data on your browser
+// MonitorOutput displays the led data in your browser
 class MonitorOutput : public WebsocketOutput
 {
 public:
-    MonitorOutput(PixelMap map, unsigned int fps = 60) : WebsocketOutput(0, fps)
+    MonitorOutput(WebServer **webServer, PixelMap map, unsigned int fps = 60) : WebsocketOutput(webServer, pathBuf, fps)
     {
-        this->port = pixelMapJson.addOutput(map);
+        this->webServer = webServer;
+        snprintf(pathBuf, 20, "/ws/monitor%d", pixelMapJson.addOutput(map));
     }
 
     void begin() override
     {
         // Log::info(TAG,"beginning MonitorOutput on port %d",port);
         WebsocketOutput::begin();
-    }
-
-    static void addPathToServer(WebServer *server)
-    {
-        server->addPath("/monitor2d/mapping.json", &pixelMapJson);
+        (*webServer)->addPath("/monitor2d/mapping.json", &pixelMapJson);
     }
 
 private:
-    // todo support multiple servers / pixel maps
+    WebServer **webServer;
+    char pathBuf[20];
+    // todo support multiple pixel maps for multiple servers
     static PixelMapJson pixelMapJson;
 };
 

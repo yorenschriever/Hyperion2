@@ -60,7 +60,7 @@ export const ControllerApp = () => {
         })
     },[setState])
 
-    const [send] = useSocket(9800, msg => {
+    const [send] = useSocket("/ws/controller", msg => {
         msg = JSON.parse(msg)
         resizeController(msg.columnIndex, msg.slotIndex)
 
@@ -186,10 +186,8 @@ const ParamFader = ({ name, value }) => {
 }
 
 const Tempo = () => {
-    return;
-    
     const [source, setSource] = useState("[none]");
-    useSocket(9799, msg => {
+    useSocket("/ws/tempo", msg => {
         msg = JSON.parse(msg)
         console.log(msg);
 
