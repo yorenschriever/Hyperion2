@@ -186,6 +186,8 @@ const ParamFader = ({ name, value }) => {
 }
 
 const Tempo = () => {
+    return;
+    
     const [source, setSource] = useState("[none]");
     useSocket(9799, msg => {
         msg = JSON.parse(msg)

@@ -17,7 +17,7 @@ class Socket {
         this.onMessage = onMessage;
         this.onStatusChange = onStatusChange;
         
-        this.reconnectInterval = window.setInterval(() => this.fixSocket(), 2500);
+        //this.reconnectInterval = window.setInterval(() => this.fixSocket(), 2500);
         this.visibilityCallback = this.onVisibilityChange.bind(this);
         document.addEventListener("visibilitychange", this.visibilityCallback);
         this.fixSocket();

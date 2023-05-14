@@ -164,8 +164,9 @@ private:
             },
             this);
 
-        auto websocketTempo = new WebsocketTempo();
-        Tempo::AddListener(websocketTempo);
+        //temporarily disabled to test websockets one at a time, enable again
+        //auto websocketTempo = new WebsocketTempo();
+        //Tempo::AddListener(websocketTempo);
     }
 
     virtual void setup_midi()

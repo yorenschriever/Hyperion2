@@ -10,8 +10,13 @@
 // The input provides the data and the output sends it out to the lamps.
 class Pipe
 {
-private:
+public:
+#if (ESP_PLATFORM)
+    static const int bufferSize = 1500; // * 4 * 6;
+#else
     static const int bufferSize = 1500 * 4 * 6;
+#endif
+private:
     static uint8_t buffer[bufferSize];
 
     virtual int transfer(uint8_t *data, int length, Output *out)
