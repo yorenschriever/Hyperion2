@@ -1,8 +1,8 @@
 #pragma once
-#include "webServer.hpp"
-
 #include "log.hpp"
 #include "server-certificate.hpp"
+#include "webServer.hpp"
+#include "websocketServer.hpp"
 #include "webServerResponseBuilder.hpp"
 #include <algorithm>
 #include <boost/asio/bind_executor.hpp>
@@ -24,19 +24,11 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <vector>
-#include <set>
-#include "websocketServer.hpp"
-
-// #include <boost/beast/http/message_generator.hpp>
-// #include <boost/beast/http/string_body.hpp>
-//#include "websocketServerSessionReceiver.hpp"
-#include "webServer-macos-ws.hpp"
-
-
 
 template <class Derived>
 class websocket_session;
@@ -46,17 +38,10 @@ class ssl_websocket_session;
 class WebSocketServerSessionReceiver
 {
 public:
-    virtual void on_connect(websocket_session<ssl_websocket_session> *session)=0;
-    virtual void on_receive(websocket_session<ssl_websocket_session> *session, std::string message)=0;
-    virtual void on_disconnect(websocket_session<ssl_websocket_session> *session)=0;
+    virtual void on_connect(websocket_session<ssl_websocket_session> *session) = 0;
+    virtual void on_receive(websocket_session<ssl_websocket_session> *session, std::string message) = 0;
+    virtual void on_disconnect(websocket_session<ssl_websocket_session> *session) = 0;
 };
-
-// class WebServerMacOsWs
-// {
-// public:
-
-//     virtual void addPathWs(std::string path, WebSocketServerSessionReceiver  *websocket)=0;
-// };
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
@@ -70,7 +55,7 @@ using PathMapWs = std::map<std::string, WebSocketServerSessionReceiver *>;
 
 // Return a reasonable mime type based on the extension of a file.
 beast::string_view
-mime_type(beast::string_view path)//;
+mime_type(beast::string_view path) //;
 {
     using beast::iequals;
     auto const ext = [&path]
@@ -130,7 +115,7 @@ mime_type(beast::string_view path)//;
 std::string
 path_cat(
     beast::string_view base,
-    beast::string_view path)//;
+    beast::string_view path) //;
 {
     if (base.empty())
         return std::string(path);
@@ -162,7 +147,7 @@ handle_request(
     beast::string_view doc_root,
     http::request<Body, http::basic_fields<Allocator>> &&req,
     PathMap *paths,
-    std::string *response_buffer)//;
+    std::string *response_buffer)
 {
     // Returns a bad request response
     auto const bad_request =
@@ -217,7 +202,7 @@ handle_request(
     auto str_target = std::string(req.target());
     if (paths->count(str_target) > 0)
     {
-        Log::info("WebServerMacOs", "path found with WebServerResponseBuilder: %s", str_target.c_str());
+        //Log::info("WebServerMacOs", "path found with WebServerResponseBuilder: %s", str_target.c_str());
 
         http::response<http::buffer_body> res;
 
@@ -233,7 +218,7 @@ handle_request(
             response_buffer->append(buffer, size);
         };
 
-        auto builder = paths->at(str_target); // (*paths)[str_target]; // TODO
+        auto builder = paths->at(str_target); 
         builder->build(builderWriter, (void *)response_buffer);
         int body_size = response_buffer->size();
 
@@ -297,7 +282,7 @@ handle_request(
 //------------------------------------------------------------------------------
 
 // Report a failure
-void fail(beast::error_code ec, char const *what)//;
+void fail(beast::error_code ec, char const *what) //;
 {
     // ssl::error::stream_truncated, also known as an SSL "short read",
     // indicates the peer closed the connection without performing the
@@ -366,43 +351,29 @@ class websocket_session
             beast::bind_front_handler(
                 &websocket_session::on_accept,
                 derived().shared_from_this()));
-
-        
     }
 
 public:
-    void write_txt(const char* data, int len){
-        
+    void write_txt(const char *data, int len)
+    {
+
         beast::flat_buffer buffer(len);
         auto buf = buffer.prepare(len);
         memcpy(buf.data(), data, len);
         buffer.commit(len);
         derived().ws().text(true);
         derived().ws().write(buffer.data());
-
-        // //todo make sync
-        // derived().ws().async_write(
-        //     buffer_.data(),
-        //     beast::bind_front_handler(
-        //         &websocket_session::on_write,
-        //         derived().shared_from_this()));
     }
 
-    void write_bin(uint8_t* data, int len){
-        
+    void write_bin(uint8_t *data, int len)
+    {
+
         beast::flat_buffer buffer(len);
         auto buf = buffer.prepare(len);
         memcpy(buf.data(), data, len);
         buffer.commit(len);
         derived().ws().text(false);
         derived().ws().write(buffer.data());
-
-        // //todo make sync
-        // derived().ws().async_write(
-        //     buffer_.data(),
-        //     beast::bind_front_handler(
-        //         &websocket_session::on_write,
-        //         derived().shared_from_this()));
     }
 
 private:
@@ -414,7 +385,6 @@ private:
 
         receiver->on_connect(this);
 
-        // Read a message
         do_read();
     }
 
@@ -445,57 +415,21 @@ private:
 
         if (derived().ws().got_text())
         {
-            Log::info("","Got string: %s",buffer_.data());
-            receiver->on_receive(this,boost::beast::buffers_to_string(buffer_.data()));
-
-
-            
+            //Log::info("", "Got string: %s", buffer_.data());
+            receiver->on_receive(this, boost::beast::buffers_to_string(buffer_.data()));
         }
         buffer_.consume(buffer_.size());
 
         do_read();
-
-        // Echo the message
-        // derived().ws().text(derived().ws().got_text());
-        // derived().ws().async_write(
-        //     buffer_.data(),
-        //     beast::bind_front_handler(
-        //         &websocket_session::on_write,
-        //         derived().shared_from_this()));
     }
-
-    // void
-    // on_write(
-    //     beast::error_code ec,
-    //     std::size_t bytes_transferred)
-    // {
-    //     boost::ignore_unused(bytes_transferred);
-
-    //     if (ec)
-    //         return fail(ec, "write");
-
-    //     // Clear the buffer
-    //     buffer_.consume(buffer_.size());
-
-    //     // Do another read
-    //     do_read();
-    // }
 
     void
     on_write(
         beast::error_code ec,
         std::size_t bytes_transferred)
     {
-        // boost::ignore_unused(bytes_transferred);
-
         if (ec)
             return fail(ec, "write");
-
-        // // Clear the buffer
-        // buffer_.consume(buffer_.size());
-
-        // // Do another read
-        // do_read();
     }
 
     WebSocketServerSessionReceiver *receiver = nullptr;
@@ -507,11 +441,10 @@ public:
     run(http::request<Body, http::basic_fields<Allocator>> req, PathMapWs *wsPaths)
     {
         auto str_target = std::string(req.target());
-        Log::info("", "Websocket session start for target: %s", str_target.c_str());
+        // Log::info("", "Websocket session start for target: %s", str_target.c_str());
 
         if (wsPaths->count(str_target) == 0)
         {
-            // return derived().ws().close(boost::beast::websocket::close_reason(boost::beast::websocket::close_code::internal_error,"No server found on path"));
             Log::error("WEBSOCKET", "No websocket found at this path: %s", str_target.c_str());
             return;
         }
@@ -526,34 +459,9 @@ public:
     {
         Log::info("", "Websocket session destroy");
         if (receiver)
-           receiver->on_disconnect(this);
+            receiver->on_disconnect(this);
     }
 };
-
-//------------------------------------------------------------------------------
-
-// // Handles a plain WebSocket connection
-// class plain_websocket_session
-//     : public websocket_session<plain_websocket_session>,
-//       public std::enable_shared_from_this<plain_websocket_session>
-// {
-//     websocket::stream<beast::tcp_stream> ws_;
-
-// public:
-//     // Create the session
-//     explicit plain_websocket_session(
-//         beast::tcp_stream &&stream)
-//         : ws_(std::move(stream))
-//     {
-//     }
-
-//     // Called by the base class
-//     websocket::stream<beast::tcp_stream> &
-//     ws()
-//     {
-//         return ws_;
-//     }
-// };
 
 //------------------------------------------------------------------------------
 
@@ -565,18 +473,13 @@ class ssl_websocket_session
     websocket::stream<
         beast::ssl_stream<beast::tcp_stream>>
         ws_;
-    
 
 public:
     // Create the ssl_websocket_session
     explicit ssl_websocket_session(
-        beast::ssl_stream<beast::tcp_stream> &&stream
-        //,
-        //PathMapWs *wsPaths
-        )
-        : ws_(std::move(stream))//, wsPaths_(wsPaths)
-    {
-    }
+        beast::ssl_stream<beast::tcp_stream> &&stream)
+        : ws_(std::move(stream))
+    {}
 
     // Called by the base class
     websocket::stream<
@@ -585,21 +488,9 @@ public:
     {
         return ws_;
     }
-
-    //PathMapWs *wsPaths_;
 };
 
 //------------------------------------------------------------------------------
-
-// template <class Body, class Allocator>
-// void make_websocket_session(
-//     beast::tcp_stream stream,
-//     http::request<Body, http::basic_fields<Allocator>> req)
-// {
-//     std::make_shared<plain_websocket_session>(
-//         std::move(stream))
-//         ->run(std::move(req));
-// }
 
 template <class Body, class Allocator>
 void make_websocket_session(
@@ -786,61 +677,6 @@ public:
 
 //------------------------------------------------------------------------------
 
-// // Handles a plain HTTP connection
-// class plain_http_session
-//     : public http_session<plain_http_session>,
-//       public std::enable_shared_from_this<plain_http_session>
-// {
-//     beast::tcp_stream stream_;
-
-// public:
-//     // Create the session
-//     plain_http_session(
-//         beast::tcp_stream &&stream,
-//         beast::flat_buffer &&buffer,
-//         std::shared_ptr<std::string const> const &doc_root)
-//         : http_session<plain_http_session>(
-//               std::move(buffer),
-//               doc_root),
-//           stream_(std::move(stream))
-//     {
-//     }
-
-//     // Start the session
-//     void
-//     run()
-//     {
-//         this->do_read();
-//     }
-
-//     // Called by the base class
-//     beast::tcp_stream &
-//     stream()
-//     {
-//         return stream_;
-//     }
-
-//     // Called by the base class
-//     beast::tcp_stream
-//     release_stream()
-//     {
-//         return std::move(stream_);
-//     }
-
-//     // Called by the base class
-//     void
-//     do_eof()
-//     {
-//         // Send a TCP shutdown
-//         beast::error_code ec;
-//         stream_.socket().shutdown(tcp::socket::shutdown_send, ec);
-
-//         // At this point the connection is closed gracefully
-//     }
-// };
-
-//------------------------------------------------------------------------------
-
 // Handles an SSL HTTP connection
 class ssl_http_session
     : public http_session<ssl_http_session>,
@@ -954,7 +790,7 @@ public:
         ssl::context &ctx,
         std::shared_ptr<std::string const> const &doc_root,
         PathMap *paths,
-        PathMapWs * wsPaths)
+        PathMapWs *wsPaths)
         : stream_(std::move(socket)), ctx_(ctx), doc_root_(doc_root), paths_(paths), wsPaths_(wsPaths)
     {
     }
@@ -1009,13 +845,6 @@ public:
         }
 
         return fail(ec, "plain http not supported");
-
-        // // Launch plain session
-        // std::make_shared<plain_http_session>(
-        //     std::move(stream_),
-        //     std::move(buffer_),
-        //     doc_root_)
-        //     ->run();
     }
 };
 
@@ -1120,7 +949,7 @@ private:
 
 //------------------------------------------------------------------------------
 
-class WebServerMacOs : public WebServer //, public WebServerMacOsWs
+class WebServerMacOs : public WebServer 
 {
 public:
     WebServerMacOs(std::string root, int port)
@@ -1144,10 +973,10 @@ public:
         // Log::info(TAG, "added path %s", path.c_str());
     }
 
-    void addPathWs(std::string path, WebSocketServerSessionReceiver  *websocket) 
+    void addPathWs(std::string path, WebSocketServerSessionReceiver *websocket)
     {
         wsPaths[path] = websocket;
-        Log::info(TAG, "added ws path %s", path.c_str());
+        // Log::info(TAG, "added ws path %s", path.c_str());
     }
 
 private:
@@ -1169,7 +998,6 @@ private:
             // Check command line arguments.
             auto const address = net::ip::make_address("0.0.0.0");
             auto const port = static_cast<unsigned short>(portArg);
-            // auto const doc_root = std::make_shared<std::string>("/Users/yoren/repos/Hyperion2/library/scripts/web");
             auto const threads = 1;
 
             // The io_context is required for all I/O
@@ -1218,378 +1046,23 @@ private:
             // Block until all the threads exit
             for (auto &t : v)
                 t.join();
-
-            // // The acceptor receives incoming connections
-            // tcp::acceptor acceptor{ioc, {address, port}};
-            // for (;;)
-            // {
-            //     // This will receive the new connection
-            //     tcp::socket socket{ioc};
-
-            //     // Block until we get a connection
-            //     acceptor.accept(socket);
-
-            //     // Launch the session, transferring ownership of the socket
-            //     std::thread{std::bind(
-            //                     &do_session,
-            //                     std::move(socket),
-            //                     std::ref(ctx),
-            //                     doc_root,
-            //                     paths)}
-            //         .detach();
-            // }
         }
         catch (const std::exception &e)
         {
             Log::error(TAG, "Error: %s", e.what());
         }
     }
-
-    //     static void do_session(
-    //         tcp::socket &socket,
-    //         ssl::context &ctx,
-    //         std::shared_ptr<std::string const> const &doc_root,
-    //         std::map<std::string, WebServerResponseBuilder *> *paths)
-    //     {
-    //         // Log::info(TAG, "Starting session");
-
-    //         beast::error_code ec;
-
-    //         // Construct the stream around the socket
-    //         beast::ssl_stream<tcp::socket &> stream{socket, ctx};
-
-    //         // Perform the SSL handshake
-    //         stream.handshake(ssl::stream_base::server, ec);
-    //         if (ec)
-    //         {
-    //             Log::error(TAG, "SSL handshake failed: %s", ec.message().c_str());
-    //             return;
-    //         }
-
-    //         // This buffer is required to persist across reads
-    //         beast::flat_buffer buffer;
-
-    //         for (;;)
-    //         {
-    //             // Read a request
-    //             http::request<http::string_body> req;
-    //             http::read(stream, buffer, req, ec);
-    //             if (ec == http::error::end_of_stream)
-    //                 break;
-    //             if (ec)
-    //             {
-    //                 Log::error(TAG, "HTTP body read error %s", ec.message().c_str());
-    //                 return;
-    //             }
-
-    //             std::string response_buffer = "";
-
-    //             // Handle request
-    //             http::message_generator msg =
-    //                 handle_request(
-    //                     *doc_root,
-    //                     paths,
-    //                     &response_buffer,
-    //                     std::move(req));
-
-    //             // Determine if we should close the connection
-    //             bool keep_alive = msg.keep_alive();
-
-    //             // Send the response
-    //             beast::write(stream, std::move(msg), ec);
-
-    //             if (ec)
-    //             {
-    //                 Log::error(TAG, "HTTP write error %s", ec.message().c_str());
-    //                 return;
-    //             }
-
-    //             if (!keep_alive)
-    //             {
-    //                 // This means we should close the connection, usually because
-    //                 // the response indicated the "Connection: close" semantic.
-    //                 break;
-    //             }
-    //         }
-
-    //         // Perform the SSL shutdown
-    //         stream.shutdown(ec);
-    //         if (ec)
-    //         {
-    //             Log::error(TAG, "SSL shutdown %s", ec.message().c_str());
-    //             return;
-    //         }
-
-    //         // At this point the connection is closed gracefully
-    //     }
-
-    //     template <class Body, class Allocator>
-    //     static http::message_generator
-    //     handle_request(
-    //         beast::string_view doc_root,
-    //         std::map<std::string, WebServerResponseBuilder *> *paths,
-    //         std::string *response_buffer,
-    //         http::request<Body, http::basic_fields<Allocator>> &&req)
-    //     {
-    //         // Returns a bad request response
-    //         auto const bad_request =
-    //             [&req](beast::string_view why)
-    //         {
-    //             http::response<http::string_body> res{http::status::bad_request, req.version()};
-    //             res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    //             res.set(http::field::content_type, "text/html");
-    //             res.keep_alive(req.keep_alive());
-    //             res.body() = std::string(why);
-    //             res.prepare_payload();
-    //             return res;
-    //         };
-
-    //         // Returns a not found response
-    //         auto const not_found =
-    //             [&req](beast::string_view target)
-    //         {
-    //             http::response<http::string_body> res{http::status::not_found, req.version()};
-    //             res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    //             res.set(http::field::content_type, "text/html");
-    //             res.keep_alive(req.keep_alive());
-    //             res.body() = "The resource '" + std::string(target) + "' was not found.";
-    //             res.prepare_payload();
-    //             return res;
-    //         };
-
-    //         // Returns a server error response
-    //         auto const server_error =
-    //             [&req](beast::string_view what)
-    //         {
-    //             http::response<http::string_body> res{http::status::internal_server_error, req.version()};
-    //             res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    //             res.set(http::field::content_type, "text/html");
-    //             res.keep_alive(req.keep_alive());
-    //             res.body() = "An error occurred: '" + std::string(what) + "'";
-    //             res.prepare_payload();
-    //             return res;
-    //         };
-
-    //         // Make sure we can handle the method
-    //         if (req.method() != http::verb::get &&
-    //             req.method() != http::verb::head)
-    //             return bad_request("Unknown HTTP-method");
-
-    //         // Request path must be absolute and not contain "..".
-    //         if (req.target().empty() ||
-    //             req.target()[0] != '/' ||
-    //             req.target().find("..") != beast::string_view::npos)
-    //             return bad_request("Illegal request-target");
-
-    //         auto str_target = std::string(req.target());
-    //         if (paths->count(str_target) > 0)
-    //         {
-    //             // Log::info(TAG, "path found with WebServerResponseBuilder");
-
-    //             http::response<http::buffer_body> res;
-
-    //             res.result(http::status::ok);
-    //             res.version(11);
-    //             res.set(http::field::server, "Beast");
-    //             res.set(http::field::transfer_encoding, "chunked");
-
-    //             auto const builderWriter =
-    //                 [](const char *buffer, int size, void *userData) -> void
-    //             {
-    //                 auto response_buffer = (std::string *)userData;
-    //                 response_buffer->append(buffer, size);
-    //             };
-
-    //             auto builder = (*paths)[str_target];
-    //             builder->build(builderWriter, (void *)response_buffer);
-    //             int body_size = response_buffer->size();
-
-    //             // Log::info("","response = %s", response_buffer->c_str());
-
-    //             res.body().data = (void *)response_buffer->c_str();
-    //             res.body().size = body_size;
-    //             res.body().more = false;
-
-    //             res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    //             res.set(http::field::content_type, mime_type(req.target()));
-    //             res.content_length(body_size);
-    //             res.keep_alive(req.keep_alive());
-    //             return res;
-    //         }
-
-    //         // Build the path to the requested file
-    //         std::string path = path_cat(doc_root, req.target());
-    //         if (req.target().back() == '/')
-    //             path.append("index.html");
-
-    //         // Attempt to open the file
-    //         beast::error_code ec;
-    //         http::file_body::value_type body;
-    //         body.open(path.c_str(), beast::file_mode::scan, ec);
-
-    //         // Handle the case where the file doesn't exist
-    //         if (ec == beast::errc::no_such_file_or_directory)
-    //             return not_found(req.target());
-
-    //         // Handle an unknown error
-    //         if (ec)
-    //             return server_error(ec.message());
-
-    //         // Cache the size since we need it after the move
-    //         auto const size = body.size();
-
-    //         // Respond to HEAD request
-    //         if (req.method() == http::verb::head)
-    //         {
-    //             http::response<http::empty_body> res{http::status::ok, req.version()};
-    //             res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    //             res.set(http::field::content_type, mime_type(path));
-    //             res.content_length(size);
-    //             res.keep_alive(req.keep_alive());
-    //             return res;
-    //         }
-
-    //         // Respond to GET request
-    //         http::response<http::file_body> res{
-    //             std::piecewise_construct,
-    //             std::make_tuple(std::move(body)),
-    //             std::make_tuple(http::status::ok, req.version())};
-    //         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    //         res.set(http::field::content_type, mime_type(path));
-    //         res.content_length(size);
-    //         res.keep_alive(req.keep_alive());
-    //         return res;
-    //     }
-
-    //     static beast::string_view
-    //     mime_type(beast::string_view path)
-    //     {
-    //         if (path.ends_with("/"))
-    //             return "text/html";
-
-    //         using beast::iequals;
-    //         auto const ext = [&path]
-    //         {
-    //             auto const pos = path.rfind(".");
-    //             if (pos == beast::string_view::npos)
-    //                 return beast::string_view{};
-    //             return path.substr(pos);
-    //         }();
-    //         if (iequals(ext, ".htm"))
-    //             return "text/html";
-    //         if (iequals(ext, ".html"))
-    //             return "text/html";
-    //         if (iequals(ext, ".php"))
-    //             return "text/html";
-    //         if (iequals(ext, ".css"))
-    //             return "text/css";
-    //         if (iequals(ext, ".txt"))
-    //             return "text/plain";
-    //         if (iequals(ext, ".js"))
-    //             return "application/javascript";
-    //         if (iequals(ext, ".json"))
-    //             return "application/json";
-    //         if (iequals(ext, ".xml"))
-    //             return "application/xml";
-    //         if (iequals(ext, ".swf"))
-    //             return "application/x-shockwave-flash";
-    //         if (iequals(ext, ".flv"))
-    //             return "video/x-flv";
-    //         if (iequals(ext, ".png"))
-    //             return "image/png";
-    //         if (iequals(ext, ".jpe"))
-    //             return "image/jpeg";
-    //         if (iequals(ext, ".jpeg"))
-    //             return "image/jpeg";
-    //         if (iequals(ext, ".jpg"))
-    //             return "image/jpeg";
-    //         if (iequals(ext, ".gif"))
-    //             return "image/gif";
-    //         if (iequals(ext, ".bmp"))
-    //             return "image/bmp";
-    //         if (iequals(ext, ".ico"))
-    //             return "image/vnd.microsoft.icon";
-    //         if (iequals(ext, ".tiff"))
-    //             return "image/tiff";
-    //         if (iequals(ext, ".tif"))
-    //             return "image/tiff";
-    //         if (iequals(ext, ".svg"))
-    //             return "image/svg+xml";
-    //         if (iequals(ext, ".svgz"))
-    //             return "image/svg+xml";
-    //         return "application/text";
-    //     }
-
-    //     http::response<http::string_body> do_parse(std::string_view input)
-    //     {
-    //         beast::error_code ec;
-    //         http::response_parser<http::string_body> p;
-
-    //         // read headers
-    //         auto buf = boost::asio::buffer(input);
-    //         auto n = p.put(buf, ec);
-    //         assert(p.is_header_done());
-
-    //         // read body
-    //         if (!ec)
-    //         {
-    //             buf += n;
-    //             n = p.put(buf, ec);
-    //             p.put_eof(ec);
-    //         }
-    //         if (ec)
-    //             throw boost::system::system_error(ec);
-    //         assert(p.is_done());
-
-    //         return p.release();
-    //     }
-
-    //     static std::string
-    //     path_cat(
-    //         beast::string_view base,
-    //         beast::string_view path)
-    //     {
-    //         if (base.empty())
-    //             return std::string(path);
-    //         std::string result(base);
-    // #ifdef BOOST_MSVC
-    //         char constexpr path_separator = '\\';
-    //         if (result.back() == path_separator)
-    //             result.resize(result.size() - 1);
-    //         result.append(path.data(), path.size());
-    //         for (auto &c : result)
-    //             if (c == '/')
-    //                 c = path_separator;
-    // #else
-    //         char constexpr path_separator = '/';
-    //         if (result.back() == path_separator)
-    //             result.resize(result.size() - 1);
-    //         result.append(path.data(), path.size());
-    // #endif
-    //         return result;
-    //     }
 };
 
 const char *WebServerMacOs::TAG = "WEBSERVER";
 
-
-
-
 class WebsocketServerMacOs : public WebsocketServer, public WebSocketServerSessionReceiver
 {
 public:
-    // using WS = websocket::stream<beast::ssl_stream<tcp::socket &>>;
     using WS = websocket_session<ssl_websocket_session>;
-    //using WS = void;
 
     WebsocketServerMacOs(WebServer *server, const char *path)
     {
-        // int port = 9800;
-        // std::thread{std::bind(
-        //                 &start_server,
-        //                 this, port)}
-        //     .detach();
-        Log::info("","WebsocketServerMacOs constructor. path = %s",path);
         ((WebServerMacOs *)server)->addPathWs(path, this);
     }
 
@@ -1599,15 +1072,9 @@ public:
     {
         try
         {
-            Log::info(TAG, "sending: %s", msg.c_str());
+            //Log::info(TAG, "sending: %s", msg.c_str());
             auto ws = (WS *)client;
-            ws->write_txt(msg.c_str(),msg.size());
-            // beast::flat_buffer buffer(msg.size());
-            // auto buf = buffer.prepare(msg.size());
-            // memcpy(buf.data(), msg.c_str(), msg.size());
-            // buffer.commit(msg.size());
-            // ws->text(true);
-            // ws->write(buffer.data());
+            ws->write_txt(msg.c_str(), msg.size());
         }
         catch (const std::exception &e)
         {
@@ -1642,15 +1109,9 @@ public:
             int sz = vsnprintf(s_buf, sizeof(s_buf), message, args);
             va_end(args);
 
-            Log::info(TAG, "sending: %s", s_buf);
+            //Log::info(TAG, "sending: %s", s_buf);
             auto ws = (WS *)client;
-            ws->write_txt(s_buf,sz);
-            // beast::flat_buffer buffer(sz);
-            // auto buf = buffer.prepare(sz);
-            // memcpy(buf.data(), s_buf, sz);
-            // buffer.commit(sz);
-            // ws->text(true);
-            // ws->write(buffer.data());
+            ws->write_txt(s_buf, sz);
         }
         catch (const std::exception &e)
         {
@@ -1685,24 +1146,16 @@ public:
 
         for (auto ws : clients)
             send(ws, s_buf);
-
-        //Thread::Sleep(1);
     };
 
     void send(RemoteWebsocketClient *client, uint8_t *bytes, int size) override
     {
         try
         {
-            //Log::info(TAG, "Sending binary");
+            // Log::info(TAG, "Sending binary");
 
             auto ws = (WS *)client;
-            ws->write_bin(bytes,size);
-            // beast::flat_buffer buffer(size);
-            // auto buf = buffer.prepare(size);
-            // memcpy(buf.data(), bytes, size);
-            // buffer.commit(size);
-            // ws->text(false);
-            // ws->write(buffer.data());
+            ws->write_bin(bytes, size);
         }
         catch (const std::exception &e)
         {
@@ -1748,135 +1201,9 @@ public:
         clients.erase(session);
     }
 
-
-
-
-
-
-//=======
-    // private:
-    //     static void start_server(WebsocketServerMacOs *server, unsigned short port)
-    //     {
-    //         try
-    //         {
-    //             auto const address = net::ip::make_address("0.0.0.0");
-    //             auto const port_ = static_cast<unsigned short>(port);
-
-    //             // The io_context is required for all I/O
-    //             net::io_context ioc{1};
-
-    //             // The SSL context is required, and holds certificates
-    //             ssl::context ctx{ssl::context::tlsv12};
-
-    //             // This holds the self-signed certificate used by the server
-    //             load_server_certificate(ctx);
-
-    //             // The acceptor receives incoming connections
-    //             tcp::acceptor acceptor{ioc, {address, port_}};
-    //             for (;;)
-    //             {
-    //                 // This will receive the new connection
-    //                 tcp::socket socket{ioc};
-
-    //                 // Block until we get a connection
-    //                 acceptor.accept(socket);
-
-    //                 Thread::sleep(Utils::random(0,100));
-    //                 // Launch the session, transferring ownership of the socket
-    //                 std::thread(
-    //                     &do_session,
-    //                     std::move(socket),
-    //                     std::ref(ctx),
-    //                     server)
-    //                     .detach();
-    //             }
-    //         }
-    //         catch (const std::exception &e)
-    //         {
-    //             Log::error(TAG, "Error 3: %s", e.what());
-    //         }
-    //     }
-
-    //     static void
-    //     do_session(tcp::socket socket, ssl::context &ctx, WebsocketServerMacOs *server)
-    //     {
-    //         WS *p_ws = nullptr;
-    //         try
-    //         {
-    //             // Construct the websocket stream around the socket
-    //             WS ws{socket, ctx};
-    //             p_ws = &ws;
-
-    //             // Perform the SSL handshake
-    //             ws.next_layer().handshake(ssl::stream_base::server);
-
-    //             // Set a decorator to change the Server of the handshake
-    //             ws.set_option(websocket::stream_base::decorator(
-    //                 [](websocket::response_type &res)
-    //                 {
-    //                     res.set(http::field::server,
-    //                             std::string(BOOST_BEAST_VERSION_STRING) +
-    //                                 " websocket-server-sync-ssl");
-    //                 }));
-
-    //             // Accept the websocket handshake
-    //             ws.accept();
-
-    //             server->insertClient(p_ws);
-    //             if (server->connectionHandler != nullptr)
-    //                 server->connectionHandler(p_ws, server, server->connectionUserData);
-
-    //             for (;;)
-    //             {
-    //                 // This buffer will hold the incoming message
-    //                 beast::flat_buffer buffer;
-
-    //                 // Read a message
-    //                 ws.read(buffer);
-
-    //                 auto str = beast::buffers_to_string(buffer.data());
-
-    //                 if (server->handler != nullptr)
-    //                     server->handler(p_ws, server, str, server->userData);
-
-    //                 //Log::info(TAG, "received %s", str.c_str());
-    //             }
-    //         }
-    //         catch (beast::system_error const &se)
-    //         {
-    //             // This indicates that the session was closed
-    //             if (se.code() != websocket::error::closed)
-    //                 Log::error(TAG, "Error 1: %s", se.code().message().c_str());
-    //             server->removeClient(p_ws);
-    //         }
-    //         catch (std::exception const &e)
-    //         {
-    //             Log::error(TAG, "Error 2: %s", e.what());
-    //             server->removeClient(p_ws);
-    //         }
-    //         server->removeClient(p_ws);
-    //     }
-
 private:
     std::set<WS *> clients;
     static const char *TAG;
-    // std::mutex mtx;
-
-    // void insertClient(WS * client){
-    //     mtx.lock();
-    //     clients.insert(client);
-    //     //Log::info(TAG,"Websocket client connected. clients: %d",clients.size());
-    //     mtx.unlock();
-    // }
-
-    // void removeClient(WS * client){
-    //     if (!client)
-    //         return;
-    //     mtx.lock();
-    //     clients.erase(client);
-    //     //Log::info(TAG,"Websocket client disconnected. clients: %d",clients.size());
-    //     mtx.unlock();
-    // }
 };
 
 const char *WebsocketServerMacOs::TAG = "WEBSOCKET_SERVER";

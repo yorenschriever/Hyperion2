@@ -1,7 +1,5 @@
 #include "webServer.hpp"
 #include "webServer-macos.hpp"
-#include "websocketServer.hpp"
-#include "websocketServer-macos.hpp"
 
 WebServer* WebServer::createInstance(int port)
 {
