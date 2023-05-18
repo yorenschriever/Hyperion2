@@ -24,7 +24,6 @@ if [ $TARGET = 'docker' ]; then
         --mount type=bind,source=$PWD,target=/project \
         --workdir=/project \
         -p 4430:4430 \
-        -p 9600-9800:9600-9800 \
         hyperion \
         /hyperion_lib/scripts/run.sh linux
 
