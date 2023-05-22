@@ -31,9 +31,16 @@ if (${ESP_PLATFORM})
             ${CORE_SRC_DIR} 
             "platform/${TARGET}" 
             "platform/${TARGET}/misc"
+            "platform/${TARGET}/misc/mdns"
             "core/generation/patterns/helpers/tempo"
             "misc"
     )
+
+    # the next line is a workaround to a bug in esp-idf 5.1
+    # https://github.com/espressif/esp-matter/issues/296
+    idf_build_set_property(COMPILE_OPTIONS "-Wno-format-nonliteral;-Wno-format-security;-Wformat=0" APPEND)
+
+    idf_component_optional_requires(PRIVATE espressif__mdns mdns)
 
     target_compile_options(${COMPONENT_LIB} PUBLIC "-Wno-maybe-uninitialized")
 

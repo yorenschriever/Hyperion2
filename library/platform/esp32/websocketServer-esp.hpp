@@ -154,12 +154,10 @@ public:
 private:
     httpd_handle_t start_wss_server(WebServerEsp *server, const char* path)
     {
-        Log::info(TAG, "Starting wss server");
-
+        Log::info(TAG, "Starting wss server: %s", path);
 
         ws.uri = path;
         ws.user_ctx = this;
-        Log::info(TAG, "Registering URI handler for %s", path);
         httpd_register_uri_handler(server->server, &ws);
         return server;
     }
@@ -173,7 +171,7 @@ private:
         {
             //Log::info(TAG, "Handshake done, the new connection was opened");
 
-            Log::info(TAG, "New WS client connected hd=%d,  fd=%d, path = %s", (int)req->handle, sockfd, server->ws.uri);
+            //Log::info(TAG, "New WS client connected hd=%d,  fd=%d, path = %s", (int)req->handle, sockfd, server->ws.uri);
 
             auto client = new RemoteWebsocketClientEsp;
             client->hd = req->handle;
@@ -221,7 +219,7 @@ private:
 
         if (ws_pkt.type == HTTPD_WS_TYPE_CLOSE)
         {
-            Log::info(TAG, "client disconnected %d. number of clients before disconnect: %d", sockfd, server->clients.size());
+            Log::info(TAG, "client disconnected.");// number of clients before disconnect: %d", sockfd, server->clients.size());
 
             auto client = server->findClient(req->handle, sockfd);
             server->clients.erase(client);

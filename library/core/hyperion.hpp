@@ -22,6 +22,7 @@
 #include "platform/includes/midi.hpp"
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
+#include "platform/includes/network.hpp"
 #include "webServer.hpp"
 #include "webServerResponseBuilder.hpp"
 #include "websocketServer.hpp"
@@ -114,6 +115,8 @@ private:
     virtual void setup_network()
     {
         Ethernet::initialize();
+
+        Network::setHostName("hyperion");
     }
 
     virtual void setup_rotary()
