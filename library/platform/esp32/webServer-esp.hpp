@@ -9,8 +9,6 @@
 #include "esp_tls.h"
 #include "esp_vfs.h"
 #include "esp_vfs_fat.h"
-#include "hyperion.crt.h"
-#include "hyperion.key.h"
 #include "log.hpp"
 #include "nvs_flash.h"
 #include "webServer.hpp"
@@ -119,11 +117,16 @@ private:
         server_data->paths = &paths;
 
         httpd_ssl_config_t config = HTTPD_SSL_CONFIG_DEFAULT();
-        // bin2hex does not include the null terminator in the size, but esp-idf expects it, therefore i add +1 to the size
-        config.servercert = HYPERION_CERT;
-        config.servercert_len = HYPERION_CERT_SIZE + 1;
-        config.prvtkey_pem = HYPERION_KEY;
-        config.prvtkey_len = HYPERION_KEY_SIZE + 1;
+
+        extern const unsigned char servercert_start[] asm("_binary_hyperion_crt_start");
+        extern const unsigned char servercert_end[]   asm("_binary_hyperion_crt_end");
+        config.servercert = servercert_start;
+        config.servercert_len = servercert_end - servercert_start;
+
+        extern const unsigned char prvtkey_pem_start[] asm("_binary_hyperion_key_start");
+        extern const unsigned char prvtkey_pem_end[]   asm("_binary_hyperion_key_end");
+        config.prvtkey_pem = prvtkey_pem_start;
+        config.prvtkey_len = prvtkey_pem_end - prvtkey_pem_start;
 
         /* Use the URI wildcard matching function in order to
          * allow the same handler to respond to multiple different

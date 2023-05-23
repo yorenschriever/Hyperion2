@@ -7,19 +7,12 @@ set(INCLUDE_DIRS
     ${CMAKE_CURRENT_LIST_DIR} 
     "${CMAKE_CURRENT_LIST_DIR}/core" 
     "${CMAKE_CURRENT_LIST_DIR}/platform/includes"
-    ${CMAKE_BINARY_DIR}/cert
     )
 set(CORE_SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/core" )
 
 #create header files for the certificate and key, so we can import them
 if(NOT EXISTS "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key")
     message([FATAL_ERROR] "\n\nYou need to generate a certificate first. Read the hyperion readme.md, and then run the following command to generate the certificates:\n\ncd $ENV{HYPERION_LIB_DIR}/scripts/certificate/\n./generate.sh\n\n")
-endif()
-if("$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key" IS_NEWER_THAN "${CMAKE_BINARY_DIR}/cert/hyperion.key.h")
-    include("$ENV{HYPERION_LIB_DIR}/build-utils/bin2h.cmake")
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/cert)
-    bin2h(SOURCE_FILE "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.crt" HEADER_FILE "${CMAKE_BINARY_DIR}/cert/hyperion.crt.h" VARIABLE_NAME "HYPERION_CERT" NULL_TERMINATE "1")
-    bin2h(SOURCE_FILE "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key" HEADER_FILE "${CMAKE_BINARY_DIR}/cert/hyperion.key.h" VARIABLE_NAME "HYPERION_KEY" NULL_TERMINATE "1")
 endif()
 
 if (${ESP_PLATFORM})
@@ -34,6 +27,9 @@ if (${ESP_PLATFORM})
             "platform/${TARGET}/misc/mdns"
             "core/generation/patterns/helpers/tempo"
             "misc"
+        EMBED_TXTFILES
+            "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.crt"
+            "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key"
     )
 
     # the next line is a workaround to a bug in esp-idf 5.1
@@ -82,5 +78,13 @@ else ()
     target_include_directories(Hyperion PRIVATE $ENV{BOOST_DIR})
 
     target_compile_definitions(Hyperion PUBLIC WEBSERVER_ROOT="$ENV{HYPERION_LIB_DIR}/scripts/web")
+
+    target_include_directories(Hyperion PUBLIC ${CMAKE_BINARY_DIR}/cert)
+    if("$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key" IS_NEWER_THAN "${CMAKE_BINARY_DIR}/cert/hyperion.key.h")
+        include("$ENV{HYPERION_LIB_DIR}/build-utils/bin2h.cmake")
+        file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/cert)
+        bin2h(SOURCE_FILE "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.crt" HEADER_FILE "${CMAKE_BINARY_DIR}/cert/hyperion.crt.h" VARIABLE_NAME "HYPERION_CERT" NULL_TERMINATE "1")
+        bin2h(SOURCE_FILE "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key" HEADER_FILE "${CMAKE_BINARY_DIR}/cert/hyperion.key.h" VARIABLE_NAME "HYPERION_KEY" NULL_TERMINATE "1")
+    endif()
 
 endif ()
