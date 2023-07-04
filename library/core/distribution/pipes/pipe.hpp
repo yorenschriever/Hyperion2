@@ -6,13 +6,13 @@
 #include "platform/includes/log.hpp"
 #include <inttypes.h>
 
-// Pipes are object that tie everything together: a pipe has an input and an output.
+// Pipes are objects that tie an input and output together.
 // The input provides the data and the output sends it out to the lamps.
 class Pipe
 {
 public:
 #if (ESP_PLATFORM)
-    static const int bufferSize = 1500; // * 4 * 6;
+    static const int bufferSize = 512*4;
 #else
     static const int bufferSize = 1500 * 4 * 6;
 #endif

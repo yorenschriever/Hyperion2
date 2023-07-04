@@ -121,6 +121,7 @@ body {
     text-align: center;
     margin-bottom: 6px;  
     user-select: none;
+    min-height:12pt;
 }
 
 .tempo {

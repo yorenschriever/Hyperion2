@@ -132,7 +132,7 @@ private:
          * allow the same handler to respond to multiple different
          * target URIs which match the wildcard scheme */
         config.httpd.uri_match_fn = wildcard_non_websocket;
-        //config.httpd.max_open_sockets = 10;
+        config.httpd.max_open_sockets = 10;
         config.port_secure = port;
 
         // Log::info(TAG, "Starting HTTP Server on port: '%d' (%d)", config.port_secure, config.port_insecure);
