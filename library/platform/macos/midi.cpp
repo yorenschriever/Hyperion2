@@ -11,6 +11,15 @@ std::vector<MidiDevice *> Midi::devices;
 std::map<std::string, std::string> Midi::name_pairs;
 std::vector<Midi::DeviceCreatedDestroyedEntry> Midi::callbacks;
 
+std::string trimDeviceName(std::string s)
+{
+    std::string::size_type pos = s.find(':');
+    if (pos == std::string::npos)
+        return s;
+
+    return s.substr(0, pos);
+}
+
 void Midi::initialize()
 {
     if (initialized)
@@ -65,11 +74,19 @@ void Midi::midiTask(void *param)
 
             std::vector<Index_Name> in_list;
             for (int i = 0; i < midiInCount; i++)
-                in_list.push_back({.index = i, .name = midiInPoll.getPortName(i)});
+            {
+                std::string name = midiInPoll.getPortName(i);
+                if (name.size() == 0) continue;
+                in_list.push_back({.index = i, .name = name});
+            }
 
             std::vector<Index_Name> out_list;
             for (int i = 0; i < midiOutCount; i++)
-                out_list.push_back({.index = i, .name = midiOutPoll.getPortName(i)});
+            {
+                std::string name = midiInPoll.getPortName(i);
+                if (name.size() == 0) continue;
+                out_list.push_back({.index = i, .name = name});
+            }
 
             for (auto in : in_list)
             {
@@ -106,6 +123,12 @@ void Midi::midiTask(void *param)
 void Midi::createDevice(int in_index, int out_index, std::string name)
 {
     Log::info("MIDI", "Creating device for %d,%d, %s", in_index, out_index, name.c_str());
+
+
+    #if TRIM_MIDI_DEVICE_NAME
+        name = trimDeviceName(name);
+        Log::info("MIDI", "trimmed midi device name to %s",name.c_str());
+    #endif
 
     auto midiDevice = new MidiDeviceMacos(in_index, out_index);
 

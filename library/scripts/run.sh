@@ -29,7 +29,7 @@ if [ $TARGET = 'docker' ]; then
         /hyperion_lib/scripts/run.sh linux
 
     exit;
-elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ]; then
+elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ] || [ $TARGET = 'rpi' ]; then
     "${BASEDIR}/build/${TARGET}/app"
 
 elif [ $TARGET = 'esp32' ]; then

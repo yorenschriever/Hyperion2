@@ -27,7 +27,7 @@ if [ $TARGET = 'docker' ]; then
         /hyperion_lib/scripts/build.sh linux
     exit;
 
-elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ]; then
+elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ] || [ $TARGET = 'rpi' ]; then
     PARAM="-DTARGET=${TARGET}"
 
 elif [ $TARGET = 'esp32' ] || [ $TARGET = 'esp32s3' ]; then

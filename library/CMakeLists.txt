@@ -45,16 +45,21 @@ else ()
       target_compile_options(Hyperion PUBLIC "-pthread")
     endif()
     if(CMAKE_THREAD_LIBS_INIT)
-      target_link_libraries(Hyperion "${CMAKE_THREAD_LIBS_INIT}")
+      target_link_libraries(Hyperion PRIVATE "${CMAKE_THREAD_LIBS_INIT}")
     endif()
 
     find_package(OpenSSL REQUIRED)
 
-    if ("${TARGET}" STREQUAL "macos")
+    if ("${TARGET}" STREQUAL "macos" OR "${TARGET}" STREQUAL "rpi")
         set(RTMIDI_BUILD_TESTING OFF)
-        add_subdirectory($ENV{HYPERION_LIB_DIR}/platform/${TARGET}/rtmidi "rtmidi")
-        target_include_directories(Hyperion PUBLIC $ENV{HYPERION_LIB_DIR}/platform/${TARGET}/rtmidi)
+        add_subdirectory($ENV{HYPERION_LIB_DIR}/platform/macos/rtmidi "rtmidi")
+        target_include_directories(Hyperion PUBLIC $ENV{HYPERION_LIB_DIR}/platform/macos/rtmidi)
         set(RTMIDI "rtmidi")
+
+        if ("${TARGET}" STREQUAL "rpi")
+            target_compile_definitions(Hyperion PUBLIC __UNIX_JACK__ AVOID_TIMESTAMPING TRIM_MIDI_DEVICE_NAME)
+        endif()
+
     endif()
 
     target_link_libraries(Hyperion PUBLIC ${RTMIDI} OpenSSL::SSL)
