@@ -1,20 +1,22 @@
 #pragma once
 
-#include "output.hpp"
 #include "core/distribution/utils/hostnameCache.hpp"
+#include "output.hpp"
 #include "platform/includes/log.hpp"
-#include "platform/includes/websocketServer.hpp"
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
+#include "platform/includes/webServer.hpp"
+#include "platform/includes/websocketServer.hpp"
 #include <algorithm>
 
 // WebsocketOutput sends data to websocket clients.
 class WebsocketOutput : public Output
 {
 public:
-    WebsocketOutput(int port, unsigned int fps)
+    WebsocketOutput(WebServer **webserver, const char *path, unsigned int fps)
     {
-        this->port = port;
+        this->webserver = webserver;
+        this->path = path;
         this->frameInterval = 1000 / fps;
 
         this->length = 12;
@@ -37,7 +39,7 @@ public:
     void show() override
     {
         lastFrame = Utils::millis();
-        server->sendAll(buffer,length);
+        server->sendAll(buffer, length);
     }
 
     void postProcess() override
@@ -48,7 +50,14 @@ public:
     {
         lastFrame = Utils::millis();
         if (server.get() == nullptr)
-            server = WebsocketServer::createInstance(this->port);
+        {
+            if ((*webserver) == nullptr)
+            {
+                Log::error(TAG, "Cannot construct WebsocketOutput or MonitorOutput without a server");
+                Utils::exit();
+            }
+            server = WebsocketServer::createInstance(*webserver, path);
+        }
     }
 
     void clear() override
@@ -78,7 +87,8 @@ public:
     }
 
 protected:
-    int port;
+    WebServer **webserver;
+    const char *path;
     int frameInterval;
     unsigned long lastFrame = 0;
 
@@ -87,5 +97,5 @@ protected:
 
     std::unique_ptr<WebsocketServer> server;
 
-    const char* TAG = "WEBSOCKET_OUTPUT";
+    const char *TAG = "WEBSOCKET_OUTPUT";
 };

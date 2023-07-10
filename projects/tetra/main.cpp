@@ -95,7 +95,7 @@ void addLedShapes(Hyperion *hyp)
   {
     auto pipe = new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(i),
-        new MonitorOutput(splitMap.getMap(i)));
+        new MonitorOutput(&hyp->webServer,splitMap.getMap(i)));
     hyp->addPipe(pipe);
   }
 }

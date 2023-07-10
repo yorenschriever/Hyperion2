@@ -1,6 +1,7 @@
 #include "webServer.hpp"
+#include "webServer-esp.hpp"
 
 WebServer* WebServer::createInstance(int port)
 {
-    return nullptr;
+    return new WebServerEsp(port);
 }

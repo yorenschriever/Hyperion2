@@ -3,7 +3,7 @@
 #include "palettes.hpp"
 #include "patterns.hpp"
 
-// forward declartions. This lets us call the functions before we defined them.
+// forward declarations. This lets us call the functions before we defined them.
 void addHaloPipe(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
 
@@ -87,7 +87,7 @@ void addHaloPipe(Hyperion *hyp)
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         input,
-        new MonitorOutput(haloMap)));
+        new MonitorOutput(&hyp->webServer,haloMap)));
 }
 
 void addPaletteColumn(Hyperion *hyp)

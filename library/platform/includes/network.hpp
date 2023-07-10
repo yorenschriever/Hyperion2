@@ -13,11 +13,8 @@ public:
 
     // i should make a hostnameCache that can resolve async
 
-    static IPAddress *resolveNoWait(const char *hostname);
-    static IPAddress *resolve(const char *hostname);
+    //static IPAddress *resolveNoWait(const char *hostname);
+    //static IPAddress *resolve(const char *hostname);
 
-    static void setHostName(const char* hostname)
-    {
-
-    }
+    static void setHostName(const char* hostname);
 };

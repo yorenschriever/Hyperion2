@@ -124,8 +124,8 @@ void addWingsPipe(Hyperion *hyp)
   {
     auto pipe = new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(i),
-        // new MonitorOutput(splitMap.getMap(i)));
-        new CloneOutput({new MonitorOutput(splitMap.getMap(i)),
+        // new MonitorOutput(&hyp->webServer,splitMap.getMap(i)));
+        new CloneOutput({new MonitorOutput(&hyp->webServer,splitMap.getMap(i)),
                          new UDPOutput(hosts[i], ports[i], 60)}));
     hyp->addPipe(pipe);
   }

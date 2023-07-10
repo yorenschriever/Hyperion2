@@ -22,6 +22,7 @@
 #include "platform/includes/midi.hpp"
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
+#include "platform/includes/network.hpp"
 #include "webServer.hpp"
 #include "webServerResponseBuilder.hpp"
 #include "websocketServer.hpp"
@@ -59,10 +60,10 @@ public:
             setup_display();
         if (config.midi)
             setup_midi();
-        if (config.tempo)
-            setup_tempo();
         if (config.web)
             setup_web();
+        if (config.tempo)
+            setup_tempo();
 
         Log::info("HYP", "starting outputs");
         for (Pipe *pipe : pipes)
@@ -114,6 +115,8 @@ private:
     virtual void setup_network()
     {
         Ethernet::initialize();
+
+        Network::setHostName("hyperion");
     }
 
     virtual void setup_rotary()
@@ -164,7 +167,7 @@ private:
             },
             this);
 
-        auto websocketTempo = new WebsocketTempo();
+        auto websocketTempo = new WebsocketTempo(this->webServer);
         Tempo::AddListener(websocketTempo);
     }
 
@@ -198,10 +201,7 @@ private:
         Log::info(TAG, "Setup web");
         webServer = WebServer::createInstance();
 
-        MonitorOutput3d::addPathToServer(webServer);
-        MonitorOutput::addPathToServer(webServer);
-
-        hub.subscribe(new WebsocketController(&hub));
+        hub.subscribe(new WebsocketController(&hub, webServer));
     }
 
     static void UpdateDisplayTask(void *parameter)

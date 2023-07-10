@@ -20,7 +20,7 @@ class PixelMap3dJson : public WebServerResponseBuilder
         for (auto output : outputs)
         {
             write(userData, writer, "  {\n");
-            write(userData, writer, "    \"port\": %d,\n", output.port);
+            write(userData, writer, "    \"path\": \"/ws/monitor3d%d\",\n", output.mapIndex);
             write(userData, writer, "    \"positions\": [\n");
             int index = 0;
             for (auto pixel : output.map)
@@ -36,20 +36,20 @@ class PixelMap3dJson : public WebServerResponseBuilder
 public:
     unsigned int addOutput(PixelMap3d map)
     {
-        outputs.push_back({.map = map, .port = ++port});
-        return port;
+        outputs.push_back({.map = map, .mapIndex = ++mapIndex});
+        return mapIndex;
     }
 
 private:
     struct PixelMonitorOutput3d
     {
         PixelMap3d map;
-        unsigned int port;
+        unsigned int mapIndex;
     };
 
     std::vector<PixelMonitorOutput3d> outputs;
     bool begun;
-    unsigned int port = 9700;
+    unsigned int mapIndex = 0;
     char buffer[100];
 
     void write(void *userData, WebServerResponseBuilder::Writer writer, const char *message, ...)
@@ -62,28 +62,27 @@ private:
     }
 };
 
-// MonitorOutput3d displays the led data on your browser
+// MonitorOutput3d displays the led data in your browser
 class MonitorOutput3d : public WebsocketOutput
 {
 public:
-    MonitorOutput3d(PixelMap3d map, unsigned int fps = 60) : WebsocketOutput(0, fps)
+    MonitorOutput3d(WebServer **webServer, PixelMap3d map, unsigned int fps = 60) : WebsocketOutput(webServer, pathBuf, fps)
     {
-        this->port = pixelMap3dJson.addOutput(map);
+        this->webServer = webServer;
+        snprintf(pathBuf, 20, "/ws/monitor3d%d", pixelMap3dJson.addOutput(map));
     }
 
     void begin() override
     {
         // Log::info(TAG,"beginning MonitorOutput3d on port %d",port);
         WebsocketOutput::begin();
-    }
-
-    static void addPathToServer(WebServer *server)
-    {
-        server->addPath("/monitor/mapping.json", &pixelMap3dJson);
+        (*webServer)->addPath("/monitor/mapping.json", &pixelMap3dJson);
     }
 
 private:
-    // todo support multiple servers / pixel maps
+    WebServer **webServer;
+    char pathBuf[20];
+    // todo support multiple pixel maps for multiple servers
     static PixelMap3dJson pixelMap3dJson;
 };
 

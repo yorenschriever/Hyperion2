@@ -3,7 +3,7 @@
 This project will explain how to make patterns. You should start this project by running:
 
 ```
-cd projects/halo
+cd examples/writing_patterns
 build docker && run docker
 ```
 

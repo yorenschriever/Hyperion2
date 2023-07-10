@@ -20,7 +20,7 @@ export class Websocket {
             const bufferOffset = ledOffset
             ledOffset += ledsInScenePart
 
-            createSocket(scenePart.port, async data => {
+            createSocket(scenePart.path, async data => {
                 const ab = await data.arrayBuffer()
                 const view = new Uint8Array(ab)
 
