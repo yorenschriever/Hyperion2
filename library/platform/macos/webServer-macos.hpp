@@ -29,6 +29,7 @@
 #include <string_view>
 #include <thread>
 #include <vector>
+#include "webServer-buffer-body-str.hpp"
 
 template <class Derived>
 class websocket_session;
@@ -146,8 +147,7 @@ http::message_generator
 handle_request(
     beast::string_view doc_root,
     http::request<Body, http::basic_fields<Allocator>> &&req,
-    PathMap *paths,
-    std::string *response_buffer)
+    PathMap *paths)
 {
     // Returns a bad request response
     auto const bad_request =
@@ -204,7 +204,7 @@ handle_request(
     {
         //Log::info("WebServerMacOs", "path found with WebServerResponseBuilder: %s", str_target.c_str());
 
-        http::response<http::buffer_body> res;
+        http::response<http::buffer_body_str> res;
 
         res.result(http::status::ok);
         res.version(11);
@@ -219,12 +219,11 @@ handle_request(
         };
 
         auto builder = paths->at(str_target); 
-        builder->build(builderWriter, (void *)response_buffer);
-        int body_size = response_buffer->size();
+        builder->build(builderWriter, (void *)&res.body().data);
+        int body_size = res.body().data.size();
 
-        // Log::info(WebServerMacOs::TAG,"response = %s", response_buffer->c_str());
+        // Log::info("WEBSERVER","response = %s", res.body().data.c_str());
 
-        res.body().data = (void *)response_buffer->c_str();
         res.body().size = body_size;
         res.body().more = false;
 
@@ -596,10 +595,8 @@ public:
                 wsPaths_);
         }
 
-        std::string response_buffer = "";
-
         // Send the response
-        queue_write(handle_request(*doc_root_, parser_->release(), paths_, &response_buffer));
+        queue_write(handle_request(*doc_root_, parser_->release(), paths_));
 
         // If we aren't at the queue limit, try to pipeline another request
         if (response_queue_.size() < queue_limit)
