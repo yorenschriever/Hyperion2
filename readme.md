@@ -1,137 +1,90 @@
-# Setup
+# Hyperion 2
 
-## General
-Clone this repo
-```
-git clone https://github.com/yorenschriever/Hyperion2.git
-```
-Add these lines to your  ~/.zprofile (and change the path to your folder)
-```
-export BOOST_DIR=/Users/yoren/repos/boost_1_81_0
-export IDF_DIR=/Users/yoren/esp-idf
+## Purpose
 
-source /Users/yoren/repos/Hyperion2/library/scripts/export.sh
-```
-Add these lines to include path of vscode plugin "microsoft c/c++ extension". (also change the path here)
-```
-/Users/yoren/repos/esp-idf/**
-/Users/yoren/repos/Hyperion2/library
-```
-Close your terminal (and reopen if you still need it)
+Hyperion is an open source soft- and hardware solution for light shows, art installations, and lighting at festivals and clubs. 
+It is capable of generating patterns and distributing it to the lights in the venue. 
+It can control DMX fixtures, addressable leds like Neopixels, or output raw PWM signals.
+Hyperion takes care of all the boring work - that is the same anyway in all installations - , so you can focus on the creative part. 
+It does this by providing re-usable and multi purpose hardware modules and a software library that contains all the code to drive the lights.
+Hyperion is written as a library, not as a platform, so you are still in control of your project. 
+You write the creative part of your installation, but you turn to the hyperion library when you get to the repetitive part. 
 
-## Windows
-After cloning repository, go to File Explorer >> Security >> Add Modify permissio
+Each installation is different, and so are its patterns. You get all the freedom to write them the way you want, but hyperion
+also provides a set of helper functions to quickly create effects likes fades and LFOs or sync to the beat. 
+You don't have to use them, but if you do, your pattern code will be clean and easily portable to new installations.
 
-Execute the script below in Powershell to add the necessary variables and functions permanently to your VSCode powershell profile (if not already present).
-```
-# This line works from project root folder.
-& .\library\scripts\setupWindows.ps1
+![](https://raw.githubusercontent.com/yorenschriever/Hyperion2/main/readme-images/webcontroller.png)
 
-```
-now you can cd into a project folder and build an enviroment:
+TODO add more example photos of installations and also control software and hardware setups
 
-```
-cd .\projects\fvf_2023_main
-build docker
-run docker
+## Target audience
 
-## To fix Line ending incompatibility:
-Change line ending default from CRLF to LF
-Commit all open commits first!!
+The target audience is people with a programming background, and ideally also one in electronics. 
+Hyperion's purpose is to give artists that would normally create an installation from scratch a set of tools to quickly set up new projects.
+You will need programming skills to use it. 
+To give you the maximum creative freedom, the patterns are also written in code instead of some kind of editor. 
 
-```
-git config core.autocrlf false
-git rm --cached -r .         # Don’t forget the dot at the end
-git reset --hard
-```
+## Getting started / installation guides
+
+Hyperion runs on multiple platforms. Choose the one that fits your purpose best. Also, have a look at the chapter *hardware configurations* to help you with the choice.
+Click in the platform name to go to the installation guide.
+
+|Platform                 |Generate patterns  |Web interface|Midi controllers|Send and receive network|Neopixel channels|PWM channels|DMX out/in|Hardware cost|
+|--                       |--                 |--           |--              |--                      |--               |--          |--        |--           |
+|[MacOs](readme-macos.md) |yes                |yes          |yes             |yes                     |0                |0           |0         |$300+        |
+|[Esp32 / Hyperion hardware](readme-esp.md)|max +/- 1500 lights|limited*     |yes             |yes                     |8                |12          |1         |$5-$150      |
+|[Raspberry pi 4](readme-rpi.md)           |yes                |yes          |yes             |yes                     |0                |0           |0         |$50-$150     |
+|[Any computer (docker)](readme-docker.md)    |yes                |yes          |no              |yes                     |0                |0           |0         |$100+        |
+
+- Memory on the ESP32 is limited, running the web interface does not leave much room for pattern data. It works for small setups, but is not recommended.
+- DMX output on macos and raspberry pi is not present yet, but would be easy to add with the use of a dongle
+- There is no documentation to run natively on windows yet, but it should be possible. (Nor on linux, but would not be hard to create using the docker and raspberry pi versions.)
+- Running Docker is also the best option if you just want to get get a taste of the platform before you want to deal with build dependencies, hardware flashing and soldering. 
+
+## hardware configurations
+
+Below are example configurations for 4 typical use cases. You can use these as inspiration, but the hardware configurations are flexible so you can make anything to want. Be creative.
+
+TODO write out tex for the example, add diagrams.
+
+### Simple standalone setup
+- only one box. easy to carry, least points of potential failure
+- midi optional
+
+### Standalone with controller in FOH
+- control the show from the FOH, have the installation somewhere else in the venue, eg hanging from the ceiling
+- hyper could also be RPI
+- potentially attach more hypers through a switch
+
+### Advanced show, many patterns and layers
+- supports large installations
+- have a laptop or raspberry pi do the heavy work
+- monitor the output on the screen
+- control via midi, or web interface to use laptop tablet or phone
+
+### Writing patterns
+- works on any machine
+- the same project will compile on any platform, so you can use this to work on patterns for an installation with another hardware setup
+- use webcontroller and monitor to see what you are doing without needing the installation (eg is storage or already at location)
+- fast build times: quickly iterate, be more creative, create better patterns
+
+## writing patterns
+- link to tutorial 
 
 
+## pipes, inputs and outputs?
+- copy from hyperion1?
 
+## architecture diagram of generation
 
-## Mac
-- brew install python3
-- pip3 install pyglet
+### controller
+- central controller
+- most important controllers: midi and web
 
-- brew install openssl (i use version stable 3.1.0)
-- brew link --force openssl
-- download boost (https://www.boost.org/users/download/), place it somewhere on your disk and update the path in ~/.zprofile i use version 1_81_0
+### patterns
 
-- on old mac i had to set
-export OPENSSL_ROOT_DIR=/usr/local/opt/openssl@3
-and reopen the shell
+### params
 
-## Espressif devices
+### palettes and gradients
 
-- Install esp idf following this
-[Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/get-started/linux-macos-setup.html)
-
-- Update IDF_DIR in ~/.zprofile
-
-- Follow these steps to checkout version 5.1
-[Documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/versions.html#updating-release-branch)
-```
-cd $IDF_PATH
-git fetch
-git checkout release/v5.1
-git pull
-git submodule update --init --recursive
-```
-
-- I had to run `python esp-idf/tools/idf_tools.py install` after the update. This was mentioned in the error messages.
-
-- If you have built projects before, and now changed the esp-idf version number, you might need to delete the build folder in your project to get rid of errors.
-
-# Build and run
-
-## WSL
-Install Docker for desktop on WIndows and enable WSL 2 integration with the current WSL distro you are using. This setting can be found in the Docker for Desktop settings. Then add your user in WSL to docker group
-```
-sudo groupadd docker
-sudo usermod -aG docker lennard
-sudo chmod 666 /var/run/docker.sock
-
-# cd into your project
-cd projects/fvf_2023_main
-build docker
-```
-
-## Mac
-
-```
-cd examples/hello_world
-build macos
-run macos
-```
-
-## esp32
-
-```
-cd examples/hello_world
-get_idf
-build esp32
-run esp32
-```
-
-### change sdkconfig
-create an sdkconfig that works for you. eg by running `idf.py menuconfig` in one of the example projects. make sure to run `idf.py set-target esp32s3` first to set the correct target. Then run `idf.py save-defconfig` to create an sdkconfig.defaults. copy the contents of this file and add it to the sdkconfig.defaults in the platform folder is you want these settings to available to all new projects in this platform, or create a new sdkconfig.defaults in your project folder and paste it there. The build system will detect changes automatically and build a new sdkconfig for you.
-
-# create, install and trust a certificate
-in order to use the web interface of hyperion, you need to create a certificate, install it an trust it.
-creating and installing can be done by going to
-```
-cd /Users/yoren/repos/Hyperion2/library/scripts/certificate
-./generate.sh
-```
-this will generate a self signed certificate. It will also install it on your machine. It will ask your permission to do so.
-After the certificate is installed you need to trust it. Open spotlight and type
-```
-Keychain Access
-```
-There, in the left menu, select 'system', and go to the tab 'Certificates'. There you see 2 items called hyperion.local. For both items, double click, and in the window that opens, expand the 'trust' section. Set everything to 'always trust'
-
-The generated certificate will be valid for a year. After that you need to create a new one and trust it again. You also need to flash new firmware with the new certificate to all your devices.
-
-after installing and trusting the certificate you need to restart your browser to recognize the new certificates
-
-TODO:
-how to install on other devices? like phone/tablet, other machines..
