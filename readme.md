@@ -14,7 +14,7 @@ Each installation is different, and so are its patterns. You get all the freedom
 also provides a set of helper functions to quickly create effects likes fades and LFOs or sync to the beat. 
 You don't have to use them, but if you do, your pattern code will be clean and easily portable to new installations.
 
-![](https://raw.githubusercontent.com/yorenschriever/Hyperion2/main/readme-images/webcontroller.png)
+![](https://github.com/yorenschriever/Hyperion2/blob/e7e0d0a4356ed15b9a02b37b12cf11b7ddc1bfb7/readme-images/webcontroller.png)
 
 TODO add more example photos of installations and also control software and hardware setups
 
