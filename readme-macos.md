@@ -13,7 +13,7 @@ export BOOST_DIR=/Users/yoren/repos/boost_1_81_0
 source /Users/yoren/repos/Hyperion2/library/scripts/export.sh
 ```
 
-Install [Brew],(https://brew.sh/) and run these commands
+Install [Brew](https://brew.sh/) and run these commands
 ```
 brew install openssl #i used version stable 3.1.0
 brew link --force openssl
@@ -28,6 +28,11 @@ Add these lines to include path of vscode plugin "microsoft c/c++ extension". (a
 /Users/yoren/repos/Hyperion2/library
 ```
 Close your terminal (and reopen if you still need it)
+
+you might also need
+```
+brew install cmake
+```
 
 ## Create, install and trust a certificate
 In order to use the web interface of hyperion, you need to create a certificate, install it an trust it.
