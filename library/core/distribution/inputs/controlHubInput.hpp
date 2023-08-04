@@ -105,11 +105,13 @@ public:
                 // how to support this in general?
                 if (std::is_same<T_COLOUR, RGBA>::value)
                 {
-                    RGBA *l = &ledData[i];
+                    //if the colour space is RGBA, apply colour mixing based on the alpha channel
+                    RGBA *l = (RGBA*) &ledData[i];
                     l->A = (l->A * dimValue) >> 8;
                 }
                 else
                 {
+                    //if the colour space is not RGBA, apply dimming and sum with the existing value.
                     ledData[i].dim(dimValue);
                 }
                 ((T_COLOUR *)dataPtr)[i] += ledData[i];
