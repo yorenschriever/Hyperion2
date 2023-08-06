@@ -4,7 +4,7 @@ points = []
 
 scale=1
 radius = 0.8
-numLeds = 12
+numLeds = 8
 
 # Create a list of coordinates.
 # Coordinates should be in the range [-1,1 X [-1,1].
@@ -18,8 +18,8 @@ for i in range(numLeds):
 print('number of leds: ', len(points))
 
 # write the coordinates to a file
-f = open("haloMap.hpp", "w")
-f.write("PixelMap haloMap = {\n")
+f = open("haloMap8.hpp", "w")
+f.write("PixelMap haloMap8 = {\n")
 for point in points:
     f.write("    {.x = " + str(point['x']) + ", .y = " + str(point['y'])+ "},\n")
 f.write("};\n")

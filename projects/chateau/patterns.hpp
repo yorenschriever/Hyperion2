@@ -164,7 +164,7 @@ protected:
             return;
         }
 
-        fader.setDuration(params->getSize(100,1000));
+        fader.setDuration(params->getSize(100, 1000));
 
         if (active && watcher.Triggered())
             fader.reset();
@@ -195,7 +195,7 @@ public:
         }
 
         perm.setSize(width);
-        fader.setDuration(params->getSize(100,1000));
+        fader.setDuration(params->getSize(100, 1000));
 
         if (active && watcher.Triggered())
         {
@@ -228,7 +228,7 @@ public:
             return;
         }
 
-        fader.setDuration(params->getSize(100,1000));
+        fader.setDuration(params->getSize(100, 1000));
 
         if (active && watcher.Triggered())
         {
@@ -263,7 +263,7 @@ public:
         }
 
         perm.setSize(width);
-        fader.setDuration(params->getSize(100,1000));
+        fader.setDuration(params->getSize(100, 1000));
 
         if (active && watcher.Triggered())
         {
@@ -384,8 +384,8 @@ public:
         if (!transition.Calculate(active))
             return;
 
-        int steps = params->getVelocity(1,4);
-        int amount = params->getAmount(1,4);
+        int steps = params->getVelocity(1, 4);
+        int amount = params->getAmount(1, 4);
 
         for (int index = 0; index < width; index++)
         {

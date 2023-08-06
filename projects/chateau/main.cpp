@@ -11,6 +11,7 @@
 #include "ledParPatterns.hpp"
 #include "palettes.hpp"
 #include "mapping/haloMap.hpp"
+#include "mapping/haloMap8.hpp"
 #include <vector>
 #include "core/distribution/outputs/monitorOutput.hpp"
 
@@ -136,9 +137,9 @@ void addColanderPipe(Hyperion *hyp)
     hyp->addPipe(pipe);
   }
 
-  hyp->addPipe(new ConvertPipe<Monochrome, RGB>(
-    splitInput->getInput(2),
-    new MonitorOutput(&hyp->webServer,haloMap)));
+  // hyp->addPipe(new ConvertPipe<Monochrome, RGB>(
+  //   splitInput->getInput(2),
+  //   new MonitorOutput(&hyp->webServer,haloMap)));
 }
 
 void addLaserPipe(Hyperion *hyp)
@@ -272,18 +273,23 @@ void addLedParPipe(Hyperion *hyp)
       &hyp->hub,
       {
           {.column = 6, .slot = 0, .pattern = new Ledpar::OnPattern()},
-          {.column = 6, .slot = 1, .pattern = new Ledpar::SinPattern()},
-          {.column = 6, .slot = 2, .pattern = new Ledpar::LFOPattern<SawDown>(1)},
-          {.column = 6, .slot = 3, .pattern = new Ledpar::BlinderPattern()},
-          {.column = 6, .slot = 4, .pattern = new Ledpar::SlowStrobePattern()},
-          {.column = 6, .slot = 5, .pattern = new Ledpar::FastStrobePattern()},
+          {.column = 6, .slot = 1, .pattern = new Ledpar::DuoTonePattern()},
+          {.column = 6, .slot = 2, .pattern = new Ledpar::SinPattern()},
+          {.column = 6, .slot = 3, .pattern = new Ledpar::LfoPattern<SawDown>()},
+          {.column = 6, .slot = 4, .pattern = new Ledpar::PaletteLfoPattern<SawDown>()},
+          {.column = 6, .slot = 5, .pattern = new Ledpar::BlinderPattern()},
+          {.column = 6, .slot = 6, .pattern = new Ledpar::SlowStrobePattern()},
+          {.column = 6, .slot = 7, .pattern = new Ledpar::FastStrobePattern()},
       });
 
-  auto pipe = new ConvertPipe<RGBA, RGBWAmberUV>(
-      input,
-      new UDPOutput(hyper_l, 9619, 60));
+  // auto pipe = new ConvertPipe<RGBA, RGBWAmberUV>(
+  //     input,
+  //     new UDPOutput(hyper_l, 9619, 60));
+  // hyp->addPipe(pipe);
 
-  hyp->addPipe(pipe);
+  hyp->addPipe(new ConvertPipe<RGBA, RGB>(
+      input,
+      new MonitorOutput(&hyp->webServer,haloMap8)));
 }
 
 

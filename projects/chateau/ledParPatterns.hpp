@@ -14,16 +14,13 @@ namespace Ledpar
 
     class OnPattern : public Pattern<RGBA>
     {
-        uint8_t intensity;
-
         Transition transition = Transition(
             400, Transition::none, 0,
             400, Transition::none, 0);
 
     public:
-        OnPattern(uint8_t intensity = 100)
+        OnPattern()
         {
-            this->intensity = intensity;
             this->name = "On";
         }
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -32,25 +29,20 @@ namespace Ledpar
                 return; // the fade out is done. we can skip calculating pattern data
 
             for (int index = 0; index < width; index++)
-                pixels[index] = params->getPrimaryColour();
+                pixels[index] = params->getPrimaryColour() * transition.getValue();
         }
     };
 
     class SinPattern : public Pattern<RGBA>
     {
-        int direction;
-        float phase;
-
         LFO<SinFast> lfo;
         Transition transition = Transition(
             1000, Transition::none, 0,
             1000, Transition::none, 0);
 
     public:
-        SinPattern(int direction = 4, float phase = 0)
+        SinPattern()
         {
-            this->direction = direction;
-            this->phase = phase;
             this->name = "Sin";
         }
 
@@ -59,8 +51,11 @@ namespace Ledpar
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
+            lfo.setPeriod(params->getVelocity(6000, 500));
+            lfo.setDutyCycle(params->getSize());
+            
             for (int index = 0; index < width; index++)
-                pixels[index] = params->getPrimaryColour() * lfo.getValue(float(index) / width, direction * 250) * transition.getValue(index, width);
+                pixels[index] = params->getPrimaryColour() * lfo.getValue(float(index) / width) * transition.getValue(index, width);
         }
     };
 
@@ -81,7 +76,7 @@ namespace Ledpar
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
-            RGBA value = Utils::millis() % 50 < 25 ? params->getHighlightColour() * transition.getValue() : RGBA() ;
+            RGBA value = Utils::millis() % 50 < 25 ? params->getHighlightColour() * transition.getValue() : RGBA();
 
             for (int index = 0; index < width; index++)
                 pixels[index] = value;
@@ -101,7 +96,7 @@ namespace Ledpar
             if (!active)
                 return;
 
-            RGBA value = Utils::millis() % 100 < 25 ? params->getHighlightColour() : RGBA() ;
+            RGBA value = Utils::millis() % 100 < 25 ? params->getHighlightColour() : RGBA();
 
             for (int index = 0; index < width; index++)
                 pixels[index] = value;
@@ -113,40 +108,33 @@ namespace Ledpar
     public:
         BlinderPattern(FadeShape in = Transition::none, FadeShape out = Transition::none, int fadein = 200, int fadeout = 600)
         {
-            transition = Transition(
-                fadein, in, 200,
-                fadeout, out, 500);
             this->name = "Blinder";
         }
 
     protected:
         Transition transition;
-        
+
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
             for (int index = 0; index < width; index++)
-                pixels[index] = params->getSecondaryColour() * transition.getValue(index, width);
+                pixels[index] = params->getSecondaryColour() * transition.getValue();
         }
     };
 
     template <class T>
-    class LFOPattern : public Pattern<RGBA>
+    class LfoPattern : public Pattern<RGBA>
     {
-        int numWaves;
         LFO<T> lfo;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
 
     public:
-        LFOPattern(int numWaves, int period = 5000, float pulsewidth = 0.5)
+        LfoPattern()
         {
-            this->numWaves = numWaves;
-            this->lfo = LFO<T>(period);
-            this->lfo.setDutyCycle(pulsewidth);
             this->name = "LFO";
         }
 
@@ -155,9 +143,65 @@ namespace Ledpar
             if (!transition.Calculate(active))
                 return;
 
+            lfo.setPeriod(params->getVelocity(6000, 500));
+            lfo.setDutyCycle(params->getSize());
+            int amount = params->getAmount(1, 3.99);
+
             for (int index = 0; index < width; index++)
             {
-                pixels[index] = params->getPrimaryColour() * transition.getValue() * lfo.getValue((float)numWaves * index / width);
+                pixels[index] = params->getPrimaryColour() * transition.getValue() * lfo.getValue((float)amount * index / width);
+            }
+        }
+    };
+
+    class DuoTonePattern : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            400, Transition::none, 0,
+            400, Transition::none, 0);
+
+    public:
+        DuoTonePattern()
+        {
+            this->name = "Duotone";
+        }
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
+
+            for (int index = 0; index < width; index++)
+                pixels[index] = (index % 2 == 0 ? params->getPrimaryColour() : params->getSecondaryColour()) * transition.getValue();
+        }
+    };
+
+    template <class T>
+    class PaletteLfoPattern : public Pattern<RGBA>
+    {
+        LFO<T> lfo;
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+
+    public:
+        PaletteLfoPattern()
+        {
+            this->name = "LFO Palette";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            lfo.setPeriod(params->getVelocity(6000, 500));
+            lfo.setDutyCycle(params->getSize());
+            int amount = params->getAmount(1, 3.99);
+
+            for (int index = 0; index < width; index++)
+            {
+                float lfoVal = lfo.getValue((float)amount * index / width);
+                pixels[index] = params->gradient->get(255 * lfoVal) * transition.getValue();
             }
         }
     };
