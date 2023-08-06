@@ -10,7 +10,9 @@
 #include "patterns.hpp"
 #include "ledParPatterns.hpp"
 #include "palettes.hpp"
+#include "mapping/haloMap.hpp"
 #include <vector>
+#include "core/distribution/outputs/monitorOutput.hpp"
 
 void addColanderPipe(Hyperion *hyp);
 void addLaserPipe(Hyperion *hyp);
@@ -74,12 +76,34 @@ int main()
 void addColanderPipe(Hyperion *hyp)
 {
 
-  auto splitInput = new InputSplitter(
-      new ControlHubInput<Monochrome>(
+
+
+  // auto splitInput = new InputSplitter(
+  //     new ControlHubInput<Monochrome>(
+  //         12,
+  //         &hyp->hub,
+  //         {
+  //             // static
+  //             {.column = 1, .slot = 0, .pattern = new GlowPattern()},
+  //             {.column = 1, .slot = 1, .pattern = new SinPattern()},
+  //             {.column = 1, .slot = 2, .pattern = new FastStrobePattern()},
+  //             {.column = 1, .slot = 3, .pattern = new SlowStrobePattern()},
+  //             {.column = 1, .slot = 4, .pattern = new BlinderPattern()},
+  //             {.column = 1, .slot = 5, .pattern = new BeatAllFadePattern()},
+  //             {.column = 1, .slot = 6, .pattern = new BeatShakePattern()},
+  //             {.column = 1, .slot = 7, .pattern = new BeatSingleFadePattern()},
+  //             {.column = 1, .slot = 8, .pattern = new BeatMultiFadePattern()},
+  //             {.column = 1, .slot = 9, .pattern = new GlitchPattern()},
+  //             {.column = 1, .slot = 10, .pattern = new LFOPattern<SawDown>()},
+  //             {.column = 1, .slot = 11, .pattern = new BeatStepPattern()},
+  //         }),
+  //     {6, 6},
+  //     true);
+
+  auto input = new ControlHubInput<Monochrome>(
           12,
           &hyp->hub,
           {
-              // static
               {.column = 1, .slot = 0, .pattern = new GlowPattern()},
               {.column = 1, .slot = 1, .pattern = new SinPattern()},
               {.column = 1, .slot = 2, .pattern = new FastStrobePattern()},
@@ -90,15 +114,20 @@ void addColanderPipe(Hyperion *hyp)
               {.column = 1, .slot = 7, .pattern = new BeatSingleFadePattern()},
               {.column = 1, .slot = 8, .pattern = new BeatMultiFadePattern()},
               {.column = 1, .slot = 9, .pattern = new GlitchPattern()},
-              {.column = 1, .slot = 10, .pattern = new LFOPattern<SawDown>(1)},
+              {.column = 1, .slot = 10, .pattern = new LFOPattern<SawDown>()},
               {.column = 1, .slot = 11, .pattern = new BeatStepPattern()},
-          }),
-      {6, 6},
-      true);
+          });
+
 
   const char *hosts[2] = {hyper_l, hyper_r};
 
-  for (int i = 0; i < splitInput->size(); i++)
+    auto splitInput = new InputSlicer(input, {
+        {0, 6, true},
+        {7, 12, true},
+        {0, 12, false}
+    });
+
+  for (int i = 0; i < splitInput->size()-1; i++)
   {
     auto pipe = new ConvertPipe<Monochrome, Monochrome12>(
         splitInput->getInput(i),
@@ -106,6 +135,10 @@ void addColanderPipe(Hyperion *hyp)
         IncandescentLut);
     hyp->addPipe(pipe);
   }
+
+  hyp->addPipe(new ConvertPipe<Monochrome, RGB>(
+    splitInput->getInput(2),
+    new MonitorOutput(&hyp->webServer,haloMap)));
 }
 
 void addLaserPipe(Hyperion *hyp)
@@ -126,7 +159,7 @@ void addLaserPipe(Hyperion *hyp)
               {.column = 2, .slot = 7, .pattern = new BeatSingleFadePattern()},
               {.column = 2, .slot = 8, .pattern = new BeatMultiFadePattern()},
               {.column = 2, .slot = 9, .pattern = new GlitchPattern()},
-              {.column = 2, .slot = 10, .pattern = new LFOPattern<SawDown>(1)},
+              {.column = 2, .slot = 10, .pattern = new LFOPattern<SawDown>()},
               {.column = 2, .slot = 11, .pattern = new BeatStepPattern()},         }),
       {4, 4, 4},
       true);
@@ -161,7 +194,7 @@ void addBulbPipe(Hyperion *hyp)
               {.column = 3, .slot = 7, .pattern = new BeatSingleFadePattern()},
               {.column = 3, .slot = 8, .pattern = new BeatMultiFadePattern()},
               {.column = 3, .slot = 9, .pattern = new GlitchPattern()},
-              {.column = 3, .slot = 10, .pattern = new LFOPattern<SawDown>(1)},
+              {.column = 3, .slot = 10, .pattern = new LFOPattern<SawDown>()},
               {.column = 3, .slot = 11, .pattern = new BeatStepPattern()},         }),
       {6},
       true);
@@ -193,7 +226,7 @@ void addPinspotPipe(Hyperion *hyp)
               {.column = 4, .slot = 7, .pattern = new BeatSingleFadePattern()},
               {.column = 4, .slot = 8, .pattern = new BeatMultiFadePattern()},
               {.column = 4, .slot = 9, .pattern = new GlitchPattern()},
-              {.column = 4, .slot = 10, .pattern = new LFOPattern<SawDown>(1)},
+              {.column = 4, .slot = 10, .pattern = new LFOPattern<SawDown>()},
               {.column = 4, .slot = 11, .pattern = new BeatStepPattern()},      });
 
   auto pipe = new ConvertPipe<Monochrome, Monochrome>(
@@ -220,7 +253,7 @@ void addLampionPipe(Hyperion *hyp)
               {.column = 5, .slot = 7, .pattern = new BeatSingleFadePattern()},
               {.column = 5, .slot = 8, .pattern = new BeatMultiFadePattern()},
               {.column = 5, .slot = 9, .pattern = new GlitchPattern()},
-              {.column = 5, .slot = 10, .pattern = new LFOPattern<SawDown>(1)},
+              {.column = 5, .slot = 10, .pattern = new LFOPattern<SawDown>()},
               {.column = 5, .slot = 11, .pattern = new BeatStepPattern()},
       });
 
