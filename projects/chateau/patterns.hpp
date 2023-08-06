@@ -78,6 +78,11 @@
             1000, Transition::none, 0,
             0, Transition::none, 0);
 
+        public:
+        FastStrobePattern(){
+            this->name="Fast strobe";
+        }
+
         inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
         {
             if (!transition.Calculate(active))
@@ -92,6 +97,11 @@
 
     class SlowStrobePattern : public Pattern<Monochrome>
     {
+        public:
+        SlowStrobePattern(){
+            this->name="Slow strobe";
+        }
+
         inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
         {
             if (!active)
@@ -111,6 +121,7 @@
                 fadein, in, 200,
                 fadeout, out, 500);
             this->intensity = intensity;
+            this->name="Blinder";
         }
 
     protected:
@@ -133,6 +144,7 @@
         BeatAllFadePattern(int fadeout = 100)
         {
             fader.duration = fadeout;
+            this->name="Beat all fade";
         }
 
     protected:
@@ -163,6 +175,11 @@
         FadeDown fader = FadeDown(300, WaitAtEnd);
         Permute perm = Permute(0);
 
+        public: 
+        BeatShakePattern(){
+            this->name="Beat shake";
+        }
+
         inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
         {
             if (!active && fader.getValue(width * 10) == 0)
@@ -190,6 +207,11 @@
         FadeDown fader = FadeDown(200, WaitAtEnd);
         int current = 0;
 
+        public:
+        BeatSingleFadePattern(){
+            this->name="Beat single fade";
+        }
+
         inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
         {
             if (!active && fader.getValue() == 0)
@@ -215,6 +237,7 @@
         BeatMultiFadePattern(int duration = 200)
         {
             fader.duration = duration;
+            this->name="Beat multi fade";
         }
 
         BeatWatcher watcher = BeatWatcher();
@@ -249,6 +272,11 @@
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
+
+        public:
+        GlitchPattern()
+        {this->name="Glitch";}
+
         inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
         {
             if (!transition.Calculate(active))
@@ -279,6 +307,7 @@
         OnPattern(uint8_t intensity = 100)
         {
             this->intensity = intensity;
+            this->name="On";
         }
         inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
         {
@@ -310,7 +339,8 @@
         {
             this->numWaves = numWaves;
             this->lfo = LFO<T>(period);
-            this->lfo.setPulseWidth(pulsewidth);
+            this->lfo.setDutyCycle(pulsewidth);
+            this->name="LFO";
         }
 
         inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
@@ -336,6 +366,7 @@
         BeatStepPattern(int steps = 2)
         {
             this->steps = steps;
+            this->name="Beat step";
         }
 
         inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
