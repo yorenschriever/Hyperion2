@@ -64,14 +64,14 @@ public:
 
         for (int index = 0; index < width; index++)
         {
-            int velocity = params->getVelocity(1, 5);
+            int velocity = params->getVelocity(1, 8);
             float period1 = 1000 * 14.7 / velocity;
             float period2 = 1000 * 15.3 / velocity;
             float combined = std::max(
                 lfo1.getValue(float(perm1.at[index]) / width, period1),
                 lfo2.getValue(float(perm1.at[index]) / width, period2));
 
-            pixels[index] = Monochrome((uint8_t)(127.f + 127.f * combined)) * transition.getValue(index, width);
+            pixels[index] = Monochrome((uint8_t)(35.f + 220.f * combined)) * transition.getValue(index, width);
         }
     }
 };
@@ -93,7 +93,7 @@ public:
         if (!transition.Calculate(active))
             return; // the fade out is done. we can skip calculating pattern data
 
-        Monochrome value = Monochrome(Utils::millis() % 50 < 25 ? 255 : 0) * transition.getValue();
+        Monochrome value = Monochrome(Utils::millis() % 60 < 25 ? 255 : 0) * transition.getValue();
 
         for (int index = 0; index < width; index++)
             pixels[index] = pixels[index] * (1. - transition.getValue()) + value;
@@ -114,9 +114,37 @@ public:
             return;
 
         for (int index = 0; index < width; index++)
-            pixels[index] = Utils::millis() % 100 < 25 ? 255 : 0;
+            pixels[index] = Utils::millis() % 200 < 25 ? 255 : 0;
     }
 };
+
+    class FastStrobePattern2 : public Pattern<Monochrome>
+    {
+
+        int framecounter = 1;
+
+        public:
+        FastStrobePattern2(){
+            this->name = "Fast Strobe 2";
+        }
+
+        inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
+        {
+            if (!active) return;
+
+            framecounter--;
+
+            Monochrome color = 0;
+            if (framecounter <= 1)
+                color = 255;
+
+            if (framecounter == 0)
+                framecounter = 5; //Params::getVelocity(40,4);
+
+            for (int index = 0; index < width; index++)
+                pixels[index] = color;
+        }
+    };
 
 class BlinderPattern : public Pattern<Monochrome>
 {
@@ -394,3 +422,41 @@ public:
         }
     }
 };
+
+    class GlowOriginalPattern : public Pattern<Monochrome>
+    {
+        float direction;
+        Permute perm1 = Permute(0);
+        Permute perm2 = Permute(0);
+        Transition transition = Transition(
+            1000, Transition::none, 0,
+            2000, Transition::none, 0);
+        unsigned long start = Utils::millis();
+
+    public:
+        GlowOriginalPattern(int direction = 1)
+        {
+            this->direction = direction;
+            this->name = "Glow OG";
+        }
+
+        inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
+
+            perm1.setSize(width);
+            perm2.setSize(width);
+
+            for (int index = 0; index < width; index++)
+            {
+                unsigned long millis = Utils::millis() - start;
+                float period1 = float(perm1.at[index]) / float(width) * (2 * 3.1415) * 14.7 + 5.5;
+                float period2 = float(perm2.at[index]) / float(width) * (2 * 3.1415) * 15.3 + 3.5;
+                float combined = std::max(cos(period1 * float(millis) / (20000.f * direction)), cos(period2 * float(millis) / (20000.f * direction)));
+
+                pixels[index] = Monochrome((uint8_t)(150.f + 105.f * combined)) * transition.getValue(index, width);
+                //pixels[index] = Monochrome(150 + 105*combined);
+            }
+        }
+    };
