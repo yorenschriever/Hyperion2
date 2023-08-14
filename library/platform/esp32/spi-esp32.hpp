@@ -1,6 +1,8 @@
 #pragma once
 
 #include "spi.hpp"
+#include "log.hpp"
+#include "utils.hpp"
 #include <inttypes.h>
 #include "driver/spi_master.h"
 #include "esp_system.h"
@@ -8,19 +10,33 @@
 #include <stdio.h>
 #include <string.h>
 
-#define SENDER_HOST HSPI_HOST
-
 class SPI_ESP: public SPI
 {
+private :
+    esp_err_t ret;
+    spi_device_handle_t handle;
+    spi_host_device_t host;
+    spi_transaction_t trans;
+
+    volatile bool sendFinished = true;
+    volatile unsigned long sendFinishedAt = 0;
+
+   static void sendFinishedCallback(spi_transaction_t *trans);
+
 public:
-    void begin() override{
+
+    SPI_ESP(spi_host_device_t host){
+        this->host = host;
+    }
+
+    void begin(uint8_t clkPin, uint8_t dataPin, int frq) override{
 
 
         //Configuration for the SPI bus
         spi_bus_config_t buscfg={
-            .mosi_io_num=pinMapping[1],
+            .mosi_io_num=pinMapping[dataPin],
             .miso_io_num=-1,
-            .sclk_io_num=pinMapping[0],
+            .sclk_io_num=pinMapping[clkPin],
             .quadwp_io_num=-1,
             .quadhd_io_num=-1
         };
@@ -31,43 +47,56 @@ public:
             .address_bits=0,
             .dummy_bits=0,
             
-            //.duty_cycle_pos=128,        //50% duty cycle
             .mode=0,
-            .clock_speed_hz=500000,
-            //.spics_io_num=-1,           //chip select pin
-            //.cs_ena_posttrans=3,        //Keep the CS low 3 cycles after transaction, to stop slave from missing the last bit when CS has less propagation delay than CLK
-            .queue_size=1
+            .clock_speed_hz=frq, 
+            .spics_io_num=-1,           //chip select pin
+            .queue_size=1,
+            .post_cb = sendFinishedCallback,
         };
 
-        ret=spi_bus_initialize(SENDER_HOST, &buscfg, SPI_DMA_CH_AUTO);
+        ret=spi_bus_initialize(host, &buscfg, SPI_DMA_CH_AUTO);
         assert(ret==ESP_OK);
-        ret=spi_bus_add_device(SENDER_HOST, &devcfg, &handle);
+        ret=spi_bus_add_device(host, &devcfg, &handle);
         assert(ret==ESP_OK);
     }
 
     void send(uint8_t *buffer, int length) override{
-        spi_transaction_t t;
-        memset(&t, 0, sizeof(t));
-        t.length=length*8;
-        t.tx_buffer=buffer;
-        t.rx_buffer=NULL;
+        if (!ready())
+            return;
 
-        spi_device_transmit(handle, &t);
+        sendFinished = false;
+
+        memset(&trans, 0, sizeof(trans));
+        trans.length=length*8;
+        trans.user = this;
+        trans.tx_buffer=buffer;
+        trans.rx_buffer=NULL;
+
+        ESP_ERROR_CHECK_WITHOUT_ABORT(spi_device_queue_trans(handle, &trans, 0));
     }
 
-    bool ready() override{
-        //spi_transaction_t description;
-        //spi_device_get_trans_result(handle, &description,0);
+    bool ready() override
+    {
+        return readyForUs(1000);
+    }
 
-        //return description.;  
-        return true; //TODO this spi implementation is not async. the main loop will halt until all pixel data is sent out. use the spi queue functionality.     
+    bool readyForUs(unsigned int offset)
+    {
+        if (!sendFinished)
+            return false;
+        return (Utils::micros() - sendFinishedAt > offset);
     }
 
     virtual ~SPI_ESP() {
         spi_bus_remove_device(handle);
     }
 
-private :
-            esp_err_t ret;
-        spi_device_handle_t handle;
+
 };
+
+void IRAM_ATTR SPI_ESP::sendFinishedCallback(spi_transaction_t *trans)
+{
+    auto instance = (SPI_ESP *)trans->user;
+    instance->sendFinished = true;
+    instance->sendFinishedAt = Utils::micros();
+}

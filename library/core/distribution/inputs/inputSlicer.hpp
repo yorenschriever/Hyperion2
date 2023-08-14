@@ -78,6 +78,9 @@ public:
         }
 
         auto len = instance->sourceInput->loadData(instance->buffer, Pipe::bufferSize);
+        if (len > Pipe::bufferSize) {
+            Log::info("InputSlicer","pixel buffer to small, not all led data is processed, %d, %d", len, Pipe::bufferSize);
+        }
         if (len > 0)
         {   
             for (auto di : instance->destinationInputs)

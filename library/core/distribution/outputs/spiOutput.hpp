@@ -5,7 +5,7 @@
 #include "thread.hpp"
 #include "utils.hpp"
 #include "log.hpp"
-#include "SPI.hpp"
+#include "spi.hpp"
 
 // SpiOutput sends the output over spi.
 // Can be used for pixel led strands.
@@ -35,20 +35,18 @@ public:
     {
         // even though the datasheet states less, 1000us seems to be necessary for
         // stable operation (tested on ledster)
-        return spi->ready();
+        return spi && spi->ready();
     }
 
     void show() override
     {
-        if (!ready())
-            return;
-
         spi->send(buffer, length);
     }
 
     void begin() override
     {
-        spi->begin(); // TODO clockPin, dataPin, frq);
+        if (spi)
+            spi->begin(clkPin, dataPin, frq );
     }
 
     void clear() override
@@ -81,7 +79,8 @@ public:
     ~SpiOutput()
     {
         //Utils::free_dma(buffer); TODO
-        delete spi;
+        if (spi)
+            delete spi;
     }
 private:
     SPI *spi;

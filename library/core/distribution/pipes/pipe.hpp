@@ -12,7 +12,7 @@ class Pipe
 {
 public:
 #if (ESP_PLATFORM)
-    static const int bufferSize = 512*4;
+    static const int bufferSize = 1200*4;
 #else
     static const int bufferSize = 1500 * 4 * 6;
 #endif
