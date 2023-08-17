@@ -15,13 +15,22 @@ LUT *ledsterLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
 auto pSailMap = sailMap.toPolarRotate90();
 
 std::vector<PaletteColumn::Palette> palettes = std::vector<PaletteColumn::Palette>(
-    {pinkSunset,
-     sunset8,
+    {retro,
+     blueOrange,
+     tunnel,
      heatmap2,
+     sunset8,
      sunset2,
+     campfire,
      sunset6,
      plumBath,
-     redSalvation});
+     greatBarrierReef,
+     redSalvation,
+     pinkSunset,
+     sunset1,
+     sunset3,
+     sunset4,
+     purpleGreen});
 
 const Hyperion::Config minimal = {
     .network = false,
@@ -41,19 +50,20 @@ int main()
     auto input = new PatternCycleInput<RGBA>(
         sailMap.size(),
         {
-            new Patterns::AngularFadePattern(pSailMap), 
-            new Patterns::Lighthouse(pSailMap),
-            new Patterns::RadialFadePattern(pSailMap), 
-            new Patterns::XY(sailMap),  
-            new Patterns::GrowingCirclesPattern(sailMap),
-            new Patterns::ChevronsConePattern(pSailMap),   
-            new Patterns::ChevronsPattern(sailMap),   
-            new Patterns::GrowingCirclesPattern2(sailMap),
-            new Patterns::RadialGlitterFadePattern(pSailMap), 
-            new Patterns::SpiralPattern(pSailMap),
+            new Patterns::AngularFadePattern(&pSailMap),
+            new Patterns::Lighthouse(&pSailMap),
+            new Patterns::RadialFadePattern(&pSailMap),
+            new Patterns::XY(&sailMap),
+            new Patterns::GrowingCirclesPattern(&sailMap),
+            new Patterns::ChevronsConePattern(&pSailMap),
+            new Patterns::ChevronsPattern(&sailMap),
+            new Patterns::RadialGlitterFadePattern(&pSailMap),
+            new Patterns::SpiralPattern(&pSailMap),
             new Patterns::GlowPulsePattern(),
+            new Patterns::GrowingCirclesPattern2(&sailMap),
         },
-        0.1 * 60 * 1000);
+
+        0.25 * 60 * 1000);
 
 #if ESP_PLATFORM
     int splitSize = sailMap.size() / 2 * sizeof(RGBA);
@@ -88,6 +98,6 @@ int main()
         paletteColumnIndex++;
         if (paletteColumnIndex >= palettes.size())
             paletteColumnIndex = 0;
-        Thread::sleep(0.1 * 1.5 * 60 * 1000);
+        Thread::sleep(1 * 1.4 * 60 * 1000);
     }
 }

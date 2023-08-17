@@ -76,7 +76,7 @@ public:
             pipe->in->begin();
 
         Log::info("Hyperion", "Initialization complete. Starting main loop");
-        // Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
+        Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
         Thread::create(runTask, "run", Thread::Purpose::distribution, 30000, this, 1);
     }
 
