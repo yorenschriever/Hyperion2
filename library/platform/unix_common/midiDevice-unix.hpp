@@ -8,10 +8,10 @@
 #include <stdint.h>
 #include <vector>
 
-class MidiDeviceMacos : public MidiDevice
+class MidiDeviceUnix : public MidiDevice
 {
 public:
-  MidiDeviceMacos(int in_index, int out_index)
+  MidiDeviceUnix(int in_index, int out_index)
   {
     if (out_index >= 0)
       midiOut.openPort(out_index);
@@ -59,7 +59,7 @@ private:
 
   static void callback(double delta_time, std::vector<unsigned char> *message, void *userData)
   {
-    auto instance = (MidiDeviceMacos *)userData;
+    auto instance = (MidiDeviceUnix *)userData;
     auto listeners = instance->listeners;
 
     if (listeners.size()==0)

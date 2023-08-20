@@ -202,7 +202,7 @@ handle_request(
     auto str_target = std::string(req.target());
     if (paths->count(str_target) > 0)
     {
-        //Log::info("WebServerMacOs", "path found with WebServerResponseBuilder: %s", str_target.c_str());
+        //Log::info("WebServerUnix", "path found with WebServerResponseBuilder: %s", str_target.c_str());
 
         http::response<http::buffer_body_str> res;
 
@@ -946,10 +946,10 @@ private:
 
 //------------------------------------------------------------------------------
 
-class WebServerMacOs : public WebServer 
+class WebServerUnix : public WebServer 
 {
 public:
-    WebServerMacOs(std::string root, int port)
+    WebServerUnix(std::string root, int port)
     {
         Log::info(TAG, "Starting web server on port %d. root=%s", port, root.c_str());
         auto const doc_root = std::make_shared<std::string>(root);
@@ -962,7 +962,7 @@ public:
             .detach();
     }
 
-    ~WebServerMacOs() = default;
+    ~WebServerUnix() = default;
 
     void addPath(std::string path, WebServerResponseBuilder *builder) override
     {
@@ -1051,19 +1051,19 @@ private:
     }
 };
 
-const char *WebServerMacOs::TAG = "WEBSERVER";
+const char *WebServerUnix::TAG = "WEBSERVER";
 
-class WebsocketServerMacOs : public WebsocketServer, public WebSocketServerSessionReceiver
+class WebsocketServerUnix : public WebsocketServer, public WebSocketServerSessionReceiver
 {
 public:
     using WS = websocket_session<ssl_websocket_session>;
 
-    WebsocketServerMacOs(WebServer *server, const char *path)
+    WebsocketServerUnix(WebServer *server, const char *path)
     {
-        ((WebServerMacOs *)server)->addPathWs(path, this);
+        ((WebServerUnix *)server)->addPathWs(path, this);
     }
 
-    ~WebsocketServerMacOs() = default;
+    ~WebsocketServerUnix() = default;
 
     void send(RemoteWebsocketClient *client, std::string msg) override
     {
@@ -1203,4 +1203,4 @@ private:
     static const char *TAG;
 };
 
-const char *WebsocketServerMacOs::TAG = "WEBSOCKET_SERVER";
+const char *WebsocketServerUnix::TAG = "WEBSOCKET_SERVER";

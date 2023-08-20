@@ -1,12 +1,12 @@
 #include "log.hpp"
 #include "midi.hpp"
-#include "midiDevice-macos.hpp"
+#include "midiDevice-unix.hpp"
 #include "midiDevice.hpp"
 #include "rtmidi/RtMidi.h"
 #include "thread.hpp"
 #include <algorithm>
 
-class MidiMacos : public Midi
+class MidiUnix : public Midi
 {
 
 private:
@@ -32,11 +32,11 @@ private:
     }
 
 public:
-    MidiMacos(){
+    MidiUnix(){
         initialize();
     }
 
-    ~MidiMacos() = default;
+    ~MidiUnix() = default;
 
     void initialize()
     {
@@ -63,7 +63,7 @@ public:
 private:
     static void midiTask(void *param)
     {
-        MidiMacos *instance = (MidiMacos *)param;
+        MidiUnix *instance = (MidiUnix *)param;
         // instances used to pull the number of connected devices.
         // once this number changes, i disconnect everything and build it all up again
         RtMidiIn midiInPoll;
@@ -158,7 +158,7 @@ private:
         Log::info("MIDI", "trimmed midi device name to %s", name.c_str());
 #endif
 
-        auto midiDevice = new MidiDeviceMacos(in_index, out_index);
+        auto midiDevice = new MidiDeviceUnix(in_index, out_index);
 
         devices.push_back(midiDevice);
 

@@ -69,8 +69,8 @@ else ()
 
     if ("${TARGET}" STREQUAL "macos" OR "${TARGET}" STREQUAL "rpi")
         set(RTMIDI_BUILD_TESTING OFF)
-        add_subdirectory($ENV{HYPERION_LIB_DIR}/platform/macos/rtmidi "rtmidi")
-        target_include_directories(Hyperion PUBLIC $ENV{HYPERION_LIB_DIR}/platform/macos/rtmidi)
+        add_subdirectory($ENV{HYPERION_LIB_DIR}/platform/unix_common/rtmidi "rtmidi")
+        target_include_directories(Hyperion PUBLIC $ENV{HYPERION_LIB_DIR}/platform/unix_common/rtmidi)
         set(RTMIDI "rtmidi")
 
         if ("${TARGET}" STREQUAL "rpi")
