@@ -28,12 +28,12 @@ To give you the maximum creative freedom, the patterns are also written in code 
 ## Getting started / installation guides
 
 Hyperion runs on multiple platforms. Choose the one that fits your purpose best. Also, have a look at the chapter *hardware configurations* to help you with the choice.
-Click in the platform name to go to the installation guide.
+Click on the platform name to go to the installation guide.
 
 |Platform                 |Generate patterns  |Web interface|Midi controllers|Send and receive network|Neopixel channels|PWM channels|DMX out/in|Hardware cost|
 |--                       |--                 |--           |--              |--                      |--               |--          |--        |--           |
 |[MacOs](readme-macos.md) |yes                |yes          |yes             |yes                     |0                |0           |0         |$300+        |
-|[Esp32 / Hyperion hardware](readme-esp.md)|max +/- 1500 lights|limited*     |yes             |yes                     |8                |12          |1         |$5-$150      |
+|[Esp32 / Hyperion hardware](readme-esp.md)|max +/- 1500 lights|limited*     |yes             |yes                     |8                |12          |1/1       |$5-$150      |
 |[Raspberry pi 4](readme-rpi.md)           |yes                |yes          |yes             |yes                     |0                |0           |0         |$50-$150     |
 |[Any computer (docker)](readme-docker.md)    |yes                |yes          |no              |yes                     |0                |0           |0         |$100+        |
 

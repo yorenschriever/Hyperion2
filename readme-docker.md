@@ -1,28 +1,32 @@
-# Hyperion 2 Docker
+# Hyperion 2 in Docker
 
-## Installation
-[Install Docker](https://docs.docker.com/get-docker/) using the instructions on their website
+## Installation on a Linux or MacOs host
 
-Clone this repo
-```
+#### 1. Install Docker and Git
+[Install Docker](https://docs.docker.com/get-docker/) using the instructions on their website.
+And, if you dan't have it already, [install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) as well.
+
+#### 2. Clone this repository
+Clone the repository and run a script to configure some environment variables.
+```sh
 git clone https://github.com/yorenschriever/Hyperion2.git
+./Hyperion2/library/scripts/export.sh
 ```
 
-On linux and MacOs: Add this lines to your  ~/.zprofile (and change the path to your folder)
-```
-source /Users/yoren/repos/Hyperion2/library/scripts/export.sh
-```
+NB: you need to run the export script every time you open a new terminal. You can also add the script to your zprofile, so it runs automatically each time. See installation step 1 of the [MacOs readme](readme-macos.md) for instructions.
 
-On windows: you have to run script script on startup: `library/scripts/setupWindows.ps1` TODO: this script is not up to date?
+#### 3. Run
+Open a terminal on your host machine, go to a project folder and build and run:
 
-
-This will setup the `build` and `run` commands, so you can build for docker in the same way as the other platforms.
-
-## Run
-Open a terminal on your local dev machine, go to a project folder and build and run:
-
-```
-cd examples/hello_world
+```sh
+cd Hyperion2/examples/hello_world
 build docker
 run docker
 ```
+
+
+## Installation on a windows host
+
+On windows the steps are the same, except the path of the script is `./Hyperion2/library/scripts/setupWindows.ps1` 
+
+TODO: this script is not up to date?

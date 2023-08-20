@@ -1,4 +1,4 @@
-# Hyperion 2 on Raspberry pi 4
+# Hyperion 2 on Raspberry Pi 4
 
 The easiest way to start is with the Hyperion image. This contains everything you need, so you don't need to install anything further. The image is based on raspberry pi os 64 bit, which means it will only work on a raspberry pi 4. Below are instructors to create your own image in case you want to use another base OS. 
 
@@ -81,7 +81,8 @@ ssh-copy-id hyperion@raspberrypi.local
 ```
 
 ## Tips for use in permanent installations
-If you want to use the pi in a permanent installtion, you should consider these things:
+If you want to use the pi in a permanent installation, you should consider these things:
+- Change the password.
 - Disable logging to reduce wear on the sd card.
 - Make SD card (/boot partition) readonly, so it is unlikely to damage when the power is interrupted 
 - Backup the sd card twice, and keep one always with the installation, the SD cards are the weakest point.
