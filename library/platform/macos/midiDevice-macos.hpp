@@ -1,8 +1,8 @@
 #pragma once
 
 #include "log.hpp"
-#include "midi-listener.hpp"
-#include "platform/includes/midi-device.hpp"
+#include "midiListener.hpp"
+#include "midiDevice.hpp"
 #include "rtmidi/RtMidi.h"
 #include <map>
 #include <stdint.h>

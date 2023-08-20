@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ipAddress.hpp"
+#include "macAddress.hpp"
 
 class Ethernet
 {
@@ -9,12 +10,9 @@ public:
     static void initialize();
 
     // tells if the network is connected
-    static bool isConnected();
+    static bool isConnected(); 
     static bool isConnecting();
 
     static IPAddress getIp();
-    static uint8_t* getMac();
-
-private:
-    static uint8_t mac[6];
+    static MacAddress getMac();
 };

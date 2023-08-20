@@ -22,7 +22,4 @@ public:
     );
 
     static void destroy();
-
-private:
-    static int mapPurposeToCore(Purpose purpose);
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "abstractTempo.h"
 #include "log.hpp"
-#include "midi-listener.hpp"
+#include "midiListener.hpp"
 
 #define MIDI_CLOCK_START 0xFA
 #define MIDI_CLOCK_STOP 0xFC

@@ -47,4 +47,5 @@ protected:
     WebsocketConnectionHandler connectionHandler = NULL;
     void* userData;
     void* connectionUserData;
+    WebsocketServer(){}
 };

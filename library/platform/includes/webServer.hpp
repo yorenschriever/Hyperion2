@@ -13,4 +13,7 @@ public:
     virtual ~WebServer() = default;
 
     virtual void addPath(std::string path, WebServerResponseBuilder *builder) = 0;
+
+protected: 
+    WebServer(){}
 };

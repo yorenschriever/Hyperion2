@@ -4,7 +4,7 @@
 #include "core/generation/controlHub/controlHub.hpp"
 #include "log.hpp"
 #include "midiController.hpp"
-#include "platform/includes/midi-device.hpp"
+#include "platform/includes/midiDevice.hpp"
 #include <algorithm>
 
 class MidiMixController : public MidiController

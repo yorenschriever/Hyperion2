@@ -4,7 +4,7 @@
 #include "core/generation/controlHub/controlHub.hpp"
 #include "log.hpp"
 #include "midiController.hpp"
-#include "platform/includes/midi-device.hpp"
+#include "midiDevice.hpp"
 #include <algorithm>
 
 class KorgNanoKontrol2controller : public MidiController

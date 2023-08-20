@@ -4,7 +4,7 @@
 #include "core/generation/controllers/midiController.hpp"
 #include "core/hyperion.hpp"
 #include "log.hpp"
-#include "platform/includes/midi-device.hpp"
+#include "platform/includes/midiDevice.hpp"
 #include <algorithm>
 
 class DaslightLinkedController : public MidiController

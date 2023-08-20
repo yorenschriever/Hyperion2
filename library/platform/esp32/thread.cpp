@@ -2,6 +2,19 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+int mapThreadPurposeToCore(Thread::Purpose purpose)
+{
+    switch (purpose)
+    {
+    case Thread::Purpose::distribution:
+        return 0;
+    case Thread::Purpose::control:
+    case Thread::Purpose::network:
+    default:
+        return 0;
+    }
+}
+
 void Thread::sleep(unsigned int duration_ms)
 {
     vTaskDelay(duration_ms / portTICK_PERIOD_MS);
@@ -22,7 +35,7 @@ int Thread::create(
         pvParameters,
         uxPriority,
         NULL,
-        mapPurposeToCore(purpose));
+        mapThreadPurposeToCore(purpose));
 }
 
 void Thread::destroy()
@@ -30,15 +43,3 @@ void Thread::destroy()
     vTaskDelete(NULL);
 }
 
-int Thread::mapPurposeToCore(Purpose purpose)
-{
-    switch (purpose)
-    {
-    case Purpose::distribution:
-        return 0;
-    case Purpose::control:
-    case Purpose::network:
-    default:
-        return 0;
-    }
-}

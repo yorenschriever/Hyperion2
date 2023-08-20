@@ -1,5 +1,6 @@
 #include "platform/includes/ethernet.hpp"
 #include "platform/includes/ipAddress.hpp"
+#include "platform/includes/macAddress.hpp"
 #include "platform/includes/log.hpp"
 
 #include <stdio.h>      
@@ -11,7 +12,7 @@
 #include <net/if_dl.h>
 
 static const char *TAG = "ETH";
-uint8_t Ethernet::mac[6] = {0,0,0,0,0,0};
+MacAddress mac = MacAddress{0,0,0,0,0,0};
 
 void Ethernet::initialize()
 {
@@ -62,7 +63,7 @@ IPAddress Ethernet::getIp()
             //todo this only works on mac, not on linux.
             //also, there is no guarantee that this will pick the correct mac address
             if (6 == sdl->sdl_alen) {
-                memcpy(mac, LLADDR(sdl), sdl->sdl_alen);
+                memcpy(mac.octets, LLADDR(sdl), sdl->sdl_alen);
                 //Log::info(TAG,"mac  : %02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
             }
       }
@@ -72,7 +73,7 @@ IPAddress Ethernet::getIp()
     return IPAddress(ip4,ip6);
 }
 
-uint8_t* Ethernet::getMac()
+MacAddress Ethernet::getMac()
 {
     getIp();
     //Log::info(TAG,"mac2  : %02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);

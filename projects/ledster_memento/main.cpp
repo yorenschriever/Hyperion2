@@ -56,8 +56,8 @@ int main()
 #if ESP_PLATFORM
     hyp->addPipe(new ConvertPipe<RGBA, GRB>(
         input,
-        //new NeopixelOutput(1),
-        new SpiOutput(0,1),
+        new NeopixelOutput(1),
+        //new SpiOutput(0,1),
         ledsterLut));
     hyp->start(minimal);
 #else

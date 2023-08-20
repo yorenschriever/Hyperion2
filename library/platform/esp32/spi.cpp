@@ -6,7 +6,7 @@ const int num_hosts = 2;
 spi_host_device_t hosts[num_hosts] = {HSPI_HOST, VSPI_HOST};
 int hostIndex=0;
 
-SPI* SPIFactory::createInstance()
+SPI* SPI::createInstance()
 {
     if (hostIndex < num_hosts)
         return new SPI_ESP(hosts[hostIndex++]);

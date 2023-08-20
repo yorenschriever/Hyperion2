@@ -1,28 +1,35 @@
-#pragma once 
+#pragma once
 
-#include <algorithm>
+#include "log.hpp"
+#include "neoPixels.hpp"
 #include "output.hpp"
-#include "rmt.hpp"
 #include "thread.hpp"
 #include "utils.hpp"
-#include "log.hpp"
+#include <algorithm>
 
-//Writes the led data to the octows2811 style connector on the front panel.
-//It use esp32's RMT peripheral to do this.
+// Writes the led data to the octows2811 style connector on the front panel.
+// It use esp32's RMT peripheral to do this.
 class NeopixelOutput : public Output
 {
 public:
-    //port goes from 1-8
+    // port goes from 1-8
     NeopixelOutput(int port)
     {
         this->port = port;
 
-        //initialize with 3 pixels by default
+        // initialize with 3 pixels by default
         this->length = 12;
         buffer = (uint8_t *)Utils::malloc_dma(length);
+
+        rmt = NeoPixels::createInstance();
     }
 
-    //index and size are in bytes
+    ~NeopixelOutput(){
+        if (rmt) 
+            delete rmt;
+    }
+
+    // index and size are in bytes
     void setData(uint8_t *data, int size, int index) override
     {
         int copy_length = std::min(size, length - index);
@@ -32,7 +39,7 @@ public:
 
     bool ready() override
     {
-        return rmt.ready();
+        return rmt && rmt->ready();
     }
 
     void show() override
@@ -40,12 +47,15 @@ public:
         if (!ready())
             return;
 
-        rmt.send(buffer,length);
+        rmt->send(buffer, length);
     }
 
     void begin() override
     {
-        rmt.begin(port);
+        if (!rmt)
+            return;
+
+        rmt->begin(port);
     }
 
     void clear() override
@@ -53,12 +63,12 @@ public:
         memset(buffer, 0, length);
     }
 
-    //length is in bytes
+    // length is in bytes
     void setLength(int len) override
     {
         if (len != this->length)
         {
-            //wait for the buffer to be sent before we are going to change its size
+            // wait for the buffer to be sent before we are going to change its size
             while (!ready())
                 Thread::sleep(1);
 
@@ -66,7 +76,7 @@ public:
 
             if (!buffer)
             {
-                Log::error("NEOPIXEL_OUTPUT","Unable to allocate memory for neoPixelOutput, free heap = %d",Utils::get_free_heap());
+                Log::error("NEOPIXEL_OUTPUT", "Unable to allocate memory for neoPixelOutput, free heap = %d", Utils::get_free_heap());
                 Utils::exit();
             }
 
@@ -78,6 +88,6 @@ public:
 private:
     uint8_t *buffer;
     int port = 1;
-    RMT rmt;
+    NeoPixels *rmt;
     int length;
 };

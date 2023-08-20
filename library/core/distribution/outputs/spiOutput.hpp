@@ -14,7 +14,7 @@ class SpiOutput : public Output
 public:
     SpiOutput(uint8_t clkPin, uint8_t dataPin, int frq = 500000)
     {
-        spi = SPIFactory::createInstance();
+        spi = SPI::createInstance();
         this->clkPin = clkPin;
         this->dataPin = dataPin;
         this->frq = frq;

@@ -20,9 +20,9 @@
 #include "platform/includes/ethernet.hpp"
 #include "platform/includes/log.hpp"
 #include "platform/includes/midi.hpp"
+#include "platform/includes/network.hpp"
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
-#include "platform/includes/network.hpp"
 #include "webServer.hpp"
 #include "webServerResponseBuilder.hpp"
 #include "websocketServer.hpp"
@@ -37,9 +37,9 @@ public:
         bool network;
         bool rotary;
         bool display;
-        bool midi ;
-        bool tempo ;
-        bool web ;
+        bool midi;
+        bool tempo;
+        bool web;
     };
 
     static const Config maximal;
@@ -146,26 +146,27 @@ private:
         // Rotary::onPress([]() { TapTempo::getInstance()->Tap(); });
         // Rotary::onLongPress([]() { TapTempo::getInstance()->Stop(); });
 
-        Midi::initialize();
-        Midi::onDeviceCreatedDestroyed(
-            [](MidiDevice *device, std::string name, void *userData)
-            {
-                auto hyp = (Hyperion *)userData;
-                auto midiTempo = new MidiClockTempo();
-                hyp->midiClockTempos.insert({device, midiTempo});
-                Tempo::AddSource(midiTempo);
-                device->addMidiListener(midiTempo);
-            },
-            [](MidiDevice *device, std::string name, void *userData)
-            {
-                auto hyp = (Hyperion *)userData;
-                auto midiTempo = hyp->midiClockTempos[device];
-                Tempo::RemoveSource(midiTempo);
-                hyp->midiClockTempos.erase(device);
-                device->removeMidiListener(midiTempo);
-                delete midiTempo;
-            },
-            this);
+        auto midi = Midi::getInstance();
+        if (midi)
+            midi->onDeviceCreatedDestroyed(
+                [](MidiDevice *device, std::string name, void *userData)
+                {
+                    auto hyp = (Hyperion *)userData;
+                    auto midiTempo = new MidiClockTempo();
+                    hyp->midiClockTempos.insert({device, midiTempo});
+                    Tempo::AddSource(midiTempo);
+                    device->addMidiListener(midiTempo);
+                },
+                [](MidiDevice *device, std::string name, void *userData)
+                {
+                    auto hyp = (Hyperion *)userData;
+                    auto midiTempo = hyp->midiClockTempos[device];
+                    Tempo::RemoveSource(midiTempo);
+                    hyp->midiClockTempos.erase(device);
+                    device->removeMidiListener(midiTempo);
+                    delete midiTempo;
+                },
+                this);
 
         auto websocketTempo = new WebsocketTempo(this->webServer);
         Tempo::AddListener(websocketTempo);
@@ -178,22 +179,23 @@ private:
             midiControllerFactory = new MidiControllerFactory();
         }
 
-        Midi::initialize();
-        Midi::onDeviceCreatedDestroyed(
-            [](MidiDevice *device, std::string name, void *userData)
-            {
-                auto hyp = (Hyperion *)userData;
-                auto controller = hyp->midiControllerFactory->create(device, name, &hyp->hub);
-                hyp->midiControllers.insert({device, std::move(controller)});
-            },
-            [](MidiDevice *device, std::string name, void *userData)
-            {
-                auto hyp = (Hyperion *)userData;
-                // because midiController contains a smart pointer to the midiDevice
-                // this will also automatically delete the device
-                hyp->midiControllers.erase(device);
-            },
-            this);
+        auto midi = Midi::getInstance();
+        if (midi)
+            midi->onDeviceCreatedDestroyed(
+                [](MidiDevice *device, std::string name, void *userData)
+                {
+                    auto hyp = (Hyperion *)userData;
+                    auto controller = hyp->midiControllerFactory->create(device, name, &hyp->hub);
+                    hyp->midiControllers.insert({device, std::move(controller)});
+                },
+                [](MidiDevice *device, std::string name, void *userData)
+                {
+                    auto hyp = (Hyperion *)userData;
+                    // because midiController contains a smart pointer to the midiDevice
+                    // this will also automatically delete the device
+                    hyp->midiControllers.erase(device);
+                },
+                this);
     }
 
     virtual void setup_web()

@@ -12,6 +12,7 @@
 #include "driver/gpio.h"
 #include "sdkconfig.h"
 #include "esp_rom_gpio.h"
+#include "esp_mac.h"
 
 static const char *TAG = "ETH";
 
@@ -103,10 +104,10 @@ void Ethernet::initialize()
     ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ETHERNET_EVENT_START, &event_handler, NULL));
     ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ETHERNET_EVENT_STOP, &event_handler, NULL));
 
-    Log::info(TAG,"Duurt lang?1");
+    //Log::info(TAG,"Duurt lang?1");
     /* start Ethernet driver state machine */
     ESP_ERROR_CHECK(esp_eth_start(eth_handle));
-    Log::info(TAG,"Duurt lang?2");
+    //Log::info(TAG,"Duurt lang?2");
 }
 
 bool Ethernet::isConnected()
@@ -124,4 +125,11 @@ IPAddress Ethernet::getIp()
     esp_netif_ip_info_t info;
     esp_netif_get_ip_info(eth_netif, &info);
     return IPAddress::fromUint32(ntohl(info.ip.addr));
+}
+
+MacAddress Ethernet::getMac()
+{
+    MacAddress result;
+    esp_read_mac(result.octets, ESP_MAC_ETH);
+    return result;
 }
