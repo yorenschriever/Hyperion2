@@ -15,7 +15,7 @@
 #include <set>
 #include <sys/param.h>
 #include "webServer-esp.hpp"
-
+#include <mutex>
 
 class WebsocketServerEsp : public WebsocketServer
 {
@@ -52,18 +52,22 @@ public:
     void sendOther(RemoteWebsocketClient *exclude, std::string msg) override
     {
         auto ws_exclude = (RemoteWebsocketClientEsp *)exclude;
+        clients_mutex.lock();
         for (auto ws : clients)
         {
             if (ws == ws_exclude)
                 continue;
             send(ws, msg);
         }
+        clients_mutex.unlock();
     };
 
     void sendAll(std::string msg) override
     {
+        clients_mutex.lock();
         for (auto ws : clients)
             send(ws, msg);
+        clients_mutex.unlock();
     };
 
     void send(RemoteWebsocketClient *client, const char *message, ...) override
@@ -96,12 +100,14 @@ public:
         va_end(args);
 
         auto ws_exclude = (RemoteWebsocketClientEsp *)exclude;
+        clients_mutex.lock();
         for (auto ws : clients)
         {
             if (ws == ws_exclude)
                 continue;
             send(ws, s_buf);
         }
+        clients_mutex.unlock();
     };
 
     void sendAll(const char *message, ...) override
@@ -112,8 +118,10 @@ public:
         vsnprintf(s_buf, sizeof(s_buf), message, args);
         va_end(args);
 
+        clients_mutex.lock();
         for (auto ws : clients)
             send(ws, s_buf);
+        clients_mutex.unlock();
     };
 
     void send(RemoteWebsocketClient *client, uint8_t *bytes, int size) override
@@ -135,18 +143,22 @@ public:
     void sendOther(RemoteWebsocketClient *exclude, uint8_t *bytes, int size) override
     {
         auto ws_exclude = (RemoteWebsocketClientEsp *)exclude;
+        clients_mutex.lock();
         for (auto ws : clients)
         {
             if (ws == ws_exclude)
                 continue;
             this->send(ws, bytes, size);
         }
+        clients_mutex.unlock();
     };
 
     void sendAll(uint8_t *bytes, int size) override
     {
+        clients_mutex.lock();
         for (auto ws : clients)
             send(ws, bytes, size);
+        clients_mutex.unlock();
     };
 
     int connectionCount() override { return clients.size(); };
@@ -177,7 +189,9 @@ private:
             client->hd = req->handle;
             client->fd = sockfd;
             client->server = server;
+            server->clients_mutex.lock();
             server->clients.insert(client);
+            server->clients_mutex.unlock();
 
             if (server->connectionHandler != nullptr)
                 server->connectionHandler((RemoteWebsocketClient *)sockfd, server, server->connectionUserData);
@@ -221,9 +235,11 @@ private:
         {
             Log::info(TAG, "client disconnected.");// number of clients before disconnect: %d", sockfd, server->clients.size());
 
+            server->clients_mutex.lock();
             auto client = server->findClient(req->handle, sockfd);
             server->clients.erase(client);
             delete client;
+            server->clients_mutex.unlock();
 
             // Response CLOSE packet with no payload to peer
             ws_pkt.len = 0;
@@ -275,6 +291,8 @@ private:
     std::set<RemoteWebsocketClientEsp *> clients;
 
     static const char *TAG;
+
+    std::mutex clients_mutex;
 };
 
 const char *WebsocketServerEsp::TAG = "wss_server";

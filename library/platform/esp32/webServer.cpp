@@ -3,5 +3,5 @@
 
 WebServer* WebServer::createInstance(int port)
 {
-    return new WebServerEsp(port);
+    return new WebServerEsp(port, false);
 }

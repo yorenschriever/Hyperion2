@@ -36,12 +36,19 @@ class websocket_session;
 
 class ssl_websocket_session;
 
+class any_session
+{
+public:
+    virtual void write_txt(const char *data, int len)=0;
+    virtual void write_bin(uint8_t *data, int len)=0; 
+};
+
 class WebSocketServerSessionReceiver
 {
 public:
-    virtual void on_connect(websocket_session<ssl_websocket_session> *session) = 0;
-    virtual void on_receive(websocket_session<ssl_websocket_session> *session, std::string message) = 0;
-    virtual void on_disconnect(websocket_session<ssl_websocket_session> *session) = 0;
+    virtual void on_connect(any_session *session) = 0;
+    virtual void on_receive(any_session *session, std::string message) = 0;
+    virtual void on_disconnect(any_session *session) = 0;
 };
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
@@ -312,7 +319,7 @@ void fail(beast::error_code ec, char const *what) //;
 // This uses the Curiously Recurring Template Pattern so that
 // the same code works with both SSL streams and regular sockets.
 template <class Derived>
-class websocket_session
+class websocket_session : public any_session
 {
     // Access the derived class, this is part of
     // the Curiously Recurring Template Pattern idiom.
@@ -353,7 +360,7 @@ class websocket_session
     }
 
 public:
-    void write_txt(const char *data, int len)
+    void write_txt(const char *data, int len) override
     {
 
         beast::flat_buffer buffer(len);
@@ -364,7 +371,7 @@ public:
         derived().ws().write(buffer.data());
     }
 
-    void write_bin(uint8_t *data, int len)
+    void write_bin(uint8_t *data, int len) override
     {
 
         beast::flat_buffer buffer(len);
@@ -464,6 +471,30 @@ public:
 
 //------------------------------------------------------------------------------
 
+// Handles a plain WebSocket connection
+class plain_websocket_session
+    : public websocket_session<plain_websocket_session>
+    , public std::enable_shared_from_this<plain_websocket_session>
+{
+    websocket::stream<beast::tcp_stream> ws_;
+
+public:
+    // Create the session
+    explicit
+    plain_websocket_session(
+        beast::tcp_stream&& stream)
+        : ws_(std::move(stream))
+    {
+    }
+
+    // Called by the base class
+    websocket::stream<beast::tcp_stream>&
+    ws()
+    {
+        return ws_;
+    }
+};
+
 // Handles an SSL WebSocket connection
 class ssl_websocket_session
     : public websocket_session<ssl_websocket_session>,
@@ -490,6 +521,17 @@ public:
 };
 
 //------------------------------------------------------------------------------
+
+template<class Body, class Allocator>
+void
+make_websocket_session(
+    beast::tcp_stream stream,
+    http::request<Body, http::basic_fields<Allocator>> req,
+    PathMapWs *wsPaths)
+{
+    std::make_shared<plain_websocket_session>(
+        std::move(stream))->run(std::move(req), wsPaths);
+}
 
 template <class Body, class Allocator>
 void make_websocket_session(
@@ -674,6 +716,63 @@ public:
 
 //------------------------------------------------------------------------------
 
+// Handles a plain HTTP connection
+class plain_http_session
+    : public http_session<plain_http_session>
+    , public std::enable_shared_from_this<plain_http_session>
+{
+    beast::tcp_stream stream_;
+
+public:
+    // Create the session
+    plain_http_session(
+        beast::tcp_stream&& stream,
+        beast::flat_buffer&& buffer,
+        std::shared_ptr<std::string const> const& doc_root,
+        PathMap *paths,
+        PathMapWs *wsPaths)
+        : http_session<plain_http_session>(
+            std::move(buffer),
+            doc_root,
+            paths,
+            wsPaths)
+        , stream_(std::move(stream))
+    {
+    }
+
+    // Start the session
+    void
+    run()
+    {
+        this->do_read();
+    }
+
+    // Called by the base class
+    beast::tcp_stream&
+    stream()
+    {
+        return stream_;
+    }
+
+    // Called by the base class
+    beast::tcp_stream
+    release_stream()
+    {
+        return std::move(stream_);
+    }
+
+    // Called by the base class
+    void
+    do_eof()
+    {
+        // Send a TCP shutdown
+        beast::error_code ec;
+        stream_.socket().shutdown(tcp::socket::shutdown_send, ec);
+
+        // At this point the connection is closed gracefully
+    }
+};
+
 // Handles an SSL HTTP connection
 class ssl_http_session
     : public http_session<ssl_http_session>,
@@ -841,7 +940,14 @@ public:
             return;
         }
 
-        return fail(ec, "plain http not supported");
+        //return fail(ec, "plain http not supported");
+        std::make_shared<plain_http_session>(
+            std::move(stream_),
+            std::move(buffer_),
+            doc_root_,
+            paths_,
+            wsPaths_
+            )->run();
     }
 };
 
@@ -1056,7 +1162,7 @@ const char *WebServerUnix::TAG = "WEBSERVER";
 class WebsocketServerUnix : public WebsocketServer, public WebSocketServerSessionReceiver
 {
 public:
-    using WS = websocket_session<ssl_websocket_session>;
+    using WS = any_session;
 
     WebsocketServerUnix(WebServer *server, const char *path)
     {

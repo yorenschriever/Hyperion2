@@ -40,7 +40,21 @@ if (${ESP_PLATFORM})
 
     target_compile_options(${COMPONENT_LIB} PUBLIC "-Wno-maybe-uninitialized")
 
-    spiffs_create_partition_image(storage "$ENV{HYPERION_LIB_DIR}/scripts/web" FLASH_IN_PROJECT)
+    file(GLOB_RECURSE WWW_FILES RELATIVE $ENV{HYPERION_LIB_DIR}/scripts/web $ENV{HYPERION_LIB_DIR}/scripts/web/*)
+    foreach(WWW_FILE ${WWW_FILES})
+        list(APPEND GZIP_COMMANDS
+                COMMAND gzip -9 ${CMAKE_BINARY_DIR}/spiffs_image/${WWW_FILE} )
+    endforeach()
+    add_custom_target(copy-and-compress-files ALL DEPENDS $ENV{HYPERION_LIB_DIR}/scripts/web
+            # clean up
+            COMMAND rm -rf ${CMAKE_BINARY_DIR}/spiffs_image
+            # copy spiffs files to build folder
+            COMMAND ${CMAKE_COMMAND} -E copy_directory $ENV{HYPERION_LIB_DIR}/scripts/web ${CMAKE_BINARY_DIR}/spiffs_image
+            # create gzip encoded www files
+            ${GZIP_COMMANDS}
+            )
+    spiffs_create_partition_image(storage ${CMAKE_BINARY_DIR}/spiffs_image FLASH_IN_PROJECT DEPENDS copy-and-compress-files)
+
 
 else ()
 

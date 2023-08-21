@@ -26,7 +26,7 @@
 
 /* Max length a file path can have on storage */
 #define FILE_PATH_MAX (ESP_VFS_PATH_MAX + CONFIG_SPIFFS_OBJ_NAME_LEN)
-#define SCRATCH_BUFSIZE 8192
+#define SCRATCH_BUFSIZE 1024 //8192
 
 struct file_server_data
 {
@@ -38,14 +38,14 @@ struct file_server_data
 class WebServerEsp : public WebServer
 {
 public:
-    WebServerEsp(int port)
+    WebServerEsp(int port, bool secure)
     {
         Log::info(TAG, "Starting web server on port %d.", port);
 
         const char *base_path = "/data";
         ESP_ERROR_CHECK(mount_storage(base_path));
 
-        ESP_ERROR_CHECK(start_file_server(base_path, port));
+        ESP_ERROR_CHECK(start_file_server(base_path, port, secure));
         //Log::info(TAG, "File server started");
     }
 
@@ -98,7 +98,7 @@ private:
         return ESP_OK;
     }
 
-    esp_err_t start_file_server(const char *base_path, int port)
+    esp_err_t start_file_server(const char *base_path, int port, bool secure)
     {
         if (server_data)
         {
@@ -132,10 +132,24 @@ private:
          * allow the same handler to respond to multiple different
          * target URIs which match the wildcard scheme */
         config.httpd.uri_match_fn = wildcard_non_websocket;
-        config.httpd.max_open_sockets = 10;
+        config.httpd.max_open_sockets = 12;
+        //config.httpd.backlog_conn = 1;
         config.port_secure = port;
+        config.port_insecure = port;
+        config.transport_mode = secure? HTTPD_SSL_TRANSPORT_SECURE : HTTPD_SSL_TRANSPORT_INSECURE;
+        // config.httpd.keep_alive_enable =true;
+        // config.httpd.keep_alive_idle = 5;
+        // config.httpd.keep_alive_interval = 5;
+        // config.httpd.keep_alive_count = 3;
+        //config.httpd.close_fn = onClose;
+        config.httpd.enable_so_linger = true;
+        config.httpd.linger_timeout = 0;
 
-        // Log::info(TAG, "Starting HTTP Server on port: '%d' (%d)", config.port_secure, config.port_insecure);
+        if (secure)
+            Log::info(TAG, "Starting HTTPS Server on port %d", config.port_secure);
+        else
+            Log::info(TAG, "Starting HTTP Server on port %d", config.port_insecure);
+
         if (httpd_ssl_start(&server, &config) != ESP_OK)
         {
             Log::error(TAG, "Failed to start file server!");
@@ -162,7 +176,7 @@ private:
     static bool wildcard_non_websocket(const char *templ, const char *uri, size_t len)
     {
         // This matches matches /ws/ exactly, so they can be matched with the registered 
-        // websockets. For other urls is does a pattern match, so we can match * 
+        // websockets. For other urls it does a pattern match, so we can match * 
         // for all files in the filesystem.
         if (len >= 4 && strncmp(uri,"/ws/",4)==0){
             //requested url is of a websocket. do not use template matching
@@ -173,7 +187,12 @@ private:
 
     static esp_err_t download_get_handler(httpd_req_t *req)
     {
+        // tell the browser to close the connections instead of keeping them open.
+        // this frees up sockets and allows more clients to connect simultaneously.
+        httpd_resp_set_hdr(req,"Connection","close");
+
         char filepath[FILE_PATH_MAX];
+        char filepath2[FILE_PATH_MAX+3];
         FILE *fd = NULL;
         struct stat file_stat;
 
@@ -216,14 +235,18 @@ private:
             return ESP_OK;
         }
 
-        if (stat(filepath, &file_stat) == -1)
+        //add .gz to the end
+        auto newFilePath2 = (filepath + std::string(".gz"));
+        memcpy(filepath2, (void *)newFilePath2.c_str(), newFilePath2.size() + 1);
+
+        if (stat(filepath2, &file_stat) == -1)
         {
             // Log::error(TAG, "Failed to stat file : %s", filepath);
             httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "404");
             return ESP_FAIL;
         }
 
-        fd = fopen(filepath, "r");
+        fd = fopen(filepath2, "r");
         if (!fd)
         {
             // Log::error(TAG, "Failed to read existing file : %s", filepath);
@@ -234,6 +257,7 @@ private:
 
         // Log::info(TAG, "Sending file : %s (%ld bytes)...", filename, file_stat.st_size);
         set_content_type_from_file(req, filename);
+        httpd_resp_set_hdr(req,"Content-Encoding","gzip");
 
         /* Retrieve the pointer to scratch buffer for temporary storage */
         char *chunk = ((struct file_server_data *)req->user_ctx)->scratch;

@@ -7,7 +7,7 @@ cd examples/writing_patterns
 build docker && run docker
 ```
 
-Then, view the results in your browser: [http://localhost:4430/].
+Then, view the results in your browser: [http://localhost/].
 Here you will se a controller and a monitor. 
 The monitor shows a ring of leds that represent the installation. 
 This example does not send out led data to physical leds. 

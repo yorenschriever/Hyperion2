@@ -30,7 +30,8 @@ class Socket {
         if (document.hidden)
             return; //don't create new socket when page is not in view
 
-        this.socket = new WebSocket(`wss://${location.host}${this.path}`)
+        const wsProtocol = window.location.protocol === "https:" ? "wss:":"ws:";
+        this.socket = new WebSocket(`${wsProtocol}//${location.host}${this.path}`)
 
         this.socket.onmessage = wsmsg => this.onMessage(wsmsg.data);
 

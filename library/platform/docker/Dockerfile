@@ -12,4 +12,4 @@ ENV BOOST_DIR=/home/boost_1_82_0
 ENV CMAKE_C_COMPILER=/usr/bin/gcc
 ENV CMAKE_CXX_COMPILER=/usr/bin/g++
 
-EXPOSE 443
+EXPOSE 80

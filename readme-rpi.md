@@ -56,7 +56,7 @@ build rpi
 run rpi
 ```
 
-Now, open https://raspberrypi.local:4430/ to view the web interface.
+Now, open https://raspberrypi.local/ to view the web interface.
 
 ## Remote development in vscode
 VScode can connect to the raspberry pi, so you can edit the files and access the shell from vscode on your computer.
