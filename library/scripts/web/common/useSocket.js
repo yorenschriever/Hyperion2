@@ -1,7 +1,7 @@
 
 import { useEffect, useRef } from './preact-standalone.js'
 
-class Socket {
+export class Socket {
 
     socket;
     path;
@@ -99,12 +99,4 @@ export const useSocket = (path, onMessage, setSocketState) =>
     return [
         (msg) => socketRef.current?.send(msg)
     ]
-}
-
-export const useMonitorSockets = (scene, onMessage) => 
-{
-    useEffect(() => {
-        const createdSockets = scene.map(scenePart => new Socket(scenePart.path, data => onMessage(scenePart, data)));
-        return () => createdSockets.forEach(socket => socket.close());
-    }, [])
 }

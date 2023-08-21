@@ -163,3 +163,13 @@ body {
     from {background-color: #ccc;}
     to {background-color: #000000;}
 }
+
+input[type="range"]::-webkit-slider-runnable-track {
+    background: #053a5f;
+    border-radius: 15px;    
+}
+
+input[type="range"]::-moz-range-track {
+    background: #053a5f;
+    border-radius: 15px;
+}

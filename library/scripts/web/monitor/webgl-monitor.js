@@ -1,17 +1,16 @@
 import { initBuffers } from "./init-buffers.js";
 import { drawScene } from "./draw-scene.js";
 import { Websocket } from "./websocket.js";
-import scene from "./mapping.json" assert { type: "json" };
 
 let cubeRotation = 0.0;
 let deltaTime = 0;
 
-main();
+fetch("./mapping.json").then(i=>i.json()).then(main);
 
 //
 // start here
 //
-function main() {
+function main(scene) {
   const canvas = document.querySelector("#glcanvas");
 
 

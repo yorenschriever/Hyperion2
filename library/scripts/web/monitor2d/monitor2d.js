@@ -1,12 +1,10 @@
 import { html, useRef, useEffect } from '../common/preact-standalone.js'
-import { useMonitorSockets } from '../common/useSocket.js'
-import scene from "./mapping.json" assert { type: "json" };
+import { Socket } from '../common/useSocket.js'
 
 export const Monitor2dApp = (props) => {
     const canvas = useRef(null);
+    const sceneRef = useRef(null);
     const r = 0.01;
-
-    useMonitorSockets(scene, async (scenePart, data) => scenePart.colors = new Uint8Array(await data.arrayBuffer()));
 
     useEffect(() => {
 
@@ -34,7 +32,8 @@ export const Monitor2dApp = (props) => {
 
             clearCanvas(canvas.current, ctx);
 
-            scene.forEach(scenePart => {
+            const scene = sceneRef.current;
+            scene?.forEach(scenePart => {
                 if (scenePart.colors) {
                     scenePart.positions.forEach((position, i) => {
                         const color = `rgb(${scenePart.colors[i * 3]},${scenePart.colors[i * 3 + 1]},${scenePart.colors[i * 3 + 2]})`
@@ -54,6 +53,14 @@ export const Monitor2dApp = (props) => {
         }
         
         window.onresize()
+        
+        let createdSockets;
+        fetch("./mapping.json").then(i=>i.json()).then(scene => {
+            sceneRef.current = scene;
+            createdSockets = sceneRef.current.map(scenePart => new Socket(scenePart.path, async data => scenePart.colors = new Uint8Array(await data.arrayBuffer())))
+        });
+
+        return () => createdSockets.forEach(socket => socket.close());
     }, [])
 
     return html`<canvas ref=${canvas} width="600" height="400"/>`

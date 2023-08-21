@@ -189,7 +189,7 @@ const Tempo = () => {
     const [source, setSource] = useState("[none]");
     useSocket("/ws/tempo", msg => {
         msg = JSON.parse(msg)
-        console.log(msg);
+        //console.log(msg);
 
         const element = document.getElementById("tempo"); 
         element.classList.remove("beat"); 

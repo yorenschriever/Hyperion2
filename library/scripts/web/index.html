@@ -21,9 +21,6 @@
 
             render(html`<${ControllerApp}/>`, document.getElementById('controller'));
 
-            import scene2d from "./monitor2d/mapping.json" assert { type: "json" };
-            import scene3d from "./monitor/mapping.json" assert { type: "json" };
-
             const createIframe = (url) => {
                 const iframe = document.createElement("iframe");
                 iframe.src = url
@@ -31,8 +28,8 @@
                 document.body.appendChild(iframe)
             }
 
-            if (scene2d.length) createIframe("./monitor2d/")
-            if (scene3d.length) createIframe("./monitor/")
+            fetch("./monitor2d/mapping.json").then(i=>i.json()).then(scene2d => {if (scene2d.length) createIframe("./monitor2d/"); });
+            fetch("./monitor/mapping.json"  ).then(i=>i.json()).then(scene3d => {if (scene3d.length) createIframe("./monitor/"); });
 
         </script>
     </head>
