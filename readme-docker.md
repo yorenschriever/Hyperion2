@@ -27,6 +27,28 @@ run docker
 
 ## Installation on a windows host
 
-On windows the steps are the same, except the path of the script is `./Hyperion2/library/scripts/setupWindows.ps1` 
+#### 1. Install Docker and Git
+See step 1 above
 
-TODO: this script is not up to date?
+#### 2. Clone this repository
+Clone the repository and run a script to configure some environment variables.
+```ps
+git clone https://github.com/yorenschriever/Hyperion2.git
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+. .\Hyperion2\library\scripts\export.ps1
+```
+
+NB: you need to run the export script every time you open a new terminal. You can also add the script to your profile, so it runs automatically each time. In order to do that, run this script:
+
+```ps
+. .\Hyperion2\library\scripts\setupWindows.ps1
+```
+
+#### 3. Run
+Open a terminal on your host machine, go to a project folder and build and run:
+
+```ps
+cd Hyperion2\examples\hello_world
+build docker
+run docker
+```

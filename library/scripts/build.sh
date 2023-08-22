@@ -12,7 +12,6 @@
 # in which it will run a linux build
 
 TARGET="$1"
-IS_INSIDE_CONTAINER=$2
 BASEDIR=.
 BUILDDIR="$BASEDIR/build/${TARGET}"
 

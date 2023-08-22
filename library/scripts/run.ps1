@@ -1,26 +1,29 @@
-﻿function run {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, Position=0)]
-        [String]$Target
-    )
+﻿$TARGET = $args[0]
+$projectDir = $($PWD.Path)
 
-    if($Target -ne "docker")  
-    {  
-        throw "Only docker builds are supported on windows. "  
-    }
+$BASEDIR=$projectDir
+$BUILDDIR="$BASEDIR\build\${TARGET}"
 
-    # run this from the project folder root
-    $projectDir = $($PWD.Path)
+if ($args.Length -eq 0) 
+{
+    Write-Host "no target specified" 
+    exit 1;
+}
 
+if ($TARGET -eq "docker")  
+{  
     docker run -it --name=hyperion --rm `
         --mount type=bind,source=$HYPERION_LIB_DIR,target=/hyperion_lib `
         --mount type=bind,source=$projectDir,target=/project `
         --workdir=/project `
         -p 80:80 `
-        -p 9600-9800:9600-9800 `
         hyperion `
-        /hyperion_lib/scripts/run.sh docker inside-container
+        /hyperion_lib/scripts/run.sh linux
+    exit;
 
-    Write-Host "Docker Run complete"  
+# } elseif ($TARGET -eq "windows") {
+#     . $BUILDDIR\app.exe
+} else {
+    Write-Host "Invalid target: " + $TARGET
+    exit 1;
 }
