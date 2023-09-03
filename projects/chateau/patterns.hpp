@@ -345,7 +345,7 @@ class OnPattern : public Pattern<Monochrome>
         400, Transition::none, 0);
 
 public:
-    OnPattern(uint8_t intensity = 100)
+    OnPattern(uint8_t intensity = 180)
     {
         this->intensity = intensity;
         this->name = "On";

@@ -69,9 +69,12 @@ IPAddress Ethernet::getIp()
     //         }
     //   }
     }
-    if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
+    auto result = IPAddress(ip4, ip6);
 
-    return IPAddress(ip4,ip6);
+    if (ifAddrStruct != NULL)
+        freeifaddrs(ifAddrStruct);
+
+    return result;
 }
 
 MacAddress Ethernet::getMac()

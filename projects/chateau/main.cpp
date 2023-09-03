@@ -24,14 +24,14 @@ void addLedParPipe(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
 
 LUT *PixelLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
-LUT *LaserLut = new LaserLUT(1.5, 4096, 2048);
+LUT *LaserLut = new LaserLUT(0.5, 4096, 3048);
 LUT *IncandescentLut = new IncandescentLUT(2.5, 4096, 200);
 LUT *GammaLut12 = new GammaLUT(2.5, 4096);
 
 const char *hyper_l = "hyperslave5.local";
 const char *hyper_r = "hyperslave7.local";
 const char *hyper_truss = "hyperslave6.local";
-const char *hyper_dmx = "hyperslave8.local";
+//const char *hyper_dmx = "hyperslave8.local";
 
 int main()
 {
@@ -60,11 +60,14 @@ int main()
   hyp->hub.setColumnName(5, "Lampion");
   hyp->hub.setColumnName(6, "LedPar");
 
-  Tempo::AddSource(new ConstantTempo(120));
+  //Tempo::AddSource(new ConstantTempo(120));
 
   hyp->hub.buttonPressed(0, 0);
   // hyp->hub.setFlashColumn(7);
-  hyp->hub.setFlashColumn(0, false, true);
+  for (int i=0;i<7;i++)
+    hyp->hub.setFlashColumn(i, false, true);
+  hyp->hub.setFlashRow(5);
+  hyp->hub.setFlashRow(6);
   hyp->hub.setFlashRow(7);
   hyp->hub.setForcedSelection(0);
 
@@ -103,17 +106,19 @@ void addColanderPipe(Hyperion *hyp)
       12,
       &hyp->hub,
       {
-          {.column = 1, .slot = 0, .pattern = new GlowPattern()},
-          {.column = 1, .slot = 1, .pattern = new SinPattern()},
-          {.column = 1, .slot = 2, .pattern = new FastStrobePattern()},
-          {.column = 1, .slot = 3, .pattern = new SlowStrobePattern()},
-          {.column = 1, .slot = 4, .pattern = new BlinderPattern()},
-          {.column = 1, .slot = 5, .pattern = new BeatAllFadePattern()},
-          {.column = 1, .slot = 6, .pattern = new BeatShakePattern()},
-          {.column = 1, .slot = 7, .pattern = new BeatSingleFadePattern()},
-          {.column = 1, .slot = 8, .pattern = new BeatMultiFadePattern()},
-          {.column = 1, .slot = 9, .pattern = new GlitchPattern()},
-          {.column = 1, .slot = 10, .pattern = new LFOPattern<SawDown>()},
+          {.column = 1, .slot = 0, .pattern = new OnPattern()},
+          {.column = 1, .slot = 1, .pattern = new GlowPattern()},
+          {.column = 1, .slot = 2, .pattern = new SinPattern()},
+          {.column = 1, .slot = 3, .pattern = new BeatSingleFadePattern()},
+          {.column = 1, .slot = 4, .pattern = new BeatMultiFadePattern()},
+
+          {.column = 1, .slot = 5, .pattern = new BlinderPattern()},
+          {.column = 1, .slot = 6, .pattern = new SlowStrobePattern()},
+          {.column = 1, .slot = 7, .pattern = new GlitchPattern()},
+
+          {.column = 1, .slot = 8, .pattern = new FastStrobePattern()},
+          {.column = 1, .slot = 9, .pattern = new BeatAllFadePattern()},
+          {.column = 1, .slot = 10, .pattern = new BeatShakePattern()},
           {.column = 1, .slot = 11, .pattern = new BeatStepPattern()},
           {.column = 1, .slot = 12, .pattern = new GlowOriginalPattern()},
           {.column = 1, .slot = 13, .pattern = new FastStrobePattern2()},
@@ -122,7 +127,7 @@ void addColanderPipe(Hyperion *hyp)
   const char *hosts[2] = {hyper_l, hyper_r};
 
   auto splitInput = new InputSlicer(input, {{0, 6, true},
-                                            {7, 12, true},
+                                            {6, 6, true},
                                             {0, 12, false}});
 
   for (int i = 0; i < splitInput->size() - 1; i++)
@@ -134,9 +139,9 @@ void addColanderPipe(Hyperion *hyp)
     hyp->addPipe(pipe);
   }
 
-  hyp->addPipe(new ConvertPipe<Monochrome, RGB>(
-      splitInput->getInput(2),
-      new MonitorOutput(&hyp->webServer, haloMap)));
+  // hyp->addPipe(new ConvertPipe<Monochrome, RGB>(
+  //     splitInput->getInput(2),
+  //     new MonitorOutput(&hyp->webServer, haloMap)));
 }
 
 void addLaserPipe(Hyperion *hyp)
@@ -147,19 +152,22 @@ void addLaserPipe(Hyperion *hyp)
           12,
           &hyp->hub,
           {
-              {.column = 2, .slot = 0, .pattern = new GlowPattern()},
-              {.column = 2, .slot = 1, .pattern = new SinPattern()},
-              {.column = 2, .slot = 2, .pattern = new FastStrobePattern()},
-              {.column = 2, .slot = 3, .pattern = new SlowStrobePattern()},
-              {.column = 2, .slot = 4, .pattern = new BlinderPattern()},
-              {.column = 2, .slot = 5, .pattern = new BeatAllFadePattern()},
-              {.column = 2, .slot = 6, .pattern = new BeatShakePattern()},
-              {.column = 2, .slot = 7, .pattern = new BeatSingleFadePattern()},
-              {.column = 2, .slot = 8, .pattern = new BeatMultiFadePattern()},
-              {.column = 2, .slot = 9, .pattern = new GlitchPattern()},
-              {.column = 2, .slot = 10, .pattern = new LFOPattern<SawDown>()},
-              {.column = 2, .slot = 11, .pattern = new BeatStepPattern()},
-              {.column = 2, .slot = 12, .pattern = new FastStrobePattern2()},
+              {.column = 2, .slot = 0, .pattern = new OnPattern(255)},
+              {.column = 2, .slot = 1, .pattern = new LFOPattern<PWM>()},
+              {.column = 2, .slot = 2, .pattern = new SinPattern()},
+              {.column = 2, .slot = 3, .pattern = new BeatMultiFadePattern()},
+              {.column = 2, .slot = 4, .pattern = new BeatShakePattern()},
+
+              {.column = 2, .slot = 5, .pattern = new BlinderPattern()},
+              {.column = 2, .slot = 6, .pattern = new FastStrobePattern()},
+              {.column = 2, .slot = 7, .pattern = new SlowStrobePattern()},
+
+              {.column = 2, .slot = 8, .pattern = new GlowPattern()},
+              {.column = 2, .slot = 9, .pattern = new BeatAllFadePattern()},
+              {.column = 2, .slot = 10, .pattern = new BeatSingleFadePattern()},
+              {.column = 2, .slot = 11, .pattern = new GlitchPattern()},
+              {.column = 2, .slot = 12, .pattern = new BeatStepPattern()},
+              {.column = 2, .slot = 13, .pattern = new FastStrobePattern2()},
           }),
       {4, 4, 4},
       true);
@@ -186,16 +194,18 @@ void addBulbPipe(Hyperion *hyp)
           {
               {.column = 3, .slot = 0, .pattern = new GlowPattern()},
               {.column = 3, .slot = 1, .pattern = new SinPattern()},
-              {.column = 3, .slot = 2, .pattern = new FastStrobePattern()},
-              {.column = 3, .slot = 3, .pattern = new SlowStrobePattern()},
-              {.column = 3, .slot = 4, .pattern = new BlinderPattern()},
-              {.column = 3, .slot = 5, .pattern = new BeatAllFadePattern()},
-              {.column = 3, .slot = 6, .pattern = new BeatShakePattern()},
-              {.column = 3, .slot = 7, .pattern = new BeatSingleFadePattern()},
-              {.column = 3, .slot = 8, .pattern = new BeatMultiFadePattern()},
-              {.column = 3, .slot = 9, .pattern = new GlitchPattern()},
-              {.column = 3, .slot = 10, .pattern = new LFOPattern<SawDown>()},
-              {.column = 3, .slot = 11, .pattern = new BeatStepPattern()},
+              {.column = 3, .slot = 2, .pattern = new LFOPattern<SawDown>()},
+              {.column = 3, .slot = 3, .pattern = new BeatShakePattern()},
+              {.column = 3, .slot = 4, .pattern = new BeatStepPattern()},
+
+              {.column = 3, .slot = 5, .pattern = new BlinderPattern()},
+              {.column = 3, .slot = 6, .pattern = new FastStrobePattern()},
+              {.column = 3, .slot = 7, .pattern = new GlitchPattern()},
+
+              {.column = 3, .slot = 8, .pattern = new SlowStrobePattern()},
+              {.column = 3, .slot = 9, .pattern = new BeatAllFadePattern()},
+              {.column = 3, .slot = 10, .pattern = new BeatSingleFadePattern()},
+              {.column = 3, .slot = 11, .pattern = new BeatMultiFadePattern()},
               {.column = 3, .slot = 12, .pattern = new FastStrobePattern2()},
 
           }),
@@ -219,19 +229,22 @@ void addPinspotPipe(Hyperion *hyp)
       4,
       &hyp->hub,
       {
-          {.column = 4, .slot = 0, .pattern = new GlowPattern()},
-          {.column = 4, .slot = 1, .pattern = new SinPattern()},
-          {.column = 4, .slot = 2, .pattern = new FastStrobePattern()},
-          {.column = 4, .slot = 3, .pattern = new SlowStrobePattern()},
-          {.column = 4, .slot = 4, .pattern = new BlinderPattern()},
-          {.column = 4, .slot = 5, .pattern = new BeatAllFadePattern()},
-          {.column = 4, .slot = 6, .pattern = new BeatShakePattern()},
+          {.column = 4, .slot = 0, .pattern = new OnPattern(255)},
+          {.column = 4, .slot = 1, .pattern = new LFOPattern<SawDown>()},
+          {.column = 4, .slot = 2, .pattern = new GlowPattern()},
+          {.column = 4, .slot = 3, .pattern = new SinPattern()},
+          {.column = 4, .slot = 4, .pattern = new BeatStepPattern()},
+
+          {.column = 4, .slot = 5, .pattern = new BlinderPattern()},
+          {.column = 4, .slot = 6, .pattern = new GlitchPattern()},
           {.column = 4, .slot = 7, .pattern = new BeatSingleFadePattern()},
-          {.column = 4, .slot = 8, .pattern = new BeatMultiFadePattern()},
-          {.column = 4, .slot = 9, .pattern = new GlitchPattern()},
-          {.column = 4, .slot = 10, .pattern = new LFOPattern<SawDown>()},
-          {.column = 4, .slot = 11, .pattern = new BeatStepPattern()},
-          {.column = 4, .slot = 12, .pattern = new FastStrobePattern2()},
+
+          {.column = 4, .slot = 8, .pattern = new FastStrobePattern()},
+          {.column = 4, .slot = 9, .pattern = new SlowStrobePattern()},
+          {.column = 4, .slot = 10, .pattern = new BeatAllFadePattern()},
+          {.column = 4, .slot = 11, .pattern = new BeatShakePattern()},
+          {.column = 4, .slot = 12, .pattern = new BeatMultiFadePattern()},
+          {.column = 4, .slot = 13, .pattern = new FastStrobePattern2()},
       });
 
   auto pipe = new ConvertPipe<Monochrome, Monochrome>(
@@ -248,24 +261,27 @@ void addLampionPipe(Hyperion *hyp)
       4,
       &hyp->hub,
       {
-          {.column = 5, .slot = 0, .pattern = new GlowPattern()},
-          {.column = 5, .slot = 1, .pattern = new SinPattern()},
-          {.column = 5, .slot = 2, .pattern = new FastStrobePattern()},
-          {.column = 5, .slot = 3, .pattern = new SlowStrobePattern()},
-          {.column = 5, .slot = 4, .pattern = new BlinderPattern()},
-          {.column = 5, .slot = 5, .pattern = new BeatAllFadePattern()},
-          {.column = 5, .slot = 6, .pattern = new BeatShakePattern()},
+          {.column = 5, .slot = 0, .pattern = new OnPattern(255)},
+          {.column = 5, .slot = 1, .pattern = new LFOPattern<SawDown>()},
+          {.column = 5, .slot = 2, .pattern = new GlowPattern()},
+          {.column = 5, .slot = 3, .pattern = new SinPattern()},
+          {.column = 5, .slot = 4, .pattern = new BeatStepPattern()},
+
+          {.column = 5, .slot = 5, .pattern = new BlinderPattern()},
+          {.column = 5, .slot = 6, .pattern = new GlitchPattern()},
           {.column = 5, .slot = 7, .pattern = new BeatSingleFadePattern()},
-          {.column = 5, .slot = 8, .pattern = new BeatMultiFadePattern()},
-          {.column = 5, .slot = 9, .pattern = new GlitchPattern()},
-          {.column = 5, .slot = 10, .pattern = new LFOPattern<SawDown>()},
-          {.column = 5, .slot = 11, .pattern = new BeatStepPattern()},
-          {.column = 5, .slot = 12, .pattern = new FastStrobePattern2()},
+
+          {.column = 5, .slot = 8, .pattern = new FastStrobePattern()},
+          {.column = 5, .slot = 9, .pattern = new SlowStrobePattern()},
+          {.column = 5, .slot = 10, .pattern = new BeatAllFadePattern()},
+          {.column = 5, .slot = 11, .pattern = new BeatShakePattern()},
+          {.column = 5, .slot = 12, .pattern = new BeatMultiFadePattern()},
+          {.column = 5, .slot = 13, .pattern = new FastStrobePattern2()},
       });
 
   auto pipe = new ConvertPipe<Monochrome, Monochrome>(
       input,
-      new UDPOutput(hyper_dmx, 9619, 60));
+      new UDPOutput(hyper_r, 9619, 60));
 
   hyp->addPipe(pipe);
 }
@@ -282,6 +298,7 @@ void addLedParPipe(Hyperion *hyp)
           {.column = 6, .slot = 2, .pattern = new Ledpar::SinPattern()},
           {.column = 6, .slot = 3, .pattern = new Ledpar::LfoPattern<SawDown>()},
           {.column = 6, .slot = 4, .pattern = new Ledpar::PaletteLfoPattern<SawDown>()},
+
           {.column = 6, .slot = 5, .pattern = new Ledpar::BlinderPattern()},
           {.column = 6, .slot = 6, .pattern = new Ledpar::SlowStrobePattern()},
           {.column = 6, .slot = 7, .pattern = new Ledpar::FastStrobePattern()},
@@ -303,30 +320,30 @@ void addPaletteColumn(Hyperion *hyp)
       &hyp->hub,
       0,
       {
-          campfire,
           pinkSunset,
-          sunset8,
           heatmap,
-          heatmap2,
           sunset2,
-          retro,
+           retro,
+           sunset1,
+           sunset3,
+           blueOrange,
+           purpleGreen,
+          
+          campfire,
+          sunset8,
+          heatmap2,
           tunnel,
-
           sunset6,
           sunset7,
-          sunset1,
           coralTeal,
           deepBlueOcean,
           redSalvation,
           plumBath,
           sunset4,
           candy,
-          sunset3,
           greatBarrierReef,
-          blueOrange,
           peach,
           denseWater,
-          purpleGreen,
           sunset5,
           salmonOnIce,
       });

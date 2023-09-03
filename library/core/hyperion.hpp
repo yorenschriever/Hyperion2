@@ -31,6 +31,7 @@
 
 class Hyperion
 {
+    const char * TAG = "Hyperion";
 public:
     using Config = struct
     {
@@ -48,7 +49,7 @@ public:
 
     virtual void start(Config config = normal)
     {
-        Log::info("Hyperion", "start");
+        Log::info(TAG, "start");
 
         check_safe_mode();
 
@@ -65,17 +66,17 @@ public:
         if (config.tempo)
             setup_tempo();
 
-        Log::info("HYP", "starting outputs");
+        Log::info(TAG, "starting outputs");
         for (Pipe *pipe : pipes)
             pipe->out->begin();
 
         clearAll();
 
-        Log::info("Hyperion", "starting inputs");
+        Log::info(TAG, "starting inputs");
         for (Pipe *pipe : pipes)
             pipe->in->begin();
 
-        Log::info("Hyperion", "Initialization complete. Starting main loop");
+        Log::info(TAG, "Initialization complete. Starting main loop");
         Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
         Thread::create(runTask, "run", Thread::Purpose::distribution, 30000, this, 1);
     }
@@ -114,6 +115,7 @@ private:
 
     virtual void setup_network()
     {
+        Log::info(TAG, "starting network");
         Ethernet::initialize();
 
         Network::setHostName("hyperion");
@@ -129,6 +131,8 @@ private:
 
     virtual void setup_tempo()
     {
+        Log::info(TAG, "setup tempo");
+
         // add tempo sources in order of importance. first has highest priority
         // Tempo::AddSource(ProDJLinkTempo::getInstance());
         // Tempo::AddSource(MidiClockTempo::getInstance());
@@ -174,6 +178,8 @@ private:
 
     virtual void setup_midi()
     {
+        Log::info(TAG, "setup midi");
+
         if (midiControllerFactory == nullptr)
         {
             midiControllerFactory = new MidiControllerFactory();
@@ -200,7 +206,7 @@ private:
 
     virtual void setup_web()
     {
-        Log::info(TAG, "Setup web");
+        Log::info(TAG, "setup web");
         webServer = WebServer::createInstance();
 
         hub.subscribe(new WebsocketController(&hub, webServer));
@@ -293,7 +299,6 @@ private:
     std::vector<Pipe *> pipes;
     std::map<MidiDevice *, std::unique_ptr<MidiController>> midiControllers;
     std::map<MidiDevice *, MidiClockTempo *> midiClockTempos;
-    const char *TAG = "Hyperion";
 };
 
 const Hyperion::Config Hyperion::minimal = {
