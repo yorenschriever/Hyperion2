@@ -281,9 +281,9 @@ public:
         xSemaphoreGive(tx_dirtySemaphore);
     }
 
-    bool txBusy() override
+    bool ready() override
     {
-        return tx_busy;
+        return !tx_busy;
     }
 
     void clearTxBuffer() override

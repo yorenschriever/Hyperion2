@@ -29,7 +29,7 @@ public:
 
     bool ready() override
     {
-        return dmx && !dmx->txBusy();
+        return dmx && dmx->ready();
     }
 
     void show() override
