@@ -46,12 +46,12 @@ namespace Hi
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d map;
+        PixelMap3d *map;
         LFO<Sin> lfoX = LFO<Sin>(2000);
         LFO<Sin> lfoZ = LFO<Sin>(2000);
 
     public:
-        XY(PixelMap3d map)
+        XY(PixelMap3d *map)
         {
             this->map = map;
             this->name="XY";
@@ -67,13 +67,13 @@ namespace Hi
             lfoX.setPeriod(params->getVelocity(4*20000,2000));
             lfoZ.setPeriod(params->getVelocity(4*14000,1400));
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                if (map[index].y < 0.44)
+                if (map->y(index) < 0.44)
                     continue;
 
-                float x_norm = (map[index].x+1)/2;
-                float z_norm = (map[index].z+1)/2;
+                float x_norm = (map->x(index)+1)/2;
+                float z_norm = (map->z(index)+1)/2;
 
                 float dim = std::max(
                     softEdge(abs(x_norm - lfoX.getValue()), size),
@@ -162,16 +162,16 @@ class DotBeatPattern : public Pattern<RGBA>
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
         //Permute perm;
 
     public:
-        DotBeatPattern(PixelMap3d::Cylindrical map)
+        DotBeatPattern(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
-            //this->perm = Permute(map.size());
+            //this->perm = Permute(map->size());
             this->name = "Dot beat";
         }
 
@@ -185,17 +185,17 @@ class DotBeatPattern : public Pattern<RGBA>
             if (watcher.Triggered())
                 fade.reset();
 
-            for (int i = 0; i < map.size(); i++)
+            for (int i = 0; i < map->size(); i++)
             {
-                if (map[i].z<0.44)
+                if (map->z(i)<0.44)
                     continue;;
 
                 float radius = fade.getValue()*1.2;
-                if (map[i].r > radius)
+                if (map->r(i) > radius)
                     continue;
 
                 RGBA color = params->gradient->get(radius * 255);
-                float dim = map[i].r / radius;
+                float dim = map->r(i) / radius;
                 pixels[i] = color * dim * transition.getValue();   
             }
         }

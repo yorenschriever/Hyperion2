@@ -74,7 +74,7 @@ namespace Ledster
 
     class RadarPattern : public Pattern<RGBA>
     {
-        PixelMap map;
+        PixelMap *map;
         LFO<SawDown> lfo;
         Transition transition = Transition(
             200, Transition::none, 0,
@@ -83,12 +83,12 @@ namespace Ledster
         FadeDown fade = FadeDown(2400);
 
     public:
-        RadarPattern(PixelMap map)
+        RadarPattern(PixelMap *map)
         {
             this->map = map;
             this->lfo = LFO<SawDown>(5000);
             this->lfo.setDutyCycle(0.7);
-            std::transform(map.begin(), map.end(), std::back_inserter(scaledAngles), [](PixelPosition pos) -> float
+            std::transform(map->begin(), map->end(), std::back_inserter(scaledAngles), [](PixelPosition pos) -> float
                            { return (atan2(pos.y, pos.x) + M_PI) / (2 * M_PI); });
         }
 
@@ -100,7 +100,7 @@ namespace Ledster
             if (!transition.Calculate(active))
                 return;
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA colour = params->getPrimaryColour();
                 float lfoVal = lfo.getValue(scaledAngles[index]);
@@ -294,16 +294,16 @@ namespace Ledster
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap map;
+        PixelMap *map;
         FadeDown fade = FadeDown(200);
         std::vector<float> normalizedRadii;
         BeatWatcher watcher = BeatWatcher();
 
     public:
-        RadialFadePattern(PixelMap map)
+        RadialFadePattern(PixelMap *map)
         {
             this->map = map;
-            std::transform(map.begin(), map.end(), std::back_inserter(normalizedRadii), [](PixelPosition pos) -> float
+            std::transform(map->begin(), map->end(), std::back_inserter(normalizedRadii), [](PixelPosition pos) -> float
                            { return sqrt(pos.y * pos.y + pos.x * pos.x); });
         }
 
@@ -404,7 +404,7 @@ namespace Ledster
 
     class ChevronsPattern : public Pattern<RGBA>
     {
-        PixelMap map;
+        PixelMap *map;
         LFO<SawDown> lfo;
         LFO<Square> lfoColour;
         Transition transition = Transition(
@@ -413,7 +413,7 @@ namespace Ledster
         FadeDown fade1 = FadeDown(1400);
 
     public:
-        ChevronsPattern(PixelMap map)
+        ChevronsPattern(PixelMap *map)
         {
             this->map = map;
             this->lfo = LFO<SawDown>(1000);
@@ -429,9 +429,9 @@ namespace Ledster
             lfo.setPeriod(params->getVelocity(2000,500));
             lfoColour.setPeriod(params->getVariant(2000,500));
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float phase = (0.5 * abs(map[index].y) + map[index].x) * amount;
+                float phase = (0.5 * abs(map->y(index)) + map->x(index)) * amount;
                 auto col = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 pixels[index] += col * lfo.getValue(phase) * transition.getValue();
             }
@@ -538,7 +538,7 @@ namespace Ledster
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap map;
+        PixelMap *map;
         FadeDown fade = FadeDown(200);
         std::vector<float> normalizedRadii;
         //Timeline timeline = Timeline(1000);
@@ -546,12 +546,12 @@ namespace Ledster
         Permute perm;
 
     public:
-        RadialGlitterFadePattern(PixelMap map)
+        RadialGlitterFadePattern(PixelMap *map)
         {
             this->map = map;
-            std::transform(map.begin(), map.end(), std::back_inserter(normalizedRadii), [](PixelPosition pos) -> float
+            std::transform(map->begin(), map->end(), std::back_inserter(normalizedRadii), [](PixelPosition pos) -> float
                            { return sqrt(pos.y * pos.y + pos.x * pos.x); });
-            this->perm = Permute(map.size());
+            this->perm = Permute(map->size());
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -614,10 +614,10 @@ namespace Ledster
             200, Transition::none, 0,
             1000, Transition::none, 0);
 
-        PixelMap map;
+        PixelMap *map;
 
     public:
-        SquareGlitchPattern(PixelMap map)
+        SquareGlitchPattern(PixelMap *map)
         {
             this->map = map;
         }
@@ -637,8 +637,8 @@ namespace Ledster
 
             for (int index = 0; index < width; index++)
             {
-                int xquantized = (map[index].x + 1) * numSquares;
-                int yquantized = (map[index].y + 1) * numSquares;
+                int xquantized = (map->x(index) + 1) * numSquares;
+                int yquantized = (map->y(index) + 1) * numSquares;
                 int square = xquantized + yquantized * numSquares;
                 if (perm.at[square] > threshold / numSquares )
                     continue;
@@ -685,7 +685,7 @@ namespace Ledster
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap map;
+        PixelMap *map;
         FadeDown fade[8] = {
             FadeDown(200),
             FadeDown(200),
@@ -701,7 +701,7 @@ namespace Ledster
         int8_t directionsy[8] = {0, 0, 0, 0, 1, -1, 1, -1};
 
     public:
-        KonamiFadePattern(PixelMap map)
+        KonamiFadePattern(PixelMap *map)
         {
             this->map = map;
         }
@@ -721,12 +721,12 @@ namespace Ledster
                 fade[i].duration = params->getIntensity(500,100);
             }
 
-            for (int i = 0; i < std::min(width, (int)map.size()); i++)
+            for (int i = 0; i < std::min(width, (int)map->size()); i++)
             {
                 float cumulativeFadeValue = 0;
                 for (int j = 0; j < 8; j++)
                 {
-                    cumulativeFadeValue += fade[j].getValue((((float)map[i].x * directionsy[j] + map[i].y * directionsx[j]) + 1.0) * 300);
+                    cumulativeFadeValue += fade[j].getValue((((float)map->x(i) * directionsy[j] + map->y(i) * directionsx[j]) + 1.0) * 300);
                 }
 
                 pixels[i] += params->getHighlightColour() * cumulativeFadeValue * transition.getValue();
@@ -739,15 +739,15 @@ namespace Ledster
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap map;
+        PixelMap *map;
         std::vector<float> normalizedRadii;
         LFO<SawUp> lfo = LFO<SawUp>(1000);
 
     public:
-        RadialRainbowPattern(PixelMap map)
+        RadialRainbowPattern(PixelMap *map)
         {
             this->map = map;
-            std::transform(map.begin(), map.end(), std::back_inserter(normalizedRadii), [](PixelPosition pos) -> float
+            std::transform(map->begin(), map->end(), std::back_inserter(normalizedRadii), [](PixelPosition pos) -> float
                            { return sqrt(pos.y * pos.y + pos.x * pos.x); });
         }
 
@@ -867,13 +867,13 @@ namespace Ledster
 
     class DoorPattern : public Pattern<RGBA>
     {
-        PixelMap map;
+        PixelMap *map;
         Transition transition = Transition(
             1000, Transition::none, 0,
             1000, Transition::none, 0);
 
     public:
-        DoorPattern(PixelMap map, int period = 1000)
+        DoorPattern(PixelMap *map, int period = 1000)
         {
             this->map = map;
         }
@@ -885,7 +885,7 @@ namespace Ledster
 
             for (int index = 0; index < 271; index++)
             {
-                auto col = 2*abs(map[index].y) < (transition.getValue()) ? RGBA(0,0,0,255) : RGBA(0,0,0,0);
+                auto col = 2*abs(map->y(index)) < (transition.getValue()) ? RGBA(0,0,0,255) : RGBA(0,0,0,0);
                 pixels[index] += col ;
             }
 
@@ -897,16 +897,16 @@ namespace Ledster
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap map;
+        PixelMap *map;
         FadeDown fade = FadeDown(200);
         std::vector<float> normalizedRadii;
         Timeline interval = Timeline(500);
 
     public:
-        RadialFadePattern2(PixelMap map)
+        RadialFadePattern2(PixelMap *map)
         {
             this->map = map;
-            std::transform(map.begin(), map.end(), std::back_inserter(normalizedRadii), [](PixelPosition pos) -> float
+            std::transform(map->begin(), map->end(), std::back_inserter(normalizedRadii), [](PixelPosition pos) -> float
                            { return sqrt(pos.y * pos.y + pos.x * pos.x); });
         }
 

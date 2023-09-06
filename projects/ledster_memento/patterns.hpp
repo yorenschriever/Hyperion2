@@ -46,12 +46,12 @@ namespace Patterns
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d map;
+        PixelMap3d *map;
         LFO<Sin> lfoX = LFO<Sin>(2000);
         LFO<Sin> lfoZ = LFO<Sin>(2000);
 
     public:
-        XY(PixelMap3d map)
+        XY(PixelMap3d *map)
         {
             this->map = map;
             this->name="XY";
@@ -67,13 +67,13 @@ namespace Patterns
             lfoX.setPeriod(10000 /*params->getVelocity(4*20000,2000)*/);
             lfoZ.setPeriod(13000 /*params->getVelocity(4*14000,1400)*/);
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                if (map[index].y < 0.44)
+                if (map->y(index) < 0.44)
                     continue;
 
-                float x_norm = (map[index].x/0.7+1)/2;
-                float z_norm = (map[index].z/0.6+1)/2;
+                float x_norm = (map->x(index)/0.7+1)/2;
+                float z_norm = (map->z(index)/0.6+1)/2;
 
                 float dim = std::max(
                     softEdge(abs(x_norm - lfoX.getValue()), size),
@@ -127,10 +127,10 @@ namespace Patterns
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<Glow> lfo;
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        Lighthouse(PixelMap3d::Cylindrical map)
+        Lighthouse(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Lighthouse";
@@ -144,12 +144,12 @@ namespace Patterns
             lfo.setPeriod(params->getVelocity(5000, 500));
             lfo.setDutyCycle(params->getSize(0.06, 0.5));
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getSecondaryColour();
-                // RGBA color = params->gradient->get(fromTop(map[index].z)*255);
-                pixels[index] = color * lfo.getValue(-2 * around(map[index].th)) * Utils::rescale(map[index].r,0.5,1,0.4,1) * transition.getValue();
-                // pixels[index] = color * lfo.getValue(fromTop(map[index].z)) * transition.getValue();
+                // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
+                pixels[index] = color * lfo.getValue(-2 * around(map->th(index))) * Utils::rescale(map->r(index),0.5,1,0.4,1) * transition.getValue();
+                // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
         }
     };
@@ -202,11 +202,11 @@ namespace Patterns
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         LFO<SoftSawDown> lfo1;
 
     public:
-        PetalChase(PixelMap3d::Cylindrical map)
+        PetalChase(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Petal chase";
@@ -222,12 +222,12 @@ namespace Patterns
             lfo1.setDutyCycle(params->getSize(0.06, 0.5));
             lfo1.setSoftEdgeWidth(0.1);
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                if (map[index].r < 0.35)
+                if (map->r(index) < 0.35)
                     continue;
 
-                float lfoVal1 = lfo1.getValue(-amount1 * around(map[index].th));
+                float lfoVal1 = lfo1.getValue(-amount1 * around(map->th(index)));
                 RGBA color1 = params->gradient->get(lfoVal1 * 255);
 
                 pixels[index] = color1 * lfoVal1 * transition.getValue();
@@ -359,12 +359,12 @@ namespace Patterns
             FadeDown(200)};
         std::vector<float> radii[6];
         BeatWatcher watcher = BeatWatcher();
-        // PixelMap3d::Cylindrical map;
+        // PixelMap3d::Cylindrical *map;
         Permute perm;
         int pos = 0;
 
     public:
-        GrowingCirclesPattern(PixelMap3d map)
+        GrowingCirclesPattern(PixelMap3d *map)
         {
             // this->map = map.toCylindricalRotate90();
             for (int i = 0; i < 6; i++)
@@ -372,10 +372,10 @@ namespace Patterns
                 float xc = cos(float(i) / 6 * 2 * M_PI);
                 float yc = 0.4;
                 float zc = sin(float(i) / 6 * 2 * M_PI);
-                std::transform(map.begin(), map.end(), std::back_inserter(radii[i]), [xc, yc, zc](PixelPosition3d pos) -> float
+                std::transform(map->begin(), map->end(), std::back_inserter(radii[i]), [xc, yc, zc](PixelPosition3d pos) -> float
                                { return sqrt(pow(pos.x - xc, 2) + pow(pos.y - yc, 2) + pow(pos.z - zc, 2)); });
             }
-            this->perm = Permute(map.size());
+            this->perm = Permute(map->size());
             this->name = "Growing circles";
         }
 
@@ -444,11 +444,11 @@ namespace Patterns
     class SpiralPattern : public Pattern<RGBA>
     {
         Transition transition = Transition();
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         LFO<SinFast> lfo;
 
     public:
-        SpiralPattern(PixelMap3d::Cylindrical map)
+        SpiralPattern(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Spiral";
@@ -466,7 +466,7 @@ namespace Patterns
             
             for (int i = 0; i < width; i++)
             {
-                float spiral = amount * (around(map[i].th) + map[i].r * curliness) + fromBottom(map[i].z);
+                float spiral = amount * (around(map->th(i)) + map->r(i) * curliness) + fromBottom(map->z(i));
                 //while (spiral < 0) spiral += 1;
                 //while (spiral > 1) spiral -= 1;
                 float pos = abs(spiral - lfo.getPhase());
@@ -480,7 +480,7 @@ namespace Patterns
                     pos -= 1;
                 }
                 float fadePosition = softEdge(pos, size, 0.06);
-                RGBA color = params->gradient->get(255 - 255 * map[i].r);
+                RGBA color = params->gradient->get(255 - 255 * map->r(i));
 
                 pixels[i] = color * fadePosition * transition.getValue();
             }

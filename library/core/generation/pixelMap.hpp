@@ -13,6 +13,8 @@ struct PixelPosition
     float y;
 };
 
+
+
 class PixelMap: public vector<PixelPosition>  {
 
 public:
@@ -23,7 +25,17 @@ public:
         float th;
     };
 
-    typedef vector<PolarPixelPosition> Polar;
+    class Polar: public vector<PolarPixelPosition>
+    {
+        public:
+        float r(unsigned int index){
+            return this->operator[](index).r;
+        }
+
+        float th(unsigned int index){
+            return this->operator[](index).th;
+        }
+    };
 
     using vector<PixelPosition>::vector;
 
@@ -32,6 +44,14 @@ private:
     Polar polar90;
 
 public:
+
+    float x(unsigned int index){
+        return this->operator[](index).x;
+    }
+
+    float y(unsigned int index){
+        return this->operator[](index).y;
+    }
 
     Polar toPolar()
     {
@@ -91,7 +111,21 @@ public:
         float z;
     };
 
-    typedef vector<CylindricalPixelPosition> Cylindrical;
+    class Cylindrical: public vector<CylindricalPixelPosition>
+    {
+        public:
+        float r(unsigned int index){
+            return this->operator[](index).r;
+        }
+
+        float th(unsigned int index){
+            return this->operator[](index).th;
+        }
+
+        float z(unsigned int index){
+            return this->operator[](index).z;
+        }
+    };
 
     using vector<PixelPosition3d>::vector;
 
@@ -100,6 +134,18 @@ private:
     Cylindrical cylindrical90;
 
 public:
+
+    float x(unsigned int index){
+        return this->operator[](index).x;
+    }
+
+    float y(unsigned int index){
+        return this->operator[](index).y;
+    }
+
+    float z(unsigned int index){
+        return this->operator[](index).z;
+    }
 
     Cylindrical toCylindrical()
     {

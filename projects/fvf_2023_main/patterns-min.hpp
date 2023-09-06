@@ -181,12 +181,12 @@ namespace Min
             FadeDown(200)};
         std::vector<float> radii[6];
         BeatWatcher watcher = BeatWatcher();
-        // PixelMap3d::Cylindrical map;
+        // PixelMap3d::Cylindrical *map;
         Permute perm;
         int pos = 0;
 
     public:
-        GrowingCirclesPattern(PixelMap3d map)
+        GrowingCirclesPattern(PixelMap3d *map)
         {
             // this->map = map.toCylindricalRotate90();
             for (int i = 0; i < 6; i++)
@@ -194,10 +194,10 @@ namespace Min
                 float xc = cos(float(i) / 6 * 2 * M_PI);
                 float yc = 0.4;
                 float zc = sin(float(i) / 6 * 2 * M_PI);
-                std::transform(map.begin(), map.end(), std::back_inserter(radii[i]), [xc, yc, zc](PixelPosition3d pos) -> float
+                std::transform(map->begin(), map->end(), std::back_inserter(radii[i]), [xc, yc, zc](PixelPosition3d pos) -> float
                                { return sqrt(pow(pos.x - xc, 2) + pow(pos.y - yc, 2) + pow(pos.z - zc, 2)); });
             }
-            this->perm = Permute(map.size());
+            this->perm = Permute(map->size());
             this->name = "Growing circles";
         }
 
@@ -234,10 +234,10 @@ namespace Min
     {
         FadeDown fade = FadeDown(50);
         BeatWatcher watcher = BeatWatcher();
-        PixelMap3d map;
+        PixelMap3d *map;
 
     public:
-        LineLaunch(PixelMap3d map)
+        LineLaunch(PixelMap3d *map)
         {
             this->map = map;
             this->name = "Line launch";
@@ -259,7 +259,7 @@ namespace Min
 
             for (int i = 0; i < width; i++)
             {
-                float fadePosition = fade.getValue((1 + map[i].z) * velocity);
+                float fadePosition = fade.getValue((1 + map->z(i)) * velocity);
                 RGBA color = params->getSecondaryColour();
                 pixels[i] += color * fadePosition;
             }
@@ -301,11 +301,11 @@ namespace Min
     class SpiralPattern : public Pattern<RGBA>
     {
         Transition transition = Transition();
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         LFO<SinFast> lfo;
 
     public:
-        SpiralPattern(PixelMap3d::Cylindrical map)
+        SpiralPattern(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Spiral";
@@ -323,7 +323,7 @@ namespace Min
             
             for (int i = 0; i < width; i++)
             {
-                float spiral = amount * (around(map[i].th) + map[i].r * curliness) + fromBottom(map[i].z);
+                float spiral = amount * (around(map->th(i)) + map->r(i) * curliness) + fromBottom(map->z(i));
                 //while (spiral < 0) spiral += 1;
                 //while (spiral > 1) spiral -= 1;
                 float pos = abs(spiral - lfo.getPhase());
@@ -337,7 +337,7 @@ namespace Min
                     pos -= 1;
                 }
                 float fadePosition = softEdge(pos, size, 0.06);
-                RGBA color = params->gradient->get(255 - 255 * map[i].r);
+                RGBA color = params->gradient->get(255 - 255 * map->r(i));
 
                 pixels[i] = color * fadePosition * transition.getValue();
             }

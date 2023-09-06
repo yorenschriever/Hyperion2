@@ -49,10 +49,10 @@ namespace Flash
             0, Transition::none, 0,
             500, Transition::none, 0);
 
-        PixelMap3d map;
+        PixelMap3d *map;
 
     public:
-        SquareGlitchPattern(PixelMap3d map)
+        SquareGlitchPattern(PixelMap3d *map)
         {
             this->map = map;
             this->name = "Square glitch";
@@ -69,11 +69,11 @@ namespace Flash
             perm.setSize(numCubes3d);
             perm.permute();
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                int xquantized = Utils::rescale(map[index].x,0,numCubes,-1,1);
-                int yquantized = fromBottom(map[index].y) * numCubes;
-                int zquantized = Utils::rescale(map[index].z,0,numCubes,-1,1);
+                int xquantized = Utils::rescale(map->x(index),0,numCubes,-1,1);
+                int yquantized = fromBottom(map->y(index)) * numCubes;
+                int zquantized = Utils::rescale(map->z(index),0,numCubes,-1,1);
 
                 int cubeIndex = 
                     xquantized + 

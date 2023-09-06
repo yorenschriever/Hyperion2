@@ -1,6 +1,8 @@
+#include "ChaserLedAnimation.cpp"
 #include "ChaserLedAnimation.h"
-#include "ShapeChaserLedAnimation.h"
 #include "LedShape.h"
+#include "ShapeChaserLedAnimation.cpp"
+#include "ShapeChaserLedAnimation.h"
 #include "animationPattern.h"
 #include "colours.h"
 #include "core/distribution/inputs/inputSplitter.hpp"
@@ -9,16 +11,15 @@
 #include "core/distribution/outputs/monitorOutput.hpp"
 #include "core/distribution/outputs/neopixelOutput.hpp"
 #include "core/distribution/pipes/convertPipe.hpp"
+#include "core/generation/patterns/helpers/tempo/constantTempo.h"
 #include "core/generation/patterns/mappedPatterns.h"
 #include "core/generation/pixelMap.hpp"
-#include "core/generation/pixelMapSplitter.hpp"
 #include "core/hyperion.hpp"
 #include "gradient.hpp"
-#include "ChaserLedAnimation.cpp"
-#include "ShapeChaserLedAnimation.cpp"
-#include "core/generation/patterns/helpers/tempo/constantTempo.h"
 
 void addLedShapes(Hyperion *hyp);
+
+PixelMap tetraMap;
 
 Installation tetra = {
     LedShape(12, 3),  //  25cm Triangle ( 12 LEDs per side,  36 total,  2.16A powerdraw)
@@ -30,10 +31,10 @@ Installation tetra = {
 };
 
 Gradient heatmap = Gradient({
-  {.position=   0, .color = RGB(    0,  0,  0)},  // Black
-  {.position= 128, .color = RGB(  255,  0,  0)},  // Red
-  {.position= 224, .color = RGB(  255,255,  0)},  // Bright yellow
-  {.position= 255, .color = RGB(  255,255,255)}   // Full white
+    {.position = 0, .color = RGB(0, 0, 0)},        // Black
+    {.position = 128, .color = RGB(255, 0, 0)},    // Red
+    {.position = 224, .color = RGB(255, 255, 0)},  // Bright yellow
+    {.position = 255, .color = RGB(255, 255, 255)} // Full white
 });
 
 int main()
@@ -45,7 +46,8 @@ int main()
   Tempo::AddSource(new ConstantTempo(120));
 
   hyp->start();
-  while (1) Thread::sleep(1000);
+  while (1)
+    Thread::sleep(1000);
 }
 
 void addLedShapes(Hyperion *hyp)
@@ -54,7 +56,6 @@ void addLedShapes(Hyperion *hyp)
   // It only works for triangles now. if you need other shapes, it might be interesting to see if
   // the generation of the Installation and the PixelMap can be combined
   const float pixelPitch = 0.014;
-  PixelMap tetraMap;
   for (LedShape shape : tetra)
   {
     for (int set = 0; set < shape.numSets; set++)
@@ -71,15 +72,19 @@ void addLedShapes(Hyperion *hyp)
     }
   }
 
+  auto input = new PatternInput<RGBA>(
+      tetraMap.size(),
+      // new Mapped::ConcentricWavePattern<SinFast>(tetraMap, 2, 2)
+      new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, true), &heatmap)
+      // new AnimationPattern(&tetra, new ShapeChaserLedAnimation(true), &heatmap)
+  );
+
+#if ESP_PLATFORM
   // Generate all pixel data in one go, and then split it up in six outputs,
   // because UDPOutput (and therefore MonitorOutput) are limited by a
   // maximum transfer size of 2*1440 bytes
   auto splitInput = new InputSplitter(
-      new PatternInput<RGBA>(
-          tetraMap.size(),
-          // new Mapped::ConcentricWavePattern<SinFast>(tetraMap, 2, 2)),
-          new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, true), &heatmap)),
-          //new AnimationPattern(&tetra, new ShapeChaserLedAnimation(true), &heatmap)),
+      input,
       {12 * 3 * sizeof(RGBA),
        33 * 3 * sizeof(RGBA),
        54 * 3 * sizeof(RGBA),
@@ -88,14 +93,18 @@ void addLedShapes(Hyperion *hyp)
        117 * 3 * sizeof(RGBA)},
       true);
 
-  auto splitMap = PixelMapSplitter(
-      &tetraMap, {12 * 3, 33 * 3, 54 * 3, 75 * 3, 96 * 3, 117 * 3});
-
   for (int i = 0; i < splitInput->size(); i++)
   {
-    auto pipe = new ConvertPipe<RGBA, RGB>(
-        splitInput->getInput(i),
-        new MonitorOutput(&hyp->webServer,splitMap.getMap(i)));
-    hyp->addPipe(pipe);
+    hyp->addPipe(
+        new ConvertPipe<RGBA, RGB>(
+            splitInput->getInput(i),
+            new NeopixelOutput(i)));
   }
+#else
+
+  hyp->addPipe(new ConvertPipe<RGBA, RGB>(
+      input,
+      new MonitorOutput(&hyp->webServer, &tetraMap)));
+
+#endif
 }

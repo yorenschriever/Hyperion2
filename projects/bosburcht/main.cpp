@@ -2,7 +2,6 @@
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 #include "core/distribution/outputs/neopixelOutput.hpp"
 #include "core/distribution/outputs/spiOutput.hpp"
-#include "core/generation/pixelMapSplitter.hpp"
 #include "core/hyperion.hpp"
 #include "distribution/inputs/patternCycleInput.hpp"
 #include "mapping/sunMap.hpp"
@@ -56,7 +55,7 @@ int main()
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         input,
         // new MonitorOutput(&hyp->webServer, sunMap)
-        new MonitorOutput3d(&hyp->webServer, sunMap3d)));
+        new MonitorOutput3d(&hyp->webServer, &sunMap3d)));
 
     hyp->start();
 

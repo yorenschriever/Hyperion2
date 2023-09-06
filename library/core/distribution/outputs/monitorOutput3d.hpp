@@ -23,8 +23,8 @@ class PixelMap3dJson : public WebServerResponseBuilder
             write(userData, writer, "    \"path\": \"/ws/monitor3d%d\",\n", output.mapIndex);
             write(userData, writer, "    \"positions\": [\n");
             int index = 0;
-            for (auto pixel : output.map)
-                write(userData, writer, "      {\"x\" : %f, \"y\" : %f, \"z\" : %f}%s \n", pixel.x, pixel.y, pixel.z, index++ == output.map.size() - 1 ? "" : ",");
+            for (auto pixel = output.map->begin(); pixel != output.map->end(); pixel++)
+                write(userData, writer, "      {\"x\" : %f, \"y\" : %f, \"z\" : %f}%s \n", pixel->x, pixel->y, pixel->z, index++ == output.map->size() - 1 ? "" : ",");
             write(userData, writer, "    ]\n");
             write(userData, writer, "  }%s\n", outputIndex++ == outputs.size() - 1 ? "" : ",");
         }
@@ -34,7 +34,7 @@ class PixelMap3dJson : public WebServerResponseBuilder
     std::vector<PixelMap3d> maps;
 
 public:
-    unsigned int addOutput(PixelMap3d map)
+    unsigned int addOutput(PixelMap3d *map)
     {
         outputs.push_back({.map = map, .mapIndex = ++mapIndex});
         return mapIndex;
@@ -43,7 +43,7 @@ public:
 private:
     struct PixelMonitorOutput3d
     {
-        PixelMap3d map;
+        PixelMap3d *map;
         unsigned int mapIndex;
     };
 
@@ -66,7 +66,7 @@ private:
 class MonitorOutput3d : public WebsocketOutput
 {
 public:
-    MonitorOutput3d(WebServer **webServer, PixelMap3d map, unsigned int fps = 60) : WebsocketOutput(webServer, pathBuf, fps)
+    MonitorOutput3d(WebServer **webServer, PixelMap3d *map, unsigned int fps = 60) : WebsocketOutput(webServer, pathBuf, fps)
     {
         this->webServer = webServer;
         snprintf(pathBuf, 20, "/ws/monitor3d%d", pixelMap3dJson.addOutput(map));

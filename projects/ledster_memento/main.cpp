@@ -39,14 +39,14 @@ int main()
         Tempo::AddSource(new ConstantTempo(120));
 
     auto input = new PatternCycleInput<RGBA>(ledsterMap3d.size(), {
-        new Patterns::Lighthouse(cLedsterMap3d),
-        new Patterns::PetalChase(cLedsterMap3d),
+        new Patterns::Lighthouse(&cLedsterMap3d),
+        new Patterns::PetalChase(&cLedsterMap3d),
         new Patterns::SnowflakePatternLedster(),
         new Patterns::SnakePattern(),
-        new Patterns::XY(ledsterMap3d),
+        new Patterns::XY(&ledsterMap3d),
         new Patterns::RibbenClivePattern<Glow>(10000, 1, 0.15),
-        new Patterns::GrowingCirclesPattern(ledsterMap3d),
-        new Patterns::SpiralPattern(cLedsterMap3d),
+        new Patterns::GrowingCirclesPattern(&ledsterMap3d),
+        new Patterns::SpiralPattern(&cLedsterMap3d),
         new Patterns::SegmentChasePattern(),
         new Patterns::GlowPulsePattern(),
         new Patterns::PetalRotatePattern(),
@@ -63,7 +63,7 @@ int main()
 #else
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         input,
-        new MonitorOutput(&hyp->webServer, ledsterMap)));
+        new MonitorOutput(&hyp->webServer, &ledsterMap)));
     hyp->start();
 #endif
 

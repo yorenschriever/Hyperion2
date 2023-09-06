@@ -24,9 +24,9 @@ public:
         }
     }
 
-    PixelMap getMap(int index)
+    PixelMap *getMap(int index)
     {
-        return destinationMaps[index];
+        return &(destinationMaps[index]);
     }
 
     int size()

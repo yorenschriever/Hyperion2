@@ -12,7 +12,7 @@ namespace Mapped
     template <class T>
     class ConcentricWavePattern : public Pattern<RGBA>
     {
-        PixelMap map;
+        PixelMap *map;
         int numWaves;
         LFO<T> lfo;
         LFO<Square> lfoColour;
@@ -21,7 +21,7 @@ namespace Mapped
             1000, Transition::none, 0);
 
     public:
-        ConcentricWavePattern(PixelMap map, int numWaves = 1, int numColourWaves=2, int period = 5000)
+        ConcentricWavePattern(PixelMap *map, int numWaves = 1, int numColourWaves=2, int period = 5000)
         {
             this->map = map;
             this->numWaves = numWaves;
@@ -34,9 +34,9 @@ namespace Mapped
             if (!transition.Calculate(active))
                 return;
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float distance = std::abs(map[index].x) + std::abs(map[index].y);
+                float distance = std::abs(map->operator[](index).x) + std::abs(map->operator[](index).y);
                 float phase = (float)numWaves * distance;
                 RGBA colour = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 RGBA dimmedColour = colour * transition.getValue() * lfo.getValue(phase);
@@ -48,7 +48,7 @@ namespace Mapped
     template <class T>
     class HorizontalWavePattern : public Pattern<RGBA>
     {
-        PixelMap map;
+        PixelMap *map;
         LFO<T> lfo;
         // LFO<Square> lfoColour;
         Transition transition = Transition(
@@ -56,7 +56,7 @@ namespace Mapped
             1000, Transition::none, 0);
 
     public:
-        HorizontalWavePattern(PixelMap map, int period = 5000)
+        HorizontalWavePattern(PixelMap *map, int period = 5000)
         {
             this->map = map;
             this->lfo = LFO<T>(period);
@@ -68,10 +68,10 @@ namespace Mapped
             if (!transition.Calculate(active))
                 return;
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                // float distance = std::abs(map[index].x) + std::abs(map[index].y);
-                float phase = (map[index].x + 1) / 2.;
+                // float distance = std::abs(map->x(index)) + std::abs(map->y(index));
+                float phase = (map->operator[](index).x + 1) / 2.;
                 RGBA colour = params->getSecondaryColour(); // lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 RGBA dimmedColour = colour * transition.getValue() * lfo.getValue(phase);
                 pixels[index] += dimmedColour;
@@ -82,7 +82,7 @@ namespace Mapped
     //template <class T>
     class ConcentricPulsePattern : public Pattern<RGBA>
     {
-        PixelMap map;
+        PixelMap *map;
         Fade<Down, Linear> fades[5] = {
             Fade<Down, Linear>(200),
             Fade<Down, Linear>(200),
@@ -93,7 +93,7 @@ namespace Mapped
         bool lastActive = false;
 
     public:
-        ConcentricPulsePattern(PixelMap map)
+        ConcentricPulsePattern(PixelMap *map)
         {
             this->map = map;
         }
@@ -107,9 +107,9 @@ namespace Mapped
             }
             lastActive = active;
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float distance = std::abs(map[index].x) + std::abs(map[index].y);
+                float distance = std::abs(map->operator[](index).x) + std::abs(map->operator[](index).y);
                 int delay = distance * 200;
                 float l = fades[0].getValue(delay) +
                           fades[1].getValue(delay) +
@@ -126,7 +126,7 @@ namespace Mapped
 
     class RadarPattern : public Pattern<RGBA>
     {
-        PixelMap map;
+        PixelMap *map;
         LFO<SawDown> lfo;
         Transition transition = Transition(
             200, Transition::none, 0,
@@ -134,12 +134,12 @@ namespace Mapped
         std::vector<float> scaledAngles;
 
     public:
-        RadarPattern(PixelMap map, int period = 5000)
+        RadarPattern(PixelMap *map, int period = 5000)
         {
             this->map = map;
             this->lfo = LFO<SawDown>(period);
             //this->lfo.setSkew(0.25);
-            std::transform(map.begin(), map.end(), std::back_inserter(scaledAngles), [](PixelPosition pos) -> float
+            std::transform(map->begin(), map->end(), std::back_inserter(scaledAngles), [](PixelPosition pos) -> float
                            { return (atan2(pos.y, pos.x) + M_PI) / (2 * M_PI); });
         }
 
@@ -148,7 +148,7 @@ namespace Mapped
             if (!transition.Calculate(active))
                 return;
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA colour = params->getSecondaryColour();
                 float lfoVal = lfo.getValue(scaledAngles[index]);
@@ -160,13 +160,13 @@ namespace Mapped
 
     class HorizontalGradientPattern : public Pattern<RGBA>
     {
-        PixelMap map;
+        PixelMap *map;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
 
     public:
-        HorizontalGradientPattern(PixelMap map)
+        HorizontalGradientPattern(PixelMap *map)
         {
             this->map = map;
         }
@@ -176,9 +176,9 @@ namespace Mapped
             if (!transition.Calculate(active))
                 return;
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float phase = (map[index].x + 1) / 2.;
+                float phase = (map->operator[](index).x + 1) / 2.;
                 RGBA colour = params->getSecondaryColour() + params->getPrimaryColour() * phase;
                 RGBA dimmedColour = colour * transition.getValue();
                 pixels[index] += dimmedColour;
@@ -188,7 +188,7 @@ namespace Mapped
 
     class HorizontalDitheredGradientPattern : public Pattern<RGBA>
     {
-        PixelMap map;
+        PixelMap *map;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
@@ -196,10 +196,10 @@ namespace Mapped
         const size_t maxNoiseMapSize = 100;
 
     public:
-        HorizontalDitheredGradientPattern(PixelMap map)
+        HorizontalDitheredGradientPattern(PixelMap *map)
         {
             this->map = map;
-            for (int i = 0; i < std::min(map.size(), maxNoiseMapSize); i++)
+            for (int i = 0; i < std::min(map->size(), maxNoiseMapSize); i++)
             {
                 noise.push_back((Utils::random_f() - 0.5) * 1.3);
             }
@@ -210,9 +210,9 @@ namespace Mapped
             if (!transition.Calculate(active))
                 return;
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                RGBA colour = (map[index].x + noise[index % maxNoiseMapSize] < 0) ? params->getSecondaryColour() : params->getPrimaryColour();
+                RGBA colour = (map->operator[](index).x + noise[index % maxNoiseMapSize] < 0) ? params->getSecondaryColour() : params->getPrimaryColour();
                 RGBA dimmedColour = colour * transition.getValue();
                 pixels[index] += dimmedColour;
             }
@@ -222,7 +222,7 @@ namespace Mapped
     template <class T>
     class DiagonalWavePattern : public Pattern<RGBA>
     {
-        PixelMap map;
+        PixelMap *map;
         LFO<T> lfo;
         float numWaves;
         Transition transition = Transition(
@@ -230,7 +230,7 @@ namespace Mapped
             1000, Transition::none, 0);
 
     public:
-        DiagonalWavePattern(PixelMap map, int period = 5000, float numWaves = 1, float pulseWidth = 0.5, float skew = 1)
+        DiagonalWavePattern(PixelMap *map, int period = 5000, float numWaves = 1, float pulseWidth = 0.5, float skew = 1)
         {
             this->map = map;
             this->lfo = LFO<T>(period);
@@ -244,9 +244,9 @@ namespace Mapped
             if (!transition.Calculate(active))
                 return;
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float phase = (map[index].x + map[index].y + 2) * numWaves;
+                float phase = (map->operator[](index).x + map->operator[](index).y + 2) * numWaves;
                 RGBA colour = params->getPrimaryColour() + params->getSecondaryColour() * lfo.getValue(phase); 
                 RGBA dimmedColour = colour * transition.getValue();
                 pixels[index] += dimmedColour;

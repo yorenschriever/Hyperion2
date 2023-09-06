@@ -2,7 +2,6 @@
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 #include "core/distribution/outputs/neopixelOutput.hpp"
 #include "core/distribution/outputs/spiOutput.hpp"
-#include "core/generation/pixelMapSplitter.hpp"
 #include "core/hyperion.hpp"
 #include "distribution/inputs/patternCycleInput.hpp"
 #include "palettes.hpp"
@@ -82,7 +81,7 @@ int main()
 #else
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         input,
-        new MonitorOutput(&hyp->webServer, sailMap)));
+        new MonitorOutput(&hyp->webServer, &sailMap)));
 
     hyp->start();
 #endif

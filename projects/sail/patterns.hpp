@@ -76,9 +76,9 @@ namespace Patterns
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getSecondaryColour();
-                // RGBA color = params->gradient->get(fromTop(map[index].z)*255);
+                // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
                 pixels[index] = (params->getPrimaryColour() * 0.5) + color * lfo.getValue(-2 * around(map->operator[](index).th)) * Utils::rescale(map->operator[](index).r, 0.5, 1, 0.4, 1) * transition.getValue();
-                // pixels[index] = color * lfo.getValue(fromTop(map[index].z)) * transition.getValue();
+                // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
         }
     };
@@ -250,14 +250,14 @@ namespace Patterns
                 float xc = 0.5 * cos(float(i) / 6 * 2 * M_PI);
                 float yc = 0.5 * sin(float(i) / 6 * 2 * M_PI);
                 // Log::info("","Reserve %d, freeheap = %d, map size = %d, float size = %d",i,Utils::get_free_heap(), map->size(), sizeof(float));
-                // radii[i].reserve(map.size()*sizeof(float));
+                // radii[i].reserve(map->size()*sizeof(float));
                 radii[i].reserve(map->size());
                 // Log::info("","fill %d, freeheap = %d",i,Utils::get_free_heap());
                 std::transform(map->begin(), map->end(), std::back_inserter(radii[i]), [xc, yc](PixelPosition pos) -> float
                                { return sqrt(pow(pos.x - xc, 2) + pow(pos.y - yc, 2)); });
                 // Log::info("","end %d, freeheap = %d",i,Utils::get_free_heap());
             }
-            // this->perm = Permute(map.size());
+            // this->perm = Permute(map->size());
             this->name = "Growing circles";
             Log::info("", "End Constructor GrowingCirclesPattern2");
         }
@@ -321,7 +321,7 @@ namespace Patterns
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                // float dir = (map[index].z > 0 || map[index].y > 0.44) ? 1:-1;
+                // float dir = (map->z(index) > 0 || map->y(index) > 0.44) ? 1:-1;
                 float phase = (0.5 * abs(map->operator[](index).x) + map->operator[](index).y) * amount;
                 auto col = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 pixels[index] += col * lfo.getValue(phase) * transition.getValue();
@@ -423,14 +423,14 @@ namespace Patterns
             for (int i = 0; i < map->size(); i++)
             {
                 // fade.duration = perm.at[i] * trail; // + 100;
-                // fade.duration = (perm.at[i] * trail) < map.size() / 20 ? ; // + 100;
+                // fade.duration = (perm.at[i] * trail) < map->size() / 20 ? ; // + 100;
 
                 // fade.duration = 100;
-                // if (perm.at[i] < density * map.size()/ 10)
+                // if (perm.at[i] < density * map->size()/ 10)
                 //     fade.duration *= 4;
 
                 float density = 481. / width;
-                fade1.duration = 100; // trail + perm.at[i] / (density * map.size()/ 10);
+                fade1.duration = 100; // trail + perm.at[i] / (density * map->size()/ 10);
                 fade2.duration = 100;
                 if (perm1.at[i] < density * map->size() / 10)
                     fade1.duration *= perm1.at[i] * 4 / (density * map->size() / 10);
@@ -505,9 +505,9 @@ namespace Patterns
 
             for (int i = 0; i < map->size(); i++)
             {
-                // fade.duration = 80; // trail + perm.at[i] / (density * map.size()/ 10);
-                //  if (perm.at[i] < density * map.size()/ 10)
-                //      fade.duration *= perm.at[i] * 4 / (density * map.size()/ 10);
+                // fade.duration = 80; // trail + perm.at[i] / (density * map->size()/ 10);
+                //  if (perm.at[i] < density * map->size()/ 10)
+                //      fade.duration *= perm.at[i] * 4 / (density * map->size()/ 10);
                 pixels[i] = params->getSecondaryColour() * 0.25;
                 for (int f = 0; f < numFades; f++)
                 {

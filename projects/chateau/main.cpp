@@ -9,8 +9,6 @@
 #include "core/hyperion.hpp"
 #include "distribution/inputs/patternCycleInput.hpp"
 #include "ledParPatterns.hpp"
-#include "mapping/haloMap.hpp"
-#include "mapping/haloMap8.hpp"
 #include "palettes.hpp"
 #include "patterns.hpp"
 #include <vector>
@@ -31,16 +29,10 @@ LUT *GammaLut12 = new GammaLUT(2.5, 4096);
 const char *hyper_l = "hyperslave5.local";
 const char *hyper_r = "hyperslave7.local";
 const char *hyper_truss = "hyperslave6.local";
-//const char *hyper_dmx = "hyperslave8.local";
 
 int main()
 {
   auto hyp = new Hyperion();
-
-  // hyp->hub.params.primaryColour = RGB(255, 0, 255);
-  // hyp->hub.params.secondaryColour = RGB(50, 50, 50);
-  // hyp->hub.params.highlightColour = RGB(250, 250, 250);
-  // hyp->hub.params.gradient = &heatmap;
 
   addColanderPipe(hyp);
   addLaserPipe(hyp);
@@ -63,7 +55,6 @@ int main()
   //Tempo::AddSource(new ConstantTempo(120));
 
   hyp->hub.buttonPressed(0, 0);
-  // hyp->hub.setFlashColumn(7);
   for (int i=0;i<7;i++)
     hyp->hub.setFlashColumn(i, false, true);
   hyp->hub.setFlashRow(5);
@@ -79,28 +70,6 @@ int main()
 
 void addColanderPipe(Hyperion *hyp)
 {
-
-  // auto splitInput = new InputSplitter(
-  //     new ControlHubInput<Monochrome>(
-  //         12,
-  //         &hyp->hub,
-  //         {
-  //             // static
-  //             {.column = 1, .slot = 0, .pattern = new GlowPattern()},
-  //             {.column = 1, .slot = 1, .pattern = new SinPattern()},
-  //             {.column = 1, .slot = 2, .pattern = new FastStrobePattern()},
-  //             {.column = 1, .slot = 3, .pattern = new SlowStrobePattern()},
-  //             {.column = 1, .slot = 4, .pattern = new BlinderPattern()},
-  //             {.column = 1, .slot = 5, .pattern = new BeatAllFadePattern()},
-  //             {.column = 1, .slot = 6, .pattern = new BeatShakePattern()},
-  //             {.column = 1, .slot = 7, .pattern = new BeatSingleFadePattern()},
-  //             {.column = 1, .slot = 8, .pattern = new BeatMultiFadePattern()},
-  //             {.column = 1, .slot = 9, .pattern = new GlitchPattern()},
-  //             {.column = 1, .slot = 10, .pattern = new LFOPattern<SawDown>()},
-  //             {.column = 1, .slot = 11, .pattern = new BeatStepPattern()},
-  //         }),
-  //     {6, 6},
-  //     true);
 
   auto input = new ControlHubInput<Monochrome>(
       12,
@@ -139,9 +108,6 @@ void addColanderPipe(Hyperion *hyp)
     hyp->addPipe(pipe);
   }
 
-  // hyp->addPipe(new ConvertPipe<Monochrome, RGB>(
-  //     splitInput->getInput(2),
-  //     new MonitorOutput(&hyp->webServer, haloMap)));
 }
 
 void addLaserPipe(Hyperion *hyp)
@@ -309,9 +275,6 @@ void addLedParPipe(Hyperion *hyp)
       new UDPOutput(hyper_l, 9619, 60));
   hyp->addPipe(pipe);
 
-  // hyp->addPipe(new ConvertPipe<RGBA, RGB>(
-  //     input,
-  //     new MonitorOutput(&hyp->webServer,haloMap8)));
 }
 
 void addPaletteColumn(Hyperion *hyp)

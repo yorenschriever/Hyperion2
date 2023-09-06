@@ -1,48 +1,41 @@
 #include "core/hyperion.hpp"
-#include "platform/includes/ethernet.hpp"
-#include "platform/includes/ipAddress.hpp"
-#include "platform/includes/log.hpp"
-#include "platform/includes/socket.hpp"
-#include "platform/includes/thread.hpp"
-
-#include "core/distribution/pipes/pipe.hpp"
-#include "core/distribution/inputs/udpInput.hpp"
-#include "core/distribution/outputs/udpOutput.hpp"
-#include "core/distribution/outputs/monitorOutput.hpp"
+#include "core/distribution/inputs/patternInput.hpp"
+#include "core/generation/patterns/mappedPatterns.h"
 
 #include "colours.h"
 #include "freakMap.h"
 
+// This example shows you how you can display another device's UDP output.
+// This can be useful for debugging when that device does not run a web server,
+// and therefore cannot have a monitorOutput.
+
 int main()
 {
+  // Use this code to listen to UDP messages and display them using the monitorInput
   auto hyp = new Hyperion();
 
-  Socket s_out = Socket();
-  //Socket s_in = Socket(4446);
-  //char buf[500];
-
   auto pipe = new Pipe(
-    new UDPInput(4445),
-    //new UDPOutput("localhost",4446,60)
-    new MonitorOutput(&hyp->webServer,freakMap)
-  );
+      new UDPInput(4445),
+      new MonitorOutput(&hyp->webServer, &freakMap));
 
   hyp->addPipe(pipe);
-
   hyp->start();
 
-  while (1)
-  {
-    Thread::sleep(200);
+  // End of the example
 
-    // int ret = s_in.recv(&buf, sizeof(buf));
-    // if (ret)
-    // {
-    //   Log::info("TEST", "received package: %s", buf);
-    // }
 
-    RGBA buf2 = Hue(Utils::millis()*10);
-    auto dest = IPAddress::fromIPString("127.0.0.1");
-    s_out.send(&dest, 4445, (uint8_t *)&buf2, sizeof(buf2));
-  }
+
+
+  // Below you find code to generate messages. Normally this would run on the machine without a web server
+  auto hyp_on_other_machine = new Hyperion();
+
+  auto pipe_on_other_machine = new ConvertPipe<RGBA,RGB>(
+      new PatternInput(freakMap.size(),new Mapped::ConcentricWavePattern<SawDown>(&freakMap)),
+      new UDPOutput("localhost",4445,60)
+  );
+
+  hyp_on_other_machine->addPipe(pipe_on_other_machine);
+  hyp_on_other_machine->start(Hyperion::minimal);
+
+  while(true) Thread::sleep(10);
 }

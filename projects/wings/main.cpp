@@ -52,27 +52,24 @@ int main()
 
 void addWingsPipe(Hyperion *hyp)
 {
-  // Generate 1 pattern, and split it up in six outputs,
-  // because UDPOutput (and therefore MonitorOutput) are limited by a
-  // maximum transfer size of 2*1440 bytes
-  auto splitInput = new InputSplitter(
-      new ControlHubInput<RGBA>(
+
+  auto input = new ControlHubInput<RGBA>(
           wingMap.size(),
           &hyp->hub,
           {
               // static
-              {.column = 1, .slot = 0, .pattern = new HorizontalGradientPattern(wingMap)},
-              {.column = 1, .slot = 1, .pattern = new RadialGradientPattern(pWingMap)},
+              {.column = 1, .slot = 0, .pattern = new HorizontalGradientPattern(&wingMap)},
+              {.column = 1, .slot = 1, .pattern = new RadialGradientPattern(&pWingMap)},
 
               // 
-              {.column = 2, .slot = 0, .pattern = new ChevronsPattern(wingMap)},
-              {.column = 2, .slot = 1, .pattern = new RadialGlitterFadePattern2(wingMap)},
-              {.column = 2, .slot = 2, .pattern = new RadialRainbowPattern(pWingMap)},
+              {.column = 2, .slot = 0, .pattern = new ChevronsPattern(&wingMap)},
+              {.column = 2, .slot = 1, .pattern = new RadialGlitterFadePattern2(&pWingMap)},
+              {.column = 2, .slot = 2, .pattern = new RadialRainbowPattern(&pWingMap)},
 
               // 
-              {.column = 3, .slot = 0, .pattern = new RadialFadePattern(wingMap)},
-              {.column = 3, .slot = 1, .pattern = new GrowingCirclesPattern(wingMap)},
-              {.column = 3, .slot = 2, .pattern = new AngularFadePattern(pWingMap)},
+              {.column = 3, .slot = 0, .pattern = new RadialFadePattern(&wingMap)},
+              {.column = 3, .slot = 1, .pattern = new GrowingCirclesPattern(&wingMap)},
+              {.column = 3, .slot = 2, .pattern = new AngularFadePattern(&pWingMap)},
 
               // 
               {.column = 4, .slot = 0, .pattern = new RibbenClivePattern<Glow>(10000, 1, 0.15)},
@@ -81,32 +78,35 @@ void addWingsPipe(Hyperion *hyp)
 
               // 
               {.column = 5, .slot = 0, .pattern = new SegmentChasePattern()},
-              {.column = 5, .slot = 1, .pattern = new Lighthouse(pWingMap)},
-              {.column = 5, .slot = 2, .pattern = new XY(wingMap)},
+              {.column = 5, .slot = 1, .pattern = new Lighthouse(&pWingMap)},
+              {.column = 5, .slot = 2, .pattern = new XY(&wingMap)},
               {.column = 5, .slot = 3, .pattern = new GlowPulsePattern()},
 
               // flash
               {.column = 6, .slot = 0, .pattern = new FlashesPattern()},
               {.column = 6, .slot = 1, .pattern = new StrobePattern()},
-              {.column = 6, .slot = 2, .pattern = new GrowingStrobePattern(pWingMap)},
-              {.column = 6, .slot = 3, .pattern = new LineLaunch(wingMap)},
+              {.column = 6, .slot = 2, .pattern = new GrowingStrobePattern(&pWingMap)},
+              {.column = 6, .slot = 3, .pattern = new LineLaunch(&wingMap)},
               {.column = 6, .slot = 4, .pattern = new PixelGlitchPattern()},
 
               // flash
               {.column = 7, .slot = 0, .pattern = new FlashesPattern()},
               {.column = 7, .slot = 1, .pattern = new StrobePattern()},
-              {.column = 7, .slot = 2, .pattern = new GrowingStrobePattern(pWingMap)},
-              {.column = 7, .slot = 3, .pattern = new LineLaunch(wingMap)},
+              {.column = 7, .slot = 2, .pattern = new GrowingStrobePattern(&pWingMap)},
+              {.column = 7, .slot = 3, .pattern = new LineLaunch(&wingMap)},
               {.column = 7, .slot = 4, .pattern = new PixelGlitchPattern()},
-          }),
-      {60 * 8 * sizeof(RGBA),
-       60 * 8 * sizeof(RGBA),
-       60 * 8 * sizeof(RGBA),
-       60 * 8 * sizeof(RGBA)},
-      true);
+          });
 
-  auto splitMap = PixelMapSplitter(
-      &wingMap, {60 * 8, 60 * 8, 60 * 8, 60 * 8});
+  int sz = 60 * 8 * sizeof(RGBA);
+  auto splitInput = new InputSlicer(
+      input,
+      {
+        {0*sz, sz, true},
+        {1*sz, sz, true},
+        {2*sz, sz, true},
+        {3*sz, sz, true},
+        {0, 4*sz, false},
+       });
 
   const char *hosts[4] = {
       "hyperslave1.local",
@@ -120,15 +120,19 @@ void addWingsPipe(Hyperion *hyp)
       9611,
       9615};
 
-  for (int i = 0; i < splitInput->size(); i++)
+  for (int i = 0; i < splitInput->size()-1; i++)
   {
     auto pipe = new ConvertPipe<RGBA, RGB>(
         splitInput->getInput(i),
-        // new MonitorOutput(&hyp->webServer,splitMap.getMap(i)));
-        new CloneOutput({new MonitorOutput(&hyp->webServer,splitMap.getMap(i)),
-                         new UDPOutput(hosts[i], ports[i], 60)}));
+        new UDPOutput(hosts[i], ports[i], 60));
     hyp->addPipe(pipe);
   }
+
+  hyp->addPipe(new ConvertPipe<RGBA, RGB>(
+        splitInput->getInput(4),
+        new MonitorOutput(&hyp->webServer,&wingMap)
+        ));
+
 }
 
 void addPaletteColumn(Hyperion *hyp)

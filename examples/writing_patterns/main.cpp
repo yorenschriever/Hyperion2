@@ -82,12 +82,12 @@ void addHaloPipe(Hyperion *hyp)
             {.column = 3, .slot = 1, .pattern = new ExamplePatterns::LFOGlow()},
             {.column = 3, .slot = 2, .pattern = new ExamplePatterns::FadeChase()},
 
-            {.column = 4, .slot = 0, .pattern = new ExamplePatterns::MappedPattern(haloMap)},
+            {.column = 4, .slot = 0, .pattern = new ExamplePatterns::MappedPattern(&haloMap)},
         });
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         input,
-        new MonitorOutput(&hyp->webServer,haloMap)));
+        new MonitorOutput(&hyp->webServer,&haloMap)));
 }
 
 void addPaletteColumn(Hyperion *hyp)

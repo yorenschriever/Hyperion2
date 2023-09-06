@@ -76,9 +76,9 @@ namespace Patterns
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getSecondaryColour();
-                // RGBA color = params->gradient->get(fromTop(map[index].z)*255);
+                // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
                 pixels[index] = color * lfo.getValue(-2 * around(map->operator[](index).th)) * Utils::rescale(map->operator[](index).r, 0.5, 1, 0.4, 1) * transition.getValue();
-                // pixels[index] = color * lfo.getValue(fromTop(map[index].z)) * transition.getValue();
+                // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
         }
     };
@@ -321,7 +321,7 @@ namespace Patterns
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                // float dir = (map[index].z > 0 || map[index].y > 0.44) ? 1:-1;
+                // float dir = (map->z(index) > 0 || map->y(index) > 0.44) ? 1:-1;
                 float phase = (0.5 * abs(map->operator[](index).x) + map->operator[](index).y) * amount;
                 auto col = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 pixels[index] += col * lfo.getValue(phase) * transition.getValue();

@@ -58,24 +58,29 @@ public:
         instance->sourceInput->begin();
     }
 
+    bool AllSyncedDestinationsAreReady()
+    {
+        int index=0;
+        for (auto di : destinationInputs)
+        {
+            //if this output not marked as sync, ignore it and continue to the next
+            if (!slices[index++].sync)
+                continue;
+
+            //the output is marked as sync. If the bufferOutput still has a frame ready to be
+            //sent out (or is in the process of sending it out), we are not ready to load new data yet.
+            if (di->getFrameReady())
+                return false;
+        }
+        return true;
+    }
+
     static void LoadData(void *argument)
     {       
         auto instance = (InputSlicer *)argument;
 
-
-        int index=0;
-        for (auto di : instance->destinationInputs)
-        {
-            //if this output not markes as sync, ignore it and continue to the next
-            if (!instance->slices[index++].sync)
-                continue;
-
-            //the output is marked as sync. If the bufferOutput still has a frame ready to be
-            //send out (or is in the process of sending it out), we are not ready to load new data yet.
-            if (di->getFrameReady()){
-                return;
-            }
-        }
+        if (!instance->AllSyncedDestinationsAreReady())
+            return;
 
         auto len = instance->sourceInput->loadData(instance->buffer, Pipe::bufferSize);
         if (len > Pipe::bufferSize) {

@@ -18,10 +18,10 @@ namespace Mid
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<Glow> lfo;
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        Lighthouse(PixelMap3d::Cylindrical map)
+        Lighthouse(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Lighthouse";
@@ -35,12 +35,12 @@ namespace Mid
             lfo.setPeriod(params->getVelocity(5000, 500));
             lfo.setDutyCycle(params->getSize(0.06, 0.5));
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getSecondaryColour();
-                // RGBA color = params->gradient->get(fromTop(map[index].z)*255);
-                pixels[index] = color * lfo.getValue(-2 * around(map[index].th)) * fromMid(map[index]) * transition.getValue();
-                // pixels[index] = color * lfo.getValue(fromTop(map[index].z)) * transition.getValue();
+                // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
+                pixels[index] = color * lfo.getValue(-2 * around(map->th(index))) * fromMid(map->operator[](index)) * transition.getValue();
+                // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
         }
     };
@@ -50,10 +50,10 @@ namespace Mid
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        Halo(PixelMap3d::Cylindrical map)
+        Halo(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Halo";
@@ -66,9 +66,9 @@ namespace Mid
 
             auto col = params->getSecondaryColour() * transition.getValue();
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                if (map[index].z < 0.44)
+                if (map->z(index) < 0.44)
                     continue;
 
                 pixels[index] = col;
@@ -81,10 +81,10 @@ namespace Mid
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        Halo2(PixelMap3d::Cylindrical map)
+        Halo2(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Halo 2";
@@ -97,9 +97,9 @@ namespace Mid
 
             auto col = params->getSecondaryColour() * transition.getValue();
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                if (map[index].r < 0.6)
+                if (map->r(index) < 0.6)
                     continue;
 
                 pixels[index] = col;
@@ -117,12 +117,12 @@ namespace Mid
             FadeDown(2000),
             FadeDown(2000),
             FadeDown(2000)};
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         BeatWatcher watcher = BeatWatcher();
         int pos = 0;
 
     public:
-        HaloOnBeat(PixelMap3d::Cylindrical map)
+        HaloOnBeat(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Halo on beat";
@@ -148,9 +148,9 @@ namespace Mid
             if (width != 481)
             {
                 // columns
-                for (int index = 0; index < std::min(width, (int)map.size()); index++)
+                for (int index = 0; index < std::min(width, (int)map->size()); index++)
                 {
-                    if (map[index].z < 0.44)
+                    if (map->z(index) < 0.44)
                         continue;
                     pixels[index] = col * fade[0].getValue();
                 }
@@ -232,10 +232,10 @@ namespace Mid
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        SnowflakePatternColumn(PixelMap3d::Cylindrical map)
+        SnowflakePatternColumn(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Snowflake";
@@ -246,12 +246,12 @@ namespace Mid
             if (!transition.Calculate(active))
                 return;
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                if (map[index].z < 0.44)
+                if (map->z(index) < 0.44)
                     continue;
 
-                pixels[index] = params->getPrimaryColour() * transition.getValue() * Utils::rescale(map[index].r, 0, 1, 1.02, 1.15);
+                pixels[index] = params->getPrimaryColour() * transition.getValue() * Utils::rescale(map->r(index), 0, 1, 1.02, 1.15);
             }
         }
     };
@@ -262,10 +262,10 @@ namespace Mid
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<SawDown> lfo;
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        TakkenChase(PixelMap3d::Cylindrical map)
+        TakkenChase(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Takken chase";
@@ -280,16 +280,16 @@ namespace Mid
             lfo.setPeriod(params->getVelocity(5000, 500));
             lfo.setDutyCycle(params->getSize(0.06, 0.5));
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 // skip the vertical beams. this pattern uses only the horizontal and angled ones
-                int angle = around(map[index].th) * 3600;
+                int angle = around(map->th(index)) * 3600;
                 if ((angle + 300) % 600 == 0)
                     continue;
 
-                float lfoVal = lfo.getValue(-amount * around(map[index].th));
+                float lfoVal = lfo.getValue(-amount * around(map->th(index)));
                 RGBA color = params->gradient->get(lfoVal * 255);
-                pixels[index] = color * lfoVal * fromMid(map[index]) * transition.getValue();
+                pixels[index] = color * lfoVal * fromMid(map->operator[](index)) * transition.getValue();
             }
         }
     };
@@ -299,11 +299,11 @@ namespace Mid
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         LFO<SoftSawDown> lfo1;
 
     public:
-        PetalChase(PixelMap3d::Cylindrical map)
+        PetalChase(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Petal chase";
@@ -319,12 +319,12 @@ namespace Mid
             lfo1.setDutyCycle(params->getSize(0.06, 0.5));
             lfo1.setSoftEdgeWidth(0.1);
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                if (map[index].r < 0.35)
+                if (map->r(index) < 0.35)
                     continue;
 
-                float lfoVal1 = lfo1.getValue(-amount1 * around(map[index].th));
+                float lfoVal1 = lfo1.getValue(-amount1 * around(map->th(index)));
                 RGBA color1 = params->gradient->get(lfoVal1 * 255);
 
                 pixels[index] = color1 * lfoVal1 * transition.getValue();
@@ -334,12 +334,12 @@ namespace Mid
 
     class DoubleFlash : public Pattern<RGBA>
     {
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         Timeline timeline = Timeline();
         BeatWatcher watcher;
 
     public:
-        DoubleFlash(PixelMap3d::Cylindrical map)
+        DoubleFlash(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Double flash";
@@ -364,7 +364,7 @@ namespace Mid
 
             for (int i = 0; i < width; i++)
             {
-                if (map[i].z < 0.44)
+                if (map->z(i) < 0.44)
                     continue;
                 pixels[i] = params->getHighlightColour();
             }
@@ -389,17 +389,17 @@ namespace Mid
         int pos = 0;
 
     public:
-        FireworksPattern(PixelMap3d map)
+        FireworksPattern(PixelMap3d *map)
         {
             for (int i = 0; i < 6; i++)
             {
                 float xc = cos(float(i) / 6 * 2 * M_PI);
                 float yc = 0.30;
                 float zc = sin(float(i) / 6 * 2 * M_PI);
-                std::transform(map.begin(), map.end(), std::back_inserter(radii[i]), [xc, yc, zc](PixelPosition3d pos) -> float
+                std::transform(map->begin(), map->end(), std::back_inserter(radii[i]), [xc, yc, zc](PixelPosition3d pos) -> float
                                { return sqrt(pow(pos.x - xc, 2) + pow(pos.y - yc, 2) + pow(pos.z - zc, 2)); });
             }
-            this->perm = Permute(map.size());
+            this->perm = Permute(map->size());
             this->name = "Fireworks";
         }
 

@@ -15,13 +15,13 @@ namespace Low
 
     class StaticGradientPattern : public Pattern<RGBA>
     {
-        PixelMap3d map;
+        PixelMap3d *map;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
 
     public:
-        StaticGradientPattern(PixelMap3d map)
+        StaticGradientPattern(PixelMap3d *map)
         {
             this->map = map;
             this->name = "Static gradient";
@@ -34,9 +34,9 @@ namespace Low
 
             float height = params->getSize(0.2,1);
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float h = fromBottom(map[index].y)* height;
+                float h = fromBottom(map->y(index))* height;
                 RGBA colour = params->gradient->get(h * 255);
                 pixels[index] = colour * h * transition.getValue();
             }
@@ -56,15 +56,15 @@ namespace Low
             FadeDown(200),
             FadeDown(200)};
         BeatWatcher watcher = BeatWatcher();
-        PixelMap3d map;
+        PixelMap3d *map;
         Permute perm;
         int pos = 0;
 
     public:
-        OnBeatColumnChaseUpPattern(PixelMap3d map)
+        OnBeatColumnChaseUpPattern(PixelMap3d *map)
         {
             this->map = map;
-            this->perm = Permute(map.size());
+            this->perm = Permute(map->size());
             this->name = "On beat column chase up";
         }
 
@@ -91,7 +91,7 @@ namespace Low
 
                 for (int i = columnStart; i < columnEnd; i++)
                 {
-                    float y = fromTop(map[i].y);
+                    float y = fromTop(map->y(i));
                     float fadePosition = fade[column].getValue(y * velocity);
                     RGBA color = params->getPrimaryColour(); 
                     pixels[i] = color * fadePosition * (1 - y) * transition.getValue();
@@ -106,10 +106,10 @@ namespace Low
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<Glow> lfo;
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        HorizontalSin(PixelMap3d::Cylindrical map)
+        HorizontalSin(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Horizontal sin";
@@ -123,12 +123,12 @@ namespace Low
             lfo.setPeriod(params->getVelocity(11000,500));
             lfo.setDutyCycle(params->getSize(0.03,0.5));
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 // RGBA color = params->getPrimaryColour(); 
-                RGBA color = params->gradient->get(fromTop(map[index].z)*255); 
-                pixels[index] = color * lfo.getValue(around(map[index].th)) * transition.getValue();
-                // pixels[index] = color * lfo.getValue(fromTop(map[index].z)) * transition.getValue();
+                RGBA color = params->gradient->get(fromTop(map->z(index))*255); 
+                pixels[index] = color * lfo.getValue(around(map->th(index))) * transition.getValue();
+                // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
         }
 
@@ -140,10 +140,10 @@ namespace Low
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<SawDown> lfo;
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        HorizontalSaw(PixelMap3d::Cylindrical map)
+        HorizontalSaw(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Horzontal saw";
@@ -158,11 +158,11 @@ namespace Low
             lfo.setDutyCycle(params->getSize(0.06,1));
             bool orientationHorizontal = params->getVariant() > 0.5;
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getPrimaryColour(); 
-                float lfoArg = orientationHorizontal ? around(map[index].th) : fromTop(map[index].z);
-                pixels[index] = color * lfo.getValue(lfoArg) * fromBottom(map[index].z) * transition.getValue();
+                float lfoArg = orientationHorizontal ? around(map->th(index)) : fromTop(map->z(index));
+                pixels[index] = color * lfo.getValue(lfoArg) * fromBottom(map->z(index)) * transition.getValue();
             }
         }
     };
@@ -173,10 +173,10 @@ namespace Low
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<SinFast> lfo;
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        GrowShrink(PixelMap3d::Cylindrical map)
+        GrowShrink(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Grow shrink";
@@ -192,13 +192,13 @@ namespace Low
             float size = params->getSize(0.1,0.5);
             float offset = params->getOffset(0,1);
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 //RGBA color = params->getPrimaryColour(); 
-                //float lfoArg = orientationHorizontal ? around(map[index].th) : fromTop(map[index].z);
+                //float lfoArg = orientationHorizontal ? around(map->th(index)) : fromTop(map->z(index));
                 
-                float lfoSize = lfo.getValue(offset * around(map[index].th)) * size; 
-                float distance = abs(map[index].z + 0.07);
+                float lfoSize = lfo.getValue(offset * around(map->th(index))) * size; 
+                float distance = abs(map->z(index) + 0.07);
                 if (distance > lfoSize)
                     continue;
 
@@ -214,10 +214,10 @@ namespace Low
         Permute perm;
         LFO<Glow> lfo = LFO<Glow>(10000);
         Transition transition;
-        PixelMap3d map;
+        PixelMap3d *map;
 
     public:
-        GlowPulsePattern(PixelMap3d map)
+        GlowPulsePattern(PixelMap3d *map)
         {
             this->map = map;
             this->name = "Glow pulse";
@@ -238,7 +238,7 @@ namespace Low
             {
                 if (index % density != 0)
                    continue;
-                float fade = Utils::constrain_f(fromBottom(map[perm.at[index]].y - fadeSize),0,1);
+                float fade = Utils::constrain_f(fromBottom(map->y(perm.at[index]) - fadeSize),0,1);
                 pixels[perm.at[index]] = params->getPrimaryColour() * fade * lfo.getValue(float(index)/width) * transition.getValue(index, width);
             }
         }
@@ -249,10 +249,10 @@ namespace Low
         Transition transition = Transition(
                 200, Transition::fromLeft, 200,
                 500, Transition::fromRight, 500);
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        VerticallyIsolated(PixelMap3d::Cylindrical map)
+        VerticallyIsolated(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Vertically isolated";
@@ -265,11 +265,11 @@ namespace Low
 
             for (int index = 0; index < width; index++)
             {
-                int angle = around(map[index].th) * 3600;
+                int angle = around(map->th(index)) * 3600;
                 if ((angle+300) % 600 > 0)
                     continue;
 
-                int z255 = fromBottom(map[index].z) * 255;
+                int z255 = fromBottom(map->z(index)) * 255;
                 pixels[index] = params->gradient->get(z255) * transition.getValue(z255, 255);
             }
         }
@@ -278,12 +278,12 @@ namespace Low
      class RotatingRingsPattern : public Pattern<RGBA>
     {
         Transition transition;
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         LFO<Sin> ring1;
         LFO<Sin> ring2;
 
     public:
-        RotatingRingsPattern(PixelMap3d::Cylindrical map)
+        RotatingRingsPattern(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Rotating rings";
@@ -303,8 +303,8 @@ namespace Low
 
             for (int index = 0; index < width; index++)
             {
-                float z_norm = zoffset+2*fromTop(map[index].z);
-                float offset = around(map[index].th) * params->getOffset();
+                float z_norm = zoffset+2*fromTop(map->z(index));
+                float offset = around(map->th(index)) * params->getOffset();
 
                 pixels[index] = col1 * softEdge(abs(z_norm - ring1.getValue(offset)), size);
                 pixels[index] += col2 * softEdge(abs(z_norm - ring2.getValue(offset)), size);

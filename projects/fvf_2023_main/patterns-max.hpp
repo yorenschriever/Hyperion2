@@ -15,7 +15,7 @@ namespace Max
 
     class ChevronsPattern : public Pattern<RGBA>
     {
-        PixelMap3d map;
+        PixelMap3d *map;
         LFO<SawDown> lfo;
         LFO<Square> lfoColour;
         Transition transition = Transition(
@@ -24,7 +24,7 @@ namespace Max
         FadeDown fade1 = FadeDown(1400);
 
     public:
-        ChevronsPattern(PixelMap3d map)
+        ChevronsPattern(PixelMap3d *map)
         {
             this->map = map;
             this->lfo = LFO<SawDown>(1000);
@@ -41,10 +41,10 @@ namespace Max
             lfo.setPeriod(params->getVelocity(2000, 500));
             lfoColour.setPeriod(params->getOffset(2000, 500));
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float dir = (map[index].z > 0 || map[index].y > 0.44) ? 1:-1;
-                float phase = (0.5 * abs(map[index].x) - map[index].z + map[index].y * dir) * amount;
+                float dir = (map->z(index) > 0 || map->y(index) > 0.44) ? 1:-1;
+                float phase = (0.5 * abs(map->x(index)) - map->z(index) + map->y(index) * dir) * amount;
                 auto col = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 pixels[index] += col * lfo.getValue(phase) * transition.getValue();
             }
@@ -53,7 +53,7 @@ namespace Max
 
     class ChevronsConePattern : public Pattern<RGBA>
     {
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         LFO<SawDown> lfo;
         LFO<Square> lfoColour;
         Transition transition = Transition(
@@ -61,7 +61,7 @@ namespace Max
             1000, Transition::none, 0);
 
     public:
-        ChevronsConePattern(PixelMap3d::Cylindrical map)
+        ChevronsConePattern(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Chevrons cone";
@@ -76,11 +76,11 @@ namespace Max
             lfo.setPeriod(params->getVelocity(2000, 500));
             lfoColour.setPeriod(params->getOffset(2000, 500));
 
-            for (int index = 0; index < std::min(width, (int)map.size()); index++)
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float conePos = 0.5 + (map[index].r - map[index].z) / 2;
+                float conePos = 0.5 + (map->r(index) - map->z(index)) / 2;
 
-                float phase = conePos * amount; //(0.5 * abs(map[index].y) + map[index].x) * amount;
+                float phase = conePos * amount; //(0.5 * abs(map->y(index)) + map->x(index)) * amount;
                 auto col = (lfoColour.getValue(phase) > 0) ? params->getSecondaryColour() : params->getPrimaryColour();
                 pixels[index] += col * lfo.getValue(phase) * transition.getValue();
             }
@@ -92,7 +92,7 @@ namespace Max
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         FadeDown fade1 = FadeDown(200);
         FadeDown fade2 = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
@@ -101,11 +101,11 @@ namespace Max
         int fadeNr =0;
 
     public:
-        RadialGlitterFadePattern(PixelMap3d::Cylindrical map)
+        RadialGlitterFadePattern(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
-            this->perm1 = Permute(map.size());
-            this->perm2 = Permute(map.size());
+            this->perm1 = Permute(map->size());
+            this->perm2 = Permute(map->size());
             this->name = "Radial glitter fade";
         }
 
@@ -139,36 +139,36 @@ namespace Max
             if (perm1.at ==0 || perm2.at==0)
                 return;
 
-            for (int i = 0; i < map.size(); i++)
+            for (int i = 0; i < map->size(); i++)
             {
                 // fade.duration = perm.at[i] * trail; // + 100;
-                // fade.duration = (perm.at[i] * trail) < map.size() / 20 ? ; // + 100;
+                // fade.duration = (perm.at[i] * trail) < map->size() / 20 ? ; // + 100;
 
                 // fade.duration = 100;
-                // if (perm.at[i] < density * map.size()/ 10)
+                // if (perm.at[i] < density * map->size()/ 10)
                 //     fade.duration *= 4;
 
                 float density = 481. / width;
-                fade1.duration = 100; // trail + perm.at[i] / (density * map.size()/ 10);
+                fade1.duration = 100; // trail + perm.at[i] / (density * map->size()/ 10);
                 fade2.duration = 100; 
-                if (perm1.at[i] < density * map.size() / 10)
-                    fade1.duration *= perm1.at[i] * 4 / (density * map.size() / 10);
-                if (perm2.at[i] < density * map.size() / 10)
-                    fade2.duration *= perm2.at[i] * 4 / (density * map.size() / 10);
+                if (perm1.at[i] < density * map->size() / 10)
+                    fade1.duration *= perm1.at[i] * 4 / (density * map->size() / 10);
+                if (perm2.at[i] < density * map->size() / 10)
+                    fade2.duration *= perm2.at[i] * 4 / (density * map->size() / 10);
 
                 float conePos = fromCenter ? 
                     // vanaf midden
-                    (0.5 + (map[i].r - map[i].z) / 2) :
+                    (0.5 + (map->r(i) - map->z(i)) / 2) :
                     // vanaf de knik beide kanten op
-                    (1-(map[i].r + map[i].z)/2);
+                    (1-(map->r(i) + map->z(i))/2);
 
                 float fadePosition1 = fade1.getValue(conePos * velocity);
                 RGBA color1 = params->gradient->get(fadePosition1 * 255);
-                pixels[i] = color1 * fadePosition1 * (1.5 - map[i].r) * transition.getValue();
+                pixels[i] = color1 * fadePosition1 * (1.5 - map->r(i)) * transition.getValue();
 
                 float fadePosition2 = fade2.getValue(conePos * velocity);
                 RGBA color2 = params->gradient->get(fadePosition2 * 255);
-                pixels[i] += color2 * fadePosition2 * (1.5 - map[i].r) * transition.getValue();
+                pixels[i] += color2 * fadePosition2 * (1.5 - map->r(i)) * transition.getValue();
             }
         }
     };
@@ -178,7 +178,7 @@ namespace Max
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         static const int numFades = 4;
         int fadeNr=0;
         FadeDown fade[numFades] = {
@@ -190,7 +190,7 @@ namespace Max
         BeatWatcher watcher = BeatWatcher();
 
     public:
-        AngularFadePattern(PixelMap3d::Cylindrical map)
+        AngularFadePattern(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Angular fade";
@@ -220,15 +220,15 @@ namespace Max
                 fade[f].duration = trail;
             }
 
-            for (int i = 0; i < map.size(); i++)
+            for (int i = 0; i < map->size(); i++)
             {
-                //fade.duration = 80; // trail + perm.at[i] / (density * map.size()/ 10);
-                // if (perm.at[i] < density * map.size()/ 10)
-                //     fade.duration *= perm.at[i] * 4 / (density * map.size()/ 10);
+                //fade.duration = 80; // trail + perm.at[i] / (density * map->size()/ 10);
+                // if (perm.at[i] < density * map->size()/ 10)
+                //     fade.duration *= perm.at[i] * 4 / (density * map->size()/ 10);
                 for(int f=0;f<numFades; f++){
-                    float fadePosition = fade[f].getValue(abs(map[i].th) * velocity);
-                    RGBA color = params->gradient->get(255 - abs(map[i].th) / M_PI * 255);
-                    pixels[i] += color * fadePosition * (map[i].r * 1.5) * transition.getValue();
+                    float fadePosition = fade[f].getValue(abs(map->th(i)) * velocity);
+                    RGBA color = params->gradient->get(255 - abs(map->th(i)) / M_PI * 255);
+                    pixels[i] += color * fadePosition * (map->r(i) * 1.5) * transition.getValue();
                 }
             }
         }
@@ -236,11 +236,11 @@ namespace Max
 
     class GrowingStrobePattern : public Pattern<RGBA>
     {
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         FadeDown fade = FadeDown(5000);
 
     public:
-        GrowingStrobePattern(PixelMap3d::Cylindrical map)
+        GrowingStrobePattern(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Growing strobe";
@@ -257,9 +257,9 @@ namespace Max
             RGBA col = Utils::millis() % 100 < 25 ? params->getPrimaryColour() : RGBA();
             int directionUp = params->getVariant() > 0.5;
 
-            for (int i = 0; i < map.size(); i++)
+            for (int i = 0; i < map->size(); i++)
             {
-                float conePos = 0.20 + (map[i].r - map[i].z) / 2;
+                float conePos = 0.20 + (map->r(i) - map->z(i)) / 2;
                 if (directionUp && conePos < fade.getValue())
                     continue;
                 if (!directionUp && 1. - conePos < fade.getValue())
@@ -275,12 +275,12 @@ namespace Max
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d::Cylindrical map;
+        PixelMap3d::Cylindrical *map;
         FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
 
     public:
-        RadialFadePattern(PixelMap3d::Cylindrical map)
+        RadialFadePattern(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Radial fade";
@@ -299,9 +299,9 @@ namespace Max
                 fade.reset();
             }
 
-            for (int i = 0; i < map.size(); i++)
+            for (int i = 0; i < map->size(); i++)
             {
-                float conePos = 0.20 + (map[i].r - map[i].z) / 2;
+                float conePos = 0.20 + (map->r(i) - map->z(i)) / 2;
                 pixels[i] += params->getPrimaryColour() * fade.getValue(conePos* velocity) * transition.getValue();
             }
         }

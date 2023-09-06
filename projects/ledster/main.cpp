@@ -36,7 +36,7 @@ int main()
 #define OUTPUT new NeopixelOutput(1)
 #else
 #define OUT_COLOR RGB
-#define OUTPUT new MonitorOutput(&hyp->webServer,ledsterMap)
+#define OUTPUT new MonitorOutput(&hyp->webServer,&ledsterMap)
 #endif
 
 void addLedsterPipe(Hyperion *hyp)
@@ -60,7 +60,7 @@ void addLedsterPipe(Hyperion *hyp)
 
           // new Ledster::RadarPattern(ledsterMap)
           // new Ledster::ChevronsPattern(ledsterMap)
-          new Ledster::RadialRainbowPattern(ledsterMap)
+          new Ledster::RadialRainbowPattern(&ledsterMap)
 
           // //mapped
           // new Ledster::RadialFadePattern(ledsterMap)
