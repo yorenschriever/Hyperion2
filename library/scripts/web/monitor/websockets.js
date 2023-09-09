@@ -1,9 +1,11 @@
-import { createSocket } from '../common/useSocket.js'
+import { Socket } from '../common/socket.js'
 
-export class Websocket {
+export class Websockets {
     buffers;
     gl;
     buffer;
+
+    buildId=null;
 
     constructor(gl, buffers, scene) {
         this.buffers = buffers;
@@ -20,11 +22,23 @@ export class Websocket {
             const bufferOffset = ledOffset
             ledOffset += ledsInScenePart
 
-            createSocket(scenePart.path, async data => {
-                const ab = await data.arrayBuffer()
-                const view = new Uint8Array(ab)
+            new Socket(scenePart.path, data => {
+                if (!(data instanceof ArrayBuffer)){
+                    const json = JSON.parse(data)
+                    if (json.type=='buildId')
+                    {
+                        const newBuildId = json.value
+                        console.log('buildid', newBuildId, 'currentid',  this.buildId)
+                        if (!this.buildId) this.buildId = newBuildId;
+                        else if (this.buildId != newBuildId) {
+                            window.onBuildIdChange?.();
+                            window.location.reload();
+                        }
+                    }
+                }
+                const view = new Uint8Array(data)
 
-                const ledsReceived = ab.byteLength / 3;
+                const ledsReceived = data.byteLength / 3;
                 
                 //TODO magic const, better calculate
                 const indicesPerLed = 15;

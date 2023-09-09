@@ -1,10 +1,12 @@
 import { html, useRef, useEffect } from '../common/preact-standalone.js'
-import { Socket } from '../common/useSocket.js'
+import { Socket } from '../common/socket.js'
 
 export const Monitor2dApp = (props) => {
     const canvas = useRef(null);
     const sceneRef = useRef(null);
     const r = 0.01;
+
+    const buildId = useRef();
 
     useEffect(() => {
 
@@ -55,9 +57,36 @@ export const Monitor2dApp = (props) => {
         window.onresize()
         
         let createdSockets;
-        fetch("./mapping.json").then(i=>i.json()).then(scene => {
+
+        const getScene = () => {
+            if (window.scene)
+                return Promise.resolve(window.scene)
+            return fetch("./mapping.json").then(i=>i.json())
+        }
+
+        const handleData = (data, scenePart) => {
+            if (data instanceof ArrayBuffer){
+                scenePart.colors = new Uint8Array(data)
+                return;
+            }
+            
+            //if a new build id comes in, the mapping could have changed, reload everything
+            const json = JSON.parse(data)
+            if (json.type=='buildId')
+            {
+                const newBuildId = json.value
+                console.log('buildid', newBuildId, 'currentid',  buildId.current)
+                if (!buildId.current) buildId.current = newBuildId;
+                else if (buildId.current != newBuildId) {
+                    window.onBuildIdChange?.();
+                    window.location.reload();
+                }
+            }
+        }
+
+        getScene().then(scene => {
             sceneRef.current = scene;
-            createdSockets = sceneRef.current.map(scenePart => new Socket(scenePart.path, async data => scenePart.colors = new Uint8Array(await data.arrayBuffer())))
+            createdSockets = sceneRef.current.map(scenePart => new Socket(scenePart.path, data => handleData(data, scenePart)))
         });
 
         return () => createdSockets.forEach(socket => socket.close());

@@ -1,5 +1,5 @@
 import { html, useState, createContext, useContext, useCallback , useEffect} from '../common/preact-standalone.js'
-import { useSocket } from '../common/useSocket.js'
+import { useSocket } from '../common/socket.js'
 
 const set = (obj, path, value) => {
     if (!path || path == "") return value;
@@ -34,6 +34,7 @@ const defaultSlot = {
 }
 
 const initialState = {
+    buildId: null,
     columns: [],
     masterDim: 255,
     params: { }
@@ -76,6 +77,23 @@ export const ControllerApp = () => {
             setState(state => set(state, `params.${msg.param}`, msg.value))
         } else if (msg.type == "onHubColumnNameChange") {
             setState(state => set(state, `columns.${msg.columnIndex}.name`, msg.name))
+        } else if (msg.type == "buildId") {
+            setState(state => {
+                if (!state.buildId)
+                    //no build id was present yet, store it
+                    return {...state,buildId: msg.value}
+                
+                if (msg.value == state.buildId)
+                    //build is unchanged, continue with the state we had
+                    return state;
+                
+                //build id is changed. try to call onBuildIdChange(). This function is present if we are in an iframe
+                //and it will reload the entire iframe container. This will trigger a re-evaluation whether
+                //we should show a 2d or 3d monitor.
+                //if we are not in an iframe, it is enough to reset out internal state. that is wat the next line does
+                window.onBuildIdChange?.();
+                return {...initialState, buildId: msg.value}
+            })
         }
     }, setSocketState)
 

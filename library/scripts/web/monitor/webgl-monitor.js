@@ -1,11 +1,17 @@
 import { initBuffers } from "./init-buffers.js";
 import { drawScene } from "./draw-scene.js";
-import { Websocket } from "./websocket.js";
+import { Websockets } from "./websockets.js";
 
 let cubeRotation = 0.0;
 let deltaTime = 0;
 
-fetch("./mapping.json").then(i=>i.json()).then(main);
+const getScene = () => {
+  if (window.scene)
+      return Promise.resolve(window.scene)
+  return fetch("./mapping.json").then(i=>i.json())
+}
+
+getScene().then(main);
 
 //
 // start here
@@ -95,7 +101,7 @@ function main(scene) {
   // objects we'll be drawing.
   const buffers = initBuffers(gl, scene);
 
-  const websocket = new Websocket(gl, buffers, scene);
+  new Websockets(gl, buffers, scene);
 
   let then = 0;
 

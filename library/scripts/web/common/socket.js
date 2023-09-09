@@ -32,6 +32,7 @@ export class Socket {
 
         const wsProtocol = window.location.protocol === "https:" ? "wss:":"ws:";
         this.socket = new WebSocket(`${wsProtocol}//${location.host}${this.path}`)
+        this.socket.binaryType = "arraybuffer";
 
         this.socket.onmessage = wsmsg => this.onMessage(wsmsg.data);
 
@@ -81,10 +82,6 @@ export class Socket {
         this.socket?.send(msg)
     }
 
-}
-
-export const createSocket = (path, onMessage) => {
-    new Socket(path, onMessage)
 }
 
 export const useSocket = (path, onMessage, setSocketState) => 

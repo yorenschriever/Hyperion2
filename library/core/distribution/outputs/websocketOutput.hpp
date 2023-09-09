@@ -8,6 +8,7 @@
 #include "platform/includes/webServer.hpp"
 #include "platform/includes/websocketServer.hpp"
 #include <algorithm>
+#include "build.hpp"
 
 // WebsocketOutput sends data to websocket clients.
 class WebsocketOutput : public Output
@@ -57,6 +58,7 @@ public:
                 Utils::exit();
             }
             server = WebsocketServer::createInstance(*webserver, path);
+            server->onConnect(connectionHandler, (void *)this);
         }
     }
 
@@ -98,4 +100,20 @@ protected:
     std::unique_ptr<WebsocketServer> server;
 
     const char *TAG = "WEBSOCKET_OUTPUT";
+
+    // This method sends a string to the client that identifies the code that is running here.
+    // This information is used when a websocket reconnects: if the build id is the same, 
+    // we are likely dealing with a restored connection, but if the build id is different
+    // we are likely dealing with a new iteration of a dev build. This resets and rebuilds the
+    // internal state of the client so everything is guaranteed to be in sync with the new version.
+    static void connectionHandler(RemoteWebsocketClient *client, WebsocketServer *server, void *userData)
+    {
+        server->sendAll(
+            "{\
+        \"type\":\"buildId\",\
+        \"value\":\"%s\"\
+    }",
+        Build::getBuildId()
+    );
+    }
 };

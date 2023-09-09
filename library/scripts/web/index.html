@@ -21,15 +21,23 @@
 
             render(html`<${ControllerApp}/>`, document.getElementById('controller'));
 
-            const createIframe = (url) => {
+            const onBuildIdChange = () =>
+            {
+                window.location.reload();
+            }
+            window.onBuildIdChange=onBuildIdChange
+
+            const createIframe = (url, scene) => {
                 const iframe = document.createElement("iframe");
                 iframe.src = url
                 iframe.className = "monitor"
                 document.body.appendChild(iframe)
+                iframe.contentWindow.scene = scene
+                iframe.contentWindow.onBuildIdChange = onBuildIdChange
             }
 
-            fetch("./monitor2d/mapping.json").then(i=>i.json()).then(scene2d => {if (scene2d.length) createIframe("./monitor2d/"); });
-            fetch("./monitor/mapping.json"  ).then(i=>i.json()).then(scene3d => {if (scene3d.length) createIframe("./monitor/"); });
+            fetch("./monitor2d/mapping.json").then(i=>i.json()).then(scene2d => {if (scene2d.length) createIframe("./monitor2d/", scene2d); });
+            fetch("./monitor/mapping.json"  ).then(i=>i.json()).then(scene3d => {if (scene3d.length) createIframe("./monitor/", scene3d); });
 
         </script>
     </head>

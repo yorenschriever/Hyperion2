@@ -7,7 +7,7 @@
 #include "platform/includes/utils.hpp"
 #include "platform/includes/websocketServer.hpp"
 #include "platform/includes/webServer.hpp"
-
+#include "build.hpp"
 class WebsocketController : public IHubController
 {
 public:
@@ -23,6 +23,7 @@ public:
     static void connectionHandler(RemoteWebsocketClient *client, WebsocketServer *server, void *userData)
     {
         auto *instance = (WebsocketController *)userData;
+        instance->sendBuildId();
         instance->hub->sendCurrentStatus(instance);
     }
 
@@ -161,5 +162,20 @@ private:
     }",
             param,
             (int)(value * 255));
+    }
+
+    // This method sends a string to the client that identifies the code that is running here.
+    // This information is used when a websocket reconnects: if the build id is the same, 
+    // we are likely dealing with a restored connection, but if the build id is different
+    // we are likely dealing with a new iteration of a dev build. This resets and rebuilds the
+    // internal state of the client so everything is guaranteed to be in sync with the new version.
+    void sendBuildId()
+    {
+        socket->sendAll(
+            "{\
+        \"type\":\"buildId\",\
+        \"value\":\"%s\"\
+    }",
+        Build::getBuildId());
     }
 };

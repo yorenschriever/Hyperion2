@@ -16,6 +16,10 @@ macro(hyperion_before)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
     set(CMAKE_CXX_FLAGS "-O2")
 
+    string(TIMESTAMP t0)
+    add_compile_definitions(PROJECT_NAME="${CMAKE_PROJECT_NAME}")
+    add_compile_definitions(BUILD_TIME="${t0}")
+
     if (NOT ("${TARGET}" STREQUAL "macos" OR "${TARGET}" STREQUAL "linux" OR "${TARGET}" STREQUAL "rpi"))
         config_esp()
     endif()
