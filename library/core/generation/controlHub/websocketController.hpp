@@ -7,7 +7,8 @@
 #include "platform/includes/utils.hpp"
 #include "platform/includes/websocketServer.hpp"
 #include "platform/includes/webServer.hpp"
-#include "build.hpp"
+#include "utils.hpp"
+
 class WebsocketController : public IHubController
 {
 public:
@@ -23,7 +24,7 @@ public:
     static void connectionHandler(RemoteWebsocketClient *client, WebsocketServer *server, void *userData)
     {
         auto *instance = (WebsocketController *)userData;
-        instance->sendBuildId();
+        instance->sendRuntimeSessionId();
         instance->hub->sendCurrentStatus(instance);
     }
 
@@ -165,17 +166,17 @@ private:
     }
 
     // This method sends a string to the client that identifies the code that is running here.
-    // This information is used when a websocket reconnects: if the build id is the same, 
-    // we are likely dealing with a restored connection, but if the build id is different
-    // we are likely dealing with a new iteration of a dev build. This resets and rebuilds the
+    // This information is used when a websocket reconnects: if the id is the same,
+    // we are likely dealing with a restored connection, but if the id is different
+    // we could be dealing with a new iteration of a dev build. This resets and rebuilds the
     // internal state of the client so everything is guaranteed to be in sync with the new version.
-    void sendBuildId()
+    void sendRuntimeSessionId()
     {
         socket->sendAll(
             "{\
-        \"type\":\"buildId\",\
-        \"value\":\"%s\"\
+        \"type\":\"runtimeSessionId\",\
+        \"value\":\"%d\"\
     }",
-        Build::getBuildId());
+            Utils::getRuntimeSessionId());
     }
 };

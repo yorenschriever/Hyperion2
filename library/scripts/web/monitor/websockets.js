@@ -5,7 +5,7 @@ export class Websockets {
     gl;
     buffer;
 
-    buildId=null;
+    runtimeSessionId=null;
 
     constructor(gl, buffers, scene) {
         this.buffers = buffers;
@@ -25,12 +25,11 @@ export class Websockets {
             new Socket(scenePart.path, data => {
                 if (!(data instanceof ArrayBuffer)){
                     const json = JSON.parse(data)
-                    if (json.type=='buildId')
+                    if (json.type=='runtimeSessionId')
                     {
                         const newBuildId = json.value
-                        console.log('buildid', newBuildId, 'currentid',  this.buildId)
-                        if (!this.buildId) this.buildId = newBuildId;
-                        else if (this.buildId != newBuildId) {
+                        if (!this.runtimeSessionId) this.runtimeSessionId = newBuildId;
+                        else if (this.runtimeSessionId != newBuildId) {
                             window.onBuildIdChange?.();
                             window.location.reload();
                         }

@@ -51,8 +51,6 @@ public:
     virtual void start(Config config = normal)
     {
         Log::info(TAG, "Start");
-        Log::info(TAG, "Project name: %s", Build::getProjectName());
-        Log::info(TAG, "Project build time: %s", Build::getBuildTime());
 
         check_safe_mode();
 

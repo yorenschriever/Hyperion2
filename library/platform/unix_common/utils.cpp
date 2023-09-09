@@ -43,3 +43,5 @@ void *Utils::realloc_dma(void* ptr, int size)
 {
     return realloc(ptr, size);
 }
+
+int Utils::runtimeSessionId = 0;

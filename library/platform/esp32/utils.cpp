@@ -45,3 +45,5 @@ void *Utils::realloc_dma(void* ptr, int size)
 {
     return heap_caps_realloc(ptr, size, MALLOC_CAP_DMA| MALLOC_CAP_32BIT);
 }
+
+int Utils::runtimeSessionId = 0;

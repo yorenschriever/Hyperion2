@@ -6,7 +6,7 @@ export const Monitor2dApp = (props) => {
     const sceneRef = useRef(null);
     const r = 0.01;
 
-    const buildId = useRef();
+    const runtimeSessionId = useRef();
 
     useEffect(() => {
 
@@ -72,12 +72,11 @@ export const Monitor2dApp = (props) => {
             
             //if a new build id comes in, the mapping could have changed, reload everything
             const json = JSON.parse(data)
-            if (json.type=='buildId')
+            if (json.type=='runtimeSessionId')
             {
                 const newBuildId = json.value
-                console.log('buildid', newBuildId, 'currentid',  buildId.current)
-                if (!buildId.current) buildId.current = newBuildId;
-                else if (buildId.current != newBuildId) {
+                if (!runtimeSessionId.current) runtimeSessionId.current = newBuildId;
+                else if (runtimeSessionId.current != newBuildId) {
                     window.onBuildIdChange?.();
                     window.location.reload();
                 }

@@ -34,7 +34,7 @@ const defaultSlot = {
 }
 
 const initialState = {
-    buildId: null,
+    runtimeSessionId: null,
     columns: [],
     masterDim: 255,
     params: { }
@@ -77,13 +77,13 @@ export const ControllerApp = () => {
             setState(state => set(state, `params.${msg.param}`, msg.value))
         } else if (msg.type == "onHubColumnNameChange") {
             setState(state => set(state, `columns.${msg.columnIndex}.name`, msg.name))
-        } else if (msg.type == "buildId") {
+        } else if (msg.type == "runtimeSessionId") {
             setState(state => {
-                if (!state.buildId)
+                if (!state.runtimeSessionId)
                     //no build id was present yet, store it
-                    return {...state,buildId: msg.value}
+                    return {...state,runtimeSessionId: msg.value}
                 
-                if (msg.value == state.buildId)
+                if (msg.value == state.runtimeSessionId)
                     //build is unchanged, continue with the state we had
                     return state;
                 
@@ -92,7 +92,7 @@ export const ControllerApp = () => {
                 //we should show a 2d or 3d monitor.
                 //if we are not in an iframe, it is enough to reset out internal state. that is wat the next line does
                 window.onBuildIdChange?.();
-                return {...initialState, buildId: msg.value}
+                return {...initialState, runtimeSessionId: msg.value}
             })
         }
     }, setSocketState)
