@@ -10,6 +10,261 @@
 
 namespace Patterns
 {
+    const float l = 60 * 0.005;
+    const float r1 = 0.35;
+    const float r2 = r1 + 0.5 * l * sqrt(3);
+    const float r3 = r1 + l;
+    const float r4 = r3 + 0.5 * l * sqrt(3);
+
+    class GlitchPattern : public Pattern<RGBA>
+    {
+        Permute perm = Permute(0);
+        int segmentSize;
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+
+    public:
+        GlitchPattern(int segmentSize=60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Glitch";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int numSegments = width / segmentSize;
+            perm.setSize(numSegments);
+
+            perm.permute();
+
+            RGBA col = params->getPrimaryColour() * transition.getValue();
+            for (int segment = 0; segment < numSegments * 0.1; segment++)
+            {
+                for (int j = 0; j < segmentSize; j++)
+                    pixels[perm.at[segment] * segmentSize + j] = col;
+            }
+        }
+    };
+
+    template <class T>
+    class RibbenClivePattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        int segmentSize;
+        int averagePeriod;
+        float precision;
+        LFO<T> lfo = LFO<T>();
+        Permute perm;
+
+    public:
+        RibbenClivePattern(int segmentSize = 60, int averagePeriod = 10000, float precision = 1, float pulsewidth = 0.025)
+        {
+            this->averagePeriod = averagePeriod;
+            this->precision = precision;
+            this->segmentSize = segmentSize;
+            this->lfo.setDutyCycle(pulsewidth);
+            this->name = "Ribben clive";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int numSegments = width / segmentSize;
+            perm.setSize(numSegments);
+            lfo.setDutyCycle(params->getAmount(0.1, 0.5));
+
+            for (int segment = 0; segment < numSegments; segment++)
+            {
+                int interval = averagePeriod + perm.at[segment] * (averagePeriod * precision) / numSegments;
+                RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval) * transition.getValue();
+                for (int j = 0; j < segmentSize; j++)
+                    pixels[segment * segmentSize + j] = col;
+            }
+        }
+    };
+
+    class RibbenFlashPattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        int segmentSize;
+        Permute perm;
+        BeatWatcher watcher = BeatWatcher();
+        FadeDown fade = FadeDown(2400);
+
+    public:
+        RibbenFlashPattern(int segmentSize = 60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Ribben flash";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int numSegments = width / segmentSize;
+            perm.setSize(numSegments);
+
+            if (watcher.Triggered())
+            {
+                perm.permute();
+                fade.reset();
+            }
+
+            fade.duration = params->getVelocity(2500, 100);
+            int numVisible = params->getAmount(1, numSegments / 3);
+
+            for (int ribbe = 0; ribbe < numVisible; ribbe++)
+            {
+                RGBA col = params->getPrimaryColour() * fade.getValue() * transition.getValue();
+                for (int j = 0; j < segmentSize; j++)
+                    pixels[perm.at[ribbe] * segmentSize + j] += col;
+            }
+        }
+    };
+
+    class SegmentChasePattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        Permute perm;
+        int segmentSize;
+        LFO<SawDown> lfo = LFO<SawDown>(5000);
+
+    public:
+        SegmentChasePattern(int segmentSize = 60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Segment chase";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int numSegments = width / segmentSize;
+            perm.setSize(numSegments);
+            float pulseWidth = params->getSize(0.25, 1);
+            float factor = params->getAmount(50, 1);
+            lfo.setPeriod(params->getVelocity(2000, 200) * factor);
+            lfo.setDutyCycle(pulseWidth / factor);
+            float lfoWidth = segmentSize * factor;
+
+            for (int segment = 0; segment < numSegments; segment++)
+            {
+                int randomSegment = perm.at[segment];
+
+                for (int j = 0; j < segmentSize; j++)
+                {
+                    float lfoVal = lfo.getValue(float(j) / lfoWidth + float(randomSegment) / numSegments + float(segment));
+                    RGBA col = params->gradient->get(lfoVal * 255) * lfoVal * transition.getValue();
+                    pixels[segment * segmentSize + j] = col;
+                }
+            }
+        }
+    };
+
+    class PixelGlitchPattern : public Pattern<RGBA>
+    {
+        Timeline timeline = Timeline(50);
+        Permute perm = Permute(0);
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+
+    public:
+        PixelGlitchPattern()
+        {
+            this->name = "Pixel glitch";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            timeline.FrameStart();
+            perm.setSize(width);
+
+            if (timeline.Happened(0))
+                perm.permute();
+
+            for (int index = 0; index < width / 30; index++)
+                pixels[perm.at[index]] = params->getSecondaryColour() * transition.getValue();
+        }
+    };
+
+    class HaloOrSwirl : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        LFO<Sin> lfoX = LFO<Sin>(2000);
+        LFO<Sin> lfoY = LFO<Sin>(2000);
+        int modulus;
+
+    public:
+        HaloOrSwirl(int modulus=2)
+        {
+            this->modulus = modulus;
+            this->name = modulus==2 ? "Halo": "Swirl";
+        }
+
+        void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            for (int index = 0; index < width; index++)
+            {
+                if ((index / 60) % 3 != modulus)
+                    continue;
+
+                pixels[index] = params->getPrimaryColour() * transition.getValue();
+            }
+        }
+    };
+
+    class Skirt : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        PixelMap::Polar *map;
+
+    public:
+        Skirt(PixelMap::Polar *map)
+        {
+            this->map = map;
+            this->name = "Skirt";
+        }
+
+        void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
+            {
+                float alpha = 0;
+                float r = map->r(index);
+                if (r < r2)
+                    alpha = Utils::rescale_c(r, 0, 1, r1, r2);
+                if (r > r3)
+                    alpha = Utils::rescale_c(r, 0, 1, r3, r4);
+
+                pixels[index] = params->getPrimaryColour() * alpha * transition.getValue();
+            }
+        }
+    };
+
     class XY : public Pattern<RGBA>
     {
         Transition transition = Transition(
@@ -45,7 +300,7 @@ namespace Patterns
                     softEdge(abs(x_norm - lfoX.getValue()), size),
                     softEdge(abs(y_norm - lfoY.getValue()), size));
 
-                pixels[index] =  col * dim;
+                pixels[index] = col * dim;
             }
         }
     };
@@ -130,7 +385,7 @@ namespace Patterns
 
             for (int i = 0; i < width; i++)
             {
-                pixels[i] = RGBA(); //params->getSecondaryColour();
+                pixels[i] = RGBA(); // params->getSecondaryColour();
                 for (int column = 0; column < 6; column++)
                 {
                     float fadePosition = fade[column].getValue(radii[column][i] * velocity);
@@ -169,7 +424,7 @@ namespace Patterns
 
             for (int index = 0; index < width; index++)
             {
-                pixels[perm.at[index]] = RGBA(); //params->getPrimaryColour();
+                pixels[perm.at[index]] = RGBA(); // params->getPrimaryColour();
                 if (index % density2 != 0)
                     continue;
                 pixels[perm.at[index]] += params->getSecondaryColour() * lfo.getValue(float(index) / width) * transition.getValue(index, width);
@@ -218,7 +473,7 @@ namespace Patterns
                     pos -= 1;
                 }
                 float fadePosition = softEdge(pos, size, 0.06);
-                RGBA color = params->gradient->get(255 - 255 * map->th(i));
+                RGBA color = params->gradient->get(255 - 255 * map->r(i));
 
                 pixels[i] = color * fadePosition * transition.getValue();
             }
@@ -439,18 +694,18 @@ namespace Patterns
 
                 float conePos = fromCenter ?
                                            // vanaf midden
-                                    (0.5 + (map->th(i)) / 2)
+                                    (0.5 + (map->r(i)) / 2)
                                            :
                                            // vanaf de knik beide kanten op
-                                    (1 - (map->th(i)) / 2);
+                                    (1 - (map->r(i)) / 2);
 
                 float fadePosition1 = fade1.getValue(conePos * velocity);
                 RGBA color1 = params->gradient->get(fadePosition1 * 255);
-                pixels[i] = color1 * fadePosition1 * (1.5 - map->th(i)) * transition.getValue();
+                pixels[i] = color1 * fadePosition1 * (1.5 - map->r(i)) * transition.getValue();
 
                 float fadePosition2 = fade2.getValue(conePos * velocity);
                 RGBA color2 = params->gradient->get(fadePosition2 * 255);
-                pixels[i] += color2 * fadePosition2 * (1.5 - map->th(i)) * transition.getValue();
+                pixels[i] += color2 * fadePosition2 * (1.5 - map->r(i)) * transition.getValue();
             }
         }
     };
@@ -508,7 +763,7 @@ namespace Patterns
                 // fade.duration = 80; // trail + perm.at[i] / (density * map.size()/ 10);
                 //  if (perm.at[i] < density * map.size()/ 10)
                 //      fade.duration *= perm.at[i] * 4 / (density * map.size()/ 10);
-                //pixels[i] = params->getSecondaryColour() * 0.25;
+                // pixels[i] = params->getSecondaryColour() * 0.25;
                 for (int f = 0; f < numFades; f++)
                 {
                     float fadePosition = fade[f].getValue(abs(map->th(i)) * velocity);
@@ -550,8 +805,8 @@ namespace Patterns
 
             for (int i = 0; i < map->size(); i++)
             {
-                //pixels[i] = params->getSecondaryColour();
-                float conePos = 0.20 + (map->th(i)) / 2;
+                // pixels[i] = params->getSecondaryColour();
+                float conePos = 0.20 + (map->r(i)) / 2;
                 pixels[i] += params->getPrimaryColour() * fade.getValue(conePos * velocity) * transition.getValue();
             }
         }

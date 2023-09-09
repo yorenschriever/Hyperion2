@@ -30,6 +30,23 @@ public:
     // so you can create scenes with for multiple outputs under 1 button
     ControlHubInput(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns)
     {
+        ControlHubInput_(length, hub, slotPatterns);
+    }
+
+    //simplified version of the constructor, where all patterns are added to a single column in the control hub
+    ControlHubInput(int length, ControlHub *hub, int column, std::vector<Pattern<T_COLOUR> *>patterns)
+    {
+        std::vector<SlotPattern> slotPatterns;
+        int slotIndex=0;
+        for (auto pattern: patterns){
+            slotPatterns.push_back({.column = column, .slot = slotIndex++, .pattern = pattern});
+        }
+        ControlHubInput_(length, hub, slotPatterns);
+    }
+
+private:
+    void ControlHubInput_(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns)
+    {
         this->length = length;
         this->slotPatterns = slotPatterns;
         this->hub = hub;
@@ -52,18 +69,7 @@ public:
         setNames();
     }
 
-    //simplified version of the constructor, where all patterns are added to a single column in the control hub
-    ControlHubInput(int length, ControlHub *hub, int column, std::vector<Pattern<T_COLOUR> *>patterns)
-    {
-        std::vector<SlotPattern> slotPatterns;
-        int slotIndex=0;
-        for (auto pattern: patterns){
-            slotPatterns.push_back({.column = column, .slot = slotIndex++, .pattern = pattern});
-        }
-        ControlHubInput(length, hub, slotPatterns);
-
-        setNames();
-    }
+public:
 
     void begin() override
     {

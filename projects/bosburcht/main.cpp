@@ -3,7 +3,7 @@
 #include "core/distribution/outputs/neopixelOutput.hpp"
 #include "core/distribution/outputs/spiOutput.hpp"
 #include "core/hyperion.hpp"
-#include "distribution/inputs/patternCycleInput.hpp"
+#include "distribution/outputs/cloneOutput.hpp"
 #include "mapping/sunMap.hpp"
 #include "mapping/sunMap3d.hpp"
 #include "palettes.hpp"
@@ -12,34 +12,55 @@
 
 auto pSunMap = sunMap.toPolarRotate90();
 
-std::vector<PaletteColumn::Palette> palettes = std::vector<PaletteColumn::Palette>(
-    {tunnel,
-     heatmap2,
-     pinkSunset,
-     retro,
-     blueOrange,
-     sunset8,
-     sunset2,
-     campfire,
-     sunset6,
-     plumBath,
-     greatBarrierReef,
-     redSalvation,
-
-     sunset1,
-     sunset3,
-     sunset4,
-     purpleGreen});
+void addPaletteColumn(Hyperion *hyp);
+void addSunPipe(Hyperion *hyp);
 
 int main()
 {
     auto hyp = new Hyperion();
 
+    addPaletteColumn(hyp);
+    addSunPipe(hyp);
     Tempo::AddSource(new ConstantTempo(120));
 
-    auto input = new PatternCycleInput<RGBA>(
+    // select first palette
+    hyp->hub.buttonPressed(0, 0);
+    hyp->hub.setFlashColumn(0, false, true);
+    hyp->hub.setForcedSelection(0);
+
+    hyp->hub.buttonPressed(1, 0);
+    hyp->hub.setFlashColumn(1, false, true);
+
+    hyp->hub.setColumnName(0, "Palette");
+    hyp->hub.setColumnName(1, "Sun");
+
+    hyp->start();
+
+
+    while (1) Thread::sleep(60 * 1000);
+}
+
+void addSunPipe(Hyperion *hyp)
+{
+    auto input = new ControlHubInput<RGBA>(
         sunMap.size(),
+        &hyp->hub,
+        1,
         {
+            new Patterns::GlitchPattern(180),
+            new Patterns::GlitchPattern(60),
+            new Patterns::GlitchPattern(20),
+            new Patterns::RibbenClivePattern<NegativeCosFast>(),
+            new Patterns::RibbenClivePattern<NegativeCosFast>(3*60),
+            new Patterns::SegmentChasePattern(),
+            new Patterns::SegmentChasePattern(3*60),
+            new Patterns::RibbenFlashPattern(),
+            new Patterns::RibbenFlashPattern(3*60),
+            new Patterns::PixelGlitchPattern(),
+            new Patterns::HaloOrSwirl(),
+            new Patterns::HaloOrSwirl(0),
+            new Patterns::HaloOrSwirl(1),
+            new Patterns::Skirt(&pSunMap),
             new Patterns::GrowingCirclesPattern(&sunMap),
             new Patterns::RadialGlitterFadePattern(&pSunMap),
             new Patterns::XY(&sunMap),
@@ -48,28 +69,50 @@ int main()
             new Patterns::AngularFadePattern(&pSunMap),
             new Patterns::RadialFadePattern(&pSunMap),
             new Patterns::ChevronsConePattern(&pSunMap),
-        },
-
-        0.1 * 60 * 1000);
+        }
+        );
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         input,
-        // new MonitorOutput(&hyp->webServer, sunMap)
-        new MonitorOutput3d(&hyp->webServer, &sunMap3d)));
+        new CloneOutput({
+            new MonitorOutput(&hyp->webServer, &sunMap),
+            new MonitorOutput3d(&hyp->webServer, &sunMap3d)
+        })
+    ));
+}
 
-    hyp->start();
+void addPaletteColumn(Hyperion *hyp)
+{
+    auto paletteColumn = new PaletteColumn(
+        &hyp->hub,
+        0,
+        {
+            campfire,
+            pinkSunset,
+            sunset8,
+            heatmap,
+            heatmap2,
+            sunset2,
+            retro,
+            tunnel,
 
-    int paletteColumnIndex = 0;
-    while (1)
-    {
-        input->params.gradient = palettes[paletteColumnIndex].gradient;
-        input->params.primaryColour = palettes[paletteColumnIndex].primary;
-        input->params.secondaryColour = palettes[paletteColumnIndex].secondary;
-        input->params.highlightColour = palettes[paletteColumnIndex].highlight;
-
-        paletteColumnIndex++;
-        if (paletteColumnIndex >= palettes.size())
-            paletteColumnIndex = 0;
-        Thread::sleep(0.15 * 60 * 1000);
-    }
+            sunset6,
+            sunset7,
+            sunset1,
+            coralTeal,
+            deepBlueOcean,
+            redSalvation,
+            plumBath,
+            sunset4,
+            candy,
+            sunset3,
+            greatBarrierReef,
+            blueOrange,
+            peach,
+            denseWater,
+            purpleGreen,
+            sunset5,
+            salmonOnIce,
+        });
+    hyp->hub.subscribe(paletteColumn);
 }

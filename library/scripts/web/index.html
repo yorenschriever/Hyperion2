@@ -2,15 +2,22 @@
     <head>
         <link rel="stylesheet" href="controller/controller.css">
         <style>
-            .monitor {
+            #monitors {
                 position: fixed;
                 right:16px;
                 bottom: 16px;
+                display: flex;
+                gap:16px;
+                flex-direction:column;
+                max-height: calc(100vh - 32px);
+            }
+            
+            .monitor {
                 width: 640;
                 height: 480;
                 resize:both;
                 border: 1px solid #444;
-                z-index: 100;
+                z-index: 100; 
             }
         </style>
         </link>
@@ -31,7 +38,7 @@
                 const iframe = document.createElement("iframe");
                 iframe.src = url
                 iframe.className = "monitor"
-                document.body.appendChild(iframe)
+                document.getElementById('monitors').appendChild(iframe)
                 iframe.contentWindow.scene = scene
                 iframe.contentWindow.onBuildIdChange = onBuildIdChange
             }
@@ -43,5 +50,6 @@
     </head>
     <body>        
         <div id="controller"></div>
+        <div id="monitors"></div>
     </body>
 </html>

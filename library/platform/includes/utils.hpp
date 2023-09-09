@@ -39,6 +39,13 @@ public:
         return minimum_out + normalized * (maximum_out - minimum_out);
     }
 
+    static float rescale_c(float value, float minimum_out, float maximum_out, float minimum_in = 0, float maximum_in = 1)
+    {
+        float normalized = (value - minimum_in) / (maximum_in - minimum_in);
+        normalized = constrain_f(normalized, 0, 1);
+        return minimum_out + normalized * (maximum_out - minimum_out);
+    }
+
     static void *malloc_dma(int size);
     static void *realloc_dma(void *ptr, int size);
 
