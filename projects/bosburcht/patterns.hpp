@@ -38,8 +38,8 @@ namespace Patterns
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float x_norm = (map->operator[](index).x + 1) / 2;
-                float y_norm = (map->operator[](index).y + 1) / 2;
+                float x_norm = (map->x(index) + 1) / 2;
+                float y_norm = (map->y(index) + 1) / 2;
 
                 float dim = std::max(
                     softEdge(abs(x_norm - lfoX.getValue()), size),
@@ -77,7 +77,7 @@ namespace Patterns
             {
                 RGBA color = params->getSecondaryColour();
                 // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
-                pixels[index] = color * lfo.getValue(-2 * around(map->operator[](index).th)) * Utils::rescale(map->operator[](index).r, 0.5, 1, 0.4, 1) * transition.getValue();
+                pixels[index] = color * lfo.getValue(-2 * around(map->th(index))) * Utils::rescale(map->r(index), 0.5, 1, 0.4, 1) * transition.getValue();
                 // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
         }
@@ -202,7 +202,7 @@ namespace Patterns
 
             for (int i = 0; i < width; i++)
             {
-                float spiral = amount * (around(map->operator[](i).th) + map->operator[](i).r * curliness);
+                float spiral = amount * (around(map->th(i)) + map->r(i) * curliness);
                 // while (spiral < 0) spiral += 1;
                 // while (spiral > 1) spiral -= 1;
                 float pos = abs(spiral - lfo.getPhase());
@@ -218,7 +218,7 @@ namespace Patterns
                     pos -= 1;
                 }
                 float fadePosition = softEdge(pos, size, 0.06);
-                RGBA color = params->gradient->get(255 - 255 * map->operator[](i).r);
+                RGBA color = params->gradient->get(255 - 255 * map->th(i));
 
                 pixels[i] = color * fadePosition * transition.getValue();
             }
@@ -322,7 +322,7 @@ namespace Patterns
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 // float dir = (map->z(index) > 0 || map->y(index) > 0.44) ? 1:-1;
-                float phase = (0.5 * abs(map->operator[](index).x) + map->operator[](index).y) * amount;
+                float phase = (0.5 * abs(map->x(index)) + map->y(index)) * amount;
                 auto col = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 pixels[index] += col * lfo.getValue(phase) * transition.getValue();
             }
@@ -356,7 +356,7 @@ namespace Patterns
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float conePos = 0.5 + (map->operator[](index).r) / 2;
+                float conePos = 0.5 + (map->r(index)) / 2;
 
                 float phase = conePos * amount;
                 auto col = (lfoColour.getValue(phase) > 0) ? params->getSecondaryColour() : params->getPrimaryColour();
@@ -439,18 +439,18 @@ namespace Patterns
 
                 float conePos = fromCenter ?
                                            // vanaf midden
-                                    (0.5 + (map->operator[](i).r) / 2)
+                                    (0.5 + (map->th(i)) / 2)
                                            :
                                            // vanaf de knik beide kanten op
-                                    (1 - (map->operator[](i).r) / 2);
+                                    (1 - (map->th(i)) / 2);
 
                 float fadePosition1 = fade1.getValue(conePos * velocity);
                 RGBA color1 = params->gradient->get(fadePosition1 * 255);
-                pixels[i] = color1 * fadePosition1 * (1.5 - map->operator[](i).r) * transition.getValue();
+                pixels[i] = color1 * fadePosition1 * (1.5 - map->th(i)) * transition.getValue();
 
                 float fadePosition2 = fade2.getValue(conePos * velocity);
                 RGBA color2 = params->gradient->get(fadePosition2 * 255);
-                pixels[i] += color2 * fadePosition2 * (1.5 - map->operator[](i).r) * transition.getValue();
+                pixels[i] += color2 * fadePosition2 * (1.5 - map->th(i)) * transition.getValue();
             }
         }
     };
@@ -511,9 +511,9 @@ namespace Patterns
                 //pixels[i] = params->getSecondaryColour() * 0.25;
                 for (int f = 0; f < numFades; f++)
                 {
-                    float fadePosition = fade[f].getValue(abs(map->operator[](i).th) * velocity);
-                    RGBA color = params->gradient->get(255 - abs(map->operator[](i).th) / M_PI * 255);
-                    pixels[i] += color * fadePosition * (map->operator[](i).r * 1.5) * transition.getValue();
+                    float fadePosition = fade[f].getValue(abs(map->th(i)) * velocity);
+                    RGBA color = params->gradient->get(255 - abs(map->th(i)) / M_PI * 255);
+                    pixels[i] += color * fadePosition * (map->th(i) * 1.5) * transition.getValue();
                 }
             }
         }
@@ -551,7 +551,7 @@ namespace Patterns
             for (int i = 0; i < map->size(); i++)
             {
                 //pixels[i] = params->getSecondaryColour();
-                float conePos = 0.20 + (map->operator[](i).r) / 2;
+                float conePos = 0.20 + (map->th(i)) / 2;
                 pixels[i] += params->getPrimaryColour() * fade.getValue(conePos * velocity) * transition.getValue();
             }
         }

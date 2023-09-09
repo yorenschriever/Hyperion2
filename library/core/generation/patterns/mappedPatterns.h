@@ -36,7 +36,7 @@ namespace Mapped
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float distance = std::abs(map->operator[](index).x) + std::abs(map->operator[](index).y);
+                float distance = std::abs(map->x(index)) + std::abs(map->y(index));
                 float phase = (float)numWaves * distance;
                 RGBA colour = lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 RGBA dimmedColour = colour * transition.getValue() * lfo.getValue(phase);
@@ -71,7 +71,7 @@ namespace Mapped
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 // float distance = std::abs(map->x(index)) + std::abs(map->y(index));
-                float phase = (map->operator[](index).x + 1) / 2.;
+                float phase = (map->x(index) + 1) / 2.;
                 RGBA colour = params->getSecondaryColour(); // lfoColour.getValue(phase) ? params->getSecondaryColour() : params->getPrimaryColour();
                 RGBA dimmedColour = colour * transition.getValue() * lfo.getValue(phase);
                 pixels[index] += dimmedColour;
@@ -109,7 +109,7 @@ namespace Mapped
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float distance = std::abs(map->operator[](index).x) + std::abs(map->operator[](index).y);
+                float distance = std::abs(map->x(index)) + std::abs(map->y(index));
                 int delay = distance * 200;
                 float l = fades[0].getValue(delay) +
                           fades[1].getValue(delay) +
@@ -178,7 +178,7 @@ namespace Mapped
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float phase = (map->operator[](index).x + 1) / 2.;
+                float phase = (map->x(index) + 1) / 2.;
                 RGBA colour = params->getSecondaryColour() + params->getPrimaryColour() * phase;
                 RGBA dimmedColour = colour * transition.getValue();
                 pixels[index] += dimmedColour;
@@ -212,7 +212,7 @@ namespace Mapped
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                RGBA colour = (map->operator[](index).x + noise[index % maxNoiseMapSize] < 0) ? params->getSecondaryColour() : params->getPrimaryColour();
+                RGBA colour = (map->x(index) + noise[index % maxNoiseMapSize] < 0) ? params->getSecondaryColour() : params->getPrimaryColour();
                 RGBA dimmedColour = colour * transition.getValue();
                 pixels[index] += dimmedColour;
             }
@@ -246,7 +246,7 @@ namespace Mapped
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float phase = (map->operator[](index).x + map->operator[](index).y + 2) * numWaves;
+                float phase = (map->x(index) + map->y(index) + 2) * numWaves;
                 RGBA colour = params->getPrimaryColour() + params->getSecondaryColour() * lfo.getValue(phase); 
                 RGBA dimmedColour = colour * transition.getValue();
                 pixels[index] += dimmedColour;
