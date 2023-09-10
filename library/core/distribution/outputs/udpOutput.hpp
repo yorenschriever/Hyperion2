@@ -7,6 +7,7 @@
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
 #include <algorithm>
+#include "log.hpp"
 
 // UDPoutput writes led data to another device over UDP.
 class UDPOutput : public Output
@@ -62,6 +63,10 @@ public:
     {
         if (len != this->length)
         {
+            if (len > 1500){
+                Log::info("UPD_OUTPUT","Warning! udp output length is > 1500, which is the maximum transfer length on some systems. Data might not be sent.");
+            }
+
             // wait for the front buffer to be sent before we are going to change its size
             while (!ready())
                 Thread::sleep(1);
