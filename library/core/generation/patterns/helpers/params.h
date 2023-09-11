@@ -1,11 +1,11 @@
 #pragma once
 #include "colours.h"
 #include "gradient.hpp"
+#include <string>
 
 class Params
 {
 public:
-
     Params(){}
     Params(std::string name){
         this->name=name;

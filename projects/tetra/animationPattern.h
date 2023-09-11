@@ -8,20 +8,19 @@
 #include "LedAnimation.h"
 #include "gradient.hpp"
 #include "platform/includes/log.hpp"
+#include <string>
 
 class AnimationPattern : public Pattern<RGBA>
 {
     std::vector<LedShape> *ledShapes;
     LedAnimation *animation;
-    Gradient *palette;
-    bool updateCache = true;
 
 public:
-    AnimationPattern(std::vector<LedShape> *ledShapes, LedAnimation *animation, Gradient *palette)
+    AnimationPattern(std::vector<LedShape> *ledShapes, LedAnimation *animation, std::string name)
     {
         this->ledShapes = ledShapes;
         this->animation = animation;
-        this->palette = palette;
+        this->name = name;
     }
 
     inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
@@ -36,7 +35,7 @@ public:
             width,
             *(ledShapes),
 
-            palette,
+            params->gradient,
             params->velocity * 255,
             params->amount * 255,
             params->size * 255,
@@ -51,9 +50,8 @@ public:
             1000,
             //Tempo::GetBeatNumber(),
             Utils::millis() / 1000,
-            updateCache
+            true //always update cache. we got cpu cycles like its 2023
         );
 
-        updateCache = false;
     }
 };

@@ -1,7 +1,6 @@
-#include "ChaserLedAnimation.cpp"
 #include "ChaserLedAnimation.h"
 #include "LedShape.h"
-#include "ShapeChaserLedAnimation.cpp"
+#include "ShapeChaserLedAnimation.h"
 #include "ShapeChaserLedAnimation.h"
 #include "animationPattern.h"
 #include "colours.h"
@@ -17,7 +16,12 @@
 #include "core/hyperion.hpp"
 #include "gradient.hpp"
 
+// TODO why doesn't cmake pick these up automatically?
+#include "ChaserLedAnimation.cpp"
+#include "ShapeChaserLedAnimation.cpp"
+
 void addLedShapes(Hyperion *hyp);
+void addPipe(Hyperion *hyp);
 
 PixelMap tetraMap;
 
@@ -41,9 +45,23 @@ int main()
 {
   auto hyp = new Hyperion();
 
+  hyp->hub.getParams(0)->name = "Led Chaser CW";
+  hyp->hub.addParams(new Params("Led Chaser CCW"));
+  hyp->hub.addParams(new Params("Shape Chaser Out"));
+  hyp->hub.addParams(new Params("Shape Chaser In"));
+
+  hyp->hub.setColumnName(0, "Led Chaser CW");
+  hyp->hub.setColumnName(1, "Led Chaser CCW");
+  hyp->hub.setColumnName(2, "Shape Chaser Out");
+  hyp->hub.setColumnName(3, "Shape Chaser In");
+
+  hyp->hub.getParams(0)->gradient = &heatmap;
   addLedShapes(hyp);
+  addPipe(hyp);
 
   Tempo::AddSource(new ConstantTempo(120));
+
+  hyp->hub.buttonPressed(0,2);
 
   hyp->start();
   while (1)
@@ -58,25 +76,34 @@ void addLedShapes(Hyperion *hyp)
   const float pixelPitch = 0.014;
   for (LedShape shape : tetra)
   {
+    float a =0;
+    float x = ((shape.numLedsPerSet + 1) * pixelPitch) / -2.;
+    float y = x * 0.59;
     for (int set = 0; set < shape.numSets; set++)
     {
-      float x = ((shape.numLedsPerSet + 1) * pixelPitch) / -2.;
-      float y = x * 0.59;
-      float a = float(set) / 3. * 2 * M_PI;
       for (int led = 0; led < shape.numLedsPerSet; led++)
       {
-        x += pixelPitch;
-        tetraMap.push_back({.x = x * cos(a) + y * sin(a),
-                            .y = y * cos(a) - x * sin(a)});
+        tetraMap.push_back({.x = x, .y = y });
+        x += pixelPitch * cos(a);
+        y += pixelPitch * sin(a);
       }
+      a += 120./360. * 2 * M_PI;
     }
   }
 
-  auto input = new PatternInput<RGBA>(
-      tetraMap.size(),
-      // new Mapped::ConcentricWavePattern<SinFast>(tetraMap, 2, 2)
-      new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, true), &heatmap)
-      // new AnimationPattern(&tetra, new ShapeChaserLedAnimation(true), &heatmap)
+}
+
+void addPipe(Hyperion *hyp)
+{
+  auto input = new ControlHubInput<RGBA>(
+    tetraMap.size(),
+    &hyp->hub,
+    {
+      {.column = 0, .slot = 0, .paramsSlot=0, .pattern=new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, true), "Led Chaser CW")},
+      {.column = 1, .slot = 0, .paramsSlot=1, .pattern=new AnimationPattern(&tetra, new ChaserLedAnimation(tetra, ChaserLedAnimation::relativeSize / 3, false), "Led Chaser CCW")},
+      {.column = 2, .slot = 0, .paramsSlot=2, .pattern=new AnimationPattern(&tetra, new ShapeChaserLedAnimation(tetra, true), "Shape Chaser CW")},
+      {.column = 3, .slot = 0, .paramsSlot=3, .pattern=new AnimationPattern(&tetra, new ShapeChaserLedAnimation(tetra, false), "Shape Chaser CCW")}
+    }
   );
 
 #if ESP_PLATFORM

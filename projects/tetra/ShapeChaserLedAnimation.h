@@ -25,7 +25,7 @@ protected:
     uint16_t _previousRelativePosition = 0;
 
 public:
-    ShapeChaserLedAnimation(bool forward);
+    ShapeChaserLedAnimation(vector<LedShape> ledShapes, bool forward);
     
     void render(
         RGBA* buffer,

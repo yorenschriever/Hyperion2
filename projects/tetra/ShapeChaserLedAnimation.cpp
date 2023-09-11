@@ -9,7 +9,7 @@
 #define SHAPE_ANIMATION_STEP_SIZE 65535
 
 // -------------------------------------------------------------------- Constructor
-ShapeChaserLedAnimation::ShapeChaserLedAnimation(bool forward) : _forward(forward)
+ShapeChaserLedAnimation::ShapeChaserLedAnimation(vector<LedShape> ledShapes, bool forward) : _forward(forward)
 {
 	// Beat synced speed options
 	// 12 = It takes 12 beats for each chaser to do a full object traversal
@@ -112,6 +112,8 @@ void ShapeChaserLedAnimation::render(
 					*pixel = ColorFromPalette(colorPalette, colorPos, 255);
 					pixel++;
 				}
+			} else {
+				pixel+=ledShape.numLedsPerSet;
 			}
 		}
 	}

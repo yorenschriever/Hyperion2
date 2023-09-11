@@ -1,6 +1,7 @@
 // -------------------------------------------------------------------- Includes
 #include "ChaserLedAnimation.h"
 #include "platform/includes/log.hpp"
+#include "log.hpp"
 
 // TODOs
 	// --- MUST:
