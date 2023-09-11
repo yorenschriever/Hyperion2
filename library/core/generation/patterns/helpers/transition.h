@@ -1,7 +1,7 @@
 #pragma once
 #include "fade.h"
 
-using FadeShape = int(*)(int, int, int);
+using FadeShape = int(*)(float, float, int);
 
 class Transition
 {
@@ -58,19 +58,19 @@ public:
         return fadein.getValue() * (lastActive?1:fadeout.getValue());
     }
 
-    float getValue(int index, int width){
-        return fadein.getValue(fadeInShape(index,width,fadeInShapeSize)) * (lastActive?1:fadeout.getValue(fadeOutShape(index,width,fadeOutShapeSize)));
+    float getValue(float position, float width){
+        return fadein.getValue(fadeInShape(position,width,fadeInShapeSize)) * (lastActive?1:fadeout.getValue(fadeOutShape(position,width,fadeOutShapeSize)));
     }
 
-    static int none(int index, int width, int delay){ return 0;}
-    static int fromRight(int index, int width, int delay){ return delay * index / width;}
-    static int fromLeft(int index, int width, int delay){return delay * (width-index) / width;}
-    static int fromCenter(int index, int width, int delay){return (delay * std::abs(width - 2*index)) / width;}
-    static int fromSides(int index, int width, int delay){return (delay * std::abs(2*index-width)) / width;}
+    static int none(float position, float width, int delay){ return 0;}
+    static int fromEnd(float position, float width, int delay){ return delay * position / width;}
+    static int fromStart(float position, float width, int delay){return delay * (width-position) / width;}
+    static int fromCenter(float position, float width, int delay){return (delay * std::abs(width - 2*position)) / width;}
+    static int fromSides(float position, float width, int delay){return (delay * std::abs(2*position-width)) / width;}
 
 private:
-    Fade<Up> fadein= Fade<Up> (0);
-    Fade<Down> fadeout= Fade<Down>(0);
+    Fade<Up> fadein= Fade<Up> (0, WaitAtStart);
+    Fade<Down> fadeout= Fade<Down>(0, WaitAtStart);
     bool lastActive;
 
     int fadeInShapeSize;

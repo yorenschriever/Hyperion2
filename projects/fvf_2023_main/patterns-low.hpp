@@ -247,8 +247,8 @@ namespace Low
  class VerticallyIsolated : public Pattern<RGBA>
     {
         Transition transition = Transition(
-                200, Transition::fromLeft, 1200,
-                500, Transition::fromRight, 1500);
+                200, Transition::fromStart, 1200,
+                500, Transition::fromEnd, 1500);
         PixelMap3d::Cylindrical *map;
 
     public:

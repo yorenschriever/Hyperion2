@@ -28,9 +28,12 @@ int main()
     // These names are displayed in the monitor
     hyp->hub.setColumnName(0, "Palette");
     hyp->hub.setColumnName(1, "Basics");
-    hyp->hub.setColumnName(2, "Helpers");
-    hyp->hub.setColumnName(3, "Params");
-    hyp->hub.setColumnName(4, "Mapping");
+    hyp->hub.setColumnName(2, "LFO");
+    hyp->hub.setColumnName(3, "Fade");
+    hyp->hub.setColumnName(4, "Permute");
+    hyp->hub.setColumnName(5, "Params");
+    hyp->hub.setColumnName(6, "Mapping");
+    hyp->hub.setColumnName(7, "Transitions");
 
     // set some column properties, like flash mode, group release, forces selection.
     hyp->hub.setFlashColumn(0, false, true);
@@ -67,22 +70,28 @@ void addHaloPipe(Hyperion *hyp)
             {.column = 1, .slot = 1, .pattern = new ExamplePatterns::Palette()},
             {.column = 1, .slot = 2, .pattern = new ExamplePatterns::PaletteGradient()},
             {.column = 1, .slot = 3, .pattern = new ExamplePatterns::Blending()},
+            {.column = 1, .slot = 4, .pattern = new ExamplePatterns::PatternLayering()},
 
             {.column = 2, .slot = 0, .pattern = new ExamplePatterns::LFOPattern()},
             {.column = 2, .slot = 1, .pattern = new ExamplePatterns::LFOChase()},
             {.column = 2, .slot = 2, .pattern = new ExamplePatterns::LFOChaseGradient()},
             {.column = 2, .slot = 3, .pattern = new ExamplePatterns::LFOAntiAlias()},
-            {.column = 2, .slot = 4, .pattern = new ExamplePatterns::FadePattern()},
-            {.column = 2, .slot = 5, .pattern = new ExamplePatterns::FadeChasePattern()},
-            {.column = 2, .slot = 6, .pattern = new ExamplePatterns::FadeFinishPattern()},
-            {.column = 2, .slot = 7, .pattern = new ExamplePatterns::TransitionPattern()},
-            {.column = 2, .slot = 8, .pattern = new ExamplePatterns::PermutePattern()},
 
-            {.column = 3, .slot = 0, .pattern = new ExamplePatterns::ParamsPattern()},
-            {.column = 3, .slot = 1, .pattern = new ExamplePatterns::LFOGlow()},
-            {.column = 3, .slot = 2, .pattern = new ExamplePatterns::FadeChase()},
+            {.column = 3, .slot = 0, .pattern = new ExamplePatterns::FadePattern()},
+            {.column = 3, .slot = 1, .pattern = new ExamplePatterns::FadeChasePattern()},
+            {.column = 3, .slot = 2, .pattern = new ExamplePatterns::FadeFinishPattern()},
 
-            {.column = 4, .slot = 0, .pattern = new ExamplePatterns::MappedPattern(&haloMap)},
+            {.column = 4, .slot = 0, .pattern = new ExamplePatterns::PermutePattern()},
+
+            {.column = 5, .slot = 0, .pattern = new ExamplePatterns::ParamsPattern()},
+            {.column = 5, .slot = 1, .pattern = new ExamplePatterns::LFOGlow()},
+            {.column = 5, .slot = 2, .pattern = new ExamplePatterns::FadeChase()},
+
+            {.column = 6, .slot = 0, .pattern = new ExamplePatterns::MappedPattern(&haloMap)},
+
+            {.column = 7, .slot = 0, .pattern = new ExamplePatterns::TransitionPattern()},
+            {.column = 7, .slot = 1, .pattern = new ExamplePatterns::SpatialTransitionPattern()},
+            {.column = 7, .slot = 2, .pattern = new ExamplePatterns::MappedSpatialTransitionPattern(&haloMap)},
         });
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
