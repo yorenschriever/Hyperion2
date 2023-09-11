@@ -21,8 +21,8 @@ if ($TARGET -eq "docker")
         /hyperion_lib/scripts/run.sh linux
     exit;
 
-# } elseif ($TARGET -eq "windows") {
-#     . $BUILDDIR\app.exe
+} elseif ($TARGET -eq "windows") {
+    . $BUILDDIR\app.exe
 } else {
     Write-Host "Invalid target: " + $TARGET
     exit 1;

@@ -20,8 +20,8 @@ if ($TARGET -eq "docker")
         /hyperion_lib/scripts/build.sh linux
     exit;
 
-# } elseif ($TARGET -eq "windows") {
-#     $PARAM="-DTARGET=${TARGET}"
+} elseif ($TARGET -eq "windows") {
+    $PARAM="-DTARGET=${TARGET}"
 } else {
     Write-Host "Invalid target: " + $TARGET
     exit 1;
