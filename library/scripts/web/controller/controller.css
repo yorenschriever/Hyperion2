@@ -16,7 +16,7 @@ body {
 @media (orientation: landscape) {
     .controller {
         grid-template-columns: auto max-content;
-        grid-template-areas: "activation params";
+        grid-template-areas: "activation paramsSet";
     }
 }
   
@@ -24,7 +24,7 @@ body {
     .controller {
         grid-template-rows: auto max-content;
         grid-template-areas:
-                  "params" 
+                  "paramsSet" 
                   "activation "
                    ;
     }
@@ -39,8 +39,8 @@ body {
     grid-area: activation;
 }
 
-.params {
-    grid-area: params;
+.paramsSet {
+    grid-area: paramsSet;
 } 
 
 .columns {
@@ -110,18 +110,27 @@ body {
     filter: hue-rotate(90deg);
 }
 
-.columnHeader {
+.columnHeader, .paramsHeader, .tempo {
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 10pt;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    user-select: none;
+}
+
+.columnHeader {
     width:80px;
     text-align: center;
     margin-bottom: 6px;  
-    user-select: none;
-    min-height:12pt;
+    min-height:12pt; 
+}
+
+.paramsHeader {
+    border-bottom:1px solid #444;
+    text-align: center;
+    margin-bottom: 6px;  
 }
 
 .tempo {
@@ -135,14 +144,7 @@ body {
     animation-duration: 1s;
     animation-fill-mode: forwards;
 
-    color: white;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 10pt;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    user-select: none;
     padding: 6px;
-
     z-index: 101;
 }
 

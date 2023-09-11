@@ -56,18 +56,20 @@ public:
     {
         //Log::info(TAG, "onControllerChange %d %d", controller, value);
 
+        int paramsSlot = 0;
+
         if (controller == ROTARY0_CONTROLLER_NUMBER)
-            return hub->setVelocity(scale127toFloat(value));
+            return hub->setVelocity(paramsSlot,scale127toFloat(value));
         if (controller == ROTARY0_CONTROLLER_NUMBER+1)
-            return hub->setIntensity(scale127toFloat(value));
+            return hub->setIntensity(paramsSlot,scale127toFloat(value));
         if (controller == ROTARY0_CONTROLLER_NUMBER+2)
-            return hub->setVariant(scale127toFloat(value));
+            return hub->setVariant(paramsSlot,scale127toFloat(value));
         if (controller == ROTARY0_CONTROLLER_NUMBER+3)
-            return hub->setSize(scale127toFloat(value));
+            return hub->setSize(paramsSlot,scale127toFloat(value));
         if (controller == ROTARY0_CONTROLLER_NUMBER+4)
-            return hub->setOffset(scale127toFloat(value));
+            return hub->setOffset(paramsSlot,scale127toFloat(value));
         if (controller == ROTARY0_CONTROLLER_NUMBER+5)
-            return hub->setAmount(scale127toFloat(value));
+            return hub->setAmount(paramsSlot,scale127toFloat(value));
         //if (controller == ROTARY0_CONTROLLER_NUMBER+6)
         //    todo palette
         if (controller == MASTER_DIM_FADER_CONTROLLER_NUMBER)

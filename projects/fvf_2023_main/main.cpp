@@ -9,7 +9,6 @@
 #include "core/hyperion.hpp"
 #include "distribution/inputs/controlHubInput.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
-#include "generation/controlHub/websocketController.hpp"
 #include "mapping/columnMap3d.hpp"
 #include "mapping/haloMap3d.hpp"
 #include "mapping/ledsterMap3d.hpp"
@@ -333,6 +332,7 @@ void addPaletteColumn(Hyperion *hyp)
 {
     auto paletteColumn = new PaletteColumn(
         &hyp->hub,
+        0,
         0,
         {
             campfire,

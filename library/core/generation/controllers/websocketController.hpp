@@ -1,6 +1,6 @@
 #pragma once
-#include "IHubController.hpp"
-#include "controlHub.hpp"
+#include "generation/controlHub/IHubController.hpp"
+#include "generation/controlHub/controlHub.hpp"
 #include "misc/cjson/cJSON.h"
 #include "platform/includes/log.hpp"
 #include "platform/includes/thread.hpp"
@@ -62,19 +62,20 @@ public:
         {
             std::string param = cJSON_GetObjectItem(parsed,"param")->valuestring;
             float value = cJSON_GetObjectItem(parsed,"value")->valuedouble / 255.;
+            int paramsSlotIndex = cJSON_GetObjectItem(parsed,"paramsSlotIndex")->valueint;
 
             if (param.compare("Amount") == 0)
-                instance->hub->setAmount(value);
+                instance->hub->setAmount(paramsSlotIndex, value);
             else if (param.compare("Intensity") == 0)
-                instance->hub->setIntensity(value);
+                instance->hub->setIntensity(paramsSlotIndex, value);
             else if (param.compare("Offset") == 0)
-                instance->hub->setOffset(value);
+                instance->hub->setOffset(paramsSlotIndex, value);
             else if (param.compare("Size") == 0)
-                instance->hub->setSize(value);
+                instance->hub->setSize(paramsSlotIndex, value);
             else if (param.compare("Variant") == 0)
-                instance->hub->setVariant(value);
+                instance->hub->setVariant(paramsSlotIndex, value);
             else if (param.compare("Velocity") == 0)
-                instance->hub->setVelocity(value);
+                instance->hub->setVelocity(paramsSlotIndex, value);
         }
 
         cJSON_Delete(parsed);
@@ -141,27 +142,41 @@ public:
             name.c_str());
     }
 
-    void onHubVelocityChange(float velocity) override { onHubParamChange("Velocity", velocity); };
-    void onHubAmountChange(float amount) override { onHubParamChange("Amount", amount); };
-    void onHubIntensityChange(float intensity) override { onHubParamChange("Intensity", intensity); };
-    void onHubVariantChange(float variant) override { onHubParamChange("Variant", variant); };
-    void onHubSizeChange(float size) override { onHubParamChange("Size", size); };
-    void onHubOffsetChange(float offset) override { onHubParamChange("Offset", offset); };
+    void onHubVelocityChange(int paramsSlotIndex, float velocity) override { onHubParamChange("Velocity", paramsSlotIndex, velocity); };
+    void onHubAmountChange(int paramsSlotIndex, float amount) override { onHubParamChange("Amount", paramsSlotIndex, amount); };
+    void onHubIntensityChange(int paramsSlotIndex, float intensity) override { onHubParamChange("Intensity", paramsSlotIndex, intensity); };
+    void onHubVariantChange(int paramsSlotIndex, float variant) override { onHubParamChange("Variant", paramsSlotIndex, variant); };
+    void onHubSizeChange(int paramsSlotIndex, float size) override { onHubParamChange("Size", paramsSlotIndex, size); };
+    void onHubOffsetChange(int paramsSlotIndex, float offset) override { onHubParamChange("Offset", paramsSlotIndex, offset); };
+
+    void onHubParamsNameChange(int paramsSlotIndex, std::string name) override
+    {
+        socket->sendAll(
+            "{\
+        \"type\":\"onHubParamsNameChange\",\
+        \"paramsSlotIndex\":%d,\
+        \"name\":\"%s\"\
+    }",
+            paramsSlotIndex,
+            name.c_str());
+    }
 
 private:
     ControlHub *hub;
     std::unique_ptr<WebsocketServer> socket;
     const char *TAG = "WebsocketController";
 
-    void onHubParamChange(const char *param, float value)
+    void onHubParamChange(const char *param, int paramsSlotIndex, float value)
     {
         socket->sendAll(
             "{\
         \"type\":\"onHubParamChange\",\
         \"param\":\"%s\",\
-        \"value\":\"%d\"\
+        \"paramsSlotIndex\":%d,\
+        \"value\":%d\
     }",
             param,
+            paramsSlotIndex,
             (int)(value * 255));
     }
 

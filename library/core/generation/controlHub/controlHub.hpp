@@ -1,16 +1,22 @@
 #pragma once
 
 #include "IHubController.hpp"
+#include "generation/patterns/helpers/params.h"
 #include "log.hpp"
 #include "stdint.h"
 #include <algorithm>
+#include <set>
 #include <vector>
-#include "generation/patterns/helpers/params.h"
 
 class ControlHub
 {
 
 public:
+    ControlHub()
+    {
+        paramsSet.push_back(new Params());
+    }
+
     struct Slot
     {
         bool activated = false;
@@ -28,11 +34,11 @@ public:
     };
 
     uint8_t masterDim = 255;
-    Params params;
 
 private:
     std::vector<Column> columns;
     std::vector<IHubController *> controllers;
+    std::vector<Params *> paramsSet;
     const char *TAG = "CONTROL_HUB";
 
 public:
@@ -54,14 +60,14 @@ public:
 
         if (newValue == slot->activated)
             return;
-        
+
         auto col = findColumn(columnIndex);
         if (newValue == false && col->forcedSelection)
         {
-            int numberOn=0;
-            for(auto slot : col->slots)
-                numberOn += slot.activated?1:0;
-            if (numberOn==1)
+            int numberOn = 0;
+            for (auto slot : col->slots)
+                numberOn += slot.activated ? 1 : 0;
+            if (numberOn == 1)
                 return;
         }
 
@@ -86,7 +92,6 @@ public:
 
         for (auto controller : controllers)
             controller->onHubSlotActiveChange(columnIndex, slotIndex, newValue);
-    
     }
 
     void buttonReleased(int columnIndex, int slotIndex)
@@ -130,66 +135,78 @@ public:
             controller->onHubMasterDimChange(value);
     }
 
-    void setVelocity(float velocity)
+    void setVelocity(int paramsSlotIndex, float velocity)
     {
-        // Log::info(TAG, "velocity %f", velocity);
-        if (params.velocity == velocity)
+        if (paramsSlotIndex < 0 || paramsSlotIndex >= paramsSet.size())
+            return;
+        if (paramsSet[paramsSlotIndex]->velocity == velocity)
             return;
 
-        params.velocity = velocity;
+        paramsSet[paramsSlotIndex]->velocity = velocity;
 
         for (auto controller : controllers)
-            controller->onHubVelocityChange(velocity);
+            controller->onHubVelocityChange(paramsSlotIndex, velocity);
     }
-    void setAmount(float amount)
+    void setAmount(int paramsSlotIndex, float amount)
     {
-        if (params.amount == amount)
+        if (paramsSlotIndex < 0 || paramsSlotIndex >= paramsSet.size())
+            return;
+        if (paramsSet[paramsSlotIndex]->amount == amount)
             return;
 
-        params.amount = amount;
+        paramsSet[paramsSlotIndex]->amount = amount;
 
         for (auto controller : controllers)
-            controller->onHubAmountChange(amount);
+            controller->onHubAmountChange(paramsSlotIndex, amount);
     }
-    void setIntensity(float intensity)
+    void setIntensity(int paramsSlotIndex, float intensity)
     {
-        if (params.intensity == intensity)
+        if (paramsSlotIndex < 0 || paramsSlotIndex >= paramsSet.size())
+            return;
+        if (paramsSet[paramsSlotIndex]->intensity == intensity)
             return;
 
-        params.intensity = intensity;
+        paramsSet[paramsSlotIndex]->intensity = intensity;
 
         for (auto controller : controllers)
-            controller->onHubIntensityChange(intensity);
+            controller->onHubIntensityChange(paramsSlotIndex, intensity);
     }
-    void setVariant(float variant)
+
+    void setVariant(int paramsSlotIndex, float variant)
     {
-        if (params.variant == variant)
+        if (paramsSlotIndex < 0 || paramsSlotIndex >= paramsSet.size())
+            return;
+        if (paramsSet[paramsSlotIndex]->variant == variant)
             return;
 
-        params.variant = variant;
+        paramsSet[paramsSlotIndex]->variant = variant;
 
         for (auto controller : controllers)
-            controller->onHubVariantChange(variant);
+            controller->onHubVariantChange(paramsSlotIndex, variant);
     }
-    void setSize(float size)
+    void setSize(int paramsSlotIndex, float size)
     {
-        if (params.size == size)
+        if (paramsSlotIndex < 0 || paramsSlotIndex >= paramsSet.size())
+            return;
+        if (paramsSet[paramsSlotIndex]->size == size)
             return;
 
-        params.size = size;
+        paramsSet[paramsSlotIndex]->size = size;
 
         for (auto controller : controllers)
-            controller->onHubSizeChange(size);
+            controller->onHubSizeChange(paramsSlotIndex, size);
     }
-    void setOffset(float offset)
+    void setOffset(int paramsSlotIndex, float offset)
     {
-        if (params.offset == offset)
+        if (paramsSlotIndex < 0 || paramsSlotIndex >= paramsSet.size())
+            return;
+        if (paramsSet[paramsSlotIndex]->offset == offset)
             return;
 
-        params.offset = offset;
+        paramsSet[paramsSlotIndex]->offset = offset;
 
         for (auto controller : controllers)
-            controller->onHubOffsetChange(offset);
+            controller->onHubOffsetChange(paramsSlotIndex, offset);
     }
 
     void subscribe(IHubController *controller, bool sendCurrentStatus = false)
@@ -222,18 +239,22 @@ public:
         }
         controller->onHubMasterDimChange(masterDim);
 
-        controller->onHubVelocityChange(params.velocity);
-        controller->onHubAmountChange(params.amount);
-        controller->onHubSizeChange(params.size);
-        controller->onHubOffsetChange(params.offset);
-        controller->onHubVariantChange(params.variant);
-        controller->onHubIntensityChange(params.intensity);
-        
+        for (int paramsSlotIndex = 0; paramsSlotIndex < paramsSet.size(); paramsSlotIndex++)
+        {
+            auto params = paramsSet[paramsSlotIndex];
+            controller->onHubVelocityChange(paramsSlotIndex, params->velocity);
+            controller->onHubAmountChange(paramsSlotIndex, params->amount);
+            controller->onHubSizeChange(paramsSlotIndex, params->size);
+            controller->onHubOffsetChange(paramsSlotIndex, params->offset);
+            controller->onHubVariantChange(paramsSlotIndex, params->variant);
+            controller->onHubIntensityChange(paramsSlotIndex, params->intensity);
+            controller->onHubParamsNameChange(paramsSlotIndex, params->name);
+        }
     }
 
     void expandTo(unsigned int minColumns, unsigned int minRows, bool expandAllColumns = false)
     {
-        for (int i = columns.size() ; i <= minColumns; i++)
+        for (int i = columns.size(); i <= minColumns; i++)
         {
             columns.push_back(Column());
             // Log::info(TAG,"added column. column size = %d", columns.size());
@@ -263,45 +284,50 @@ public:
         //    Log::info(TAG,"column %d has %d slots", i, columns[i].slots.size());
     }
 
-    void setFlash(int columnIndex, int slotIndex, bool flash=true, bool releaseColumn=false)
+    void setFlash(int columnIndex, int slotIndex, bool flash = true, bool releaseColumn = false)
     {
         auto slot = findSlot(columnIndex, slotIndex);
-        if (!slot){
-            Log::error(TAG,"Cannot set slot to flash mode");
+        if (!slot)
+        {
+            Log::error(TAG, "Cannot set slot to flash mode");
             return;
         }
         slot->flash = flash;
         slot->releaseColumn = releaseColumn;
     }
 
-    void setFlashColumn(int columnIndex, bool flash=true, bool releaseColumn=false)
+    void setFlashColumn(int columnIndex, bool flash = true, bool releaseColumn = false)
     {
         auto column = findColumn(columnIndex);
-        if (!column){
-            Log::error(TAG,"Cannot set column to flash mode");
-            return; 
+        if (!column)
+        {
+            Log::error(TAG, "Cannot set column to flash mode");
+            return;
         }
-        for(auto& slot: column->slots){
+        for (auto &slot : column->slots)
+        {
             slot.flash = flash;
             slot.releaseColumn = releaseColumn;
         }
     }
 
-    void setForcedSelection(int columnIndex, bool force=true)
+    void setForcedSelection(int columnIndex, bool force = true)
     {
         auto column = findColumn(columnIndex);
-        if (!column){
-            Log::error(TAG,"Cannot set column forced selection");
-            return; 
+        if (!column)
+        {
+            Log::error(TAG, "Cannot set column forced selection");
+            return;
         }
         column->forcedSelection = force;
     }
 
-    void setFlashRow(int rowIndex, bool flash=true, bool releaseColumn=false)
+    void setFlashRow(int rowIndex, bool flash = true, bool releaseColumn = false)
     {
-        for(auto& column: columns)
+        for (auto &column : columns)
         {
-            if (column.slots.size() > rowIndex){
+            if (column.slots.size() > rowIndex)
+            {
                 column.slots[rowIndex].flash = flash;
                 column.slots[rowIndex].releaseColumn = releaseColumn;
             }
@@ -337,12 +363,74 @@ public:
         return &column->slots.data()[slotIndex];
     }
 
-    void setColumnName(int columnIndex, const char* name){
+    void setColumnName(int columnIndex, const char *name)
+    {
         auto col = findColumn(columnIndex);
-        if (!col){
-            Log::error(TAG,"Cannot set name of column %d", columnIndex);
+        if (!col)
+        {
+            Log::error(TAG, "Cannot set name of column %d", columnIndex);
             return;
         }
         col->name = name;
     }
+
+    // params
+    // currently you can only add params. first of all, because you probably never have to remove them,
+    // and second: it will become confusing that the slots will shift if one item is removed.
+    // the mappings to the slots will stay the same,
+
+    int addParams(Params *params)
+    {
+        paramsSet.push_back(params);
+        return paramsSet.size() - 1;
+    }
+
+    Params *getParams(int paramsSlotIndex)
+    {
+        if (paramsSlotIndex < 0 || paramsSlotIndex > paramsSet.size() - 1)
+        {
+            Log::error(TAG, "Cannot access params in slot %d, num slots = %d", paramsSlotIndex, paramsSet.size());
+            return nullptr;
+        }
+
+        return paramsSet[paramsSlotIndex];
+    }
+
+    // Params *createParams(const char* name= nullptr){
+    //     auto newParams = new Params();
+    //     newParams->name = name;
+    //     paramsSet.insert(newParams);
+    //     return newParams;
+    // }
+
+    // // void setParamsName(int index, const char* name){
+    // //     params[index].name = name;
+    // // }
+
+    // void deleteParams(Params * params_tdb)
+    // {
+    //     if (params.size()==1){
+    //         Log::error(TAG, "Cannot remove last params");
+    //         return;
+    //     }
+
+    //     for (int columnIndex = 0; columnIndex < columns.size(); columnIndex++)
+    //     {
+    //         auto column = columns[columnIndex];
+    //         for (int slotIndex = 0; slotIndex < column.slots.size(); slotIndex++)
+    //         {
+    //             auto slot = column.slots[slotIndex];
+    //             if (slot.params == params_tdb){
+    //                 slot.params= getParams(0);
+    //             }
+    //         }
+
+    //     }
+
+    //     delete(darams_td)
+    // }
+
+    // Params *getParams(int index){
+    //     return &params[index];
+    // }
 };

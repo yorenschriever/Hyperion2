@@ -11,10 +11,11 @@ public:
     virtual void onHubColumnNameChange(int columnIndex, std::string name) {};
     virtual void onHubMasterDimChange(uint8_t dim) {};
 
-    virtual void onHubVelocityChange(float velocity) {};
-    virtual void onHubAmountChange(float amount) {};
-    virtual void onHubIntensityChange(float intensity) {};
-    virtual void onHubVariantChange(float variant) {};
-    virtual void onHubSizeChange(float size) {};
-    virtual void onHubOffsetChange(float offset) {};
+    virtual void onHubVelocityChange(int paramsSlotIndex, float velocity) {};
+    virtual void onHubAmountChange(int paramsSlotIndex, float amount) {};
+    virtual void onHubIntensityChange(int paramsSlotIndex, float intensity) {};
+    virtual void onHubVariantChange(int paramsSlotIndex, float variant) {};
+    virtual void onHubSizeChange(int paramsSlotIndex, float size) {};
+    virtual void onHubOffsetChange(int paramsSlotIndex, float offset) {};
+    virtual void onHubParamsNameChange(int paramsSlotIndex, std::string name) {};
 };

@@ -19,6 +19,8 @@ int main()
 {
     auto hyp = new Hyperion();
 
+    hyp->hub.addParams(new Params("second params"));
+
     addPaletteColumn(hyp);
     addSunPipe(hyp);
     Tempo::AddSource(new ConstantTempo(120));
@@ -42,33 +44,37 @@ int main()
 
 void addSunPipe(Hyperion *hyp)
 {
+    int i=0;
+
     auto input = new ControlHubInput<RGBA>(
         sunMap.size(),
         &hyp->hub,
-        1,
+        //1,
         {
-            new Patterns::GlitchPattern(180),
-            new Patterns::GlitchPattern(60),
-            new Patterns::GlitchPattern(20),
-            new Patterns::RibbenClivePattern<NegativeCosFast>(),
-            new Patterns::RibbenClivePattern<NegativeCosFast>(3*60),
-            new Patterns::SegmentChasePattern(),
-            new Patterns::SegmentChasePattern(3*60),
-            new Patterns::RibbenFlashPattern(),
-            new Patterns::RibbenFlashPattern(3*60),
-            new Patterns::PixelGlitchPattern(),
-            new Patterns::HaloOrSwirl(),
-            new Patterns::HaloOrSwirl(0),
-            new Patterns::HaloOrSwirl(1),
-            new Patterns::Skirt(&pSunMap),
-            new Patterns::GrowingCirclesPattern(&sunMap),
-            new Patterns::RadialGlitterFadePattern(&pSunMap),
-            new Patterns::XY(&sunMap),
-            new Patterns::Lighthouse(&pSunMap),
-            new Patterns::GlowPulsePattern(),
-            new Patterns::AngularFadePattern(&pSunMap),
-            new Patterns::RadialFadePattern(&pSunMap),
-            new Patterns::ChevronsConePattern(&pSunMap),
+            {.column = 1, .slot = i++, .pattern=new Patterns::GlitchPattern(180)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::GlitchPattern(60)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::GlitchPattern(20)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::RibbenClivePattern<NegativeCosFast>()},
+            {.column = 1, .slot = i++, .pattern=new Patterns::RibbenClivePattern<NegativeCosFast>(3*60)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::SegmentChasePattern()},
+            {.column = 1, .slot = i++, .pattern=new Patterns::SegmentChasePattern(3*60)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::RibbenFlashPattern()},
+            {.column = 1, .slot = i++, .pattern=new Patterns::RibbenFlashPattern(3*60)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::PixelGlitchPattern()},
+            {.column = 1, .slot = i++, .pattern=new Patterns::HaloOrSwirl()},
+            {.column = 1, .slot = i++, .pattern=new Patterns::HaloOrSwirl(0)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::HaloOrSwirl(1)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::Skirt(&pSunMap)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::GrowingCirclesPattern(&sunMap)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::RadialGlitterFadePattern(&pSunMap)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::XY(&sunMap)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::Lighthouse(&pSunMap)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::GlowPulsePattern()},
+            {.column = 1, .slot = i++, .pattern=new Patterns::AngularFadePattern(&pSunMap)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::RadialFadePattern(&pSunMap)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::ChevronsConePattern(&pSunMap)},
+
+            {.column = 2, .slot = 0, .paramsSlot=1, .pattern=new Patterns::Lighthouse(&pSunMap)},
         }
         );
 
@@ -76,15 +82,18 @@ void addSunPipe(Hyperion *hyp)
         input,
         new CloneOutput({
             new MonitorOutput(&hyp->webServer, &sunMap),
-            new MonitorOutput3d(&hyp->webServer, &sunMap3d)
+            //new MonitorOutput3d(&hyp->webServer, &sunMap3d)
         })
     ));
+
+
 }
 
 void addPaletteColumn(Hyperion *hyp)
 {
     auto paletteColumn = new PaletteColumn(
         &hyp->hub,
+        0,
         0,
         {
             campfire,

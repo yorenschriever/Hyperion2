@@ -14,12 +14,13 @@ template <class T_COLOUR>
 class ControlHubInput : public Input
 {
 public:
-    typedef struct
+    struct SlotPattern 
     {
         int column;
         int slot;
         Pattern<T_COLOUR> *pattern;
-    } SlotPattern;
+        int paramsSlot {0};
+    };
 
     // length = the length in pixels
     // hub = the controlHub to listen to
@@ -102,7 +103,7 @@ public:
 
             //Log::info("CONTROL_HUB_INPUT", "calculating pattern active = %d, dim = %d ,masterDim = %d", slot->activated, column->dim, hub->masterDim);
 
-            slotPattern.pattern->Calculate(ledData, safeLength, slot->activated, &hub->params);
+            slotPattern.pattern->Calculate(ledData, safeLength, slot->activated, hub->getParams(slotPattern.paramsSlot));
 
             // apply dimming and copy to output buffer
             for (int i = 0; i < safeLength; i++)

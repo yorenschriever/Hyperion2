@@ -5,6 +5,13 @@
 class Params
 {
 public:
+
+    Params(){}
+    Params(std::string name){
+        this->name=name;
+    }
+    std::string name;
+
     RGBA getPrimaryColour() { return primaryColour; }
     RGBA getSecondaryColour() { return secondaryColour; }
     RGBA getHighlightColour() { return highlightColour; }

@@ -95,6 +95,7 @@ void addPaletteColumn(Hyperion *hyp)
     auto paletteColumn = new PaletteColumn(
         &hyp->hub,  //The control hub to connect to
         0,          //Column index (0 based)
+        0,          //If you are using multiple parameters you can choose one here. Here we dont, so we choose 0
         {           //The list of palettes
             heatmap,
             sunset1,

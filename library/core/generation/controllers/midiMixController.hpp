@@ -41,17 +41,17 @@ public:
         //Log::info(TAG, "onControllerChange %d %d", controller, value);
 
         if (controller == 16)
-            return hub->setVelocity(scale127toFloat(value));
+            return hub->setVelocity(0,scale127toFloat(value));
         if (controller == 20)
-            return hub->setAmount(scale127toFloat(value));
+            return hub->setAmount(0,scale127toFloat(value));
         if (controller == 24)
-            return hub->setSize(scale127toFloat(value));
+            return hub->setSize(0,scale127toFloat(value));
         if (controller == 28)
-            return hub->setOffset(scale127toFloat(value));
+            return hub->setOffset(0,scale127toFloat(value));
         if (controller == 46)
-            return hub->setVariant(scale127toFloat(value));
+            return hub->setVariant(0,scale127toFloat(value));
         if (controller == 50)
-            return hub->setIntensity(scale127toFloat(value));
+            return hub->setIntensity(0,scale127toFloat(value));
     }
     void onSystemRealtime(uint8_t message) override {}
     void onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override {}

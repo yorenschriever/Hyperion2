@@ -33,11 +33,16 @@ const defaultSlot = {
     name: ""
 }
 
+const defaultParams = {
+    params: {},
+    name: ""
+};
+
 const initialState = {
     runtimeSessionId: null,
     columns: [],
     masterDim: 255,
-    params: { }
+    paramsSet: []
 }
 
 const SendMessage = createContext();
@@ -61,9 +66,22 @@ export const ControllerApp = () => {
         })
     },[setState])
 
+    const resizeParams = useCallback((paramsSlotIndex) => {
+        setState(state => {
+            if (paramsSlotIndex === undefined || state.paramsSet.length > paramsSlotIndex)
+                return state;
+
+            const newstate = set(state, `paramsSet.${paramsSlotIndex}`, defaultParams)
+            console.log({newstate})
+            return newstate
+        })
+
+    },[setState])
+
     const [send] = useSocket("/ws/controller", msg => {
         msg = JSON.parse(msg)
         resizeController(msg.columnIndex, msg.slotIndex)
+        resizeParams(msg.paramsSlotIndex)
 
         if (msg.type == "onHubSlotActiveChange") {
             setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.active`, Boolean(msg.active)))
@@ -73,21 +91,23 @@ export const ControllerApp = () => {
             setState(state => set(state, `columns.${msg.columnIndex}.dim`, msg.dim))
         } else if (msg.type == "onHubMasterDimChange") {
             setState(state => set(state, `masterDim`, msg.masterDim))
-        } else if (msg.type == "onHubParamChange") {
-            setState(state => set(state, `params.${msg.param}`, msg.value))
         } else if (msg.type == "onHubColumnNameChange") {
             setState(state => set(state, `columns.${msg.columnIndex}.name`, msg.name))
+        } else if (msg.type == "onHubParamChange") {
+            setState(state => set(state, `paramsSet.${msg.paramsSlotIndex}.params.${msg.param}`, msg.value))
+        } else if (msg.type == "onHubParamsNameChange") {
+            setState(state => set(state, `paramsSet.${msg.paramsSlotIndex}.name`, msg.name))
         } else if (msg.type == "runtimeSessionId") {
             setState(state => {
                 if (!state.runtimeSessionId)
-                    //no build id was present yet, store it
+                    //no runtimeSessionId was present yet, store it
                     return {...state,runtimeSessionId: msg.value}
                 
                 if (msg.value == state.runtimeSessionId)
-                    //build is unchanged, continue with the state we had
+                    //runtimeSessionId is unchanged, continue with the state we had
                     return state;
                 
-                //build id is changed. try to call onBuildIdChange(). This function is present if we are in an iframe
+                //runtimeSessionId is changed. try to call onBuildIdChange(). This function is present if we are in an iframe
                 //and it will reload the entire iframe container. This will trigger a re-evaluation whether
                 //we should show a 2d or 3d monitor.
                 //if we are not in an iframe, it is enough to reset out internal state. that is wat the next line does
@@ -114,8 +134,8 @@ const Controller = ({ state }) => {
     return html`
     <div class="controller">
 
-        <div class="params columns">
-            ${Object.entries(state.params).map(([name, value]) => html`<${ParamFader} name=${name} value=${value}/>`)}
+        <div class="paramsSet">
+            ${state.paramsSet.map((params, paramsSlotIndex) => html`<${Params} params=${params} paramsSlotIndex=${paramsSlotIndex}/>`)}
         </div>
 
         <div class="activation columns">
@@ -126,10 +146,16 @@ const Controller = ({ state }) => {
             </div> 
         </div>
     
-
     </div>
 `;
 }
+
+const Params = ({ params, paramsSlotIndex }) => html`
+    <div class="paramsHeader">${params.name}</div>
+    <div class="params columns">
+        ${Object.entries(params.params).map(([name, value]) => html`<${ParamFader} name=${name} value=${value} paramsSlotIndex=${paramsSlotIndex}/>`)}
+    </div>
+    `;
 
 const Column = ({ column, columnIndex }) => html`
     <div class="column">
@@ -188,11 +214,11 @@ const MasterDimFader = ({ value }) => {
     `
 }
 
-const ParamFader = ({ name, value }) => {
+const ParamFader = ({ name, value, paramsSlotIndex }) => {
     const sender = useContext(SendMessage);
 
     const handleChange = (e) => {
-        sender(`{"type":"paramChange", \"param\": \"${name}\", "value": ${e.target.value}}`)
+        sender(`{"type":"paramChange", "paramsSlotIndex":${paramsSlotIndex}, "param": "${name}", "value": ${e.target.value}}`)
     }
 
     return html`

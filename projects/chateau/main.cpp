@@ -282,6 +282,7 @@ void addPaletteColumn(Hyperion *hyp)
   auto paletteColumn = new PaletteColumn(
       &hyp->hub,
       0,
+      0,
       {
           pinkSunset,
           heatmap,

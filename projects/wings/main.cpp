@@ -137,7 +137,7 @@ void addWingsPipe(Hyperion *hyp)
 
 void addPaletteColumn(Hyperion *hyp)
 {
-  auto paletteColumn = new PaletteColumn(&hyp->hub, 0, std::vector<PaletteColumn::Palette>{
+  auto paletteColumn = new PaletteColumn(&hyp->hub, 0,0, std::vector<PaletteColumn::Palette>{
     //coralTeal,
     plumBath,
     deepBlueOcean,

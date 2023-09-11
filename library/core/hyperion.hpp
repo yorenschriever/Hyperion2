@@ -16,7 +16,7 @@
 #include "distribution/inputs/controlHubInput.hpp"
 #include "distribution/outputs/neopixelOutput.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
-#include "generation/controlHub/websocketController.hpp"
+#include "generation/controllers/websocketController.hpp"
 #include "platform/includes/ethernet.hpp"
 #include "platform/includes/log.hpp"
 #include "platform/includes/midi.hpp"
