@@ -32,12 +32,12 @@ elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ] || [ $TARGET = 'rpi' ]; then
     "${BASEDIR}/build/${TARGET}/app"
 
 elif [ $TARGET = 'esp32' ]; then
-    PORT=${2:-$(ls /dev/tty.usbserial*)}
+    PORT=${2:-$(ls /dev/tty.usbserial-1*)}
 
     [ ! $IDF_PATH ] && . $IDF_DIR/export.sh; 
 
     cd ${BASEDIR}/build/${TARGET}
-    python3 $IDF_PATH/components/esptool_py/esptool/esptool.py -p ${PORT} -b 460800 write_flash @flash_project_args
+    python3 $IDF_PATH/components/esptool_py/esptool/esptool.py -p ${PORT} -b 460800 write_flash @flash_project_args && \
     python3 $IDF_PATH/tools/idf_monitor.py -p ${PORT} "firmware.elf"
 else 
     echo "Invalid target: ${TARGET}"

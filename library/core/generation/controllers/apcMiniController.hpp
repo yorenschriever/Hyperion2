@@ -49,10 +49,11 @@ public:
         this->midi = midi;
 
         midi->addMidiListener(this);
+        hub->subscribe(this, false);
 
-        clearAll();
-        Thread::sleep(200);
-        hub->subscribe(this, true);
+        //Manually set all leds, instead of sendCurrentStatus, 
+        //because that also clears leds that have no slots in the control hub
+        setLeds();
 
         // Log::info("APCMINI", "apcmini constructor");
     }
@@ -104,10 +105,30 @@ public:
         midi->sendNoteOn(MIDI_CHANNEL, note, active ? GREEN : OFF);
     }
 
-    void clearAll()
+    void setLeds()
     {
-        for (int x = 0; x < WIDTH; x++)
-            for (int y = 0; y < HEIGHT; y++)
-                onHubSlotActiveChange(x, y, false);
+        midi->waitTxDone();
+        Thread::sleep(10);
+        for (int x = 0; x < WIDTH; x++){
+            for (int y = 0; y < HEIGHT; y++){
+                auto slot = hub->findSlot(x,y);
+                bool isOn = slot && slot->activated;
+                onHubSlotActiveChange(x, y, isOn);
+            }
+            midi->waitTxDone();
+            Thread::sleep(5);
+        }
+
+        //clear the side leds
+        for (int note = 82; note <= 89; note++)
+            midi->sendNoteOn(MIDI_CHANNEL, note, OFF);
+        midi->waitTxDone();
+        Thread::sleep(5);
+
+        //clear the bottom leds
+        for (int note = 64; note <= 71; note++)
+            midi->sendNoteOn(MIDI_CHANNEL, note, OFF);
+        midi->waitTxDone();
+        Thread::sleep(5);
     }
 };

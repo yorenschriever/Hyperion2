@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <set>
 
+#define UNKNOWN_DIN_MIDI_DEVICE "Unknown din midi device"
+
 class IMidiListener;
 
 class MidiDevice

@@ -1,10 +1,12 @@
 #include "midi.hpp"
 #include "log.hpp"
+#include "midi-esp.hpp"
 
 Midi *Midi::createInstance()
 {
-    Log::error("MIDI", "Midi is yet supported on this platform.");
-    return nullptr;
+    if (!instance)
+        instance = new MidiEsp();
+    return instance;
 }
 
 Midi *Midi::instance = nullptr;
