@@ -14,5 +14,5 @@ public:
     virtual ~SPI() = default;
 
 protected: 
-    SPI();
+    SPI() = default;
 };
