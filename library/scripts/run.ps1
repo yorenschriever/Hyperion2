@@ -13,7 +13,7 @@ if ($args.Length -eq 0)
 if ($TARGET -eq "docker")  
 {  
     docker run -it --name=hyperion --rm `
-        --mount type=bind,source=$HYPERION_LIB_DIR,target=/hyperion_lib `
+        --mount type=bind,source=$env:HYPERION_LIB_DIR,target=/hyperion_lib `
         --mount type=bind,source=$projectDir,target=/project `
         --workdir=/project `
         -p 80:80 `

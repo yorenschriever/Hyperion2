@@ -12,9 +12,9 @@ if ($args.Length -eq 0)
 
 if ($TARGET -eq "docker")  
 {  
-    docker build -t hyperion $HYPERION_LIB_DIR\platform\docker
+    docker build -t hyperion $env:HYPERION_LIB_DIR\platform\docker
     docker run -it --name hyperion --rm `
-        --mount type=bind,source=$HYPERION_LIB_DIR,target=/hyperion_lib `
+        --mount type=bind,source=$env:HYPERION_LIB_DIR,target=/hyperion_lib `
         --mount type=bind,source=$projectDir,target=/project `
         --workdir /project hyperion `
         /hyperion_lib/scripts/build.sh linux
