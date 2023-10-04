@@ -43,7 +43,7 @@ That's it. Close your terminal and reopen (if you still need it).
 /Users/yoren/repos/esp-idf/**
 ```
 
-## Create, install and trust a certificate
+## Create, install and trust a certificate (optional)
 In order to use the web interface of Hyperion, you need to create a certificate, install it, and trust it.
 ```sh
 $HYPERION_LIB_DIR/scripts/certificate/generate.sh
