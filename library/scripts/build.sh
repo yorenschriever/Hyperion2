@@ -27,9 +27,11 @@ if [ $TARGET = 'docker' ]; then
     exit;
 
 elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ] || [ $TARGET = 'rpi' ]; then
+    ${HYPERION_LIB_DIR}/scripts/certificate/generate.sh
     PARAM="-DTARGET=${TARGET}"
 
 elif [ $TARGET = 'esp32' ] || [ $TARGET = 'esp32s3' ]; then
+    ${HYPERION_LIB_DIR}/scripts/certificate/generate.sh
     [ ! $IDF_PATH ] && . $IDF_DIR/export.sh; 
     PARAM="-DCMAKE_TOOLCHAIN_FILE=$IDF_PATH/tools/cmake/toolchain-${TARGET}.cmake -DTARGET=${TARGET} -GNinja"
     

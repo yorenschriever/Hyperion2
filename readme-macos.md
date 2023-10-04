@@ -46,8 +46,8 @@ That's it. Close your terminal and reopen (if you still need it).
 ## Create, install and trust a certificate
 In order to use the web interface of Hyperion, you need to create a certificate, install it, and trust it.
 ```sh
-cd $HYPERION_LIB_DIR/scripts/certificate
-./generate.sh
+$HYPERION_LIB_DIR/scripts/certificate/generate.sh
+$HYPERION_LIB_DIR/scripts/certificate/install-mac.sh
 ```
 This will generate a-self signed certificate. It will also install it on your machine. It will ask your password for permission to do so.
 
@@ -73,9 +73,10 @@ You should see the text 'initializing' followed by 'running'
 
 
 # Troubleshooting
-You might also need to install command line tools for xcode 
+You might also need to install command line tools for xcode. Make sure to also accept the license before using it.
 ```sh
 xcode-select –install
+sudo xcodebuild -license
 ```
 or alternatively install the required tools manually
 ```sh
@@ -97,3 +98,5 @@ rm -r build
 build macos
 run macos
 ```
+
+The error `Target "Hyperion" links to: OpenSSL::SSL but the target was not found.` can also be solved by removing the build dir

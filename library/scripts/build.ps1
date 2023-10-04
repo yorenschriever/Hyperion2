@@ -21,6 +21,7 @@ if ($TARGET -eq "docker")
     exit;
 
 } elseif ($TARGET -eq "windows") {
+    # $env:HYPERION_LIB_DIR\scripts\certificate\generate.ps1
     $PARAM="-DTARGET=${TARGET}"
 } else {
     Write-Host "Invalid target: " + $TARGET
