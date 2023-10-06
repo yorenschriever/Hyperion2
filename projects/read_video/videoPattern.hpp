@@ -8,6 +8,25 @@
 #include <math.h>
 #include <vector>
 
+class BgPattern : public Pattern<RGBA>
+{
+
+public:
+    BgPattern()
+    {
+        this->name = "BG";
+    }
+
+    inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    {
+        if (!active)
+            return;
+
+        for (int i = 0; i < width; i++)
+            pixels[i] = params->getSecondaryColour();
+    }
+};
+
 class VideoPattern : public Pattern<RGBA>
 {
     Transition transition = Transition(
@@ -40,6 +59,8 @@ public:
                             animation->pixelData[animationIndex + 1],
                             animation->pixelData[animationIndex + 2]) *
                         transition.getValue();
+            if (animation->depth==4)
+                pixels[i] = pixels[i] * (float(animation->pixelData[animationIndex + 2])/255.);
         }
     }
 };

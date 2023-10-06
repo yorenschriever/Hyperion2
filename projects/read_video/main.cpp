@@ -13,6 +13,7 @@
 #include "mapping/ledsterMap.hpp"
 #include "videoPattern.hpp"
 #include "videos/triangle.hpp"
+#include "videos/ExplosionBombAlpha.hpp"
 
 void addLedsterPipe(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
@@ -44,8 +45,10 @@ void addLedsterPipe(Hyperion *hyp)
       &hyp->hub,
       1,
       {
+          new BgPattern(),
           new VideoPattern(&anim_triangle),
-          new VideoPalettePattern(&anim_triangle)
+          new VideoPalettePattern(&anim_triangle),
+          new VideoPattern(&anim_ExplosionBombAlpha)
       });
 
   auto ledsterPipe = new ConvertPipe<RGBA, RGB>(

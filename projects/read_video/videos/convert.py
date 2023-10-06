@@ -24,6 +24,7 @@ if (not cap.isOpened()):
 
 width  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)   # float `width`
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
+channels = 3 #opencv automatically converts all video formats to BGR
     
 # read pixel map and convert coordinates
 with open(dir+"/../mapping/map.json", "r") as infile:
@@ -41,7 +42,7 @@ points = list(map(convertCoordinates, pointsJson))
 outName = dir+"/"+videoName+".hpp"
 print ("Saving to file:", outName)
 f = open(outName, "w")
-f.write("Animation anim_"+videoName+" = {\n"+str(int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))+",\n"+str(len(points))+",\n3,\n{\n")
+f.write("Animation anim_"+videoName+" = {\n"+str(int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))+",\n"+str(len(points))+",\n"+str(channels)+",\n{\n")
 
 while(True):
     # Capture frame-by-frame
@@ -50,7 +51,10 @@ while(True):
 
     for p in points:
         bgrPixel = frame[p[1],p[0]]
-        f.write("    "+str(bgrPixel[0])+","+str(bgrPixel[1])+","+str(bgrPixel[2])+",\n")
+        f.write("    ")
+        for c in range(channels):
+            f.write(str(bgrPixel[c])+",")
+        f.write("\n")
 
     f.write("\n")
 
