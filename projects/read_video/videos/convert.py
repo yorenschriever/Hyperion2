@@ -1,6 +1,6 @@
 #!/opt/homebrew/bin/python3
 #pip3 install opencv-python
-
+from multiprocessing import Pool, Queue
 import cv2
 import json
 import sys
