@@ -44,3 +44,5 @@ sdkconfig.old
 **/*.pem
 **/*.csr
 **/*.srl
+
+wifi-credentials.hpp

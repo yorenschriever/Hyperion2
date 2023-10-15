@@ -1,4 +1,6 @@
 #include "core/distribution/inputs/inputSlicer.hpp"
+#include "core/distribution/inputs/fallbackInput.hpp"
+#include "core/distribution/inputs/switchableInput.hpp"
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 #include "core/distribution/outputs/neopixelOutput.hpp"
 #include "core/distribution/outputs/spiOutput.hpp"
@@ -9,13 +11,15 @@
 #include "core/distribution/inputs/inputSplitter.hpp"
 #include "palettes.hpp"
 #include "patterns.hpp"
+#include "distribution/inputs/controlHubInput.hpp"
+// #include "dynamicPipe.hpp"
 #include <vector>
 
-// #if ESP_PLATFORM
-// #include "wifi-ap.hpp"
-// #else
-// void setup_wifi() {}
-// #endif
+#if ESP_PLATFORM
+#include "wifi-ap.hpp"
+#else
+void setup_wifi() {}
+#endif
 
 LUT *ledsterLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
 
@@ -30,28 +34,22 @@ std::vector<PaletteColumn::Palette> palettes = std::vector<PaletteColumn::Palett
     plumBath,
     redSalvation});
 
-const Hyperion::Config minimal = {
-    .network = false,
-    .rotary = false,
-    .display = false,
-    .midi = false,
-    .tempo = false,
-    .web = false,
-};
+auto hyp = new Hyperion();
+int autoColumn=2;
 
 int main()
 {
-    // setup_wifi();
-    // char hostname[14];
-    // sprintf(hostname+10,"hyperion-$x",Ethernet::getMac().octets[0],Ethernet::getMac().octets[1]);
-    // Network::setHostName(hostname);
-    // Log::info("","Hostname: %s",hostname);
-    
-    auto hyp = new Hyperion();
+    setup_wifi();
+    char hostname[14];
+    snprintf(hostname,14,"hyperion-%x%x",Ethernet::getMac().octets[0],Ethernet::getMac().octets[1]);
+    Network::setHostName(hostname);
+    Log::info("HYPER","Hostname: %s",hostname);
 
-        Tempo::AddSource(new ConstantTempo(120));
+    Tempo::AddSource(new ConstantTempo(120));
 
-    auto input = new PatternCycleInput<RGBA>(ledsterMap3d.size(), {
+    auto inputUdp = new UDPInput(9601);
+
+    std::vector<Pattern<RGBA>*> patterns = {
         new Patterns::Lighthouse(&cLedsterMap3d),
         new Patterns::PetalChase(&cLedsterMap3d),
         new Patterns::SnowflakePatternLedster(),
@@ -63,8 +61,31 @@ int main()
         new Patterns::SegmentChasePattern(),
         new Patterns::GlowPulsePattern(),
         new Patterns::PetalRotatePattern(),
-    },
+    };
+
+    auto inputAuto = new PatternCycleInput<RGBA>(ledsterMap3d.size(), patterns,
     3 * 60 * 1000);
+
+    auto inputControlled = new ControlHubInput<RGBA>(ledsterMap3d.size(),&hyp->hub,1,patterns);
+
+    auto input = new FallbackInput(
+        inputUdp,
+        new SwitchableInput(
+            inputAuto,
+            inputControlled,
+            [](){return hyp->hub.findSlot(autoColumn,0)->activated;}
+        )
+    );
+
+    hyp->hub.expandTo(autoColumn,0);
+    hyp->hub.setColumnName(autoColumn,"Palette");
+    hyp->hub.setColumnName(autoColumn,"Patterns");
+    hyp->hub.setColumnName(autoColumn,"Auto");
+    hyp->hub.findSlot(autoColumn,0)->name="Auto";
+    hyp->hub.buttonPressed(autoColumn,0);
+    hyp->hub.subscribe(new PaletteColumn(&hyp->hub,0,0,palettes));
+    hyp->hub.setFlashColumn(0, false, true);
+    hyp->hub.setForcedSelection(0);
 
 #if ESP_PLATFORM
     // ledster big
@@ -80,6 +101,7 @@ int main()
     int size2 = 210 * sizeof(RGBA);
     auto splitInput = new InputSplitter(input, {size1, size2}, true);
 
+    //TOOD use dynamicPipe to convert form RGB to GRB, instead of RGBA to GRB when data is coming from UDP
     hyp->addPipe(new ConvertPipe<RGBA, GRB>(
         splitInput->getInput(0),
         new NeopixelOutput(6),
@@ -95,7 +117,7 @@ int main()
       .display = false,
       .midi = false,
       .tempo = false,
-      .web = false,
+      .web = true,
   });
 #else
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
@@ -107,10 +129,10 @@ int main()
     int paletteColumnIndex = 0;
     while (1)
     {
-        input->params.gradient = palettes[paletteColumnIndex].gradient;
-        input->params.primaryColour = palettes[paletteColumnIndex].primary;
-        input->params.secondaryColour = palettes[paletteColumnIndex].secondary;
-        input->params.highlightColour = palettes[paletteColumnIndex].highlight;
+        inputAuto->params.gradient = palettes[paletteColumnIndex].gradient;
+        inputAuto->params.primaryColour = palettes[paletteColumnIndex].primary;
+        inputAuto->params.secondaryColour = palettes[paletteColumnIndex].secondary;
+        inputAuto->params.highlightColour = palettes[paletteColumnIndex].highlight;
 
         paletteColumnIndex++;
         if (paletteColumnIndex >= palettes.size())

@@ -8,12 +8,10 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
-
 #include "lwip/err.h"
 #include "lwip/sys.h"
+#include "wifi-credentials.hpp"
 
-#define EXAMPLE_ESP_WIFI_SSID      "Tetra"
-#define EXAMPLE_ESP_WIFI_PASS      "tetratetra"
 #define EXAMPLE_ESP_WIFI_CHANNEL   1
 #define EXAMPLE_MAX_STA_CONN       4
 
