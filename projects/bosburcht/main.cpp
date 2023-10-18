@@ -4,16 +4,32 @@
 #include "core/distribution/outputs/spiOutput.hpp"
 #include "core/hyperion.hpp"
 #include "distribution/outputs/cloneOutput.hpp"
-#include "mapping/sunMap.hpp"
-#include "mapping/sunMap3d.hpp"
+#include "mapping/windowMap.hpp"
+#include "mapping/windowMap3dCombined.hpp"
+#include "mapping/ceilingMap.hpp"
+#include "mapping/ceilingMap3dCombined.hpp"
+#include "mapping/chandelierMap3d.hpp"
+#include "mapping/chandelierMap3dCombined.hpp"
 #include "palettes.hpp"
 #include "patterns.hpp"
 #include <vector>
+#include "setViewParams.hpp"
 
-auto pSunMap = sunMap.toPolarRotate90();
+// auto pWindowMap = windowMap.toPolarRotate90();
+// auto pCeilingMap = ceilingMap.toPolarRotate90();
+// // auto pChandelierMap = chandelierMap.toPolarRotate90();
+
+// auto cMap = ceilingMap;
+// auto pMap = pCeilingMap;
+
+// auto cMap = chandelierMap;
+// auto pMap = pChandelierMap;
 
 void addPaletteColumn(Hyperion *hyp);
-void addSunPipe(Hyperion *hyp);
+
+void addWindowPipe(Hyperion *);
+void addChandelierPipe(Hyperion *);
+void addCeilingPipe(Hyperion *);
 
 int main()
 {
@@ -22,7 +38,12 @@ int main()
     hyp->hub.addParams(new Params("second params"));
 
     addPaletteColumn(hyp);
-    addSunPipe(hyp);
+    
+    addWindowPipe(hyp);
+    addChandelierPipe(hyp);
+    addCeilingPipe(hyp);
+    
+    // addCeilingPipe(hyp);
     Tempo::AddSource(new ConstantTempo(120));
 
     // select first palette
@@ -36,58 +57,94 @@ int main()
     hyp->hub.setColumnName(0, "Palette");
     hyp->hub.setColumnName(1, "Sun");
 
-    hyp->start();
 
+    hyp->start();
+    setViewParams(hyp);
 
     while (1) Thread::sleep(60 * 1000);
 }
 
-void addSunPipe(Hyperion *hyp)
+void addWindowPipe(Hyperion *hyp)
+{
+    int i=0;
+
+    auto inputL = new ControlHubInput<RGBA>(
+        windowMap3dCombinedLeft.size(),
+        &hyp->hub,
+        {
+            {.column = 1, .slot = i++, .pattern=new Patterns::Quadrants3d(&windowMap3dCombinedLeft)},
+        }
+        );
+
+    hyp->addPipe(new ConvertPipe<RGBA, RGB>(
+        inputL,
+        new CloneOutput({
+            new MonitorOutput3d(&hyp->webServer, &windowMap3dCombinedLeft),
+            //new MonitorOutput3d(&hyp->webServer, &sunMap3d)
+        })
+    ));
+
+    i=0;
+    auto inputR = new ControlHubInput<RGBA>(
+        windowMap3dCombinedRight.size(),
+        &hyp->hub,
+        {
+            {.column = 1, .slot = i++, .pattern=new Patterns::Quadrants3d(&windowMap3dCombinedRight)},
+        }
+        );
+
+    hyp->addPipe(new ConvertPipe<RGBA, RGB>(
+        inputR,
+        new CloneOutput({
+            new MonitorOutput3d(&hyp->webServer, &windowMap3dCombinedRight),
+            //new MonitorOutput3d(&hyp->webServer, &sunMap3d)
+        })
+    ));
+}
+
+void addChandelierPipe(Hyperion *hyp)
 {
     int i=0;
 
     auto input = new ControlHubInput<RGBA>(
-        sunMap.size(),
+        chandelierMap3dCombined.size(),
         &hyp->hub,
-        //1,
         {
-            {.column = 1, .slot = i++, .pattern=new Patterns::GlitchPattern(180)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::GlitchPattern(60)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::GlitchPattern(20)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::RibbenClivePattern<NegativeCosFast>()},
-            {.column = 1, .slot = i++, .pattern=new Patterns::RibbenClivePattern<NegativeCosFast>(3*60)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::SegmentChasePattern()},
-            {.column = 1, .slot = i++, .pattern=new Patterns::SegmentChasePattern(3*60)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::RibbenFlashPattern()},
-            {.column = 1, .slot = i++, .pattern=new Patterns::RibbenFlashPattern(3*60)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::PixelGlitchPattern()},
-            {.column = 1, .slot = i++, .pattern=new Patterns::HaloOrSwirl()},
-            {.column = 1, .slot = i++, .pattern=new Patterns::HaloOrSwirl(0)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::HaloOrSwirl(1)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::Skirt(&pSunMap)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::GrowingCirclesPattern(&sunMap)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::RadialGlitterFadePattern(&pSunMap)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::XY(&sunMap)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::Lighthouse(&pSunMap)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::GlowPulsePattern()},
-            {.column = 1, .slot = i++, .pattern=new Patterns::AngularFadePattern(&pSunMap)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::RadialFadePattern(&pSunMap)},
-            {.column = 1, .slot = i++, .pattern=new Patterns::ChevronsConePattern(&pSunMap)},
-
-            {.column = 2, .slot = 0, .paramsSlot=1, .pattern=new Patterns::Lighthouse(&pSunMap)},
+            {.column = 1, .slot = i++, .pattern=new Patterns::Quadrants3d(&chandelierMap3dCombined)},
         }
         );
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         input,
         new CloneOutput({
-            new MonitorOutput(&hyp->webServer, &sunMap),
+            new MonitorOutput3d(&hyp->webServer, &chandelierMap3dCombined),
             //new MonitorOutput3d(&hyp->webServer, &sunMap3d)
         })
     ));
-
-
 }
+
+
+void addCeilingPipe(Hyperion *hyp)
+{
+    int i=0;
+
+    auto input = new ControlHubInput<RGBA>(
+        ceilingMap3dCombined.size(),
+        &hyp->hub,
+        {
+            {.column = 1, .slot = i++, .pattern=new Patterns::Quadrants3d(&ceilingMap3dCombined)},
+        }
+        );
+
+    hyp->addPipe(new ConvertPipe<RGBA, RGB>(
+        input,
+        new CloneOutput({
+            new MonitorOutput3d(&hyp->webServer, &ceilingMap3dCombined),
+            //new MonitorOutput3d(&hyp->webServer, &sunMap3d)
+        })
+    ));
+}
+
 
 void addPaletteColumn(Hyperion *hyp)
 {
@@ -125,3 +182,4 @@ void addPaletteColumn(Hyperion *hyp)
         });
     hyp->hub.subscribe(paletteColumn);
 }
+

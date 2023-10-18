@@ -12,15 +12,9 @@ export class Websockets {
         this.gl = gl;
 
         //TODO this is too big, but how big should it actually be? 
-        this.buffer = new Uint8Array(buffers.verticesCount * 3)
+        this.bytesbuffer = buffers.ledBuffers.map(b => new Uint8Array(b.verticesCount * 3));
 
-        let ledOffset = 0;
-
-        scene.forEach(scenePart => {
-            const ledsInScenePart = scenePart.positions.length;
-            
-            const bufferOffset = ledOffset
-            ledOffset += ledsInScenePart
+        scene.forEach((scenePart,index) => {
 
             new Socket(scenePart.path, data => {
                 if (!(data instanceof ArrayBuffer)){
@@ -30,6 +24,7 @@ export class Websockets {
                         const newBuildId = json.value
                         if (!this.runtimeSessionId) this.runtimeSessionId = newBuildId;
                         else if (this.runtimeSessionId != newBuildId) {
+                            delete window.scene
                             window.onBuildIdChange?.();
                             window.location.reload();
                         }
@@ -44,10 +39,10 @@ export class Websockets {
 
                 for (let i = 0; i < ledsReceived * indicesPerLed; i++) {
                     const ledIndex = Math.floor(i / indicesPerLed);
-                    const bufferIndex = 3 * i + 3* indicesPerLed * bufferOffset
-                    this.buffer[bufferIndex + 0] = view[3 * ledIndex + 0]
-                    this.buffer[bufferIndex + 1] = view[3 * ledIndex + 1]
-                    this.buffer[bufferIndex + 2] = view[3 * ledIndex + 2]
+                    const bufferIndex = 3 * i 
+                    this.bytesbuffer[index][bufferIndex + 0] = view[3 * ledIndex + 0]
+                    this.bytesbuffer[index][bufferIndex + 1] = view[3 * ledIndex + 1]
+                    this.bytesbuffer[index][bufferIndex + 2] = view[3 * ledIndex + 2]
                 }  
             })
         })
@@ -56,9 +51,10 @@ export class Websockets {
     }
 
     writeBuffer() {
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffers.color);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.buffer, this.gl.STATIC_DRAW);
-
+        this.bytesbuffer.forEach((buf, index) => {
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffers.ledBuffers[index].color);
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, buf, this.gl.STATIC_DRAW);
+        })
         window.requestAnimationFrame(() => this.writeBuffer());
     }
 }

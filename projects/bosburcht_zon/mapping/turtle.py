@@ -24,7 +24,7 @@ class Turtle:
         self.pos_y += distance * sin(self.direction * 2 * pi / 360)
         if addPositionToTrail:
             self.addPositionToTrail()
-        
+
     def addPositionToTrail(self):
         self.trail.append({'x': self.pos_x, 'y': self.pos_y})
 

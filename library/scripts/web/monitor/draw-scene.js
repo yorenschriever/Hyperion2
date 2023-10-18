@@ -1,5 +1,8 @@
-function drawScene(gl, programInfo, buffers, cubeRotation) {
-    gl.clearColor(0.1, 0.1, 0.1, 1.0); // Clear to black, fully opaque
+import { viewParams } from './view-params.js'
+
+
+function drawScene(gl, programInfo, buffers, time) {
+    gl.clearColor(...viewParams.clearColor); // Clear to black, fully opaque
     gl.clearDepth(1.0); // Clear everything
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
@@ -15,7 +18,7 @@ function drawScene(gl, programInfo, buffers, cubeRotation) {
     // and we only want to see objects between 0.1 units
     // and 100 units away from the camera.
   
-    const fieldOfView = (80 * Math.PI) / 180; // in radians
+    const fieldOfView = viewParams.fieldOfView; //(80 * Math.PI) / 180; // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.1;
     const zFar = 255.0;
@@ -29,90 +32,58 @@ function drawScene(gl, programInfo, buffers, cubeRotation) {
     // the center of the scene.
     const modelViewMatrix = mat4.create();
   
-    // Now move the drawing position a bit to where we want to
-    // start drawing the square.
-    mat4.translate(
-      modelViewMatrix, // destination matrix
-      modelViewMatrix, // matrix to translate
-      [-0.0, 0.0, -2.0]
-    ); // amount to translate
-  
-    // mat4.rotate(
-    //   modelViewMatrix, // destination matrix
-    //   modelViewMatrix, // matrix to rotate
-    //   cubeRotation, // amount to rotate in radians
-    //   [0, 0, 1]
-    // ); // axis to rotate around (Z)
-    // mat4.rotate(
-    //   modelViewMatrix, // destination matrix
-    //   modelViewMatrix, // matrix to rotate
-    //   cubeRotation * 0.7, // amount to rotate in radians
-    //   [0, 1, 0]
-    // ); // axis to rotate around (Y)
-    // mat4.rotate(
-    //   modelViewMatrix, // destination matrix
-    //   modelViewMatrix, // matrix to rotate
-    //   cubeRotation * 0.3, // amount to rotate in radians
-    //   [1, 0, 0]
-    // ); // axis to rotate around (X)
-  
-    mat4.rotate(
-      modelViewMatrix, // destination matrix
-      modelViewMatrix, // matrix to rotate
-      -0.1, // amount to rotate in radians
-      [1, 0, 0]
-    ); 
-    mat4.rotate(
-      modelViewMatrix, // destination matrix
-      modelViewMatrix, // matrix to rotate
-      cubeRotation/8, // amount to rotate in radians
-      [0, 1, 0]
-    ); // axis to rotate around (Z)
+    viewParams.transform.forEach(transformation => {
+      if (transformation.type==='translate'){
+        mat4.translate(
+          modelViewMatrix, // destination matrix
+          modelViewMatrix, // matrix to translate
+          transformation.amount
+        );
+      } else if (transformation.type==='rotate') {
+        mat4.rotate(
+          modelViewMatrix, // destination matrix
+          modelViewMatrix, // matrix to rotate
+          transformation.amount(time),
+          transformation.vector
+        ); 
+      }
+    })
 
     const normalMatrix = mat4.create();
     mat4.invert(normalMatrix, modelViewMatrix);
     mat4.transpose(normalMatrix, normalMatrix);
 
-    // Tell WebGL how to pull out the positions from the position
-    // buffer into the vertexPosition attribute.
-    setPositionAttribute(gl, buffers.position, programInfo);
-  
-    setColorAttribute(gl, buffers.color, programInfo);
-  
-    //light
-    //setNormalAttribute(gl, buffers, programInfo);
+    buffers.ledBuffers.forEach(buf => {
+        // Tell WebGL how to pull out the positions from the position
+        // buffer into the vertexPosition attribute.
+        setPositionAttribute(gl, buf.position, programInfo);
+      
+        setColorAttribute(gl, buf.color, programInfo);
+      
+        //light
+        //setNormalAttribute(gl, buffers, programInfo);
 
-    // Tell WebGL which indices to use to index the vertices
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+        // Tell WebGL which indices to use to index the vertices
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buf.indices);
 
-    // Tell WebGL to use our program when drawing
-    gl.useProgram(programInfo.program);
-  
-    // Set the shader uniforms
-    gl.uniformMatrix4fv(
-      programInfo.uniformLocations.projectionMatrix,
-      false,
-      projectionMatrix
-    );
-    gl.uniformMatrix4fv(
-      programInfo.uniformLocations.modelViewMatrix,
-      false,
-      modelViewMatrix
-    );
+        // Tell WebGL to use our program when drawing
+        gl.useProgram(programInfo.program);
+      
+        // Set the shader uniforms
+        gl.uniformMatrix4fv(
+          programInfo.uniformLocations.projectionMatrix,
+          false,
+          projectionMatrix
+        );
+        gl.uniformMatrix4fv(
+          programInfo.uniformLocations.modelViewMatrix,
+          false,
+          modelViewMatrix
+        );
 
-    //light
-    // gl.uniformMatrix4fv(
-    //     programInfo.uniformLocations.normalMatrix,
-    //     false,
-    //     normalMatrix
-    // );
-  
-    {
-      //const vertexCount = 36; 
-      const type = gl.UNSIGNED_SHORT;
-      const offset = 0;
-      gl.drawElements(gl.TRIANGLES, buffers.indicesCount, type, offset);
-    }
+        gl.drawElements(gl.TRIANGLES, buf.indicesCount, gl.UNSIGNED_SHORT, 0);
+    })
+    
 
 
 
@@ -122,22 +93,7 @@ function drawScene(gl, programInfo, buffers, cubeRotation) {
     setColorAttribute(gl, buffers.gridColor, programInfo);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.gridIndices);
     gl.useProgram(programInfo.program);
-    // gl.uniformMatrix4fv(
-    //   programInfo.uniformLocations.projectionMatrix,
-    //   false,
-    //   projectionMatrix
-    // );
-    // gl.uniformMatrix4fv(
-    //   programInfo.uniformLocations.modelViewMatrix,
-    //   false,
-    //   modelViewMatrix
-    // );
-    {
-      //const vertexCount = 36; 
-      const type = gl.UNSIGNED_SHORT;
-      const offset = 0;
-      gl.drawElements(gl.LINES, buffers.gridIndicesCount, type, offset);
-    }
+    gl.drawElements(gl.LINES, buffers.gridIndicesCount, gl.UNSIGNED_SHORT, 0);
   }
 
   
