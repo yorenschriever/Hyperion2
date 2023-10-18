@@ -311,10 +311,10 @@ namespace Patterns
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<Glow> lfo;
-        PixelMap::Polar *map;
+        PixelMap3d::Cylindrical *map;
 
     public:
-        Lighthouse(PixelMap::Polar *map)
+        Lighthouse(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
             this->name = "Lighthouse";
