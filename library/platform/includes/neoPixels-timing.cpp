@@ -1,4 +1,4 @@
-#include "NeoPixels.hpp"
+#include "neoPixels.hpp"
 
 NeoPixels::Timing NeoPixels::WS2811{
     300, 950,

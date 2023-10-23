@@ -66,9 +66,57 @@ f.close()
 
 
 
-# f = open("ceilingMap3dCombined.hpp", "w")
-# f.write("PixelMap3d sunMap3d = {\n")
-# for point in turtle.trail:
-#     f.write("    {.x = " + str(point['x']) + ", .z = " + str(point['y']) + ", .y = " + str(find_z(point)) + "},\n")
-# f.write("};\n\n")
-# f.close()
+# ====== ceiling index map
+# maps the indices to get rid of the zigzag order en quadrants
+# the order becomes
+# 60 --- 0
+# 120 -- 61
+# 180 -- 121
+
+numLeds = len(turtle.trail)
+numLedsPerQuadrant = int(numLeds/4)
+mappedIndices=[]
+
+def fillAsc(startIndex):
+    mappedIndices.extend(range(startIndex, startIndex+60) )
+
+def fillDesc(startIndex):
+    mappedIndices.extend(range(startIndex+59,startIndex-1,-1) )
+
+startAscending = (numLedsPerQuadrant/60)%2==1
+# Q1
+for i in range(numLedsPerQuadrant,0,-120):
+    if startAscending:
+        fillAsc(i-60)
+        fillDesc(i-120)
+    else:
+        fillDesc(i-60)
+        fillAsc(i-120)
+# Q2
+for i in range(0,numLedsPerQuadrant,120):
+    fillAsc(i     + numLedsPerQuadrant)
+    fillDesc(i+60 + numLedsPerQuadrant)
+# Q3
+for i in range(numLedsPerQuadrant,0,-120):
+    if startAscending:
+        fillAsc(i-60     + 2*numLedsPerQuadrant)
+        fillDesc(i-120   + 2*numLedsPerQuadrant)
+    else:
+        fillDesc(i-60    + 2*numLedsPerQuadrant)
+        fillAsc(i-120    + 2*numLedsPerQuadrant)
+# Q4
+for i in range(0,numLedsPerQuadrant,120):
+    fillAsc(i       + 3*numLedsPerQuadrant)
+    fillDesc(i+60   + 3*numLedsPerQuadrant)        
+
+
+
+print(mappedIndices)
+
+f = open("ceilingMappedIndices.hpp", "w")
+f.write("#include <stdint.h>\n")
+f.write("uint16_t ceilingMappedIndices[] = {\n")
+for index in mappedIndices:
+    f.write(str(index)+",\n")
+f.write("};\n\n")
+f.close()

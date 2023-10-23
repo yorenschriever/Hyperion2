@@ -7,6 +7,7 @@
 #include "mappingHelpers.hpp"
 #include <math.h>
 #include <vector>
+#include "mapping/ceilingMappedIndices.hpp"
 
 namespace Patterns
 {
@@ -15,6 +16,65 @@ namespace Patterns
     const float r2 = r1 + 0.5 * l * sqrt(3);
     const float r3 = r1 + l;
     const float r4 = r3 + 0.5 * l * sqrt(3);
+
+
+    class IndexMapTest : public Pattern<RGBA>
+    {
+        int segmentSize;
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+
+    public:
+        IndexMapTest(int segmentSize=60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Index map test";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int start = int(params->getVariant()*width/segmentSize)*segmentSize;
+            for (int i=start+0; i < start+60; i++)
+                pixels[ceilingMappedIndices[i]] = params->getPrimaryColour();
+
+        }
+    };
+
+
+    class CeilingChase : public Pattern<RGBA>
+    {
+        int segmentSize;
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        LFO<SawDown> lfo;
+
+    public:
+        CeilingChase(int segmentSize=60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Ceiling chase";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            lfo.setPeriod(params->getVelocity(5000,500));
+            int multiply = int(params->getAmount(1,10));
+            lfo.setDutyCycle(params->getSize());
+            lfo.setSoftEdgeWidth(1./width);
+
+            for (int i=0;i<width; i++)
+                pixels[ceilingMappedIndices[i]] = params->getPrimaryColour() * lfo.getValue(float(i)/width * multiply);
+
+        }
+    };
 
     class GlitchPattern : public Pattern<RGBA>
     {

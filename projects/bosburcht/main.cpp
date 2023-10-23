@@ -30,6 +30,15 @@ void addWindowPipe(Hyperion *);
 void addChandelierPipe(Hyperion *);
 void addCeilingPipe(Hyperion *);
 
+#define COL_PALETTE 0
+#define COL_WINDOW_BG 1
+#define COL_WINDOW_FG 2
+#define COL_CHANDELIER_BG 3
+#define COL_CHANDELIER_FG 4
+#define COL_CEILING_BG 5
+#define COL_CEILING_FG 6
+#define COL_FLASH 7
+
 int main()
 {
     auto hyp = new Hyperion();
@@ -53,9 +62,14 @@ int main()
     hyp->hub.buttonPressed(1, 0);
     // hyp->hub.setFlashColumn(1, false, true);
 
-    hyp->hub.setColumnName(0, "Palette");
-    hyp->hub.setColumnName(1, "Test");
-
+    hyp->hub.setColumnName(COL_PALETTE, "Palette");
+    hyp->hub.setColumnName(COL_WINDOW_BG, "Window bg");
+    hyp->hub.setColumnName(COL_WINDOW_FG, "Window fg");
+    hyp->hub.setColumnName(COL_CHANDELIER_BG, "Chandelier bg");
+    hyp->hub.setColumnName(COL_CHANDELIER_FG, "Chandelier fg");
+    hyp->hub.setColumnName(COL_CEILING_BG, "Ceiling bg");
+    hyp->hub.setColumnName(COL_CEILING_FG, "Ceiling fg");
+    hyp->hub.setColumnName(COL_FLASH, "Flash");
 
     hyp->start();
     setViewParams(hyp);
@@ -162,6 +176,9 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = 1, .slot = i++, .pattern=new Patterns::Quadrants3d(&ceilingMap3dCombined)},
             {.column = 1, .slot = i++, .pattern=new Patterns::GlowPulsePattern()},
             {.column = 1, .slot = i++, .pattern=new Patterns::Lighthouse(&cceilingMap3dCombined)},
+            {.column = 1, .slot = 4, .pattern=new Patterns::IndexMapTest()},
+            {.column = 1, .slot = 5, .pattern=new Patterns::CeilingChase()},
+
         }
         );
 
