@@ -114,6 +114,7 @@ for i in range(0,numLedsPerQuadrant,120):
 print(mappedIndices)
 
 f = open("ceilingMappedIndices.hpp", "w")
+f.write("#pragma once\n")
 f.write("#include <stdint.h>\n")
 f.write("uint16_t ceilingMappedIndices[] = {\n")
 for index in mappedIndices:

@@ -24,9 +24,9 @@ public:
         }
     }
 
-    PixelMap3d getMap(int index)
+    PixelMap3d *getMap(int index)
     {
-        return destinationMaps[index];
+        return &(destinationMaps[index]);
     }
 
     int size()

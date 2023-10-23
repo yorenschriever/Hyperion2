@@ -97,21 +97,23 @@ def transformTo3d(point2d, translate_x, translate_y):
 
 f = open("windowMap3dCombined.hpp", "w")
 
+# for x in [-3375,3375]:
+#     f.write("PixelMap3d windowMap3dCombined" + ("Left" if x<0 else "Right") +  " = {\n")
+#     for y in range(-7000,7000,1750*2):
+#         for y2 in [0, 1000]:
+#             for point2d in turtle.trail:
+#                 point = transformTo3d(point2d,x,y+y2+windowWidth+500)
+#                 f.write("    {.x = " + str(point['x'] * scale) + ", .z = " + str(point['y'] * scale) + ", .y = " + str((point['z']+zoffset) * scale) + "},\n")
+#     f.write("};\n\n")
+
+f.write("PixelMap3d windowMap3dCombined = {\n")
 for x in [-3375,3375]:
-    f.write("PixelMap3d windowMap3dCombined" + ("Left" if x<0 else "Right") +  " = {\n")
+    
     for y in range(-7000,7000,1750*2):
         for y2 in [0, 1000]:
             for point2d in turtle.trail:
                 point = transformTo3d(point2d,x,y+y2+windowWidth+500)
                 f.write("    {.x = " + str(point['x'] * scale) + ", .z = " + str(point['y'] * scale) + ", .y = " + str((point['z']+zoffset) * scale) + "},\n")
-    f.write("};\n\n")
-
-# x=3375
-# f.write("PixelMap3d windowMap3dCombinedRight = {\n")
-# for y in range(-7000,7000,1750):
-#     for point2d in turtle.trail:
-#         point = transformTo3d(point2d,x,y+windowWidth)
-#         f.write("    {.x = " + str(point['x'] * scale) + ", .z = " + str(point['y'] * scale) + ", .y = " + str((point['z']+zoffset) * scale) + "},\n")
-# f.write("};\n\n")
+f.write("};\n\n")
 
 f.close()
