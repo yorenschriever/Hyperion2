@@ -27,7 +27,7 @@ public:
         int cb, cbr;
         bool gotFrame = false;
         // read all packets, throw them away, but keep the last one.
-        while ((cbr = sock->recv(dataPtr, buffersize)) > 0)
+        while ((cbr = sock->receive(dataPtr, buffersize)) > 0)
         {
             gotFrame = true;
             cb = cbr;

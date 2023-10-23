@@ -83,8 +83,12 @@ void Ethernet::initialize()
     eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
     eth_phy_config_t phy_config = ETH_PHY_DEFAULT_CONFIG();
 
+    mac_config.rx_task_stack_size = 4096;
+    mac_config.rx_task_prio = 4;
+    mac_config.flags = ETH_MAC_FLAG_WORK_WITH_CACHE_DISABLE;
+    mac_config.sw_reset_timeout_ms = 1000;
     phy_config.phy_addr = 0;
-    phy_config.reset_gpio_num = -1;
+    phy_config.reset_gpio_num = 12;
     esp_rom_gpio_pad_select_gpio(PIN_PHY_POWER);
     gpio_set_direction(PIN_PHY_POWER, GPIO_MODE_OUTPUT);
     gpio_set_level(PIN_PHY_POWER, 1);

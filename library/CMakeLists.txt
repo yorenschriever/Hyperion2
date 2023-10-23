@@ -25,6 +25,7 @@ if (${ESP_PLATFORM})
             "platform/${TARGET}" 
             "platform/${TARGET}/misc"
             "platform/${TARGET}/misc/mdns"
+            "platform/includes"
             "core/generation/patterns/helpers/tempo"
             "misc"
         EMBED_TXTFILES
@@ -60,6 +61,7 @@ else ()
 
     file(GLOB PLATFORM_SRC CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_LIST_DIR}/platform/${TARGET}/*.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/platform/includes/*.cpp"
     )
 
     file(GLOB_RECURSE CORE_SRC CONFIGURE_DEPENDS

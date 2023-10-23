@@ -125,7 +125,7 @@ public:
         return 0;
     }
 
-    int recv(void *rx_buffer, unsigned int buffer_length)
+    int receive(void *rx_buffer, unsigned int buffer_length)
     {
         if (sock <= 0)
         {
@@ -133,9 +133,7 @@ public:
             return 0;
         }
 
-        struct sockaddr_storage source_addr; // Large enough for both IPv4 or IPv6
-        socklen_t socklen = sizeof(source_addr);
-        int len = recvfrom(sock, rx_buffer, buffer_length, 0, (struct sockaddr *)&source_addr, &socklen);
+        int len = recv(sock, rx_buffer, buffer_length, MSG_DONTWAIT);
 
         if (len < 0 && errno != EWOULDBLOCK)
         {

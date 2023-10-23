@@ -7,6 +7,10 @@
 #include "esp_check.h"
 #include "led_strip_encoder.h"
 #include "esp_attr.h"
+#include "driver/gpio.h"
+
+//gpio pin used to measure how much time is spent in the interrupt
+//#define GPIO_OUTPUT GPIO_NUM_16
 
 static const char *TAG = "led_encoder";
 
@@ -18,8 +22,11 @@ typedef struct {
     rmt_symbol_word_t reset_code;
 } rmt_led_strip_encoder_t;
 
+
 static IRAM_ATTR size_t rmt_encode_led_strip(rmt_encoder_t *encoder, rmt_channel_handle_t channel, const void *primary_data, size_t data_size, rmt_encode_state_t *ret_state)
 {
+    //gpio_set_level(GPIO_OUTPUT, 1);
+
     rmt_led_strip_encoder_t *led_encoder = __containerof(encoder, rmt_led_strip_encoder_t, base);
     rmt_encoder_handle_t bytes_encoder = led_encoder->bytes_encoder;
     rmt_encoder_handle_t copy_encoder = led_encoder->copy_encoder;
@@ -51,6 +58,7 @@ static IRAM_ATTR size_t rmt_encode_led_strip(rmt_encoder_t *encoder, rmt_channel
     }
 out:
     *ret_state = state;
+    //gpio_set_level(GPIO_OUTPUT, 0);
     return encoded_symbols;
 }
 
@@ -74,6 +82,8 @@ static IRAM_ATTR esp_err_t rmt_led_strip_encoder_reset(rmt_encoder_t *encoder)
 
 esp_err_t IRAM_ATTR rmt_new_led_strip_encoder(const led_strip_encoder_config_t *config, rmt_encoder_handle_t *ret_encoder)
 {
+    //gpio_set_direction(GPIO_OUTPUT, GPIO_MODE_OUTPUT);
+
     esp_err_t ret = ESP_OK;
     rmt_led_strip_encoder_t *led_encoder = NULL;
     ESP_GOTO_ON_FALSE(config && ret_encoder, ESP_ERR_INVALID_ARG, err, TAG, "invalid argument");
@@ -86,15 +96,15 @@ esp_err_t IRAM_ATTR rmt_new_led_strip_encoder(const led_strip_encoder_config_t *
     rmt_bytes_encoder_config_t bytes_encoder_config = {
         .bit0 = {
             .level0 = 1,
-            .duration0 = 0.3 * config->resolution / 1000000, // T0H=0.3us
+            .duration0 = 0.4 * config->resolution / 1000000, // T0H=0.3us
             .level1 = 0,
-            .duration1 = 0.9 * config->resolution / 1000000, // T0L=0.9us
+            .duration1 = 0.85 * config->resolution / 1000000, // T0L=0.9us
         },
         .bit1 = {
             .level0 = 1,
-            .duration0 = 0.9 * config->resolution / 1000000, // T1H=0.9us
+            .duration0 = 0.8 * config->resolution / 1000000, // T1H=0.9us
             .level1 = 0,
-            .duration1 = 0.3 * config->resolution / 1000000, // T1L=0.3us
+            .duration1 = 0.45 * config->resolution / 1000000, // T1L=0.3us
         },
         .flags.msb_first = 1 // WS2812 transfer bit order: G7...G0R7...R0B7...B0
     };
@@ -102,7 +112,7 @@ esp_err_t IRAM_ATTR rmt_new_led_strip_encoder(const led_strip_encoder_config_t *
     rmt_copy_encoder_config_t copy_encoder_config = {};
     ESP_GOTO_ON_ERROR(rmt_new_copy_encoder(&copy_encoder_config, &led_encoder->copy_encoder), err, TAG, "create copy encoder failed");
 
-    uint32_t reset_ticks =  config->resolution / 1000000 * 1000 / 2; // reset code duration defaults to 1000us
+    uint32_t reset_ticks = config->resolution / 1000000 * 1000 / 2; // reset code duration defaults to 1000us
     led_encoder->reset_code = (rmt_symbol_word_t) {
         .level0 = 0,
         .duration0 = reset_ticks,

@@ -13,13 +13,14 @@ class NeopixelOutput : public Output
 {
 public:
     // port goes from 1-8
-    NeopixelOutput(int port)
+    NeopixelOutput(int port, NeoPixels::Timing timing = NeoPixels::Kpbs800)
     {
         this->port = port;
+        this->timing = timing;
 
         // initialize with 3 pixels by default
         this->length = 12;
-        buffer = (uint8_t *)Utils::malloc_dma(length);
+        buffer = (uint8_t *)malloc(length);
 
         rmt = NeoPixels::createInstance();
     }
@@ -55,7 +56,7 @@ public:
         if (!rmt)
             return;
 
-        rmt->begin(port);
+        rmt->begin(port, timing);
     }
 
     void clear() override
@@ -72,8 +73,7 @@ public:
             while (!ready())
                 Thread::sleep(1);
 
-            buffer = (uint8_t *)Utils::realloc_dma(buffer, len);
-
+            buffer = (uint8_t *)realloc(buffer, len);
             if (!buffer)
             {
                 Log::error("NEOPIXEL_OUTPUT", "Unable to allocate memory for neoPixelOutput, free heap = %d", Utils::get_free_heap());
@@ -90,4 +90,5 @@ private:
     int port = 1;
     NeoPixels *rmt;
     int length;
+    NeoPixels::Timing timing;
 };
