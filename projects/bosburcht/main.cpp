@@ -18,11 +18,13 @@
 
 LUT *columnsLut = nullptr; //new ColourCorrectionLUT(1, 255, 200, 200, 200);
 
-auto cwindowMap3dCombinedLeft = windowMap3dCombinedLeft.toCylindricalRotate90();
-auto cwindowMap3dCombinedRight = windowMap3dCombinedRight.toCylindricalRotate90();
-auto cchandelierMap3dCombined = chandelierMap3dCombined.toCylindricalRotate90();
-auto cceilingMap3dCombined = ceilingMap3dCombined.toCylindricalRotate90();
-auto cchandelierMap3d = chandelierMap3d.toCylindricalRotate90();
+auto cwindowMap3dCombinedLeft = windowMap3dCombinedLeft.toCylindricalXZ(0,chandelierYOffset);
+auto cwindowMap3dCombinedRight = windowMap3dCombinedRight.toCylindricalXZ(0,chandelierYOffset);
+auto cchandelierMap3dCombined = chandelierMap3dCombined.toCylindricalXZ(0,chandelierYOffset);
+auto cceilingMap3dCombined = ceilingMap3dCombined.toCylindricalXZ(0,chandelierYOffset);
+auto cchandelierMap3d = chandelierMap3d.toCylindricalXZ();
+
+
 
 void addPaletteColumn(Hyperion *hyp);
 

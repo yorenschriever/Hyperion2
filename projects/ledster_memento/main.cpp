@@ -23,7 +23,7 @@ void setup_wifi() {}
 
 LUT *ledsterLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
 
-auto cLedsterMap3d = ledsterMap3d.toCylindricalRotate90();
+auto cLedsterMap3d = ledsterMap3d.toCylindricalXZ();
 
 std::vector<PaletteColumn::Palette> palettes = std::vector<PaletteColumn::Palette>({
     pinkSunset,

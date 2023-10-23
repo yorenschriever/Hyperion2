@@ -39,12 +39,6 @@ public:
 
     using vector<PixelPosition>::vector;
 
-private:
-    Polar polar;
-    Polar polar90;
-
-public:
-
     float x(unsigned int index){
         return this->operator[](index).x;
     }
@@ -55,8 +49,7 @@ public:
 
     Polar toPolar()
     {
-        if (polar.size() == this->size())
-            return polar;
+        Polar polar;
 
         transform(
             this->begin(), 
@@ -73,8 +66,7 @@ public:
     //to polar coordinates where th==0 points to the top instead of to the right
     Polar toPolarRotate90()
     {
-        if (polar90.size() == this->size())
-            return polar90;
+        Polar polar90;
 
         transform(
             this->begin(), 
@@ -97,8 +89,6 @@ struct PixelPosition3d
     float y;
     float z;
 };
-
-//typedef std::vector<PixelPosition3d> PixelMap3d;
 
 class PixelMap3d: public vector<PixelPosition3d>  {
 
@@ -129,12 +119,6 @@ public:
 
     using vector<PixelPosition3d>::vector;
 
-private:
-    Cylindrical cylindrical;
-    Cylindrical cylindrical90;
-
-public:
-
     float x(unsigned int index){
         return this->operator[](index).x;
     }
@@ -147,43 +131,42 @@ public:
         return this->operator[](index).z;
     }
 
-    Cylindrical toCylindrical()
+    Cylindrical toCylindricalXY(float centerX=0, float centerY=0)
     {
-        if (cylindrical.size() == this->size())
-            return cylindrical;
+        Cylindrical cylindricalXY;
 
         transform(
             this->begin(), 
             this->end(), 
-            back_inserter(cylindrical), [](PixelPosition3d pos) -> CylindricalPixelPosition{ 
+            back_inserter(cylindricalXY), [centerX,centerY](PixelPosition3d pos) -> CylindricalPixelPosition{ 
+                float x = pos.y - centerX;
+                float y = pos.y - centerY;
                 return {
-                    .r = sqrt(pos.y * pos.y + pos.x * pos.x),
-                    .th = atan2(pos.y, pos.x),
+                    .r = sqrt(y * y + x * x),
+                    .th = atan2(y, x),
                     .z = pos.z
                 };
             });
-        return cylindrical;
+        return cylindricalXY;
     }
 
     //to Cylindrical coordinates where th==0 points to the top instead of to the right
-    Cylindrical toCylindricalRotate90()
+    Cylindrical toCylindricalXZ(float centerX=0, float centerZ=0)
     {
-        if (cylindrical90.size() == this->size())
-            return cylindrical90;
+        Cylindrical cylindricalXZ;
 
         transform(
             this->begin(), 
             this->end(), 
-            back_inserter(cylindrical90), [](PixelPosition3d pos) -> CylindricalPixelPosition{ 
+            back_inserter(cylindricalXZ), [centerX, centerZ](PixelPosition3d pos) -> CylindricalPixelPosition{ 
+                float x = pos.x - centerX;
+                float z = pos.z - centerZ;
                 return {
-                    // .r = sqrt(pos.y * pos.y + pos.x * pos.x),
-                    // .th = atan2(pos.x, -1*pos.y),
-                    // .z = pos.z
-                    .r = sqrt(pos.z * pos.z + pos.x * pos.x),
-                    .th = atan2(pos.x, -1*pos.z),
+                    .r = sqrt(z * z + x * x),
+                    .th = atan2(x, -1*z),
                     .z = pos.y
                 };
             });
-        return cylindrical90;
+        return cylindricalXZ;
     }
 };

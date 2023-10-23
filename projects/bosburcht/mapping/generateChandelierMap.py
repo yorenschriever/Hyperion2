@@ -80,4 +80,5 @@ f.write("PixelMap3d chandelierMap3dCombined = {\n")
 for point in turtle.trail:
     f.write("    {.x = " + str(point['x'] * scale) + ", .z = " + str((point['y']-yoffset) * scale) + ", .y = " + str((point['z']+height+zoffset) * scale) + "},\n")
 f.write("};\n\n")
+f.write("float chandelierYOffset = " + str(-yoffset * scale) + ";\n")
 f.close()

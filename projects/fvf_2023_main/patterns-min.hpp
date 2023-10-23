@@ -188,7 +188,7 @@ namespace Min
     public:
         GrowingCirclesPattern(PixelMap3d *map)
         {
-            // this->map = map.toCylindricalRotate90();
+            // this->map = map.toCylindricalXZ();
             for (int i = 0; i < 6; i++)
             {
                 float xc = cos(float(i) / 6 * 2 * M_PI);

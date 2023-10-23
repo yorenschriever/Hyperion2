@@ -35,9 +35,9 @@ LUT *ledsterLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
 LUT *columnsLut = new ColourCorrectionLUT(1, 255, 200, 200, 200);
 LUT *haloLut = nullptr; // new ColourCorrectionLUT(1, 255, 255, 255, 255);
 
-auto cColumnMap3d = columnMap3d.toCylindricalRotate90();
-auto cLedsterMap3d = ledsterMap3d.toCylindricalRotate90();
-auto cHaloMap3d = haloMap3d.toCylindricalRotate90();
+auto cColumnMap3d = columnMap3d.toCylindricalXZ();
+auto cLedsterMap3d = ledsterMap3d.toCylindricalXZ();
+auto cHaloMap3d = haloMap3d.toCylindricalXZ();
 
 void addLedsterPipe(Hyperion *hyp);
 void addColumnPipes(Hyperion *hyp);

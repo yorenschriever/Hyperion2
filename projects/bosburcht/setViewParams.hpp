@@ -13,7 +13,7 @@ export const viewParams = {\n\
         {\n\
             //move 2 units back\n\
             type:'translate',\n\
-            amount: [0,0.2,-1.5]\n\
+            amount: [0,0,-1.5]\n\
         },\n\
         {\n\
             // look slightly from below\n\
