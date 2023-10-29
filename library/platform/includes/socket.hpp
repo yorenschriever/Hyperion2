@@ -19,7 +19,7 @@ private:
     int sock = 0;
 
 public:
-    Socket(uint16_t port = 0, int addr_family = AF_INET)
+    Socket(uint16_t port = 0, int addr_family = AF_INET, int receive_timeout=0)
     {
         int err;
         this->addr_family = addr_family;
@@ -58,7 +58,7 @@ public:
             return;
         }
 
-        set_recv_timeout(0);
+        set_recv_timeout(receive_timeout);
 
         if (port != 0)
         {
@@ -136,6 +136,24 @@ public:
         int len = recv(sock, rx_buffer, buffer_length, MSG_DONTWAIT);
 
         if (len < 0 && errno != EWOULDBLOCK)
+        {
+            Log::error(TAG, "error during recvfrom: errno: %d", errno);
+        }
+
+        return len;
+    }
+
+    int receive_wait(void *rx_buffer, unsigned int buffer_length)
+    {
+        if (sock <= 0)
+        {
+            Log::error(TAG, "cannot recv. socket not open");
+            return 0;
+        }
+
+        int len = recv(sock, rx_buffer, buffer_length, MSG_WAITALL);
+
+        if (len < 0 && errno != EAGAIN)
         {
             Log::error(TAG, "error during recvfrom: errno: %d", errno);
         }

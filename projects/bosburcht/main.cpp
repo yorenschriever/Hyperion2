@@ -19,6 +19,7 @@
 #include "patterns/chandelier.hpp"
 #include "setViewParams.hpp"
 #include <vector>
+#include "artNetPattern.hpp"
 
 LUT *columnsLut = nullptr; // new ColourCorrectionLUT(1, 255, 200, 200, 200);
 
@@ -41,6 +42,7 @@ void addCeilingPipe(Hyperion *);
 #define COL_MASK 5
 // #define COL_UNUSED 6
 #define COL_FLASH 7
+#define COL_ARTNET 8
 
 typedef struct
 {
@@ -68,7 +70,8 @@ int main()
     hyp->hub.setForcedSelection(0);
 
     //hyp->hub.buttonPressed(1, 0);
-    hyp->hub.setFlashColumn(7, true, false);
+    hyp->hub.setFlashColumn(COL_FLASH, true, false);
+    hyp->hub.buttonPressed(COL_ARTNET, 0);
 
     hyp->hub.setColumnName(COL_PALETTE, "Palette");
     hyp->hub.setColumnName(COL_WINDOW, "Window bg");
@@ -77,6 +80,7 @@ int main()
     hyp->hub.setColumnName(COL_ALL, "All");
     hyp->hub.setColumnName(COL_MASK, "Mask");
     hyp->hub.setColumnName(COL_FLASH, "Flash");
+    hyp->hub.setColumnName(COL_ARTNET, "ArtNet");
 
     hyp->start();
     setViewParams(hyp);
@@ -119,6 +123,8 @@ void addWindowPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::FlashesPattern()},
             {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
+
+            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,0,segmentSize)},
             
         });
 
@@ -224,6 +230,8 @@ void addChandelierPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::FlashesPattern()},
             {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
+
+            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,16)},
         });
 
     auto splitInput = new InputSlicer(
@@ -294,6 +302,8 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::FlashesPattern()},
             {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
+
+            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,16+48,60,ceilingMappedIndices)},
 
 
         });

@@ -92,6 +92,11 @@ public:
         return result;
     }
 
+    static IPAddress broadcast()
+    {
+        return fromUint32(0xFFFFFFFF);
+    }
+
     static IPAddress fromUint32(uint32_t ipv4)
     {
         struct sockaddr_in sockaddr;
