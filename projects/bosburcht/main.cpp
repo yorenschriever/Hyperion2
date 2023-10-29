@@ -11,12 +11,12 @@
 #include "mapping/windowMap.hpp"
 #include "mapping/windowMap3dCombined.hpp"
 #include "palettes.hpp"
-// #include "patterns.hpp"
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 #include "core/generation/pixelMapSplitter3d.hpp"
 #include "patterns/ceiling.hpp"
 #include "patterns/common.hpp"
 #include "patterns/window.hpp"
+#include "patterns/chandelier.hpp"
 #include "setViewParams.hpp"
 #include <vector>
 
@@ -34,12 +34,12 @@ void addChandelierPipe(Hyperion *);
 void addCeilingPipe(Hyperion *);
 
 #define COL_PALETTE 0
-#define COL_WINDOW_BG 1
-#define COL_WINDOW_FG 2
-#define COL_CHANDELIER_BG 3
-#define COL_CHANDELIER_FG 4
-#define COL_CEILING_BG 5
-#define COL_CEILING_FG 6
+#define COL_WINDOW 1
+#define COL_CHANDELIER 2
+#define COL_CEILING 3
+#define COL_ALL 4
+#define COL_MASK 5
+// #define COL_UNUSED 6
 #define COL_FLASH 7
 
 typedef struct
@@ -60,7 +60,6 @@ int main()
     addChandelierPipe(hyp);
     addCeilingPipe(hyp);
 
-    // addCeilingPipe(hyp);
     Tempo::AddSource(new ConstantTempo(120));
 
     // select first palette
@@ -68,16 +67,15 @@ int main()
     hyp->hub.setFlashColumn(0, false, true);
     hyp->hub.setForcedSelection(0);
 
-    hyp->hub.buttonPressed(1, 0);
-    // hyp->hub.setFlashColumn(1, false, true);
+    //hyp->hub.buttonPressed(1, 0);
+    hyp->hub.setFlashColumn(7, true, false);
 
     hyp->hub.setColumnName(COL_PALETTE, "Palette");
-    hyp->hub.setColumnName(COL_WINDOW_BG, "Window bg");
-    hyp->hub.setColumnName(COL_WINDOW_FG, "Window fg");
-    hyp->hub.setColumnName(COL_CHANDELIER_BG, "Chandelier bg");
-    hyp->hub.setColumnName(COL_CHANDELIER_FG, "Chandelier fg");
-    hyp->hub.setColumnName(COL_CEILING_BG, "Ceiling bg");
-    hyp->hub.setColumnName(COL_CEILING_FG, "Ceiling fg");
+    hyp->hub.setColumnName(COL_WINDOW, "Window bg");
+    hyp->hub.setColumnName(COL_CHANDELIER, "Chandelier");
+    hyp->hub.setColumnName(COL_CEILING, "Ceiling");
+    hyp->hub.setColumnName(COL_ALL, "All");
+    hyp->hub.setColumnName(COL_MASK, "Mask");
     hyp->hub.setColumnName(COL_FLASH, "Flash");
 
     hyp->start();
@@ -99,20 +97,29 @@ void addWindowPipe(Hyperion *hyp)
         {
             // {.column = 1, .slot = i++, .pattern=new Patterns::Quadrants3d(&windowMap3dCombinedLeft)},
 
-            {.column = COL_WINDOW_BG, .slot = 0, .pattern = new Patterns::RibbenClivePattern<NegativeCosFast>(segmentSize)},
-            {.column = COL_WINDOW_BG, .slot = 1, .pattern = new Patterns::RibbenFlashPattern(segmentSize)},
-            {.column = COL_WINDOW_BG, .slot = 2, .pattern = new Patterns::GrowShrink(&windowMap3dCombined)},
-            {.column = COL_WINDOW_BG, .slot = 3, .pattern = new Patterns::VerticallyIsolated(&windowMap3dCombined)},
-            {.column = COL_WINDOW_BG, .slot = 4, .pattern = new Patterns::RotatingRingsPattern(&windowMap3dCombined)},
-            {.column = COL_WINDOW_BG, .slot = 5, .pattern = new Patterns::OnBeatWindowChaseUpPattern(&windowMap3dCombined)},
-
-            {.column = COL_WINDOW_FG, .slot = 0, .pattern = new Patterns::GlowPulsePattern()},
+            {.column = COL_WINDOW, .slot = 0, .pattern = new Patterns::RibbenClivePattern<NegativeCosFast>(segmentSize)},
+            {.column = COL_WINDOW, .slot = 1, .pattern = new Patterns::RibbenFlashPattern(segmentSize)},
+            {.column = COL_WINDOW, .slot = 2, .pattern = new Patterns::GrowShrink(&windowMap3dCombined)},
+            {.column = COL_WINDOW, .slot = 3, .pattern = new Patterns::VerticallyIsolated(&windowMap3dCombined)},
+            {.column = COL_WINDOW, .slot = 4, .pattern = new Patterns::RotatingRingsPattern(&windowMap3dCombined)},
+            {.column = COL_WINDOW, .slot = 5, .pattern = new Patterns::OnBeatWindowChaseUpPattern(&windowMap3dCombined)},
+            {.column = COL_WINDOW, .slot = 6, .pattern = new Patterns::HorizontalSin(&windowMap3dCombined)},
+            {.column = COL_WINDOW, .slot = 7, .pattern = new Patterns::OnbeatFadePattern()},
+            {.column = COL_WINDOW, .slot = 8, .pattern = new Patterns::WindowGlitchPattern()},
+            {.column = COL_WINDOW, .slot = 9, .pattern = new Patterns::GlowPulsePattern()},
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern(segmentSize)},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
             {.column = COL_FLASH, .slot = 2, .pattern = new Patterns::Lighthouse(&cwindowMap3dCombined)},
             {.column = COL_FLASH, .slot = 3, .pattern = new Patterns::RadialGlitterFadePattern(&cwindowMap3dCombined)},
             {.column = COL_FLASH, .slot = 4, .pattern = new Patterns::RadialFadePattern(&cwindowMap3dCombined)},
+            {.column = COL_FLASH, .slot = 5, .pattern = new Patterns::LineLaunch(&windowMap3dCombined)},
+            {.column = COL_FLASH, .slot = 6, .pattern = new Patterns::FadingNoisePattern()},
+            {.column = COL_FLASH, .slot = 7, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
+            {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
+            
         });
 
     auto splitInput = new InputSlicer(
@@ -180,6 +187,11 @@ void addWindowPipe(Hyperion *hyp)
         new ConvertPipe<RGBA, RGB>(
             splitInput->getInput(splitInput->size() - 1),
             new MonitorOutput3d(&hyp->webServer, splitMap->getMap(1))));
+
+    // hyp->addPipe(
+    //     new ConvertPipe<RGBA, RGB>(
+    //         splitInput->getInput(splitInput->size() - 2),
+    //         new MonitorOutput(&hyp->webServer, &windowMap)));
 }
 
 void addChandelierPipe(Hyperion *hyp)
@@ -193,32 +205,40 @@ void addChandelierPipe(Hyperion *hyp)
         {
             // {.column = 1, .slot = i++, .pattern=new Patterns::Quadrants3d(&chandelierMap3dCombined)},
 
-            {.column = COL_CHANDELIER_BG, .slot = 0, .pattern = new Patterns::RibbenClivePattern<NegativeCosFast>()},
-            {.column = COL_CHANDELIER_BG, .slot = 1, .pattern = new Patterns::RibbenFlashPattern()},
-
-            {.column = COL_CHANDELIER_FG, .slot = 0, .pattern = new Patterns::GlowPulsePattern()},
-            {.column = COL_CHANDELIER_FG, .slot = 1, .pattern = new Patterns::SegmentChasePattern()},
-            {.column = COL_CHANDELIER_FG, .slot = 2, .pattern = new Patterns::Lighthouse(&cchandelierMap3d)},
+            {.column = COL_CHANDELIER, .slot = 0, .pattern = new Patterns::RibbenClivePattern<NegativeCosFast>()},
+            {.column = COL_CHANDELIER, .slot = 1, .pattern = new Patterns::RibbenFlashPattern()},
+            {.column = COL_CHANDELIER, .slot = 2, .pattern = new Patterns::StaticGradientPattern(&cchandelierMap3d)},
+            {.column = COL_CHANDELIER, .slot = 3, .pattern = new Patterns::BreathingGradientPattern(&cchandelierMap3d)},
+            {.column = COL_CHANDELIER, .slot = 4, .pattern = new Patterns::GlowPulsePattern()},
+            {.column = COL_CHANDELIER, .slot = 5, .pattern = new Patterns::SegmentChasePattern()},
+            {.column = COL_CHANDELIER, .slot = 6, .pattern = new Patterns::Lighthouse(&cchandelierMap3d)},
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
             {.column = COL_FLASH, .slot = 2, .pattern = new Patterns::Lighthouse(&cchandelierMap3dCombined)},
             {.column = COL_FLASH, .slot = 3, .pattern = new Patterns::RadialGlitterFadePattern(&cchandelierMap3dCombined)},
             {.column = COL_FLASH, .slot = 4, .pattern = new Patterns::RadialFadePattern(&cchandelierMap3dCombined)},
+            {.column = COL_FLASH, .slot = 5, .pattern = new Patterns::LineLaunch(&chandelierMap3dCombined)},
+            {.column = COL_FLASH, .slot = 6, .pattern = new Patterns::FadingNoisePattern()},
+            {.column = COL_FLASH, .slot = 7, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
+            {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
         });
 
-    auto splitInput = new InputSlicer(input,
-                                      {
-                                          {0 * nbytes / 8, nbytes / 8, true},
-                                          {1 * nbytes / 8, nbytes / 8, true},
-                                          {2 * nbytes / 8, nbytes / 8, true},
-                                          {3 * nbytes / 8, nbytes / 8, true},
-                                          {4 * nbytes / 8, nbytes / 8, true},
-                                          {5 * nbytes / 8, nbytes / 8, true},
-                                          {6 * nbytes / 8, nbytes / 8, true},
-                                          {7 * nbytes / 8, nbytes / 8, true},
-                                          {0, nbytes, false},
-                                      });
+    auto splitInput = new InputSlicer(
+        input,
+        {
+            {0 * nbytes / 8, nbytes / 8, true},
+            {1 * nbytes / 8, nbytes / 8, true},
+            {2 * nbytes / 8, nbytes / 8, true},
+            {3 * nbytes / 8, nbytes / 8, true},
+            {4 * nbytes / 8, nbytes / 8, true},
+            {5 * nbytes / 8, nbytes / 8, true},
+            {6 * nbytes / 8, nbytes / 8, true},
+            {7 * nbytes / 8, nbytes / 8, true},
+            {0, nbytes, false},
+        });
 
     for (int i = 0; i < splitInput->size() - 1; i++)
     {
@@ -233,12 +253,16 @@ void addChandelierPipe(Hyperion *hyp)
         new ConvertPipe<RGBA, RGB>(
             splitInput->getInput(splitInput->size() - 1),
             new MonitorOutput3d(&hyp->webServer, &chandelierMap3dCombined)));
+            // new MonitorOutput3d(&hyp->webServer, &chandelierMap3d)));
 }
 
 void addCeilingPipe(Hyperion *hyp)
 {
+    int nleds = ceilingMap3dCombined.size();
+    int nbytes = nleds * sizeof(RGBA);
+
     auto input = new ControlHubInput<RGBA>(
-        ceilingMap3dCombined.size(),
+        nleds,
         &hyp->hub,
         {
             // {.column = 1, .slot = i++, .pattern=new Patterns::Quadrants3d(&ceilingMap3dCombined)},
@@ -247,27 +271,57 @@ void addCeilingPipe(Hyperion *hyp)
             // {.column = 1, .slot = 4, .pattern=new Patterns::IndexMapTest()},
             // {.column = 1, .slot = 5, .pattern=new Patterns::CeilingChase()},
 
-            {.column = COL_CEILING_BG, .slot = 0, .pattern = new Patterns::RibbenClivePattern<NegativeCosFast>()},
-            {.column = COL_CEILING_BG, .slot = 1, .pattern = new Patterns::RibbenFlashPattern()},
-            {.column = COL_CEILING_BG, .slot = 2, .pattern = new Patterns::CeilingChase()},
-
-            {.column = COL_CEILING_FG, .slot = 0, .pattern = new Patterns::GlowPulsePattern()},
-            {.column = COL_CEILING_FG, .slot = 1, .pattern = new Patterns::SegmentChasePattern()},
+            {.column = COL_CEILING, .slot = 0, .pattern = new Patterns::RibbenClivePattern<NegativeCosFast>()},
+            {.column = COL_CEILING, .slot = 1, .pattern = new Patterns::RibbenFlashPattern()},
+            {.column = COL_CEILING, .slot = 2, .pattern = new Patterns::CeilingChase()},
+            {.column = COL_CEILING, .slot = 3, .pattern = new Patterns::SinChasePattern()},
+            {.column = COL_CEILING, .slot = 4, .pattern = new Patterns::SawChasePattern()},
+            {.column = COL_CEILING, .slot = 5, .pattern = new Patterns::FadeFromCenter()},
+            {.column = COL_CEILING, .slot = 6, .pattern = new Patterns::FadeFromRandom()},
+            {.column = COL_CEILING, .slot = 7, .pattern = new Patterns::SideWave()},
+            {.column = COL_CEILING, .slot = 8, .pattern = new Patterns::SinChase2Pattern()},
+            {.column = COL_CEILING, .slot = 9, .pattern = new Patterns::GlowPulsePattern()},
+            {.column = COL_CEILING, .slot = 10, .pattern = new Patterns::SegmentChasePattern()},
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
             {.column = COL_FLASH, .slot = 2, .pattern = new Patterns::Lighthouse(&cceilingMap3dCombined)},
             {.column = COL_FLASH, .slot = 3, .pattern = new Patterns::RadialGlitterFadePattern(&cceilingMap3dCombined)},
             {.column = COL_FLASH, .slot = 4, .pattern = new Patterns::RadialFadePattern(&cceilingMap3dCombined)},
+            {.column = COL_FLASH, .slot = 5, .pattern = new Patterns::LineLaunch(&ceilingMap3dCombined)},
+            {.column = COL_FLASH, .slot = 6, .pattern = new Patterns::FadingNoisePattern()},
+            {.column = COL_FLASH, .slot = 7, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
+            {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
+
 
         });
 
-    hyp->addPipe(new ConvertPipe<RGBA, RGB>(
+    auto splitInput = new InputSlicer(
         input,
-        new CloneOutput({
-            new MonitorOutput3d(&hyp->webServer, &ceilingMap3dCombined),
-            // new MonitorOutput3d(&hyp->webServer, &sunMap3d)
-        })));
+        {
+            {0 * nbytes / 4, nbytes / 4, true},
+            {1 * nbytes / 4, nbytes / 4, true},
+            {2 * nbytes / 4, nbytes / 4, true},
+            {3 * nbytes / 4, nbytes / 4, true},
+            {0, nbytes, false},
+        });
+
+    for (int i = 0; i < splitInput->size() - 1; i++)
+    {
+        auto pipe = new ConvertPipe<RGBA, BGR>(
+            splitInput->getInput(i),
+            new UDPOutput("hyperslave6.local", 9611 + i, 45),
+            columnsLut);
+        hyp->addPipe(pipe);
+    }
+
+    hyp->addPipe(
+        new ConvertPipe<RGBA, RGB>(
+            splitInput->getInput(splitInput->size() - 1),
+            new MonitorOutput3d(&hyp->webServer, &ceilingMap3dCombined)));
+            //new MonitorOutput(&hyp->webServer, &ceilingMap)));
 }
 
 void addPaletteColumn(Hyperion *hyp)

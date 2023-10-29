@@ -57,6 +57,33 @@ export const viewParams = {\n\
 //     ]\n\
 // };\n";
 
+//Best for chandelier solo view
+// const char viewParams[] = "\n\
+// export const viewParams = {\n\
+//     clearColor: [0.1, 0.1, 0.1, 1.0],\n\
+//     fieldOfView: (40 * Math.PI) / 180,\n\
+//     gridZ: -0.35,\n\
+//     transform: [\n\
+//         {\n\
+//             //move 2 units back\n\
+//             type:'translate',\n\
+//             amount: [0,0.0,-4.0]\n\
+//         },\n\
+//         {\n\
+//             // look slightly from below\n\
+//             type:'rotate',\n\
+//             amount: (_t)=>0.0,\n\
+//             vector:[1,0,0]\n\
+//         },\n\
+//         {\n\
+//             //rotate the scene\n\
+//             type:'rotate',\n\
+//             amount: (t)=>0,\n\
+//             vector: [0,1,0]\n\
+//         }\n\
+//     ]\n\
+// };\n";
+
 class ViewParams: public WebServerResponseBuilder
 {
     public:

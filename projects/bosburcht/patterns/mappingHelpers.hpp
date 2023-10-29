@@ -7,6 +7,11 @@ float around(float th){
     return (th + M_PI)/(2*M_PI);
 }
 
+float normalize(float a)
+{
+    return (a+1.)/2.;
+}
+
 inline float softEdge(float dist, float size, float edgeSize = 0.03)
 {
     if (dist > size) return 0;

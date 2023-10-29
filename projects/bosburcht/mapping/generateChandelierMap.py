@@ -19,7 +19,7 @@ def ledLine():
         turtle.move(ledDistance)
 
 def reverseLedLine():
-    turtle.move(ledDistance * ledsPerMeter)
+    turtle.move(ledDistance * ledsPerMeter, False)
     turtle.turnVertical(180)
     for i in range(ledsPerMeter):
         turtle.move(ledDistance)
