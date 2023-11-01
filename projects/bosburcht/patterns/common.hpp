@@ -256,7 +256,7 @@ namespace Patterns
             {
                 RGBA color = params->getSecondaryColour();
                 // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
-                pixels[index] = color * lfo.getValue(-2 * around(map->th(index))) * Utils::rescale(map->r(index), 0.5, 1, 0.4, 1) * transition.getValue();
+                pixels[index] = color * lfo.getValue(-2 * around(map->th(index))) * Utils::rescale(map->r(index), 0.7, 1, 0.4, 1) * transition.getValue();
                 // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
         }

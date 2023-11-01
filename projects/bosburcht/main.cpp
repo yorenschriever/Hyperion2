@@ -17,6 +17,7 @@
 #include "patterns/common.hpp"
 #include "patterns/window.hpp"
 #include "patterns/chandelier.hpp"
+#include "patterns/mask.hpp"
 #include "setViewParams.hpp"
 #include <vector>
 #include "artNetPattern.hpp"
@@ -74,7 +75,7 @@ int main()
     hyp->hub.buttonPressed(COL_ARTNET, 0);
 
     hyp->hub.setColumnName(COL_PALETTE, "Palette");
-    hyp->hub.setColumnName(COL_WINDOW, "Window bg");
+    hyp->hub.setColumnName(COL_WINDOW, "Windows");
     hyp->hub.setColumnName(COL_CHANDELIER, "Chandelier");
     hyp->hub.setColumnName(COL_CEILING, "Ceiling");
     hyp->hub.setColumnName(COL_ALL, "All");
@@ -111,6 +112,21 @@ void addWindowPipe(Hyperion *hyp)
             {.column = COL_WINDOW, .slot = 7, .pattern = new Patterns::OnbeatFadePattern()},
             {.column = COL_WINDOW, .slot = 8, .pattern = new Patterns::WindowGlitchPattern()},
             {.column = COL_WINDOW, .slot = 9, .pattern = new Patterns::GlowPulsePattern()},
+
+            {.column = COL_ALL, .slot = 0, .pattern = new Patterns::GlitchPattern(segmentSize)},
+            {.column = COL_ALL, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
+            {.column = COL_ALL, .slot = 2, .pattern = new Patterns::Lighthouse(&cwindowMap3dCombined)},
+            {.column = COL_ALL, .slot = 3, .pattern = new Patterns::RadialGlitterFadePattern(&cwindowMap3dCombined)},
+            {.column = COL_ALL, .slot = 4, .pattern = new Patterns::RadialFadePattern(&cwindowMap3dCombined)},
+            {.column = COL_ALL, .slot = 5, .pattern = new Patterns::LineLaunch(&windowMap3dCombined)},
+            {.column = COL_ALL, .slot = 6, .pattern = new Patterns::FadingNoisePattern()},
+            {.column = COL_ALL, .slot = 7, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_ALL, .slot = 8, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_ALL, .slot = 9, .pattern = new Patterns::StrobePattern()},
+            {.column = COL_ALL, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
+
+            {.column = COL_MASK, .slot = 3, .pattern = new Patterns::RotatingRingsMaskPattern(&windowMap3dCombined)},
+            {.column = COL_MASK, .slot = 4, .pattern = new Patterns::GlowPulseMaskPattern()},
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern(segmentSize)},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
@@ -218,6 +234,21 @@ void addChandelierPipe(Hyperion *hyp)
             {.column = COL_CHANDELIER, .slot = 4, .pattern = new Patterns::GlowPulsePattern()},
             {.column = COL_CHANDELIER, .slot = 5, .pattern = new Patterns::SegmentChasePattern()},
             {.column = COL_CHANDELIER, .slot = 6, .pattern = new Patterns::Lighthouse(&cchandelierMap3d)},
+            {.column = COL_CHANDELIER, .slot = 7, .pattern = new Patterns::BarLFO()},
+
+            {.column = COL_ALL, .slot = 0, .pattern = new Patterns::GlitchPattern()},
+            {.column = COL_ALL, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
+            {.column = COL_ALL, .slot = 2, .pattern = new Patterns::Lighthouse(&cchandelierMap3dCombined)},
+            {.column = COL_ALL, .slot = 3, .pattern = new Patterns::RadialGlitterFadePattern(&cchandelierMap3dCombined)},
+            {.column = COL_ALL, .slot = 4, .pattern = new Patterns::RadialFadePattern(&cchandelierMap3dCombined)},
+            {.column = COL_ALL, .slot = 5, .pattern = new Patterns::LineLaunch(&chandelierMap3dCombined)},
+            {.column = COL_ALL, .slot = 6, .pattern = new Patterns::FadingNoisePattern()},
+            {.column = COL_ALL, .slot = 7, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_ALL, .slot = 8, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_ALL, .slot = 9, .pattern = new Patterns::StrobePattern()},
+            {.column = COL_ALL, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
+
+            {.column = COL_MASK, .slot = 6, .pattern = new Patterns::GlowPulseMaskPattern()},
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
@@ -290,6 +321,22 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_CEILING, .slot = 8, .pattern = new Patterns::SinChase2Pattern()},
             {.column = COL_CEILING, .slot = 9, .pattern = new Patterns::GlowPulsePattern()},
             {.column = COL_CEILING, .slot = 10, .pattern = new Patterns::SegmentChasePattern()},
+
+            {.column = COL_ALL, .slot = 0, .pattern = new Patterns::GlitchPattern()},
+            {.column = COL_ALL, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
+            {.column = COL_ALL, .slot = 2, .pattern = new Patterns::Lighthouse(&cceilingMap3dCombined)},
+            {.column = COL_ALL, .slot = 3, .pattern = new Patterns::RadialGlitterFadePattern(&cceilingMap3dCombined)},
+            {.column = COL_ALL, .slot = 4, .pattern = new Patterns::RadialFadePattern(&cceilingMap3dCombined)},
+            {.column = COL_ALL, .slot = 5, .pattern = new Patterns::LineLaunch(&ceilingMap3dCombined)},
+            {.column = COL_ALL, .slot = 6, .pattern = new Patterns::FadingNoisePattern()},
+            {.column = COL_ALL, .slot = 7, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_ALL, .slot = 8, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_ALL, .slot = 9, .pattern = new Patterns::StrobePattern()},
+            {.column = COL_ALL, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
+
+            {.column = COL_MASK, .slot = 0, .pattern = new Patterns::GlowPulseMaskPattern()},
+            {.column = COL_MASK, .slot = 1, .pattern = new Patterns::SinChaseMaskPattern()},
+            {.column = COL_MASK, .slot = 2, .pattern = new Patterns::SideWaveMask()},
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
