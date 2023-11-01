@@ -75,50 +75,48 @@ namespace Patterns
 
     
 
-    // class SegmentChasePattern : public Pattern<RGBA>
-    // {
-    //     Transition transition;
-    //     Permute perm;
-    //     int segmentSize;
-    //     LFO<SawDown> lfo = LFO<SawDown>(5000);
+    class SegmentChasePattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        Permute perm;
+        int segmentSize;
+        LFO<SawDown> lfo = LFO<SawDown>(5000);
 
-    // public:
-    //     SegmentChasePattern(int segmentSize = 60)
-    //     {
-    //         this->segmentSize = segmentSize;
-    //         this->name = "Segment chase";
-    //     }
+    public:
+        SegmentChasePattern(int segmentSize = 60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Segment chase";
+        }
 
-    //     inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-    //     {
-    //         if (!transition.Calculate(active))
-    //             return;
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
 
-    //         int numSegments = width / segmentSize;
-    //         perm.setSize(numSegments);
-    //         float pulseWidth = params->getSize(0.25, 1);
-    //         float factor = params->getAmount(50, 1);
-    //         lfo.setPeriod(params->getVelocity(2000, 200) * factor);
-    //         lfo.setDutyCycle(pulseWidth / factor);
-    //         lfo.setSoftEdgeWidth(1. / width * factor);
-    //         float lfoWidth = segmentSize * factor;
+            int numSegments = width / segmentSize;
+            perm.setSize(numSegments);
+            float pulseWidth = params->getSize(0.25, 1);
+            float factor = params->getAmount(50, 1);
+            lfo.setPeriod(params->getVelocity(2000, 200) * factor);
+            lfo.setDutyCycle(pulseWidth / factor);
+            lfo.setSoftEdgeWidth(1. / width * factor);
+            float lfoWidth = segmentSize * factor;
 
-    //         for (int segment = 0; segment < numSegments; segment++)
-    //         {
-    //             int randomSegment = perm.at[segment];
+            for (int segment = 0; segment < numSegments; segment++)
+            {
+                int randomSegment = perm.at[segment];
 
-    //             for (int j = 0; j < segmentSize; j++)
-    //             {
-    //                 float lfoVal = lfo.getValue(float(j) / lfoWidth + float(randomSegment) / numSegments + float(segment));
-    //                 RGBA col = params->gradient->get(lfoVal * 255) * lfoVal * transition.getValue();
-    //                 int index = segment * segmentSize + j;
-    //                 if (width == sizeof(ceilingMappedIndices) / 2)
-    //                     index = ceilingMappedIndices[index];
-    //                 pixels[index] = col;
-    //             }
-    //         }
-    //     }
-    // };
+                for (int j = 0; j < segmentSize; j++)
+                {
+                    float lfoVal = lfo.getValue(float(j) / lfoWidth + float(randomSegment) / numSegments + float(segment));
+                    RGBA col = params->gradient->get(lfoVal * 255) * lfoVal * transition.getValue();
+                    int index = segment * segmentSize + j;
+                    pixels[index] = col;
+                }
+            }
+        }
+    };
 
     class PixelGlitchPattern : public Pattern<RGBA>
     {
@@ -494,7 +492,7 @@ namespace Patterns
             1000, Transition::none, 0);
         Timeline timeline = Timeline(1000);
         int window = 0;
-        const int numWindows = 16;
+        const int numWindows = 8;
 
     public:
         WindowGlitchPattern()

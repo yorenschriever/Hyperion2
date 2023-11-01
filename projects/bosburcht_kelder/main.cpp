@@ -1,5 +1,6 @@
 #include "core/distribution/inputs/inputSlicer.hpp"
 #include "core/distribution/luts/colourCorrectionLut.hpp"
+#include "core/distribution/luts/incandescentLut.hpp"
 #include "core/distribution/outputs/neopixelOutput.hpp"
 #include "core/distribution/outputs/spiOutput.hpp"
 #include "core/generation/pixelMapSplitter3d.hpp"
@@ -11,14 +12,18 @@
 #include "mapping/colanderMap3dCombined.hpp"
 #include "palettes.hpp"
 #include "patterns/ceiling.hpp"
-#include "patterns/chandelier.hpp"
 #include "patterns/colander.hpp"
-#include "patterns/common.hpp"
 #include "patterns/window.hpp"
+#include "patterns/common.hpp"
+#include "patterns/videoPattern.hpp"
+#include "animation.hpp"
 #include "setViewParams.hpp"
 #include <vector>
+#include "videos/Gradient_circle.hpp"
+#include "videos/driehoek_v1.hpp"
 
 LUT *columnsLut = nullptr; // new ColourCorrectionLUT(1, 255, 200, 200, 200);
+LUT *incandescentLut8 = new IncandescentLUT(2.5, 255, 24);
 
 void addPaletteColumn(Hyperion *hyp);
 
@@ -26,8 +31,11 @@ void addColanderPipe(Hyperion *);
 void addCeilingPipe(Hyperion *);
 
 #define COL_PALETTE 0
-#define COL_COLANDER 1
-#define COL_CEILING 2
+#define COL_COLANDER1 1
+#define COL_COLANDER2 2
+#define COL_CEILING1 3
+#define COL_CEILING2 4
+#define COL_VIDEO 5
 // #define COL_ALL 4
 // #define COL_MASK 5
 // #define COL_UNUSED 6
@@ -59,11 +67,14 @@ int main()
 
     hyp->hub.setFlashColumn(COL_FLASH, true, false);
 
-    hyp->hub.buttonPressed(COL_CEILING, 0);
+    // hyp->hub.buttonPressed(COL_CEILING, 0);
 
     hyp->hub.setColumnName(COL_PALETTE, "Palette");
-    hyp->hub.setColumnName(COL_COLANDER, "Colander");
-    hyp->hub.setColumnName(COL_CEILING, "Ceiling");
+    hyp->hub.setColumnName(COL_COLANDER1, "Vergiet");
+    hyp->hub.setColumnName(COL_COLANDER2, "Vergiet");
+    hyp->hub.setColumnName(COL_CEILING1, "Ceiling");
+    hyp->hub.setColumnName(COL_CEILING2, "Ceiling");
+    hyp->hub.setColumnName(COL_VIDEO, "Video");
     hyp->hub.setColumnName(COL_FLASH, "Flash");
 
     hyp->start();
@@ -77,47 +88,43 @@ void addCeilingPipe(Hyperion *hyp)
 {
     int nleds = ceilingMap3dCombined.size();
     int nbytes = nleds * sizeof(RGBA);
-    int i=0;
 
     auto input = new ControlHubInput<RGBA>(
         nleds,
         &hyp->hub,
         {
-            // {.column = 1, .slot = i++, .pattern=new Patterns::Quadrants3d(&ceilingMap3dCombined)},
+            {.column = COL_CEILING1, .slot = 0, .pattern = new Ceiling::Fireworks()},
+            {.column = COL_CEILING1, .slot = 1, .pattern = new Ceiling::Chaser()},
+            {.column = COL_CEILING1, .slot = 2, .pattern = new Ceiling::RibbenClivePattern<NegativeCosFast>(20)},
+            {.column = COL_CEILING1, .slot = 3, .pattern = new Ceiling::RibbenFlashPattern()},
+            {.column = COL_CEILING1, .slot = 4, .pattern = new Patterns::FadeFromCenter()},
+            {.column = COL_CEILING1, .slot = 5, .pattern = new Patterns::FadeFromRandom()},
+            {.column = COL_CEILING1, .slot = 6, .pattern = new Patterns::FadeFromRandom(600)},
 
-            // {.column = 1, .slot = i++, .pattern=new Patterns::Lighthouse(&cceilingMap3dCombined)},
-            // {.column = 1, .slot = 4, .pattern=new Patterns::IndexMapTest()},
-            // {.column = 1, .slot = 5, .pattern=new Patterns::CeilingChase()},
+            {.column = COL_CEILING2, .slot = 0, .pattern = new Patterns::GlowPulsePattern()},
+            {.column = COL_CEILING2, .slot = 1, .pattern = new Patterns::SegmentChasePattern(600)},
+            {.column = COL_CEILING2, .slot = 2, .pattern = new Patterns::GlitchPattern()},
+            {.column = COL_CEILING2, .slot = 3, .pattern = new Patterns::PixelGlitchPattern()},
+            {.column = COL_CEILING2, .slot = 4, .pattern = new Patterns::LineLaunch(&ceilingMap3dCombined)},
+            {.column = COL_CEILING2, .slot = 5, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_CEILING2, .slot = 6, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_CEILING2, .slot = 7, .pattern = new Patterns::StrobePattern()},
 
-            {.column = COL_CEILING, .slot = i++, .pattern = new Ceiling::Fireworks()},
-            {.column = COL_CEILING, .slot = i++, .pattern = new Ceiling::Chaser()},
-            {.column = COL_CEILING, .slot = i++, .pattern = new Ceiling::RibbenClivePattern<NegativeCosFast>(20)},
-            {.column = COL_CEILING, .slot = i++, .pattern = new Ceiling::RibbenFlashPattern()},
+            {.column = COL_VIDEO, .slot = 0, .pattern = new VideoPattern(&anim_driehoek_v1)},
+            {.column = COL_VIDEO, .slot = 1, .pattern = new VideoPalettePattern(&anim_driehoek_v1)},
 
-
-            // {.column = COL_CEILING, .slot = 2, .pattern = new Patterns::CeilingChase()},
-            // {.column = COL_CEILING, .slot = 3, .pattern = new Patterns::SinChasePattern()},
-            // {.column = COL_CEILING, .slot = 4, .pattern = new Patterns::SawChasePattern()},
-            {.column = COL_CEILING, .slot = i++, .pattern = new Patterns::FadeFromCenter()},
-            {.column = COL_CEILING, .slot = i++, .pattern = new Patterns::FadeFromRandom()},
-            // {.column = COL_CEILING, .slot = 7, .pattern = new Patterns::SideWave()},
-            // {.column = COL_CEILING, .slot = 8, .pattern = new Patterns::SinChase2Pattern()},
-            {.column = COL_CEILING, .slot = i++, .pattern = new Patterns::GlowPulsePattern()},
-            // {.column = COL_CEILING, .slot = 10, .pattern = new Patterns::SegmentChasePattern()},
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
-            // {.column = COL_FLASH, .slot = 2, .pattern = new Patterns::Lighthouse(&cceilingMap3dCombined)},
-            // {.column = COL_FLASH, .slot = 3, .pattern = new Patterns::RadialGlitterFadePattern(&cceilingMap3dCombined)},
-            // {.column = COL_FLASH, .slot = 4, .pattern = new Patterns::RadialFadePattern(&cceilingMap3dCombined)},
-            {.column = COL_FLASH, .slot = 5, .pattern = new Patterns::LineLaunch(&ceilingMap3dCombined)},
-            {.column = COL_FLASH, .slot = 6, .pattern = new Patterns::FadingNoisePattern()},
-            {.column = COL_FLASH, .slot = 7, .pattern = new Patterns::SegmentGlitchPattern()},
-            {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::FlashesPattern()},
-            {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
-            {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
+            {.column = COL_FLASH, .slot = 2, .pattern = new Patterns::LineLaunch(&ceilingMap3dCombined)},
+            {.column = COL_FLASH, .slot = 3, .pattern = new Patterns::FadingNoisePattern()},
+            {.column = COL_FLASH, .slot = 4, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_FLASH, .slot = 5, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_FLASH, .slot = 6, .pattern = new Patterns::StrobePattern()},
+            {.column = COL_FLASH, .slot = 7, .pattern = new Patterns::StrobeHighlightPattern()},
+            {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::WindowGlitchPattern()},
 
-            // {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,16+48,60,ceilingMappedIndices)},
+
 
         });
 
@@ -172,23 +179,23 @@ void addColanderPipe(Hyperion *hyp)
         nleds,
         &hyp->hub,
         {
-            {.column = COL_COLANDER, .slot = 0, .pattern = new Colander::OnPattern()},
-            {.column = COL_COLANDER, .slot = 1, .pattern = new Colander::GlowPattern()},
-            {.column = COL_COLANDER, .slot = 2, .pattern = new Colander::SinPattern()},
-            {.column = COL_COLANDER, .slot = 3, .pattern = new Colander::BeatSingleFadePattern()},
-            {.column = COL_COLANDER, .slot = 4, .pattern = new Colander::BeatMultiFadePattern()},
-            {.column = COL_COLANDER, .slot = 5, .pattern = new Colander::BlinderPattern()},
-            {.column = COL_COLANDER, .slot = 6, .pattern = new Colander::SlowStrobePattern()},
-            {.column = COL_COLANDER, .slot = 7, .pattern = new Colander::GlitchPattern()},
+            {.column = COL_COLANDER1, .slot = 0, .pattern = new Colander::OnPattern()},
+            {.column = COL_COLANDER1, .slot = 1, .pattern = new Colander::GlowPattern()},
+            {.column = COL_COLANDER1, .slot = 2, .pattern = new Colander::SinPattern()},
+            {.column = COL_COLANDER1, .slot = 3, .pattern = new Colander::BeatSingleFadePattern()},
+            {.column = COL_COLANDER1, .slot = 4, .pattern = new Colander::BeatMultiFadePattern()},
+            {.column = COL_COLANDER1, .slot = 5, .pattern = new Colander::BlinderPattern()},
+            {.column = COL_COLANDER1, .slot = 6, .pattern = new Colander::SlowStrobePattern()},
+            {.column = COL_COLANDER1, .slot = 7, .pattern = new Colander::GlitchPattern()},
 
-            {.column = COL_COLANDER, .slot = 8, .pattern = new Colander::FastStrobePattern()},
-            {.column = COL_COLANDER, .slot = 9, .pattern = new Colander::BeatAllFadePattern()},
-            {.column = COL_COLANDER, .slot = 10, .pattern = new Colander::BeatShakePattern()},
-            {.column = COL_COLANDER, .slot = 11, .pattern = new Colander::BeatStepPattern()},
-            {.column = COL_COLANDER, .slot = 12, .pattern = new Colander::GlowOriginalPattern()},
-            {.column = COL_COLANDER, .slot = 13, .pattern = new Colander::FastStrobePattern2()},
-            {.column = COL_COLANDER, .slot = 14, .pattern = new Colander::LFOPattern<PWM>()},
-            {.column = COL_COLANDER, .slot = 15, .pattern = new Colander::LFOPattern<SawDown>()},
+            {.column = COL_COLANDER2, .slot = 0, .pattern = new Colander::FastStrobePattern()},
+            {.column = COL_COLANDER2, .slot = 1, .pattern = new Colander::BeatAllFadePattern()},
+            {.column = COL_COLANDER2, .slot = 2, .pattern = new Colander::BeatShakePattern()},
+            {.column = COL_COLANDER2, .slot = 3, .pattern = new Colander::BeatStepPattern()},
+            {.column = COL_COLANDER2, .slot = 4, .pattern = new Colander::GlowOriginalPattern()},
+            {.column = COL_COLANDER2, .slot = 5, .pattern = new Colander::FastStrobePattern2()},
+            {.column = COL_COLANDER2, .slot = 6, .pattern = new Colander::LFOPattern<PWM>()},
+            {.column = COL_COLANDER2, .slot = 7, .pattern = new Colander::LFOPattern<SawDown>()},
         });
 
     auto splitInput = new InputSlicer(
@@ -199,9 +206,10 @@ void addColanderPipe(Hyperion *hyp)
             {0, nbytes, false},
         });
 
-    auto pipe = new Pipe(
+    auto pipe = new ConvertPipe<Monochrome,Monochrome>(
         splitInput->getInput(0),
-        new UDPOutput("hyperslave6.local", 9619, 60));
+        new UDPOutput("hyperslave6.local", 9619, 60),
+        incandescentLut8);
     hyp->addPipe(pipe);
 
     hyp->addPipe(

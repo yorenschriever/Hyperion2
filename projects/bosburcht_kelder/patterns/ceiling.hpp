@@ -293,7 +293,7 @@ namespace Patterns
             if (!transition.Calculate(active))
                 return;
 
-            float trailSize = params->getSize(1, 10);
+            float trailSize = params->getSize(1, 50);
             float velocity = params->getVelocity(250, 5);
 
             for (int bar = 0; bar < width / segmentSize; bar++)
@@ -321,8 +321,9 @@ namespace Patterns
         FadeDown fade;
         BeatWatcher watcher;
         int beatDivs[6] = {16,8,4,2,1,1};
-        int centers[48];
-        int delays[48];
+        static const int numSegments = 8*10;
+        int centers[numSegments];
+        int delays[numSegments];
         FadeDown masterFade;
 
     public:
@@ -339,10 +340,10 @@ namespace Patterns
             {
                 fade.reset();
                 masterFade.reset();
-                for(int i=0;i<48;i++)
+                for(int i=0;i<numSegments;i++)
                 {
-                    centers[i] = Utils::random(15,45);
-                    delays[i] = Utils::random(0,500);
+                    centers[i] = Utils::random(segmentSize/4,3*segmentSize/4);
+                    delays[i] = Utils::random(0,params->getOffset(0,1500));
                 }
             }
 
@@ -366,6 +367,7 @@ namespace Patterns
             }
         }
     };
+
 
 
 // class SideWave : public Pattern<RGBA>

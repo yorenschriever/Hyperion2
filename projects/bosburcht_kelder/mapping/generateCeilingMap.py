@@ -1,4 +1,5 @@
 from math import cos, sin,pi
+import json
 
 points=[]
 for y in range(8):
@@ -16,6 +17,9 @@ for point in points:
     f.write("    {.x = " + str(point['x']) + ", .y = " + str(point['y']) + "},\n")
 f.write("};\n\n")
 f.close()
+
+with open("ceilingMap.json", "w") as outfile:
+    json.dump(points, outfile)
 
 f = open("ceilingMap3dCombined.hpp", "w")
 f.write("PixelMap3d ceilingMap3dCombined = {\n")
