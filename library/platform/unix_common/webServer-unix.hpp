@@ -1,9 +1,10 @@
 #pragma once
 #include "log.hpp"
 #include "server-certificate.hpp"
+#include "webServer-buffer-body-str.hpp"
 #include "webServer.hpp"
-#include "websocketServer.hpp"
 #include "webServerResponseBuilder.hpp"
+#include "websocketServer.hpp"
 #include <algorithm>
 #include <boost/asio/bind_executor.hpp>
 #include <boost/asio/dispatch.hpp>
@@ -29,7 +30,6 @@
 #include <string_view>
 #include <thread>
 #include <vector>
-#include "webServer-buffer-body-str.hpp"
 
 template <class Derived>
 class websocket_session;
@@ -39,8 +39,8 @@ class ssl_websocket_session;
 class any_session
 {
 public:
-    virtual void write_txt(const char *data, int len)=0;
-    virtual void write_bin(uint8_t *data, int len)=0; 
+    virtual void write_txt(const char *data, int len) = 0;
+    virtual void write_bin(uint8_t *data, int len) = 0;
 };
 
 class WebSocketServerSessionReceiver
@@ -156,133 +156,149 @@ handle_request(
     http::request<Body, http::basic_fields<Allocator>> &&req,
     PathMap *paths)
 {
-    // Returns a bad request response
-    auto const bad_request =
-        [&req](beast::string_view why)
-    {
-        http::response<http::string_body> res{http::status::bad_request, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(req.keep_alive());
-        res.body() = std::string(why);
-        res.prepare_payload();
-        return res;
-    };
-
-    // Returns a not found response
-    auto const not_found =
-        [&req](beast::string_view target)
-    {
-        http::response<http::string_body> res{http::status::not_found, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(req.keep_alive());
-        res.body() = "The resource '" + std::string(target) + "' was not found.";
-        res.prepare_payload();
-        return res;
-    };
-
-    // Returns a server error response
-    auto const server_error =
-        [&req](beast::string_view what)
-    {
-        http::response<http::string_body> res{http::status::internal_server_error, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(req.keep_alive());
-        res.body() = "An error occurred: '" + std::string(what) + "'";
-        res.prepare_payload();
-        return res;
-    };
-
-    // Make sure we can handle the method
-    if (req.method() != http::verb::get &&
-        req.method() != http::verb::head)
-        return bad_request("Unknown HTTP-method");
-
-    // Request path must be absolute and not contain "..".
-    if (req.target().empty() ||
-        req.target()[0] != '/' ||
-        req.target().find("..") != beast::string_view::npos)
-        return bad_request("Illegal request-target");
-
-    auto str_target = std::string(req.target());
-    if (paths->count(str_target) > 0)
-    {
-        //Log::info("WebServerUnix", "path found with WebServerResponseBuilder: %s", str_target.c_str());
-
-        http::response<http::buffer_body_str> res;
-
-        res.result(http::status::ok);
-        res.version(11);
-        res.set(http::field::server, "Beast");
-        res.set(http::field::transfer_encoding, "chunked");
-
-        auto const builderWriter =
-            [](const char *buffer, int size, void *userData) -> void
+        // Returns a bad request response
+        auto const bad_request =
+            [&req](beast::string_view why)
         {
-            auto response_buffer = (std::string *)userData;
-            response_buffer->append(buffer, size);
+            http::response<http::string_body> res{http::status::bad_request, req.version()};
+            res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+            res.set(http::field::content_type, "text/html");
+            res.keep_alive(req.keep_alive());
+            res.body() = std::string(why);
+            res.prepare_payload();
+            return res;
         };
 
-        auto builder = paths->at(str_target); 
-        builder->build(builderWriter, (void *)&res.body().data);
-        int body_size = res.body().data.size();
+        // Returns a not found response
+        auto const not_found =
+            [&req](beast::string_view target)
+        {
+            http::response<http::string_body> res{http::status::not_found, req.version()};
+            res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+            res.set(http::field::content_type, "text/html");
+            res.keep_alive(req.keep_alive());
+            res.body() = "The resource '" + std::string(target) + "' was not found.";
+            res.prepare_payload();
+            return res;
+        };
 
-        // Log::info("WEBSERVER","response = %s", res.body().data.c_str());
+        // Returns a server error response
+        auto const server_error =
+            [&req](beast::string_view what)
+        {
+            http::response<http::string_body> res{http::status::internal_server_error, req.version()};
+            res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+            res.set(http::field::content_type, "text/html");
+            res.keep_alive(req.keep_alive());
+            res.body() = "An error occurred: '" + std::string(what) + "'";
+            res.prepare_payload();
+            return res;
+        };
 
-        res.body().size = body_size;
-        res.body().more = false;
-
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, mime_type(req.target()));
-        res.content_length(body_size);
-        res.keep_alive(req.keep_alive());
-        return res;
-    }
-
-    // Build the path to the requested file
-    std::string path = path_cat(doc_root, req.target());
-    if (req.target().back() == '/')
-        path.append("index.html");
-
-    // Attempt to open the file
-    beast::error_code ec;
-    http::file_body::value_type body;
-    body.open(path.c_str(), beast::file_mode::scan, ec);
-
-    // Handle the case where the file doesn't exist
-    if (ec == beast::errc::no_such_file_or_directory)
-        return not_found(req.target());
-
-    // Handle an unknown error
-    if (ec)
-        return server_error(ec.message());
-
-    // Cache the size since we need it after the move
-    auto const size = body.size();
-
-    // Respond to HEAD request
-    if (req.method() == http::verb::head)
+    try
     {
-        http::response<http::empty_body> res{http::status::ok, req.version()};
+        // Make sure we can handle the method
+        if (req.method() != http::verb::get &&
+            req.method() != http::verb::head)
+            return bad_request("Unknown HTTP-method");
+
+        // Request path must be absolute and not contain "..".
+        if (req.target().empty() ||
+            req.target()[0] != '/' ||
+            req.target().find("..") != beast::string_view::npos)
+            return bad_request("Illegal request-target");
+
+        auto str_target = std::string(req.target());
+        if (paths->count(str_target) > 0)
+        {
+            // Log::info("WebServerUnix", "path found with WebServerResponseBuilder: %s", str_target.c_str());
+
+            try
+            {
+                http::response<http::buffer_body_str> res;
+
+                res.result(http::status::ok);
+                res.version(11);
+                res.set(http::field::server, "Beast");
+                res.set(http::field::transfer_encoding, "chunked");
+
+                auto const builderWriter =
+                    [](const char *buffer, int size, void *userData) -> void
+                {
+                    auto response_buffer = (std::string *)userData;
+                    response_buffer->append(buffer, size);
+                };
+
+                auto builder = paths->at(str_target);
+                builder->build(builderWriter, (void *)&res.body().data);
+                int body_size = res.body().data.size();
+
+                // Log::info("WEBSERVER","response = %s", res.body().data.c_str());
+
+                res.body().size = body_size;
+                res.body().more = false;
+
+                res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+                res.set(http::field::content_type, mime_type(req.target()));
+                res.content_length(body_size);
+                res.keep_alive(req.keep_alive());
+                return res;
+            }
+            catch (const std::exception &e)
+            {
+                Log::error("WEB", "Error in custom content: %s", e.what());
+                return server_error("Error in custom content");
+            }
+        }
+
+        // Build the path to the requested file
+        std::string path = path_cat(doc_root, req.target());
+        if (req.target().back() == '/')
+            path.append("index.html");
+
+        // Attempt to open the file
+        beast::error_code ec;
+        http::file_body::value_type body;
+        body.open(path.c_str(), beast::file_mode::scan, ec);
+
+        // Handle the case where the file doesn't exist
+        if (ec == beast::errc::no_such_file_or_directory)
+            return not_found(req.target());
+
+        // Handle an unknown error
+        if (ec)
+            return server_error(ec.message());
+
+        // Cache the size since we need it after the move
+        auto const size = body.size();
+
+        // Respond to HEAD request
+        if (req.method() == http::verb::head)
+        {
+            http::response<http::empty_body> res{http::status::ok, req.version()};
+            res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+            res.set(http::field::content_type, mime_type(path));
+            res.content_length(size);
+            res.keep_alive(req.keep_alive());
+            return res;
+        }
+
+        // Respond to GET request
+        http::response<http::file_body> res{
+            std::piecewise_construct,
+            std::make_tuple(std::move(body)),
+            std::make_tuple(http::status::ok, req.version())};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(http::field::content_type, mime_type(path));
         res.content_length(size);
         res.keep_alive(req.keep_alive());
         return res;
     }
-
-    // Respond to GET request
-    http::response<http::file_body> res{
-        std::piecewise_construct,
-        std::make_tuple(std::move(body)),
-        std::make_tuple(http::status::ok, req.version())};
-    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(http::field::content_type, mime_type(path));
-    res.content_length(size);
-    res.keep_alive(req.keep_alive());
-    return res;
+    catch (const std::exception &e)
+    {
+        Log::error("WEB", "Server error: %s", e.what());
+        return server_error("Server error");
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -421,7 +437,7 @@ private:
 
         if (derived().ws().got_text())
         {
-            //Log::info("", "Got string: %s", buffer_.data());
+            // Log::info("", "Got string: %s", buffer_.data());
             receiver->on_receive(this, boost::beast::buffers_to_string(buffer_.data()));
         }
         buffer_.consume(buffer_.size());
@@ -473,22 +489,21 @@ public:
 
 // Handles a plain WebSocket connection
 class plain_websocket_session
-    : public websocket_session<plain_websocket_session>
-    , public std::enable_shared_from_this<plain_websocket_session>
+    : public websocket_session<plain_websocket_session>,
+      public std::enable_shared_from_this<plain_websocket_session>
 {
     websocket::stream<beast::tcp_stream> ws_;
 
 public:
     // Create the session
-    explicit
-    plain_websocket_session(
-        beast::tcp_stream&& stream)
+    explicit plain_websocket_session(
+        beast::tcp_stream &&stream)
         : ws_(std::move(stream))
     {
     }
 
     // Called by the base class
-    websocket::stream<beast::tcp_stream>&
+    websocket::stream<beast::tcp_stream> &
     ws()
     {
         return ws_;
@@ -509,7 +524,8 @@ public:
     explicit ssl_websocket_session(
         beast::ssl_stream<beast::tcp_stream> &&stream)
         : ws_(std::move(stream))
-    {}
+    {
+    }
 
     // Called by the base class
     websocket::stream<
@@ -522,15 +538,15 @@ public:
 
 //------------------------------------------------------------------------------
 
-template<class Body, class Allocator>
-void
-make_websocket_session(
+template <class Body, class Allocator>
+void make_websocket_session(
     beast::tcp_stream stream,
     http::request<Body, http::basic_fields<Allocator>> req,
     PathMapWs *wsPaths)
 {
     std::make_shared<plain_websocket_session>(
-        std::move(stream))->run(std::move(req), wsPaths);
+        std::move(stream))
+        ->run(std::move(req), wsPaths);
 }
 
 template <class Body, class Allocator>
@@ -718,25 +734,25 @@ public:
 
 // Handles a plain HTTP connection
 class plain_http_session
-    : public http_session<plain_http_session>
-    , public std::enable_shared_from_this<plain_http_session>
+    : public http_session<plain_http_session>,
+      public std::enable_shared_from_this<plain_http_session>
 {
     beast::tcp_stream stream_;
 
 public:
     // Create the session
     plain_http_session(
-        beast::tcp_stream&& stream,
-        beast::flat_buffer&& buffer,
-        std::shared_ptr<std::string const> const& doc_root,
+        beast::tcp_stream &&stream,
+        beast::flat_buffer &&buffer,
+        std::shared_ptr<std::string const> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : http_session<plain_http_session>(
-            std::move(buffer),
-            doc_root,
-            paths,
-            wsPaths)
-        , stream_(std::move(stream))
+              std::move(buffer),
+              doc_root,
+              paths,
+              wsPaths),
+          stream_(std::move(stream))
     {
     }
 
@@ -748,7 +764,7 @@ public:
     }
 
     // Called by the base class
-    beast::tcp_stream&
+    beast::tcp_stream &
     stream()
     {
         return stream_;
@@ -940,14 +956,14 @@ public:
             return;
         }
 
-        //return fail(ec, "plain http not supported");
+        // return fail(ec, "plain http not supported");
         std::make_shared<plain_http_session>(
             std::move(stream_),
             std::move(buffer_),
             doc_root_,
             paths_,
-            wsPaths_
-            )->run();
+            wsPaths_)
+            ->run();
     }
 };
 
@@ -1052,7 +1068,7 @@ private:
 
 //------------------------------------------------------------------------------
 
-class WebServerUnix : public WebServer 
+class WebServerUnix : public WebServer
 {
 public:
     WebServerUnix(std::string root, int port)
@@ -1148,7 +1164,7 @@ private:
 
             // Block until all the threads exit
             for (auto &t : v)
-               t.join();
+                t.join();
         }
         catch (const std::exception &e)
         {
@@ -1175,7 +1191,7 @@ public:
     {
         try
         {
-            //Log::info(TAG, "sending: %s", msg.c_str());
+            // Log::info(TAG, "sending: %s", msg.c_str());
             auto ws = (WS *)client;
             ws->write_txt(msg.c_str(), msg.size());
         }
@@ -1212,7 +1228,7 @@ public:
             int sz = vsnprintf(s_buf, sizeof(s_buf), message, args);
             va_end(args);
 
-            //Log::info(TAG, "sending: %s", s_buf);
+            // Log::info(TAG, "sending: %s", s_buf);
             auto ws = (WS *)client;
             ws->write_txt(s_buf, sz);
         }
@@ -1258,7 +1274,8 @@ public:
             // Log::info(TAG, "Sending binary");
 
             auto ws = (WS *)client;
-            if (!ws) return;
+            if (!ws)
+                return;
             ws->write_bin(bytes, size);
         }
         catch (const std::exception &e)

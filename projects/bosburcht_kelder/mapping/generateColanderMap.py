@@ -2,7 +2,7 @@ from math import cos, sin,pi
 
 points=[]
 for y in range(20):
-    angle = y/20 * 2 * pi *0.5
+    angle = y/19 * 2 * pi *0.5
     x = sin(angle) * 0.5
     y = cos(angle) * 0.5
     points.append({'x': x, 'y': y})   

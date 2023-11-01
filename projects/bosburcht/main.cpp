@@ -146,6 +146,11 @@ void addWindowPipe(Hyperion *hyp)
             {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,0,segmentSize)},
 
             {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(1,segmentSize)},
+            {.column = COL_DEBUG, .slot = 1, .pattern = new Patterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = COL_DEBUG, .slot = 2, .pattern = new Patterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = COL_DEBUG, .slot = 3, .pattern = new Patterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = COL_DEBUG, .slot = 4, .pattern = new Patterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = COL_DEBUG, .slot = 5, .pattern = new Patterns::OneColor(RGB(127, 127, 127), "White 50%")},
             
         });
 
@@ -270,6 +275,11 @@ void addChandelierPipe(Hyperion *hyp)
             {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,16)},
 
             {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(nleds/60/8)},
+            {.column = COL_DEBUG, .slot = 1, .pattern = new Patterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = COL_DEBUG, .slot = 2, .pattern = new Patterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = COL_DEBUG, .slot = 3, .pattern = new Patterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = COL_DEBUG, .slot = 4, .pattern = new Patterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = COL_DEBUG, .slot = 5, .pattern = new Patterns::OneColor(RGB(127, 127, 127), "White 50%")},
         });
 
     auto splitInput = new InputSlicer(
@@ -360,6 +370,11 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,16+48,60,ceilingMappedIndices)},
 
             {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(12)},
+            {.column = COL_DEBUG, .slot = 1, .pattern = new Patterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = COL_DEBUG, .slot = 2, .pattern = new Patterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = COL_DEBUG, .slot = 3, .pattern = new Patterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = COL_DEBUG, .slot = 4, .pattern = new Patterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = COL_DEBUG, .slot = 5, .pattern = new Patterns::OneColor(RGB(127, 127, 127), "White 50%")},
         });
 
     auto splitInput = new InputSlicer(

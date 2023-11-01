@@ -49,7 +49,7 @@ public:
     static void *malloc_dma(int size);
     static void *realloc_dma(void *ptr, int size);
 
-    static const int getRuntimeSessionId()
+    static int getRuntimeSessionId()
     {
         if (runtimeSessionId == 0)
         {

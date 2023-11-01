@@ -9,7 +9,7 @@ int main()
 {
   auto hyp = new Hyperion();
 
-  Network::setHostName("hyperslave5");
+  Network::setHostName("hyperslave3");
 
   for (int i = 1; i <= 8; i++)
   {

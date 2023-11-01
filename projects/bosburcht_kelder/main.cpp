@@ -143,7 +143,7 @@ void addCeilingPipe(Hyperion *hyp)
     {
         auto pipe = new ConvertPipe<RGBA, BGR>(
             splitInput->getInput(i),
-            new UDPOutput("hyperslave6.local", 9611 + i, 45),
+            new UDPOutput("hyperslave5.local", 9611 + i, 45),
             columnsLut);
         hyp->addPipe(pipe);
     }
@@ -201,7 +201,7 @@ void addColanderPipe(Hyperion *hyp)
 
     auto pipe = new Pipe(
         splitInput->getInput(0),
-        new UDPOutput("hyperslave6.local", 9611, 60));
+        new UDPOutput("hyperslave6.local", 9619, 60));
     hyp->addPipe(pipe);
 
     hyp->addPipe(

@@ -1,5 +1,4 @@
 #pragma once
-// #include "../mapping/ceilingMappedIndices.hpp"
 #include "core/generation/patterns/pattern.hpp"
 #include "generation/patterns/helpers/fade.h"
 #include "generation/patterns/helpers/interval.h"
@@ -8,6 +7,207 @@
 #include "mappingHelpers.hpp"
 #include <math.h>
 #include <vector>
+
+namespace Ceiling
+{
+
+    template <class T>
+    class RibbenClivePattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        int segmentSize;
+        int averagePeriod;
+        float precision;
+        LFO<T> lfo = LFO<T>();
+        Permute perm;
+
+    public:
+        RibbenClivePattern(int segmentSize = 60, int averagePeriod = 10000, float precision = 1)
+        {
+            this->averagePeriod = averagePeriod;
+            this->precision = precision;
+            this->segmentSize = segmentSize;
+            this->name = "Ribben clive";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int numSegments = width / segmentSize;
+            perm.setSize(numSegments);
+            float duty = params->getAmount(0.01, 0.2);
+            lfo.setDutyCycle(duty);
+
+            for (int segment = 0; segment < numSegments; segment++)
+            {
+                int interval = averagePeriod + perm.at[segment] * (averagePeriod * precision) / numSegments / (duty);
+                RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval) * transition.getValue();
+                for (int j = 0; j < segmentSize; j++)
+                    pixels[segment * segmentSize + j] = col;
+            }
+        }
+    };
+
+    class RibbenFlashPattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        int segmentSize;
+        Permute perm;
+        BeatWatcher watcher = BeatWatcher();
+        FadeDown fade = FadeDown(2400);
+
+    public:
+        RibbenFlashPattern(int segmentSize = 60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Ribben flash";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int numSegments = width / segmentSize;
+            perm.setSize(numSegments);
+
+            if (watcher.Triggered())
+            {
+                perm.permute();
+                fade.reset();
+            }
+
+            fade.duration = params->getVelocity(2500, 100);
+            int numVisible = params->getAmount(1, numSegments / 3);
+
+            for (int ribbe = 0; ribbe < numVisible; ribbe++)
+            {
+                RGBA col = params->getPrimaryColour() * fade.getValue() * transition.getValue();
+                for (int j = 0; j < segmentSize; j++)
+                    pixels[perm.at[ribbe] * segmentSize + j] += col;
+            }
+        }
+    };
+
+    class Chaser : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        LFO<SawDown> lfo;
+
+    public:
+        Chaser()
+        {
+            this->name = "Chaser";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            float velocity = params->getVelocity(250, 50);
+
+            float duty = params->getSize(0.1,1);
+            float amount = params->getAmount(1,25);
+            lfo.setDutyCycle(duty);
+            lfo.setSoftEdgeWidth(1./width);
+            lfo.setPeriod(velocity * amount);
+
+            for (int i = 0; i < width; i++)
+            {
+                float v = lfo.getValue(float(i)/width * amount);
+                pixels[i] = params->gradient->get(255 * v) * v * transition.getValue();
+            }
+        }
+    };
+
+    class Fireworks : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        static const int numFades = 8;
+
+        int currentFade = 0;
+        FadeDown fades[numFades];
+        int centers[numFades];
+        BeatWatcher watcher;
+        int beatDivs[5] = {16,8,4,2,2};
+
+    public:
+        Fireworks()
+        {
+            this->name = "Fireworks";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            // int beatDiv = beatDivs[int(params->getAmount(0, 4))];
+            // if (this->wachter.Triggered() && Tempo::GetBeatNumber() % beatDiv == 0)
+            // {
+            //     currentFade = (currentFade + 1) % numFades;
+            //     fade[currentFade].reset();
+            // }
+
+            if (!transition.Calculate(active))
+                return;
+
+            if (watcher.Triggered())
+            {
+                for(int fade=0;fade<numFades;fade++)
+                {
+                    centers[fade] = Utils::random(0,width);
+                    fades[fade].reset();
+                }
+            }
+                
+            for(int fade=0;fade<numFades;fade++)
+            {
+                fades[fade].setDuration(params->getVelocity(1000,250));
+            }
+
+            // float trailSize = params->getSize(5, 20);
+            // float velocity = params->getVelocity(250, 5);
+            // int offset = params->getOffset(4,9);
+
+
+            for (int fade=0;fade < numFades; fade++)
+            {
+                int center = centers[fade];
+                int size=60;
+                for (int i=0; i<size; i++)
+                {
+                    float fadeValue = fades[fade].getValue(float(i)/size * 250);
+                    if (center+i < width) pixels[center + i] += params->gradient->get(255 * fadeValue) * fadeValue;
+                    if (center-1 >= 0) pixels[center - i] += params->gradient->get(255 * fadeValue) * fadeValue;
+                }
+            }
+
+
+
+            // for (int bar = 0; bar < width / segmentSize; bar++)
+            // {
+            //     for (int i = 0; i < segmentSize; i++)
+            //     {
+            //         int center = segmentSize / 2;
+            //         int distance = abs(center - i);
+            //         for (int f = 0; f < numFades; f++)
+            //         {
+            //             float fadeValue = fade[f].getValue(distance * trailSize + (bar % (width / segmentSize / offset)) * velocity);
+            //             pixels[bar * segmentSize + i] += params->gradient->get(255 * fadeValue) * fadeValue * transition.getValue();
+            //         }
+            //     }
+            // }
+        }
+    };
+
+}
+
+
 
 class BarFade
 {
