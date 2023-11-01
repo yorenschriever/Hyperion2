@@ -8,7 +8,7 @@ function initBuffers(gl, scene) {
     let sphere = { vertices: [], normals: [], indices: [] }
 
     scenePart.positions.forEach(pos => {
-      draw_sphere(sphere, pos.x, pos.y, pos.z);
+      draw_sphere(sphere, pos.x, pos.y, pos.z, scenePart.size ?? 0.01);
     })
 
 
@@ -73,9 +73,8 @@ function initBuffers(gl, scene) {
   };
 }
 
-function draw_sphere(target, cx, cy, cz) {
+function draw_sphere(target, cx, cy, cz, r=0.01) {
   // http://www.songho.ca/opengl/gl_sphere.html
-  const r = 0.01;
   const stacks = 2;
   const sectors = 4;
   const startVertex = target.vertices.length / 3;
