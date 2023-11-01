@@ -1258,6 +1258,7 @@ public:
             // Log::info(TAG, "Sending binary");
 
             auto ws = (WS *)client;
+            if (!ws) return;
             ws->write_bin(bytes, size);
         }
         catch (const std::exception &e)

@@ -18,6 +18,7 @@
 #include "patterns/window.hpp"
 #include "patterns/chandelier.hpp"
 #include "patterns/mask.hpp"
+#include "patterns/debug.hpp"
 #include "setViewParams.hpp"
 #include <vector>
 #include "artNetPattern.hpp"
@@ -44,6 +45,7 @@ void addCeilingPipe(Hyperion *);
 // #define COL_UNUSED 6
 #define COL_FLASH 7
 #define COL_ARTNET 8
+#define COL_DEBUG 9
 
 typedef struct
 {
@@ -82,6 +84,7 @@ int main()
     hyp->hub.setColumnName(COL_MASK, "Mask");
     hyp->hub.setColumnName(COL_FLASH, "Flash");
     hyp->hub.setColumnName(COL_ARTNET, "ArtNet");
+    hyp->hub.setColumnName(COL_DEBUG, "Debug");
 
     hyp->start();
     setViewParams(hyp);
@@ -141,6 +144,8 @@ void addWindowPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
 
             {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,0,segmentSize)},
+
+            {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(1,segmentSize)},
             
         });
 
@@ -176,20 +181,20 @@ void addWindowPipe(Hyperion *hyp)
         {.host = "hyperslave1.local", .port = 9613},
         {.host = "hyperslave1.local", .port = 9614},
 
+        {.host = "hyperslave1.local", .port = 9615},
+        {.host = "hyperslave1.local", .port = 9616},
+        {.host = "hyperslave1.local", .port = 9617},
+        {.host = "hyperslave1.local", .port = 9618},
+
         {.host = "hyperslave2.local", .port = 9611},
         {.host = "hyperslave2.local", .port = 9612},
         {.host = "hyperslave2.local", .port = 9613},
         {.host = "hyperslave2.local", .port = 9614},
 
-        {.host = "hyperslave3.local", .port = 9611},
-        {.host = "hyperslave3.local", .port = 9612},
-        {.host = "hyperslave3.local", .port = 9613},
-        {.host = "hyperslave3.local", .port = 9614},
-
-        {.host = "hyperslave4.local", .port = 9611},
-        {.host = "hyperslave4.local", .port = 9612},
-        {.host = "hyperslave4.local", .port = 9613},
-        {.host = "hyperslave4.local", .port = 9614},
+        {.host = "hyperslave2.local", .port = 9615},
+        {.host = "hyperslave2.local", .port = 9616},
+        {.host = "hyperslave2.local", .port = 9617},
+        {.host = "hyperslave2.local", .port = 9618},
     };
 
     for (int i = 0; i < splitInput->size() - 2; i++)
@@ -263,6 +268,8 @@ void addChandelierPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
 
             {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,16)},
+
+            {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(nleds/60/8)},
         });
 
     auto splitInput = new InputSlicer(
@@ -283,7 +290,7 @@ void addChandelierPipe(Hyperion *hyp)
     {
         auto pipe = new ConvertPipe<RGBA, BGR>(
             splitInput->getInput(i),
-            new UDPOutput("hyperslave5.local", 9611 + i, 60),
+            new UDPOutput("hyperslave4.local", 9611 + i, 60),
             columnsLut);
         hyp->addPipe(pipe);
     }
@@ -292,7 +299,7 @@ void addChandelierPipe(Hyperion *hyp)
         new ConvertPipe<RGBA, RGB>(
             splitInput->getInput(splitInput->size() - 1),
             new MonitorOutput3d(&hyp->webServer, &chandelierMap3dCombined)));
-            // new MonitorOutput3d(&hyp->webServer, &chandelierMap3d)));
+            // new MonitorOutput3d(&hyp->webServer, &chandelierMap3d, 60, 0.03)));
 }
 
 void addCeilingPipe(Hyperion *hyp)
@@ -352,7 +359,7 @@ void addCeilingPipe(Hyperion *hyp)
 
             {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,16+48,60,ceilingMappedIndices)},
 
-
+            {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(12)},
         });
 
     auto splitInput = new InputSlicer(
@@ -369,7 +376,7 @@ void addCeilingPipe(Hyperion *hyp)
     {
         auto pipe = new ConvertPipe<RGBA, BGR>(
             splitInput->getInput(i),
-            new UDPOutput("hyperslave6.local", 9611 + i, 45),
+            new UDPOutput("hyperslave3.local", 9611 + i, 45),
             columnsLut);
         hyp->addPipe(pipe);
     }

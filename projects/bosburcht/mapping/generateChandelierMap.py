@@ -9,7 +9,7 @@ turtle = Turtle3d()
 ledsPerMeter = 60
 ledDistance = 1000 / ledsPerMeter #sizes are in mm
 
-barsPerRing=4*8
+barsPerRing=4*6
 
 totalSize = 2000 #total size of the installation, to calculate the scale
 scale = 2/totalSize #scale to fit in the -1,1 canvas
