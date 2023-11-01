@@ -117,9 +117,11 @@ private:
     virtual void setup_network()
     {
         Log::info(TAG, "starting network");
-        Ethernet::initialize();
 
-        Network::setHostName("hyperion");
+        if (!Network::getHostName())
+            Network::setHostName("hyperion");
+
+        Ethernet::initialize();
     }
 
     virtual void setup_rotary()

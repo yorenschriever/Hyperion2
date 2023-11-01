@@ -10,16 +10,13 @@ const char* TAG = "MDNS";
 void Network::setHostName(const char* hostname)
 {
     Log::info(TAG,"Setting hostname to: %s.local",hostname);
-    //initialize mDNS service
-    esp_err_t err = mdns_init();
-    if (err) {
-        Log::error(TAG,"MDNS Init failed: %d\n", err);
-        return;
-    }
 
-    //set hostname
-    ESP_ERROR_CHECK(mdns_hostname_set(hostname));
-    //set default instance
-    mdns_instance_name_set("Hyperion");
+
+    //store the hostname. the actual mdns_hostname_set takes places after ETH has acquired an ip address
+    //ethernet.cpp takes care of that.
+    Network::hostname = hostname;
 }
 
+const char* Network::getHostName() { return hostname; }
+
+const char* Network::hostname = nullptr;

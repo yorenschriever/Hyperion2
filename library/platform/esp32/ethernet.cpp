@@ -1,5 +1,6 @@
 #include "platform/includes/ethernet.hpp"
 #include "platform/includes/log.hpp"
+#include "platform/includes/network.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -13,6 +14,7 @@
 #include "sdkconfig.h"
 #include "esp_rom_gpio.h"
 #include "esp_mac.h"
+#include "misc/mdns/mdns.h"
 
 static const char *TAG = "ETH";
 
@@ -27,10 +29,16 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
 {
     if (event_base == IP_EVENT)
     {
+        const char* hostname = Network::getHostName();
         switch (event_id)
         {
         case IP_EVENT_ETH_GOT_IP:
             Log::info(TAG,"Got IP: %s", Ethernet::getIp().toString().c_str());
+
+            if (hostname){
+                Log::info(TAG,"Setting hostname %s", hostname);
+                ESP_ERROR_CHECK(mdns_hostname_set(hostname));
+            }
 
             eth_connected = true;
             eth_connecting = false;
@@ -73,6 +81,16 @@ void Ethernet::initialize()
     ESP_ERROR_CHECK(esp_netif_init());
     // Create default event loop that running in background
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+    //initialize mDNS service
+    if (Network::getHostName())
+    {
+        esp_err_t err = mdns_init();
+        if (err) {
+            Log::error(TAG,"MDNS Init failed: %d\n", err);
+            return;
+        }
+    }
 
     // Create new default instance of esp-netif for Ethernet
     esp_netif_config_t cfg = ESP_NETIF_DEFAULT_ETH();

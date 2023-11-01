@@ -32,7 +32,7 @@ elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ] || [ $TARGET = 'rpi' ]; then
     "${BASEDIR}/build/${TARGET}/app"
 
 elif [ $TARGET = 'esp32' ]; then
-    PORT=${2:-$(ls /dev/tty.usbserial-*)}
+    PORT=${2:-$(ls /dev/cu.usbserial-*)}
 
     [ ! $IDF_PATH ] && . $IDF_DIR/export.sh; 
 
