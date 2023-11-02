@@ -30,6 +30,7 @@
 #include <string_view>
 #include <thread>
 #include <vector>
+#include <mutex>
 
 template <class Derived>
 class websocket_session;
@@ -1203,6 +1204,7 @@ public:
 
     void sendOther(RemoteWebsocketClient *exclude, std::string msg) override
     {
+        m.lock();
         auto ws_exclude = (WS *)exclude;
         for (auto ws : clients)
         {
@@ -1210,12 +1212,15 @@ public:
                 continue;
             send(ws, msg);
         }
+        m.unlock();
     };
 
     void sendAll(std::string msg) override
     {
+        m.lock();
         for (auto ws : clients)
             send(ws, msg);
+        m.unlock();
     };
 
     void send(RemoteWebsocketClient *client, const char *message, ...) override
@@ -1246,6 +1251,7 @@ public:
         int sz = vsnprintf(s_buf, sizeof(s_buf), message, args);
         va_end(args);
 
+        m.lock();
         auto ws_exclude = (WS *)exclude;
         for (auto ws : clients)
         {
@@ -1253,6 +1259,7 @@ public:
                 continue;
             send(ws, s_buf);
         }
+        m.unlock();
     };
 
     void sendAll(const char *message, ...) override
@@ -1263,8 +1270,10 @@ public:
         int sz = vsnprintf(s_buf, sizeof(s_buf), message, args);
         va_end(args);
 
+        m.lock();
         for (auto ws : clients)
             send(ws, s_buf);
+        m.unlock();
     };
 
     void send(RemoteWebsocketClient *client, uint8_t *bytes, int size) override
@@ -1286,6 +1295,7 @@ public:
 
     void sendOther(RemoteWebsocketClient *exclude, uint8_t *bytes, int size) override
     {
+        m.lock();
         auto ws_exclude = (WS *)exclude;
         for (auto ws : clients)
         {
@@ -1293,19 +1303,24 @@ public:
                 continue;
             send(ws, bytes, size);
         }
+        m.unlock();
     };
 
     void sendAll(uint8_t *bytes, int size) override
     {
+        m.lock();
         for (auto ws : clients)
             send(ws, bytes, size);
+        m.unlock();
     };
 
     int connectionCount() override { return clients.size(); };
 
     void on_connect(WS *session) override
     {
+        m.lock();
         clients.insert(session);
+        m.unlock();
 
         if (connectionHandler != nullptr)
             connectionHandler(session, this, connectionUserData);
@@ -1319,12 +1334,15 @@ public:
 
     void on_disconnect(WS *session) override
     {
+        m.lock();
         clients.erase(session);
+        m.unlock();
     }
 
 private:
     std::set<WS *> clients;
     static const char *TAG;
+    std::mutex m;
 };
 
 const char *WebsocketServerUnix::TAG = "WEBSOCKET_SERVER";
