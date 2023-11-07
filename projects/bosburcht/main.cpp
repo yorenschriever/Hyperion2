@@ -43,11 +43,10 @@ void addCeilingPipe(Hyperion *);
 #define COL_CHANDELIER 2
 #define COL_CEILING 3
 #define COL_ALL 4
-#define COL_MASK 5
-// #define COL_UNUSED 6
+#define COL_ARTNET 5
+#define COL_MASK 6
 #define COL_FLASH 7
-#define COL_ARTNET 8
-#define COL_DEBUG 9
+#define COL_DEBUG 8
 
 typedef struct
 {
@@ -92,7 +91,7 @@ int main()
     setViewParams(hyp);
 
     auto artNetController = new ArtNetController();
-    artNetController->subscribe(&hyp->hub,0);
+    artNetController->subscribe(&hyp->hub,1);
     artNetController->linkToPalette(&grandMA);
 
     while (1)
@@ -134,6 +133,9 @@ void addWindowPipe(Hyperion *hyp)
             {.column = COL_ALL, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_ALL, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
 
+            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPatternRGB(0,(48+48)*4,segmentSize)},
+            {.column = COL_ARTNET, .slot = 1, .pattern = new Patterns::ArtNetPattern(0,48+48,segmentSize)},
+
             {.column = COL_MASK, .slot = 3, .pattern = new Patterns::RotatingRingsMaskPattern(&windowMap3dCombined)},
             {.column = COL_MASK, .slot = 4, .pattern = new Patterns::GlowPulseMaskPattern()},
 
@@ -148,9 +150,6 @@ void addWindowPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::FlashesPattern()},
             {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
-
-            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPatternRGB(0,0,segmentSize)},
-            {.column = COL_ARTNET, .slot = 1, .pattern = new Patterns::ArtNetPattern(0,0,segmentSize)},
 
             {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(1,segmentSize)},
             {.column = COL_DEBUG, .slot = 1, .pattern = new Patterns::OneColor(RGB(255, 0, 0), "Red")},
@@ -266,6 +265,9 @@ void addChandelierPipe(Hyperion *hyp)
             {.column = COL_ALL, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_ALL, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
 
+            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPatternRGB(0,48*4)},
+            {.column = COL_ARTNET, .slot = 1, .pattern = new Patterns::ArtNetPattern(0,48)},
+
             {.column = COL_MASK, .slot = 6, .pattern = new Patterns::GlowPulseMaskPattern()},
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
@@ -279,9 +281,6 @@ void addChandelierPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::FlashesPattern()},
             {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
-
-            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPatternRGB(0,16*4)},
-            {.column = COL_ARTNET, .slot = 1, .pattern = new Patterns::ArtNetPattern(0,16)},
 
             {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(nleds/60/8)},
             {.column = COL_DEBUG, .slot = 1, .pattern = new Patterns::OneColor(RGB(255, 0, 0), "Red")},
@@ -360,6 +359,9 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_ALL, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_ALL, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
 
+            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPatternRGB(0,0,60,ceilingMappedIndices)},
+            {.column = COL_ARTNET, .slot = 1, .pattern = new Patterns::ArtNetPattern(0,0,60,ceilingMappedIndices)},
+
             {.column = COL_MASK, .slot = 0, .pattern = new Patterns::GlowPulseMaskPattern()},
             {.column = COL_MASK, .slot = 1, .pattern = new Patterns::SinChaseMaskPattern()},
             {.column = COL_MASK, .slot = 2, .pattern = new Patterns::SideWaveMask()},
@@ -375,9 +377,6 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::FlashesPattern()},
             {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
-
-            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPatternRGB(0,(16+48)*4,60,ceilingMappedIndices)},
-            {.column = COL_ARTNET, .slot = 1, .pattern = new Patterns::ArtNetPattern(0,16+48,60,ceilingMappedIndices)},
 
             {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(12)},
             {.column = COL_DEBUG, .slot = 1, .pattern = new Patterns::OneColor(RGB(255, 0, 0), "Red")},

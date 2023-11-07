@@ -166,7 +166,7 @@ private:
             uint16_t incomingUniverse = recvBuffer[14] | recvBuffer[15] << 8;
             uint16_t dmxDataLength = recvBuffer[17] | recvBuffer[16] << 8;
 
-            // Log::info(TAG, "Got artnet DMX Packet, universe=%d, channel 0= %d", incomingUniverse, recvBuffer[ART_DMX_START]);
+            // Log::info(TAG, "Got artnet DMX Packet, universe=%d, channel 0= %d, sequence=%d", incomingUniverse, recvBuffer[ART_DMX_START], sequence);
             
             if (auto universe = universes.find(incomingUniverse); universe != universes.end())
             {

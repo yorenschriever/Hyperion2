@@ -1,0 +1,86 @@
+=== Universe 0
+ch 1-4 = RGBA plafond stok 1 (linkerrij, dj kant)
+ch 5-8 = RGBA plafond stok 2 (linkerrij, dj kant)
+...
+ch 93-96 = RGBA plafond stok 24 (linkerrij, ingang kant)
+
+ch 97-100 = RGBA plafond stok 25 (rechterrij, dj kant)
+ch 101-104 = RGBA plafond stok 26 (rechterrij, dj kant)
+...
+ch 189-192 = RGBA plafond stok 48 (rechterrij, ingang kant)
+
+ch 193-196 = RGBA chandelier onderste ring, rechter stok
+ch 197-200 = RGBA chandelier onderste ring, clockwise opgeschoven (vanaf boven bekeken)
+...
+ch 185-288 = RGBA chandelier onderste ring, laatste stok
+
+ch 289-292 = RGBA chandelier bovenste ring, rechter stok
+ch 293-296 = RGBA chandelier bovenste ring, clockwise opgeschoven (vanaf boven bekeken)
+...
+ch 381-384 = RGBA chandelier bovenste ring, laatste stok
+
+ch 385-388 = window1 (links, dj kant)
+ch 389-392 = window2 (links)
+ch 393-396 = window3 (links)
+ch 397-400 = window4 (links, ingang kant)
+
+ch 401-404 = window1 (links, dj kant)
+ch 405-408 = window2 (links)
+ch 409-412 = window3 (links)
+ch 413-416 = window4 (links, ingang kant)
+
+
+=== Universe 1
+ch 26 = windows alpha
+ch 27 = window pattern 1 on/off
+ch 28 = window pattern 2 on/off
+..
+ch 37 = window pattern 11 on/off
+
+ch 51 = chandelier alpha
+ch 52 = chandelier pattern 1 on/off
+...
+ch 62 = chandelier pattern 11 on/off
+
+ch 76 = ceiling alpha
+ch 77 = ceiling pattern 1 on/off
+...
+ch 87 = ceiling pattern 11 on/off
+
+ch 101 = all alpha
+ch 102 = all pattern 1 on/off
+...
+ch 112 = all pattern 11 on/off
+
+ch 126 = artnet alpha
+ch 127 = artnet pattern 1 on/off
+
+ch 151 = mask alpha
+ch 152 = mask pattern 1 on/off
+...
+ch 162 = mask pattern 11 on/off
+
+ch 176 = flash alpha
+ch 177 = flash pattern 1 on/off
+...
+ch 187 = flash pattern 11 on/off
+
+401 = primary R
+402 = primary G
+403 = primary B
+404 = secondary R
+405 = secondary G
+406 = secondary B
+407 = gradient white->primary width
+408 = gradient primary->secondary width
+409 = gradient secondary->black width
+
+501 = velocity
+502 = amount
+503 = size
+504 = offset
+505 = variant
+506 = intensity
+
+512 masterdim
+
