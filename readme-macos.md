@@ -75,7 +75,7 @@ You should see the text 'initializing' followed by 'running'
 # Troubleshooting
 You might also need to install command line tools for xcode. Make sure to also accept the license before using it.
 ```sh
-xcode-select –install
+xcode-select --install
 sudo xcodebuild -license
 ```
 or alternatively install the required tools manually
@@ -86,6 +86,7 @@ brew install cmake gcc git
 On some machines i had to explicitly set OPENSSL_ROOT
 ```sh
 export OPENSSL_ROOT=$(brew --prefix openssl)
+export OPENSSL_ROOT_DIR=$(brew --prefix openssl)
 ```
 
 In case the link to boost version 1.82 is no longer working, you can find a backup here
