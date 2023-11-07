@@ -1,5 +1,4 @@
 #pragma once
-#include "../mapping/ceilingMappedIndices.hpp"
 #include "core/generation/patterns/pattern.hpp"
 #include "generation/patterns/helpers/fade.h"
 #include "generation/patterns/helpers/interval.h"
@@ -293,7 +292,7 @@ namespace Patterns
             for (int i = 0; i < width; i++)
             {
                 float phase = ((float)i / width) * amount * 48 + float(i % (width / 2)) * offset / width;
-                pixels[ceilingMappedIndices[i]] = RGBA(0, 0, 0, 255) * (1. - lfo.getValue(phase)) * transition.getValue();
+                pixels[i] = RGBA(0, 0, 0, 255) * (1. - lfo.getValue(phase)) * transition.getValue();
             }
         }
     };

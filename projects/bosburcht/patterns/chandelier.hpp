@@ -148,39 +148,35 @@ namespace Patterns
     // };
 
 
-class FadeFromCenterChandelier : public Pattern<RGBA>
+class GradientLFO : public Pattern<RGBA>
     {
         int segmentSize;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        static const int numFades = 3;
-        int currentFade = 0;
-        FadeDown fade[numFades];
+        //static const int numFades = 3;
+        //int currentFade = 0;
+        //FadeDown fade[numFades];
         BeatWatcher wachter;
-        int beatDivs[5] = {16, 8, 4, 2, 2};
+        //int beatDivs[5] = {16, 8, 4, 2, 2};
+
+        LFO<SawDown> lfo;
 
     public:
-        FadeFromCenterChandelier(int segmentSize = 60)
+        GradientLFO(int segmentSize = 60)
         {
             this->segmentSize = segmentSize;
-            this->name = "Fade from center";
+            this->name = "Gradient LFO";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
-            int beatDiv = beatDivs[int(params->getAmount(0, 4))];
-            if (this->wachter.Triggered() && Tempo::GetBeatNumber() % beatDiv == 0)
-            {
-                currentFade = (currentFade + 1) % numFades;
-                fade[currentFade].reset();
-            }
-
             if (!transition.Calculate(active))
                 return;
 
-            float trailSize = params->getSize(1, 10);
-            float velocity = params->getVelocity(250, 5);
+            float trailSize = params->getAmount(30, 120);
+            lfo.setPeriod(params->getVelocity(4000,500));
+            lfo.setDutyCycle(params->getSize());
 
             for (int bar = 0; bar < width / segmentSize; bar++)
             {
@@ -188,11 +184,9 @@ class FadeFromCenterChandelier : public Pattern<RGBA>
                 {
                     int center = segmentSize / 2;
                     int distance = abs(center - i);
-                    for (int f = 0; f < numFades; f++)
-                    {
-                        float fadeValue = fade[f].getValue(distance * trailSize + (bar % (width / segmentSize / 4)) * velocity);
-                        pixels[bar * segmentSize + i] += params->getGradient(255 * fadeValue) * fadeValue * transition.getValue();
-                    }
+
+                    float fadeValue = lfo.getValue(float(bar) / (width/ segmentSize) * 2 + distance / trailSize);
+                    pixels[bar * segmentSize + i] = params->getGradientf(fadeValue) * fadeValue * transition.getValue();
                 }
             }
         }

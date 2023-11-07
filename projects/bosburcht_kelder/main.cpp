@@ -15,6 +15,7 @@
 #include "patterns/colander.hpp"
 #include "patterns/window.hpp"
 #include "patterns/common.hpp"
+#include "patterns/mask.hpp"
 #include "patterns/videoPattern.hpp"
 #include "animation.hpp"
 #include "setViewParams.hpp"
@@ -36,9 +37,7 @@ void addCeilingPipe(Hyperion *);
 #define COL_CEILING1 3
 #define COL_CEILING2 4
 #define COL_VIDEO 5
-// #define COL_ALL 4
-// #define COL_MASK 5
-// #define COL_UNUSED 6
+#define COL_MASK 6
 #define COL_FLASH 7
 
 typedef struct
@@ -75,6 +74,7 @@ int main()
     hyp->hub.setColumnName(COL_CEILING1, "Ceiling");
     hyp->hub.setColumnName(COL_CEILING2, "Ceiling");
     hyp->hub.setColumnName(COL_VIDEO, "Video");
+    hyp->hub.setColumnName(COL_MASK, "Mask");
     hyp->hub.setColumnName(COL_FLASH, "Flash");
 
     hyp->start();
@@ -113,6 +113,8 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_VIDEO, .slot = 0, .pattern = new VideoPattern(&anim_driehoek_v1)},
             {.column = COL_VIDEO, .slot = 1, .pattern = new VideoPalettePattern(&anim_driehoek_v1)},
 
+            {.column = COL_MASK, .slot = 0, .pattern = new Patterns::GlowPulseMaskPattern()},
+            {.column = COL_MASK, .slot = 1, .pattern = new Patterns::SinChaseMaskPattern()},
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
