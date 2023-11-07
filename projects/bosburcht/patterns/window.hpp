@@ -118,7 +118,7 @@ namespace Patterns
 
     class OnBeatWindowChaseUpPattern : public Pattern<RGBA>
     {
-        static const int numWindows = 16;
+        static const int numWindows = 8;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
@@ -130,15 +130,7 @@ namespace Patterns
             FadeDown(200),
             FadeDown(200),
             FadeDown(200),
-            FadeDown(200),
-            FadeDown(200),
-            FadeDown(200),
-            FadeDown(200),
-            FadeDown(200),
-            FadeDown(200),
-            FadeDown(200),
-            FadeDown(200),
-            FadeDown(200),
+            FadeDown(200)
         };
         BeatWatcher watcher = BeatWatcher();
         PixelMap3d *map;
@@ -222,16 +214,8 @@ namespace Patterns
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        static const int numWindows = 16;
+        static const int numWindows = 8;
         FadeDown fade[numWindows] = {
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
             FadeDown(1400, WaitAtEnd),
             FadeDown(1400, WaitAtEnd),
             FadeDown(1400, WaitAtEnd),

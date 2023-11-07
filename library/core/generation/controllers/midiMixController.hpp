@@ -9,7 +9,7 @@
 
 class MidiMixController : public MidiController
 {
-private:
+protected:
     ControlHub *hub;
     MidiDevice *midi;
 

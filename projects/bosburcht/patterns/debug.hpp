@@ -8,7 +8,7 @@
 #include "mappingHelpers.hpp"
 #include <math.h>
 #include <vector>
-
+#include "../midiController.hpp"
 namespace Patterns
 {
 
@@ -116,5 +116,58 @@ namespace Patterns
             }
         }
     };
+
+    class WindowMapPattern : public Pattern<RGBA>
+    {
+        const int estimate[6] = {     
+            66,   //boogje  rechts
+            172,  //rechts naar beneden
+            112,  //horizontaal
+            172,  //links naar boven
+            66,   //boogje links
+            172,  //midden naar beneden
+        };
+
+        RGBA colors[7] = {
+            RGBA(255, 0, 0, 255),
+            RGBA(0, 255, 0, 255),
+            RGBA(0, 0, 255, 255),
+            RGBA(0, 255, 255, 255),
+            RGBA(255, 0, 255, 255),
+            RGBA(255, 255, 0, 255),
+            RGBA(255, 255, 255, 255),
+        };
+
+    public:
+        WindowMapPattern(uint16_t *remap=nullptr)
+        {
+            this->name = "Window mapper";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            int nextColorAt;
+            int segmentIndex;
+            for (int i = 0; i < width; i++)
+            {
+                int ii = i % (width/8);
+                if (ii==0){
+                    segmentIndex=-1;
+                    nextColorAt=0;
+                }
+                if (ii==nextColorAt){
+                    segmentIndex++;
+                    nextColorAt += estimate[segmentIndex] + Corrections::corrections[segmentIndex];
+                }
+    
+                pixels[i] = colors[segmentIndex];
+            }
+        }
+    };
+
+
 
 }

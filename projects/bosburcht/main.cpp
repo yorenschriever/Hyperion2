@@ -24,6 +24,7 @@
 #include <vector>
 #include "artNetPattern.hpp"
 #include "artNetController.hpp"
+#include "midiController.hpp"
 
 LUT *columnsLut = nullptr; // new ColourCorrectionLUT(1, 255, 200, 200, 200);
 
@@ -57,6 +58,7 @@ typedef struct
 int main()
 {
     auto hyp = new Hyperion();
+    hyp->midiControllerFactory = new CustomMidiControllerFactory();
 
     // hyp->hub.addParams(new Params("second params"));
 
@@ -102,7 +104,7 @@ void addWindowPipe(Hyperion *hyp)
 {
     int nleds = windowMap3dCombined.size();
     int nbytes = nleds * sizeof(RGBA);
-    int segmentSize = nleds / 16;
+    int segmentSize = nleds / 8;
 
     auto input = new ControlHubInput<RGBA>(
         windowMap3dCombined.size(),
@@ -158,28 +160,20 @@ void addWindowPipe(Hyperion *hyp)
             {.column = COL_DEBUG, .slot = 4, .pattern = new Patterns::OneColor(RGB(255, 255, 255), "White")},
             {.column = COL_DEBUG, .slot = 5, .pattern = new Patterns::OneColor(RGB(127, 127, 127), "White 50%")},
             {.column = COL_DEBUG, .slot = 7, .pattern = new Patterns::PaletteColors()},
-            
+            {.column = COL_DEBUG, .slot = 8, .pattern = new Patterns::WindowMapPattern()},
         });
 
     auto splitInput = new InputSlicer(
         input,
         {
-            {0 * nbytes / 16, nbytes / 16, true},
-            {1 * nbytes / 16, nbytes / 16, true},
-            {2 * nbytes / 16, nbytes / 16, true},
-            {3 * nbytes / 16, nbytes / 16, true},
-            {4 * nbytes / 16, nbytes / 16, true},
-            {5 * nbytes / 16, nbytes / 16, true},
-            {6 * nbytes / 16, nbytes / 16, true},
-            {7 * nbytes / 16, nbytes / 16, true},
-            {8 * nbytes / 16, nbytes / 16, true},
-            {9 * nbytes / 16, nbytes / 16, true},
-            {10 * nbytes / 16, nbytes / 16, true},
-            {11 * nbytes / 16, nbytes / 16, true},
-            {12 * nbytes / 16, nbytes / 16, true},
-            {13 * nbytes / 16, nbytes / 16, true},
-            {14 * nbytes / 16, nbytes / 16, true},
-            {15 * nbytes / 16, nbytes / 16, true},
+            {0 * nbytes / 8, nbytes / 8, true},
+            {1 * nbytes / 8, nbytes / 8, true},
+            {2 * nbytes / 8, nbytes / 8, true},
+            {3 * nbytes / 8, nbytes / 8, true},
+            {4 * nbytes / 8, nbytes / 8, true},
+            {5 * nbytes / 8, nbytes / 8, true},
+            {6 * nbytes / 8, nbytes / 8, true},
+            {7 * nbytes / 8, nbytes / 8, true},
 
             {0, nbytes / 2, false},
             {nbytes / 2, nbytes / 2, false},
@@ -187,26 +181,26 @@ void addWindowPipe(Hyperion *hyp)
 
     auto splitMap = new PixelMapSplitter3d(&windowMap3dCombined, {nleds / 2, nleds / 2});
 
-    Slave slaves[] = {
+    Slave slaves[8] = {
         {.host = "hyperslave1.local", .port = 9611},
         {.host = "hyperslave1.local", .port = 9612},
         {.host = "hyperslave1.local", .port = 9613},
         {.host = "hyperslave1.local", .port = 9614},
 
-        {.host = "hyperslave1.local", .port = 9615},
-        {.host = "hyperslave1.local", .port = 9616},
-        {.host = "hyperslave1.local", .port = 9617},
-        {.host = "hyperslave1.local", .port = 9618},
+        // {.host = "hyperslave1.local", .port = 9615},
+        // {.host = "hyperslave1.local", .port = 9616},
+        // {.host = "hyperslave1.local", .port = 9617},
+        // {.host = "hyperslave1.local", .port = 9618},
 
         {.host = "hyperslave2.local", .port = 9611},
         {.host = "hyperslave2.local", .port = 9612},
         {.host = "hyperslave2.local", .port = 9613},
         {.host = "hyperslave2.local", .port = 9614},
 
-        {.host = "hyperslave2.local", .port = 9615},
-        {.host = "hyperslave2.local", .port = 9616},
-        {.host = "hyperslave2.local", .port = 9617},
-        {.host = "hyperslave2.local", .port = 9618},
+        // {.host = "hyperslave2.local", .port = 9615},
+        // {.host = "hyperslave2.local", .port = 9616},
+        // {.host = "hyperslave2.local", .port = 9617},
+        // {.host = "hyperslave2.local", .port = 9618},
     };
 
     for (int i = 0; i < splitInput->size() - 2; i++)

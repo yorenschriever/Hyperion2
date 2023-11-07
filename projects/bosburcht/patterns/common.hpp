@@ -573,7 +573,7 @@ namespace Patterns
             1000, Transition::none, 0);
         Timeline timeline = Timeline(1000);
         int window = 0;
-        const int numWindows = 16;
+        const int numWindows = 8;
 
     public:
         WindowGlitchPattern()
