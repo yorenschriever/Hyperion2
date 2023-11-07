@@ -9,15 +9,15 @@ ch 101-104 = RGBA plafond stok 26 (rechterrij, dj kant)
 ...
 ch 189-192 = RGBA plafond stok 48 (rechterrij, ingang kant)
 
-ch 193-196 = RGBA chandelier onderste ring, rechter stok
-ch 197-200 = RGBA chandelier onderste ring, clockwise opgeschoven (vanaf boven bekeken)
+ch 193-196 = RGBA chandelier bovenste ring, rechter stok
+ch 197-200 = RGBA chandelier bovenste ring, clockwise opgeschoven (vanaf boven bekeken)
 ...
-ch 185-288 = RGBA chandelier onderste ring, laatste stok
+ch 185-288 = RGBA chandelier bovenste ring, laatste stok
 
-ch 289-292 = RGBA chandelier bovenste ring, rechter stok
-ch 293-296 = RGBA chandelier bovenste ring, clockwise opgeschoven (vanaf boven bekeken)
+ch 289-292 = RGBA chandelier onderste ring, rechter stok
+ch 293-296 = RGBA chandelier onderste ring, clockwise opgeschoven (vanaf boven bekeken)
 ...
-ch 381-384 = RGBA chandelier bovenste ring, laatste stok
+ch 381-384 = RGBA chandelier onderste ring, laatste stok
 
 ch 385-388 = window1 (links, dj kant)
 ch 389-392 = window2 (links)

@@ -24,6 +24,7 @@ def reverseLedLine():
     for i in range(ledsPerMeter):
         turtle.move(ledDistance)
 
+#bovenste ring
 for i in range(barsPerRing):
     turtle.setPosition(0,0,1000)
     turtle.setDirection(i * 360 / (barsPerRing), 90)
@@ -34,16 +35,13 @@ for i in range(barsPerRing):
     else:
         reverseLedLine()
 
-
+#onderste ring
 for i in range(barsPerRing):
     turtle.setPosition(0,0,-180)
     turtle.setDirection(i * 360 / (barsPerRing), 90)
     turtle.move(500,False)
     turtle.turnVertical(-30)
-    if (i%2==0):
-        ledLine()
-    else:
-        reverseLedLine()
+    ledLine()
 
 
 print ("chandelier map leds: ", len(turtle.trail))
