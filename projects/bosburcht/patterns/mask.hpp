@@ -334,11 +334,13 @@ namespace Patterns
             1000, Transition::none, 0);
         LFO<Glow> lfo;
         static const int segmentSize = 60;
+        uint16_t *remap;
 
     public:
-        SideWaveMask()
+        SideWaveMask(uint16_t *remap)
         {
             this->name = "Side wave mask";
+            this->remap = remap;
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -358,7 +360,9 @@ namespace Patterns
                 for (int i = 0; i < segmentSize; i++)
                 {
                     float fadeValue = softEdge(i - baseSize, size * lfo.getValue(2. * float(bar) / (width / segmentSize) * offset) * segmentSize);
-                    pixels[ceilingMappedIndices[bar * segmentSize + i]] = RGBA(0,0,0,255) * (1.-fadeValue) * transition.getValue();
+                    int index = ceilingMappedIndices[bar * segmentSize + i];
+                    if (remap) index = remap[index];
+                    pixels[index] = RGBA(0,0,0,255) * (1.-fadeValue) * transition.getValue();
                 }
             }
         }

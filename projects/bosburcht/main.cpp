@@ -246,6 +246,9 @@ void addChandelierPipe(Hyperion *hyp)
             {.column = COL_CHANDELIER, .slot = 5, .pattern = new Patterns::SegmentChasePattern()},
             {.column = COL_CHANDELIER, .slot = 6, .pattern = new Patterns::Lighthouse(&cchandelierMap3d)},
             {.column = COL_CHANDELIER, .slot = 7, .pattern = new Patterns::BarLFO()},
+            {.column = COL_CHANDELIER, .slot = 8, .pattern = new Patterns::FadeFromCenterChandelier()},
+            {.column = COL_CHANDELIER, .slot = 9, .pattern = new Patterns::FadeFromRandomChandelier()},
+            
 
             {.column = COL_ALL, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_ALL, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
@@ -262,7 +265,9 @@ void addChandelierPipe(Hyperion *hyp)
             {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPatternRGB(0,48*4)},
             {.column = COL_ARTNET, .slot = 1, .pattern = new Patterns::ArtNetPattern(0,48)},
 
+            {.column = COL_MASK, .slot = 5, .pattern = new Patterns::SinChaseMaskPattern()},
             {.column = COL_MASK, .slot = 6, .pattern = new Patterns::GlowPulseMaskPattern()},
+            {.column = COL_MASK, .slot = 7, .pattern = new Patterns::SideWaveMask(nullptr)}, /*ceilingMappedIndices*/
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
@@ -358,7 +363,7 @@ void addCeilingPipe(Hyperion *hyp)
 
             {.column = COL_MASK, .slot = 0, .pattern = new Patterns::GlowPulseMaskPattern()},
             {.column = COL_MASK, .slot = 1, .pattern = new Patterns::SinChaseMaskPattern()},
-            {.column = COL_MASK, .slot = 2, .pattern = new Patterns::SideWaveMask()},
+            {.column = COL_MASK, .slot = 2, .pattern = new Patterns::SideWaveMask(ceilingMappedIndices)},
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},

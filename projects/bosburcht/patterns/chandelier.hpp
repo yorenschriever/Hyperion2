@@ -147,4 +147,111 @@ namespace Patterns
     //     }
     // };
 
+
+class FadeFromCenterChandelier : public Pattern<RGBA>
+    {
+        int segmentSize;
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        static const int numFades = 3;
+        int currentFade = 0;
+        FadeDown fade[numFades];
+        BeatWatcher wachter;
+        int beatDivs[5] = {16, 8, 4, 2, 2};
+
+    public:
+        FadeFromCenterChandelier(int segmentSize = 60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Fade from center";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            int beatDiv = beatDivs[int(params->getAmount(0, 4))];
+            if (this->wachter.Triggered() && Tempo::GetBeatNumber() % beatDiv == 0)
+            {
+                currentFade = (currentFade + 1) % numFades;
+                fade[currentFade].reset();
+            }
+
+            if (!transition.Calculate(active))
+                return;
+
+            float trailSize = params->getSize(1, 10);
+            float velocity = params->getVelocity(250, 5);
+
+            for (int bar = 0; bar < width / segmentSize; bar++)
+            {
+                for (int i = 0; i < segmentSize; i++)
+                {
+                    int center = segmentSize / 2;
+                    int distance = abs(center - i);
+                    for (int f = 0; f < numFades; f++)
+                    {
+                        float fadeValue = fade[f].getValue(distance * trailSize + (bar % (width / segmentSize / 4)) * velocity);
+                        pixels[bar * segmentSize + i] += params->getGradient(255 * fadeValue) * fadeValue * transition.getValue();
+                    }
+                }
+            }
+        }
+    };
+
+
+    class FadeFromRandomChandelier : public Pattern<RGBA>
+    {
+        int segmentSize;
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        FadeDown fade;
+        BeatWatcher watcher;
+        int beatDivs[6] = {16, 8, 4, 2, 1, 1};
+        int centers[48];
+        int delays[48];
+        FadeDown masterFade;
+
+    public:
+        FadeFromRandomChandelier(int segmentSize = 60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Fade from random";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            int beatDiv = beatDivs[int(params->getAmount(0, 5))];
+            if (this->watcher.Triggered() && Tempo::GetBeatNumber() % beatDiv == 0)
+            {
+                fade.reset();
+                masterFade.reset();
+                for (int i = 0; i < 48; i++)
+                {
+                    centers[i] = Utils::random(15, 45);
+                    delays[i] = Utils::random(0, 500);
+                }
+            }
+
+            if (!transition.Calculate(active))
+                return;
+
+            masterFade.duration = Tempo::TimeBetweenBeats() * beatDiv;
+
+            float trailSize = params->getVelocity(15, 5);
+            fade.setDuration(params->getSize(1200, 300));
+            float offset = params->getOffset();
+
+            for (int bar = 0; bar < width / segmentSize; bar++)
+            {
+                for (int i = 0; i < segmentSize; i++)
+                {
+                    int distance = abs(centers[bar] - i);
+                    float fadeValue = fade.getValue(distance * trailSize + delays[bar] * offset);
+                    pixels[bar * segmentSize + i] += params->getPrimaryColour() * fadeValue * masterFade.getValue() * transition.getValue();
+                }
+            }
+        }
+    };
+
 }
