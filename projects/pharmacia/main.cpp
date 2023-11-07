@@ -19,10 +19,7 @@ int main()
         crossMap.size(),
         new Patterns::Cross(&crossMap));
 
-    input->params.gradient = tunnel.gradient;
-    input->params.primaryColour = tunnel.primary;
-    input->params.secondaryColour = tunnel.secondary;
-    input->params.highlightColour = tunnel.highlight;
+    input->params.palette = &tunnel;
 
     hyp->addPipe(new ConvertPipe<RGBA, RGB>(
         input,

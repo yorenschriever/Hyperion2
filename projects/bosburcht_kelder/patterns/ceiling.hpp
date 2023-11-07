@@ -120,7 +120,7 @@ namespace Ceiling
             for (int i = 0; i < width; i++)
             {
                 float v = lfo.getValue(float(i)/width * amount);
-                pixels[i] = params->gradient->get(255 * v) * v * transition.getValue();
+                pixels[i] = params->getGradient(255 * v) * v * transition.getValue();
             }
         }
     };
@@ -182,8 +182,8 @@ namespace Ceiling
                 for (int i=0; i<size; i++)
                 {
                     float fadeValue = fades[fade].getValue(float(i)/size * 250);
-                    if (center+i < width) pixels[center + i] += params->gradient->get(255 * fadeValue) * fadeValue;
-                    if (center-1 >= 0) pixels[center - i] += params->gradient->get(255 * fadeValue) * fadeValue;
+                    if (center+i < width) pixels[center + i] += params->getGradient(255 * fadeValue) * fadeValue;
+                    if (center-1 >= 0) pixels[center - i] += params->getGradient(255 * fadeValue) * fadeValue;
                 }
             }
 
@@ -198,7 +198,7 @@ namespace Ceiling
             //         for (int f = 0; f < numFades; f++)
             //         {
             //             float fadeValue = fade[f].getValue(distance * trailSize + (bar % (width / segmentSize / offset)) * velocity);
-            //             pixels[bar * segmentSize + i] += params->gradient->get(255 * fadeValue) * fadeValue * transition.getValue();
+            //             pixels[bar * segmentSize + i] += params->getGradient(255 * fadeValue) * fadeValue * transition.getValue();
             //         }
             //     }
             // }
@@ -305,7 +305,7 @@ namespace Patterns
                     for (int f = 0; f < numFades; f++)
                     {
                         float fadeValue = fade[f].getValue(distance * trailSize + (bar % (width / segmentSize / 4)) * velocity);
-                        pixels[bar * segmentSize + i] += params->gradient->get(255 * fadeValue) * fadeValue * transition.getValue();
+                        pixels[bar * segmentSize + i] += params->getGradient(255 * fadeValue) * fadeValue * transition.getValue();
                     }
                 }
             }
@@ -466,7 +466,7 @@ namespace Patterns
     //                 float phase = ((float)i/width) * amount;
     //                 if (variant == 1) phase  = 1.0 - phase;
     //                 float lfoVal =  lfo.getValue(phase);
-    //                 pixels[ceilingMappedIndices[i]] += params->gradient->get(255*lfoVal) * lfoVal * transition.getValue();
+    //                 pixels[ceilingMappedIndices[i]] += params->getGradient(255*lfoVal) * lfoVal * transition.getValue();
     //             }
     //         }
     //     }

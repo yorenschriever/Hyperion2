@@ -47,7 +47,7 @@ namespace Patterns
 
                 float distanceAsRatio = 1 - distance / lfoSize;
 
-                pixels[index] = params->gradient->get(distanceAsRatio * 255) * distanceAsRatio * transition.getValue();
+                pixels[index] = params->getGradient(distanceAsRatio * 255) * distanceAsRatio * transition.getValue();
             }
         }
     };
@@ -74,7 +74,7 @@ namespace Patterns
             for (int index = 0; index < width; index++)
             {
                 int z255 = fromBottom(map->y(index)) * 255;
-                pixels[index] = params->gradient->get(z255) * transition.getValue(255 - z255, 255);
+                pixels[index] = params->getGradient(z255) * transition.getValue(255 - z255, 255);
             }
         }
     };
@@ -211,7 +211,7 @@ namespace Patterns
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 // RGBA color = params->getPrimaryColour();
-                RGBA color = params->gradient->get(fromTop(map->y(index)) * 255);
+                RGBA color = params->getGradient(fromTop(map->y(index)) * 255);
                 pixels[index] = color * lfo.getValue(normalize(map->z(index))) * transition.getValue();
             }
         }

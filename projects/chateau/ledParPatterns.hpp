@@ -201,7 +201,7 @@ namespace Ledpar
             for (int index = 0; index < width; index++)
             {
                 float lfoVal = lfo.getValue((float)amount * index / width);
-                pixels[index] = params->gradient->get(255 * lfoVal) * transition.getValue();
+                pixels[index] = params->getGradient(255 * lfoVal) * transition.getValue();
             }
         }
     };

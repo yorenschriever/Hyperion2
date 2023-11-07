@@ -109,6 +109,23 @@ public:
         }
     }
 
+    /*
+     * Be aware that this method does not take into account column/button behaviour 
+     * like flash mode, column release, forced selection etc. 
+     * Use with caution.
+     */
+    void setSlotActive(int columnIndex, int slotIndex, bool active)
+    {
+        auto slot = findSlot(columnIndex, slotIndex);
+        if (slot == NULL)
+            return;
+
+        slot->activated = active;
+
+        for (auto controller : controllers)
+            controller->onHubSlotActiveChange(columnIndex, slotIndex, active);
+    }
+
     void dim(int columnIndex, uint8_t value)
     {
         if (columnIndex < 0 || columnIndex > columns.size() - 1)
@@ -348,6 +365,19 @@ public:
         return &column->slots.data()[slotIndex];
     }
 
+    int getColumnCount()
+    {
+        return columns.size();
+    }
+
+    int getSlotCount(int columnIndex)
+    {
+        auto col = findColumn(columnIndex);
+        if (!col)
+            return 0;
+        return col->slots.size();
+    }
+
     Column *findColumn(int columnIndex) &
     {
         if (columnIndex < 0 || columnIndex > ((int)columns.size()) - 1)
@@ -396,41 +426,4 @@ public:
         return paramsSet[paramsSlotIndex];
     }
 
-    // Params *createParams(const char* name= nullptr){
-    //     auto newParams = new Params();
-    //     newParams->name = name;
-    //     paramsSet.insert(newParams);
-    //     return newParams;
-    // }
-
-    // // void setParamsName(int index, const char* name){
-    // //     params[index].name = name;
-    // // }
-
-    // void deleteParams(Params * params_tdb)
-    // {
-    //     if (params.size()==1){
-    //         Log::error(TAG, "Cannot remove last params");
-    //         return;
-    //     }
-
-    //     for (int columnIndex = 0; columnIndex < columns.size(); columnIndex++)
-    //     {
-    //         auto column = columns[columnIndex];
-    //         for (int slotIndex = 0; slotIndex < column.slots.size(); slotIndex++)
-    //         {
-    //             auto slot = column.slots[slotIndex];
-    //             if (slot.params == params_tdb){
-    //                 slot.params= getParams(0);
-    //             }
-    //         }
-
-    //     }
-
-    //     delete(darams_td)
-    // }
-
-    // Params *getParams(int index){
-    //     return &params[index];
-    // }
 };

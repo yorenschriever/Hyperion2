@@ -18,8 +18,8 @@ int main()
 {
   auto hyp = new Hyperion();
 
-  hyp->hub.params.primaryColour = RGB(255, 0, 255);
-  hyp->hub.params.secondaryColour = RGB(250, 210, 0);
+  hyp->hub.getParams(0)->palette->primary = RGB(255, 0, 255);
+  hyp->hub.getParams(0)->palette->secondary= RGB(250, 210, 0);
 
   addLedsterPipe(hyp);
 

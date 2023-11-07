@@ -9,7 +9,7 @@
 #include "mapping/ledsterMap.hpp"
 #include "mapping/ledsterMap3d.hpp"
 #include "core/distribution/inputs/inputSplitter.hpp"
-#include "palettes.hpp"
+#include "core/generation/palettes.hpp"
 #include "patterns.hpp"
 #include "distribution/inputs/controlHubInput.hpp"
 // #include "dynamicPipe.hpp"
@@ -25,14 +25,14 @@ LUT *ledsterLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
 
 auto cLedsterMap3d = ledsterMap3d.toCylindricalXZ();
 
-std::vector<PaletteColumn::Palette> palettes = std::vector<PaletteColumn::Palette>({
-    pinkSunset,
-    sunset8,
-    heatmap2,
-    sunset2,
-    sunset6,
-    plumBath,
-    redSalvation});
+std::vector<Palette*> palettes = std::vector<Palette*>({
+    &pinkSunset,
+    &sunset8,
+    &heatmap2,
+    &sunset2,
+    &sunset6,
+    &plumBath,
+    &redSalvation});
 
 auto hyp = new Hyperion();
 int autoColumn=2;
@@ -129,10 +129,7 @@ int main()
     int paletteColumnIndex = 0;
     while (1)
     {
-        inputAuto->params.gradient = palettes[paletteColumnIndex].gradient;
-        inputAuto->params.primaryColour = palettes[paletteColumnIndex].primary;
-        inputAuto->params.secondaryColour = palettes[paletteColumnIndex].secondary;
-        inputAuto->params.highlightColour = palettes[paletteColumnIndex].highlight;
+        inputAuto->params.palette = palettes[paletteColumnIndex];
 
         paletteColumnIndex++;
         if (paletteColumnIndex >= palettes.size())

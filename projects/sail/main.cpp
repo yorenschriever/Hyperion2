@@ -4,7 +4,7 @@
 #include "core/distribution/outputs/spiOutput.hpp"
 #include "core/hyperion.hpp"
 #include "distribution/inputs/patternCycleInput.hpp"
-#include "palettes.hpp"
+#include "core/generation/palettes.hpp"
 #include "patterns.hpp"
 #include "sailMap.hpp"
 #include <vector>
@@ -13,23 +13,23 @@ LUT *ledsterLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
 
 auto pSailMap = sailMap.toPolarRotate90();
 
-std::vector<PaletteColumn::Palette> palettes = std::vector<PaletteColumn::Palette>(
-    {retro,
-     blueOrange,
-     tunnel,
-     heatmap2,
-     sunset8,
-     sunset2,
-     campfire,
-     sunset6,
-     plumBath,
-     greatBarrierReef,
-     redSalvation,
-     pinkSunset,
-     sunset1,
-     sunset3,
-     sunset4,
-     purpleGreen});
+std::vector<Palette*> palettes = std::vector<Palette*>(
+    {&retro,
+     &blueOrange,
+     &tunnel,
+     &heatmap2,
+     &sunset8,
+     &sunset2,
+     &campfire,
+     &sunset6,
+     &plumBath,
+     &greatBarrierReef,
+     &redSalvation,
+     &pinkSunset,
+     &sunset1,
+     &sunset3,
+     &sunset4,
+     &purpleGreen});
 
 const Hyperion::Config minimal = {
     .network = false,
@@ -89,10 +89,7 @@ int main()
     int paletteColumnIndex = 0;
     while (1)
     {
-        input->params.gradient = palettes[paletteColumnIndex].gradient;
-        input->params.primaryColour = palettes[paletteColumnIndex].primary;
-        input->params.secondaryColour = palettes[paletteColumnIndex].secondary;
-        input->params.highlightColour = palettes[paletteColumnIndex].highlight;
+        input->params.palette = palettes[paletteColumnIndex];
 
         paletteColumnIndex++;
         if (paletteColumnIndex >= palettes.size())

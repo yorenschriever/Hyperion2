@@ -1,20 +1,36 @@
 #pragma once
 #include "colours.h"
-#include "gradient.hpp"
+#include "core/generation/gradient.hpp"
+#include "core/generation/palette.hpp"
 #include <string>
+
+Palette defaultPalette{
+    .primary = RGB(255, 0, 0),
+    .secondary = RGB(0, 255, 0),
+    .highlight = RGB(255, 255, 255),
+    .gradient = Gradient({
+        {.position = 0, .color = RGB(0, 0, 0)},        // Black
+        {.position = 128, .color = RGB(255, 0, 0)},    // Red
+        {.position = 224, .color = RGB(255, 255, 0)},  // Bright yellow
+        {.position = 255, .color = RGB(255, 255, 255)} // Full white
+    })};
+
 
 class Params
 {
 public:
-    Params(){}
-    Params(std::string name){
-        this->name=name;
+    Params() {}
+    Params(std::string name)
+    {
+        this->name = name;
     }
     std::string name;
 
-    RGBA getPrimaryColour() { return primaryColour; }
-    RGBA getSecondaryColour() { return secondaryColour; }
-    RGBA getHighlightColour() { return highlightColour; }
+    RGBA getPrimaryColour() { return palette->primary; }
+    RGBA getSecondaryColour() { return palette->secondary; }
+    RGBA getHighlightColour() { return palette->highlight; }
+    RGBA getGradient(int pos) { return palette->gradient.get(pos); }
+    RGBA getGradientf(float pos) { return palette->gradient.getf(pos); }
 
     float getVelocity(float start = 0, float end = 1) { return convert(start, end, velocity); }
     float getAmount(float start = 0, float end = 1) { return convert(start, end, amount); }
@@ -22,16 +38,8 @@ public:
     float getVariant(float start = 0, float end = 1) { return convert(start, end, variant); }
     float getSize(float start = 0, float end = 1) { return convert(start, end, size); }
     float getOffset(float start = 0, float end = 1) { return convert(start, end, offset); }
-    
-    RGBA primaryColour = RGB(255, 0, 0);
-    RGBA secondaryColour = RGB(0, 255, 0);
-    RGBA highlightColour = RGB(255, 255, 255);
-    Gradient *gradient = new Gradient({
-        {.position = 0, .color = RGB(0, 0, 0)},        // Black
-        {.position = 128, .color = RGB(255, 0, 0)},    // Red
-        {.position = 224, .color = RGB(255, 255, 0)},  // Bright yellow
-        {.position = 255, .color = RGB(255, 255, 255)} // Full white
-    });
+
+    Palette *palette = &defaultPalette;
 
     float velocity = 0.5;
     float amount = 0.5;
@@ -47,3 +55,4 @@ private:
         return start + value * distance;
     }
 };
+

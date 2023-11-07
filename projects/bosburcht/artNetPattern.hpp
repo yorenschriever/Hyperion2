@@ -51,4 +51,55 @@ namespace Patterns
         }
     };
 
+
+class ArtNetPatternRGB : public Pattern<RGBA>
+    {
+        int startChannel;
+        int sequenceNumber = 0;
+        int segmentSize;
+        uint16_t *remap;
+        ArtNetUniverse *universe = nullptr;
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+
+    public:
+        ArtNetPatternRGB(uint16_t port = 0, int startChannel=0, int segmentSize=60, uint16_t *remap=nullptr)
+        {
+            this->name = "ArtNet RGB";
+            auto artnet = ArtNet::getInstance();
+            universe = artnet->addUniverse(port);
+            this->startChannel = startChannel;
+            this->segmentSize = segmentSize;
+            this->remap=remap;
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            for (int segment = 0; segment < width/segmentSize; segment++)
+            {
+                if(segment*4+startChannel+3 >= universe->size) 
+                    break;
+
+                auto col = RGBA(
+                    universe->channels[segment*4+startChannel+0],
+                    universe->channels[segment*4+startChannel+1],
+                    universe->channels[segment*4+startChannel+2],
+                    universe->channels[segment*4+startChannel+3]
+                ) * transition.getValue();
+                
+                for(int i=0;i<segmentSize;i++)
+                {
+                    if (remap)
+                        pixels[remap[segment*segmentSize+i]] = col;
+                    else
+                        pixels[segment*segmentSize+i] = col;
+                }
+            }
+        }
+    };
+
 }

@@ -38,7 +38,7 @@ namespace Mid
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getSecondaryColour();
-                // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
+                // RGBA color = params->getGradient(fromTop(map->z(index))*255);
                 pixels[index] = color * lfo.getValue(-2 * around(map->th(index))) * fromMid(map->operator[](index)) * transition.getValue();
                 // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
@@ -288,7 +288,7 @@ namespace Mid
                     continue;
 
                 float lfoVal = lfo.getValue(-amount * around(map->th(index)));
-                RGBA color = params->gradient->get(lfoVal * 255);
+                RGBA color = params->getGradient(lfoVal * 255);
                 pixels[index] = color * lfoVal * fromMid(map->operator[](index)) * transition.getValue();
             }
         }
@@ -325,7 +325,7 @@ namespace Mid
                     continue;
 
                 float lfoVal1 = lfo1.getValue(-amount1 * around(map->th(index)));
-                RGBA color1 = params->gradient->get(lfoVal1 * 255);
+                RGBA color1 = params->getGradient(lfoVal1 * 255);
 
                 pixels[index] = color1 * lfoVal1 * transition.getValue();
             }
@@ -442,7 +442,7 @@ namespace Mid
                         continue;
                     float fadePosition = fade[column].getValue(radii[column][i] * velocity);
                     float fadeRatio = 1. - (radii[column][i] / size);
-                    RGBA color = params->gradient->get(255 * fadeRatio) * fadeRatio;
+                    RGBA color = params->getGradient(255 * fadeRatio) * fadeRatio;
                     pixels[i] += color * fadePosition * transition.getValue();
                 }
             }

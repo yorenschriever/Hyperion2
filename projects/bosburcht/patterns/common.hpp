@@ -189,7 +189,7 @@ namespace Patterns
                 for (int j = 0; j < segmentSize; j++)
                 {
                     float lfoVal = lfo.getValue(float(j) / lfoWidth + float(randomSegment) / numSegments + float(segment));
-                    RGBA col = params->gradient->get(lfoVal * 255) * lfoVal * transition.getValue();
+                    RGBA col = params->getGradient(lfoVal * 255) * lfoVal * transition.getValue();
                     int index = segment * segmentSize + j;
                     if (width == sizeof(ceilingMappedIndices) / 2)
                         index = ceilingMappedIndices[index];
@@ -255,7 +255,7 @@ namespace Patterns
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getSecondaryColour();
-                // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
+                // RGBA color = params->getGradient(fromTop(map->z(index))*255);
                 pixels[index] = color * lfo.getValue(-2 * around(map->th(index))) * Utils::rescale(map->r(index), 0.7, 1, 0.4, 1) * transition.getValue();
                 // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
@@ -326,11 +326,11 @@ namespace Patterns
                 float conePos = (0.5 + (map->r(i)) / 2);
 
                 float fadePosition1 = fade1.getValue(conePos * velocity);
-                RGBA color1 = params->gradient->get(fadePosition1 * 255);
+                RGBA color1 = params->getGradient(fadePosition1 * 255);
                 pixels[i] = color1 * fadePosition1 * (1.5 - map->r(i)) * transition.getValue();
 
                 float fadePosition2 = fade2.getValue(conePos * velocity);
-                RGBA color2 = params->gradient->get(fadePosition2 * 255);
+                RGBA color2 = params->getGradient(fadePosition2 * 255);
                 pixels[i] += color2 * fadePosition2 * (1.5 - map->r(i)) * transition.getValue();
             }
         }

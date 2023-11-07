@@ -6,7 +6,7 @@
 #include "distribution/outputs/cloneOutput.hpp"
 #include "mapping/sunMap.hpp"
 #include "mapping/sunMap3d.hpp"
-#include "palettes.hpp"
+#include "core/generation/palettes.hpp"
 #include "patterns.hpp"
 #include <vector>
 
@@ -96,32 +96,32 @@ void addPaletteColumn(Hyperion *hyp)
         0,
         0,
         {
-            campfire,
-            pinkSunset,
-            sunset8,
-            heatmap,
-            heatmap2,
-            sunset2,
-            retro,
-            tunnel,
+            &campfire,
+            &pinkSunset,
+            &sunset8,
+            &heatmap,
+            &heatmap2,
+            &sunset2,
+            &retro,
+            &tunnel,
 
-            sunset6,
-            sunset7,
-            sunset1,
-            coralTeal,
-            deepBlueOcean,
-            redSalvation,
-            plumBath,
-            sunset4,
-            candy,
-            sunset3,
-            greatBarrierReef,
-            blueOrange,
-            peach,
-            denseWater,
-            purpleGreen,
-            sunset5,
-            salmonOnIce,
+            &sunset6,
+            &sunset7,
+            &sunset1,
+            &coralTeal,
+            &deepBlueOcean,
+            &redSalvation,
+            &plumBath,
+            &sunset4,
+            &candy,
+            &sunset3,
+            &greatBarrierReef,
+            &blueOrange,
+            &peach,
+            &denseWater,
+            &purpleGreen,
+            &sunset5,
+            &salmonOnIce,
         });
     hyp->hub.subscribe(paletteColumn);
 }

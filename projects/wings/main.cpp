@@ -14,7 +14,7 @@
 #include "distribution/inputs/controlHubInput.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
 #include "mapping/wingMap.hpp"
-#include "palettes.hpp"
+#include "core/generation/palettes.hpp"
 #include "patterns.hpp"
 
 #include "../ledster/mapping/ledsterMap.hpp"
@@ -29,11 +29,6 @@ LUT *PixelLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 240);
 int main()
 {
   auto hyp = new Hyperion();
-
-  hyp->hub.params.primaryColour = RGB(255, 0, 255);
-  hyp->hub.params.secondaryColour = RGB(50, 50, 50);
-  hyp->hub.params.highlightColour = RGB(250, 250, 250);
-  hyp->hub.params.gradient = &heatmap;
 
   addWingsPipe(hyp);
   addPaletteColumn(hyp);
@@ -137,26 +132,20 @@ void addWingsPipe(Hyperion *hyp)
 
 void addPaletteColumn(Hyperion *hyp)
 {
-  auto paletteColumn = new PaletteColumn(&hyp->hub, 0,0, std::vector<PaletteColumn::Palette>{
-    //coralTeal,
-    plumBath,
-    deepBlueOcean,
-    heatmap2,
-    salmonOnIce,
-    // retro,
-    // candy,
-    greatBarrierReef,
-    pinkSunset,
-    //blueOrange,
-    campfire,
-    tunnel,
-    {.gradient = &heatmap, .primary = heatmap.get(127), .secondary = heatmap.get(200), .highlight = heatmap.get(255)},
-    {.gradient = &sunset1, .primary = sunset1.get(127), .secondary = sunset1.get(200), .highlight = sunset1.get(255)},
-    purpleGreen,
-    //{.gradient = &sunset3, .primary = sunset3.get(127), .secondary = sunset3.get(200), .highlight = sunset3.get(255)},
-    //{.gradient = &sunset4, .primary = sunset4.get(127), .secondary = sunset4.get(200), .highlight = sunset4.get(255)},
-    redSalvation,
-    denseWater,
+  auto paletteColumn = new PaletteColumn(&hyp->hub, 0,0, {
+    &plumBath,
+    &deepBlueOcean,
+    &heatmap2,
+    &salmonOnIce,
+    &greatBarrierReef,
+    &pinkSunset,
+    &campfire,
+    &tunnel,
+    &heatmap,
+    &sunset1,
+    &purpleGreen,
+    &redSalvation,
+    &denseWater,
     });
 
   hyp->hub.subscribe(paletteColumn);

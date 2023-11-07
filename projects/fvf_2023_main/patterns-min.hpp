@@ -157,7 +157,7 @@ namespace Min
                 for (int j = 0; j < segmentSize; j++)
                 {
                     float lfoVal = lfo.getValue(float(j) / lfoWidth + float(randomSegment) / numSegments + float(segment));
-                    RGBA col = params->gradient->get(lfoVal * 255) * lfoVal * transition.getValue();
+                    RGBA col = params->getGradient(lfoVal * 255) * lfoVal * transition.getValue();
                     if (isLedster)
                         pixels[LedsterShapes::ribben[segment][j]] += col;
                     else
@@ -337,7 +337,7 @@ namespace Min
                     pos -= 1;
                 }
                 float fadePosition = softEdge(pos, size, 0.06);
-                RGBA color = params->gradient->get(255 - 255 * map->r(i));
+                RGBA color = params->getGradient(255 - 255 * map->r(i));
 
                 pixels[i] = color * fadePosition * transition.getValue();
             }

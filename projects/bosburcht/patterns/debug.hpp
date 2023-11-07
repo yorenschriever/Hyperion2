@@ -74,4 +74,47 @@ namespace Patterns
         }
     };
 
+
+    class PaletteColors : public Pattern<RGBA>
+    {
+    public:
+        PaletteColors()
+        {
+            this->name = "Palette colors";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            for (int i = 0; i < width; i++)
+                pixels[i] = i<width/2 ? params->getPrimaryColour() : params->getSecondaryColour();
+        }
+    };
+
+    class PaletteGradient : public Pattern<RGBA>
+    {
+    public:
+        uint16_t *remap;
+        PaletteGradient(uint16_t *remap=nullptr)
+        {
+            this->name = "Palette gradient";
+            this->remap=remap;
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            for (int i = 0; i < width; i++)
+            {
+                int gradientPos = 2 * i * 255 / width;
+                int ii = remap ? remap[i] : i;
+                pixels[ii] = params->getGradient(gradientPos % 255);
+            }
+        }
+    };
+
 }

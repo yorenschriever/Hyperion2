@@ -12,8 +12,8 @@
 // - A secondary color: A contrasting color
 // - A Highlight color: A bright color, contrasting 
 
-PaletteColumn::Palette heatmap{
-    .gradient = new Gradient({
+Palette heatmap{
+    .gradient = Gradient({
         {.position = 0, .color = RGB(0, 0, 0)},        // Black
         {.position = 128, .color = RGB(255, 0, 0)},    // Red
         {.position = 224, .color = RGB(255, 255, 0)},  // Bright yellow
@@ -24,8 +24,8 @@ PaletteColumn::Palette heatmap{
     .highlight = RGB(255, 255, 255),
     .name = "Heatmap"};
 
-PaletteColumn::Palette sunset1{
-    .gradient = new Gradient({
+Palette sunset1{
+    .gradient = Gradient({
         {.position = 0, .color = RGB(8, 7, 72)},        // Dark blue
         {.position = 120, .color = RGB(78, 150, 212)},  // Light blue
         {.position = 160, .color = RGB(78, 150, 212)},  // Light blue

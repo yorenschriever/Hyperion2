@@ -36,7 +36,7 @@ namespace Hi
             for (int i = 0; i < LedsterShapes::snake.size(); i++)
             {
                 float lfoVal = lfo.getValue((float)i / LedsterShapes::snake.size() * amount);
-                pixels[LedsterShapes::snake[i]] += params->gradient->get(255 * lfoVal) * lfoVal * transition.getValue();
+                pixels[LedsterShapes::snake[i]] += params->getGradient(255 * lfoVal) * lfoVal * transition.getValue();
             }
         }
     };
@@ -111,9 +111,9 @@ namespace Hi
             {
                 for (int j = 0; j < 45; j++)
                 {
-                    //auto col = params->gradient->get(255 * j / 45);
+                    //auto col = params->getGradient(255 * j / 45);
                     float lfoVal = lfo.getValue((((float)j) + phase * petalIndex/6)/45.);
-                    auto col = params->gradient->get(255 * lfoVal);
+                    auto col = params->getGradient(255 * lfoVal);
                     pixels[petal[j]] += col * lfoVal * transition.getValue();
                 }
                 petalIndex++;
@@ -194,7 +194,7 @@ class DotBeatPattern : public Pattern<RGBA>
                 if (map->r(i) > radius)
                     continue;
 
-                RGBA color = params->gradient->get(radius * 255);
+                RGBA color = params->getGradient(radius * 255);
                 float dim = map->r(i) / radius;
                 pixels[i] = color * dim * transition.getValue();   
             }

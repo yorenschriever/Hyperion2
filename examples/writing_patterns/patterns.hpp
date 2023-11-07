@@ -83,7 +83,7 @@ namespace ExamplePatterns
             // You can also access the gradient. It needs a parameter in the range 0-255
             for (int i = 0; i < width; i++)
             {
-                pixels[i] = params->gradient->get(255 * i / width);
+                pixels[i] = params->getGradient(255 * i / width);
             }
         }
     };
@@ -241,7 +241,7 @@ namespace ExamplePatterns
                 float lfoVal = lfo.getValue(phase);
                 // Here i use lfoVal to lookup the gradient value, but also to apply transparency,
                 // so the chase nicely fades to transparent
-                pixels[i] = params->gradient->get(255 * lfoVal) * lfoVal;
+                pixels[i] = params->getGradient(255 * lfoVal) * lfoVal;
             }
         }
     };

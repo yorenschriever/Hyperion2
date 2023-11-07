@@ -91,7 +91,7 @@ namespace TestPatterns
                 int pos = i % totalSize;
                 if (pos < gradientSize){
                     int gradientPos = pos * 255 / gradientSize;
-                    pixels[i] = params->gradient->get(gradientPos);
+                    pixels[i] = params->getGradient(gradientPos);
                     continue;
                 } 
 

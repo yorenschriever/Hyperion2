@@ -76,7 +76,7 @@ namespace Patterns
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getSecondaryColour();
-                // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
+                // RGBA color = params->getGradient(fromTop(map->z(index))*255);
                 pixels[index] = (params->getPrimaryColour() * 0.5) + color * lfo.getValue(-2 * around(map->th(index))) * Utils::rescale(map->r(index), 0.5, 1, 0.4, 1) * transition.getValue();
                 // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
@@ -135,7 +135,7 @@ namespace Patterns
                 {
                     float fadePosition = fade[column].getValue(radii[column][i] * velocity);
                     // RGBA color = params->getPrimaryColour();
-                    RGBA color = params->gradient->get(255 - 255. * fadePosition);
+                    RGBA color = params->getGradient(255 - 255. * fadePosition);
                     pixels[i] += color * fadePosition * transition.getValue();
                 }
             }
@@ -218,7 +218,7 @@ namespace Patterns
                     pos -= 1;
                 }
                 float fadePosition = softEdge(pos, size, 0.06);
-                RGBA color = params->gradient->get(255 - 255 * map->r(i));
+                RGBA color = params->getGradient(255 - 255 * map->r(i));
 
                 pixels[i] = params->getSecondaryColour() * 0.5 + color * fadePosition * transition.getValue();
             }
@@ -284,7 +284,7 @@ namespace Patterns
                 for (int column = 0; column < 6; column++)
                 {
                     float fadePosition = fade[column].getValue(radii[column][i] * velocity);
-                    RGBA color = params->gradient->get(255 - 255. * radii[column][i]); //  params->getPrimaryColour();
+                    RGBA color = params->getGradient(255 - 255. * radii[column][i]); //  params->getPrimaryColour();
                     pixels[i] += color * fadePosition * transition.getValue();
                 }
             }
@@ -445,11 +445,11 @@ namespace Patterns
                                     (1 - (map->r(i)) / 2);
 
                 float fadePosition1 = fade1.getValue(conePos * velocity);
-                RGBA color1 = params->gradient->get(fadePosition1 * 255);
+                RGBA color1 = params->getGradient(fadePosition1 * 255);
                 pixels[i] = color1 * fadePosition1 * (1.5 - map->r(i)) * transition.getValue();
 
                 float fadePosition2 = fade2.getValue(conePos * velocity);
-                RGBA color2 = params->gradient->get(fadePosition2 * 255);
+                RGBA color2 = params->getGradient(fadePosition2 * 255);
                 pixels[i] += color2 * fadePosition2 * (1.5 - map->r(i)) * transition.getValue();
             }
         }
@@ -512,7 +512,7 @@ namespace Patterns
                 for (int f = 0; f < numFades; f++)
                 {
                     float fadePosition = fade[f].getValue(abs(map->th(i)) * velocity);
-                    RGBA color = params->gradient->get(255 - abs(map->th(i)) / M_PI * 255);
+                    RGBA color = params->getGradient(255 - abs(map->th(i)) / M_PI * 255);
                     pixels[i] += color * fadePosition * (map->r(i) * 1.5) * transition.getValue();
                 }
             }

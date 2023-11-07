@@ -35,7 +35,7 @@ namespace Patterns
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 float h = map->r(index) * height;
-                RGBA colour = params->gradient->get(h * 255);
+                RGBA colour = params->getGradient(h * 255);
                 pixels[index] = colour * h * transition.getValue();
             }
         }
@@ -68,7 +68,7 @@ namespace Patterns
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 float h = map->r(index) * height;
-                RGBA colour = params->gradient->get(h * 255);
+                RGBA colour = params->getGradient(h * 255);
                 pixels[index] = colour * h * transition.getValue();
             }
         }
@@ -140,7 +140,7 @@ namespace Patterns
     //             if (map->r(i) > radius)
     //                 continue;
 
-    //             RGBA color = params->gradient->get(radius * 255);
+    //             RGBA color = params->getGradient(radius * 255);
     //             float dim = map->r(i) / radius;
     //             pixels[i] = color * dim * transition.getValue();
     //         }

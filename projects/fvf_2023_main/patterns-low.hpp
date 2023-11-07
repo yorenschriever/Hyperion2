@@ -37,7 +37,7 @@ namespace Low
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 float h = fromBottom(map->y(index))* height;
-                RGBA colour = params->gradient->get(h * 255);
+                RGBA colour = params->getGradient(h * 255);
                 pixels[index] = colour * h * transition.getValue();
             }
         }
@@ -126,7 +126,7 @@ namespace Low
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 // RGBA color = params->getPrimaryColour(); 
-                RGBA color = params->gradient->get(fromTop(map->z(index))*255); 
+                RGBA color = params->getGradient(fromTop(map->z(index))*255); 
                 pixels[index] = color * lfo.getValue(around(map->th(index))) * transition.getValue();
                 // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
@@ -204,7 +204,7 @@ namespace Low
 
                 float distanceAsRatio = 1 - distance / lfoSize ;
 
-                pixels[index] = params->gradient->get(distanceAsRatio * 255) * distanceAsRatio * transition.getValue();
+                pixels[index] = params->getGradient(distanceAsRatio * 255) * distanceAsRatio * transition.getValue();
             }
         }
     };
@@ -270,7 +270,7 @@ namespace Low
                     continue;
 
                 int z255 = fromBottom(map->z(index)) * 255;
-                pixels[index] = params->gradient->get(z255)* transition.getValue(z255,255);
+                pixels[index] = params->getGradient(z255)* transition.getValue(z255,255);
             }
         }
     };

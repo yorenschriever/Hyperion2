@@ -9,10 +9,25 @@
 class ArtNetUniverse
 {
 public:
+    using OnFrameCallback = void (*)(void *userData);
+    typedef struct {OnFrameCallback callback; void* userData;} Subscription;
+
     int port = 0;
     uint8_t channels[512];
     int size = 0;
     uint8_t sequence=0;
+    void subscribe(OnFrameCallback callback, void* userData) {
+        subscriptions.push_back({callback, userData});
+    }
+
+    void notifyFrame()
+    {
+        for (auto subscription : subscriptions)
+            subscription.callback(subscription.userData);
+    }
+
+private: 
+    std::vector<Subscription> subscriptions;
 };
 
 class ArtNet
@@ -115,8 +130,11 @@ public:
     }
 
     ArtNetUniverse *addUniverse(uint16_t port) override {
+        ArtNetUniverse uni;
+        uni.port = port;
         if (universes.find(port) == universes.end())
-            universes.insert({port, ArtNetUniverse {.port=port}});
+            // universes.insert({port, ArtNetUniverse{.port=port}});
+            universes.insert({port, uni});
         
         return &(universes.find(port)->second);
     }
@@ -155,6 +173,7 @@ private:
                 universe->second.size = dmxDataLength;
                 universe->second.sequence = sequence;
                 memcpy(universe->second.channels, recvBuffer + ART_DMX_START, dmxDataLength);
+                universe->second.notifyFrame();
                 return;
             }
 

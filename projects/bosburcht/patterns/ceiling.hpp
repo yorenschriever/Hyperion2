@@ -105,7 +105,7 @@ namespace Patterns
                     for (int f = 0; f < numFades; f++)
                     {
                         float fadeValue = fade[f].getValue(distance * trailSize + (bar % (width / segmentSize / 4)) * velocity);
-                        pixels[bar * segmentSize + i] += params->gradient->get(255 * fadeValue) * fadeValue * transition.getValue();
+                        pixels[bar * segmentSize + i] += params->getGradient(255 * fadeValue) * fadeValue * transition.getValue();
                     }
                 }
             }
@@ -263,7 +263,7 @@ namespace Patterns
                     if (variant == 1)
                         phase = 1.0 - phase;
                     float lfoVal = lfo.getValue(phase);
-                    pixels[ceilingMappedIndices[i]] += params->gradient->get(255 * lfoVal) * lfoVal * transition.getValue();
+                    pixels[ceilingMappedIndices[i]] += params->getGradient(255 * lfoVal) * lfoVal * transition.getValue();
                 }
             }
         }

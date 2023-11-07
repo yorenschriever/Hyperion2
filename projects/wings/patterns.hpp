@@ -268,7 +268,7 @@ public:
         for (int i = 0; i < map->size(); i++)
         {
             float phase = map->r(i) * scale + lfo.getValue() + offset * abs(map->th(i));
-            RGBA color = params->gradient->get(int((phase) * 255 + 255)%255);
+            RGBA color = params->getGradient(int((phase) * 255 + 255)%255);
             pixels[i] = color * transition.getValue();
         }
     }
@@ -367,7 +367,7 @@ public:
             float conePos = 0.5 + (map->r(i)) / 2;
 
             float fadePosition = fade.getValue(conePos * velocity);
-            RGBA color = params->gradient->get(fadePosition * 255);
+            RGBA color = params->getGradient(fadePosition * 255);
             pixels[i] = color * fadePosition * (1.5 - map->r(i)) * transition.getValue();
         }
     }
@@ -436,7 +436,7 @@ public:
             for (int j = 0; j < segmentSize; j++)
             {
                 float lfoVal = lfo.getValue(float(j) / lfoWidth + float(randomSegment) / numSegments + float(segment));
-                RGBA col = params->gradient->get(lfoVal * 255) * lfoVal;
+                RGBA col = params->getGradient(lfoVal * 255) * lfoVal;
                 pixels[segment * segmentSize + j] = col * transition.getValue();
             }
         }
@@ -465,7 +465,7 @@ public:
         {
             // float phase = (map->x(index) + 1) / 2.;
             // RGBA colour = params->getSecondaryColour() + params->getPrimaryColour() * phase;
-            RGBA colour = params->gradient->get(abs(map->x(index)) * 255);
+            RGBA colour = params->getGradient(abs(map->x(index)) * 255);
             RGBA dimmedColour = colour * transition.getValue();
             pixels[index] += dimmedColour;
         }
@@ -495,7 +495,7 @@ public:
             else if (map->y(index) > 0.5) 
                 pixels[index] = params->getPrimaryColour();
             else
-                pixels[index] = params->gradient->get(Utils::rescale(map->x(index),0,255,-1,1));
+                pixels[index] = params->getGradient(Utils::rescale(map->x(index),0,255,-1,1));
         }
     }
 };
@@ -527,7 +527,7 @@ public:
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getSecondaryColour();
-                // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
+                // RGBA color = params->getGradient(fromTop(map->z(index))*255);
                 pixels[index] = color * lfo.getValue(-2 * around(map->th(index))) * transition.getValue();
                 // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
@@ -701,7 +701,7 @@ public:
                 float th = M_PI-abs(map->th(i));
 
                 float fadePosition = fade.getValue(th * velocity);
-                RGBA color = params->gradient->get(255 - th / M_PI * 255);
+                RGBA color = params->getGradient(255 - th / M_PI * 255);
                 pixels[i] = color * fadePosition * (map->r(i) * 1.5) * transition.getValue();
                 ;
             }

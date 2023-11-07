@@ -85,7 +85,7 @@ namespace Patterns
                     float y_c = y_start[cross] * (1.0 - lfoVal);
                     if (crossOutline(map->x(index) - x_c, map->y(index) - y_c, lfoVal, Utils::rescale(lfoVal, 0.01, 0.04)))
                         // pixels[index] = params->getPrimaryColour() * Utils::rescale(lfoVal, 0.1, 1);
-                        pixels[index] = params->gradient->get(125 - 125 * lfoVal)* Utils::rescale(lfoVal, 0.5, 1);
+                        pixels[index] = params->getGradient(125 - 125 * lfoVal)* Utils::rescale(lfoVal, 0.5, 1);
                 }
             }
 

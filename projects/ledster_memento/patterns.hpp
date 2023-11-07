@@ -36,7 +36,7 @@ namespace Patterns
             for (int i = 0; i < LedsterShapes::snake.size(); i++)
             {
                 float lfoVal = lfo.getValue((float)i / LedsterShapes::snake.size() * amount);
-                pixels[LedsterShapes::snake[i]] += params->gradient->get(255 * lfoVal) * lfoVal * transition.getValue();
+                pixels[LedsterShapes::snake[i]] += params->getGradient(255 * lfoVal) * lfoVal * transition.getValue();
             }
         }
     };
@@ -111,9 +111,9 @@ namespace Patterns
             {
                 for (int j = 0; j < 45; j++)
                 {
-                    //auto col = params->gradient->get(255 * j / 45);
+                    //auto col = params->getGradient(255 * j / 45);
                     float lfoVal = lfo.getValue((((float)j) + phase * petalIndex/6)/45.);
-                    auto col = params->gradient->get(255 * lfoVal);
+                    auto col = params->getGradient(255 * lfoVal);
                     pixels[petal[j]] += col * lfoVal * transition.getValue();
                 }
                 petalIndex++;
@@ -147,7 +147,7 @@ namespace Patterns
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getSecondaryColour();
-                // RGBA color = params->gradient->get(fromTop(map->z(index))*255);
+                // RGBA color = params->getGradient(fromTop(map->z(index))*255);
                 pixels[index] = color * lfo.getValue(-2 * around(map->th(index))) * Utils::rescale(map->r(index),0.5,1,0.4,1) * transition.getValue();
                 // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
             }
@@ -228,7 +228,7 @@ namespace Patterns
                     continue;
 
                 float lfoVal1 = lfo1.getValue(-amount1 * around(map->th(index)));
-                RGBA color1 = params->gradient->get(lfoVal1 * 255);
+                RGBA color1 = params->getGradient(lfoVal1 * 255);
 
                 pixels[index] = color1 * lfoVal1 * transition.getValue();
             }
@@ -335,7 +335,7 @@ namespace Patterns
                 for (int j = 0; j < segmentSize; j++)
                 {
                     float lfoVal = lfo.getValue(float(j) / lfoWidth + float(randomSegment) / numSegments + float(segment));
-                    RGBA col = params->gradient->get(lfoVal * 255) * lfoVal * transition.getValue();
+                    RGBA col = params->getGradient(lfoVal * 255) * lfoVal * transition.getValue();
                     if (isLedster)
                         pixels[LedsterShapes::ribben[segment][j]] += col;
                     else
@@ -480,7 +480,7 @@ namespace Patterns
                     pos -= 1;
                 }
                 float fadePosition = softEdge(pos, size, 0.06);
-                RGBA color = params->gradient->get(255 - 255 * map->r(i));
+                RGBA color = params->getGradient(255 - 255 * map->r(i));
 
                 pixels[i] = color * fadePosition * transition.getValue();
             }

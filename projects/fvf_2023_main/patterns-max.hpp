@@ -163,11 +163,11 @@ namespace Max
                     (1-(map->r(i) + map->z(i))/2);
 
                 float fadePosition1 = fade1.getValue(conePos * velocity);
-                RGBA color1 = params->gradient->get(fadePosition1 * 255);
+                RGBA color1 = params->getGradient(fadePosition1 * 255);
                 pixels[i] = color1 * fadePosition1 * (1.5 - map->r(i)) * transition.getValue();
 
                 float fadePosition2 = fade2.getValue(conePos * velocity);
-                RGBA color2 = params->gradient->get(fadePosition2 * 255);
+                RGBA color2 = params->getGradient(fadePosition2 * 255);
                 pixels[i] += color2 * fadePosition2 * (1.5 - map->r(i)) * transition.getValue();
             }
         }
@@ -227,7 +227,7 @@ namespace Max
                 //     fade.duration *= perm.at[i] * 4 / (density * map->size()/ 10);
                 for(int f=0;f<numFades; f++){
                     float fadePosition = fade[f].getValue(abs(map->th(i)) * velocity);
-                    RGBA color = params->gradient->get(255 - abs(map->th(i)) / M_PI * 255);
+                    RGBA color = params->getGradient(255 - abs(map->th(i)) / M_PI * 255);
                     pixels[i] += color * fadePosition * (map->r(i) * 1.5) * transition.getValue();
                 }
             }

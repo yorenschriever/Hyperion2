@@ -9,7 +9,7 @@
 #include "core/hyperion.hpp"
 #include "distribution/inputs/patternCycleInput.hpp"
 #include "ledParPatterns.hpp"
-#include "palettes.hpp"
+#include "core/generation/palettes.hpp"
 #include "patterns.hpp"
 #include <vector>
 
@@ -284,32 +284,32 @@ void addPaletteColumn(Hyperion *hyp)
       0,
       0,
       {
-          pinkSunset,
-          heatmap,
-          sunset2,
-           retro,
-           sunset1,
-           sunset3,
-           blueOrange,
-           purpleGreen,
+          &pinkSunset,
+          &heatmap,
+          &sunset2,
+          &retro,
+          &sunset1,
+          &sunset3,
+          &blueOrange,
+          &purpleGreen,
           
-          campfire,
-          sunset8,
-          heatmap2,
-          tunnel,
-          sunset6,
-          sunset7,
-          coralTeal,
-          deepBlueOcean,
-          redSalvation,
-          plumBath,
-          sunset4,
-          candy,
-          greatBarrierReef,
-          peach,
-          denseWater,
-          sunset5,
-          salmonOnIce,
+          &campfire,
+          &sunset8,
+          &heatmap2,
+          &tunnel,
+          &sunset6,
+          &sunset7,
+          &coralTeal,
+          &deepBlueOcean,
+          &redSalvation,
+          &plumBath,
+          &sunset4,
+          &candy,
+          &greatBarrierReef,
+          &peach,
+          &denseWater,
+          &sunset5,
+          &salmonOnIce,
       });
   hyp->hub.subscribe(paletteColumn);
 }

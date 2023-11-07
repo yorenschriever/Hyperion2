@@ -11,6 +11,7 @@
 #include "mapping/windowMap.hpp"
 #include "mapping/windowMap3dCombined.hpp"
 #include "palettes.hpp"
+#include "core/generation/palettes.hpp"
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 #include "core/generation/pixelMapSplitter3d.hpp"
 #include "patterns/ceiling.hpp"
@@ -22,6 +23,7 @@
 #include "setViewParams.hpp"
 #include <vector>
 #include "artNetPattern.hpp"
+#include "artNetController.hpp"
 
 LUT *columnsLut = nullptr; // new ColourCorrectionLUT(1, 255, 200, 200, 200);
 
@@ -89,6 +91,10 @@ int main()
     hyp->start();
     setViewParams(hyp);
 
+    auto artNetController = new ArtNetController();
+    artNetController->subscribe(&hyp->hub,0);
+    artNetController->linkToPalette(&grandMA);
+
     while (1)
         Thread::sleep(60 * 1000);
 }
@@ -143,7 +149,8 @@ void addWindowPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
 
-            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,0,segmentSize)},
+            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPatternRGB(0,0,segmentSize)},
+            {.column = COL_ARTNET, .slot = 1, .pattern = new Patterns::ArtNetPattern(0,0,segmentSize)},
 
             {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(1,segmentSize)},
             {.column = COL_DEBUG, .slot = 1, .pattern = new Patterns::OneColor(RGB(255, 0, 0), "Red")},
@@ -151,6 +158,7 @@ void addWindowPipe(Hyperion *hyp)
             {.column = COL_DEBUG, .slot = 3, .pattern = new Patterns::OneColor(RGB(0, 0, 255), "Blue")},
             {.column = COL_DEBUG, .slot = 4, .pattern = new Patterns::OneColor(RGB(255, 255, 255), "White")},
             {.column = COL_DEBUG, .slot = 5, .pattern = new Patterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = COL_DEBUG, .slot = 7, .pattern = new Patterns::PaletteColors()},
             
         });
 
@@ -272,7 +280,8 @@ void addChandelierPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
 
-            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,16)},
+            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPatternRGB(0,16*4)},
+            {.column = COL_ARTNET, .slot = 1, .pattern = new Patterns::ArtNetPattern(0,16)},
 
             {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(nleds/60/8)},
             {.column = COL_DEBUG, .slot = 1, .pattern = new Patterns::OneColor(RGB(255, 0, 0), "Red")},
@@ -367,7 +376,8 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 9, .pattern = new Patterns::StrobePattern()},
             {.column = COL_FLASH, .slot = 10, .pattern = new Patterns::StrobeHighlightPattern()},
 
-            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPattern(0,16+48,60,ceilingMappedIndices)},
+            {.column = COL_ARTNET, .slot = 0, .pattern = new Patterns::ArtNetPatternRGB(0,(16+48)*4,60,ceilingMappedIndices)},
+            {.column = COL_ARTNET, .slot = 1, .pattern = new Patterns::ArtNetPattern(0,16+48,60,ceilingMappedIndices)},
 
             {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(12)},
             {.column = COL_DEBUG, .slot = 1, .pattern = new Patterns::OneColor(RGB(255, 0, 0), "Red")},
@@ -375,6 +385,7 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_DEBUG, .slot = 3, .pattern = new Patterns::OneColor(RGB(0, 0, 255), "Blue")},
             {.column = COL_DEBUG, .slot = 4, .pattern = new Patterns::OneColor(RGB(255, 255, 255), "White")},
             {.column = COL_DEBUG, .slot = 5, .pattern = new Patterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = COL_DEBUG, .slot = 6, .pattern = new Patterns::PaletteGradient(ceilingMappedIndices)},
         });
 
     auto splitInput = new InputSlicer(
@@ -410,32 +421,33 @@ void addPaletteColumn(Hyperion *hyp)
         0,
         0,
         {
-            campfire,
-            pinkSunset,
-            sunset8,
-            heatmap,
-            heatmap2,
-            sunset2,
-            retro,
-            tunnel,
+            &grandMA,
+            &campfire,
+            &pinkSunset,
+            &sunset8,
+            &heatmap,
+            &heatmap2,
+            &sunset2,
+            &retro,
+            &tunnel,
 
-            sunset6,
-            sunset7,
-            sunset1,
-            coralTeal,
-            deepBlueOcean,
-            redSalvation,
-            plumBath,
-            sunset4,
-            candy,
-            sunset3,
-            greatBarrierReef,
-            blueOrange,
-            peach,
-            denseWater,
-            purpleGreen,
-            sunset5,
-            salmonOnIce,
+            &sunset6,
+            &sunset7,
+            &sunset1,
+            &coralTeal,
+            &deepBlueOcean,
+            &redSalvation,
+            &plumBath,
+            &sunset4,
+            &candy,
+            &sunset3,
+            &greatBarrierReef,
+            &blueOrange,
+            &peach,
+            &denseWater,
+            &purpleGreen,
+            &sunset5,
+            &salmonOnIce,
         });
     hyp->hub.subscribe(paletteColumn);
 }

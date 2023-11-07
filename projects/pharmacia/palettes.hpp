@@ -6,8 +6,8 @@
 // https://webgradients.com/
 // https://color.adobe.com/create/color-wheel
 
-PaletteColumn::Palette tunnel{
-    .gradient = new Gradient({
+Palette tunnel{
+    .gradient = Gradient({
         {.position = 0, .color = RGB(0x03A688)},
         {.position = 63, .color = RGB(0x026873)},
         {.position = 127, .color = RGB(0x011F26)},

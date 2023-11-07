@@ -117,7 +117,7 @@ namespace Halo
                     float phase = ((float)i/width) * amount;
                     if (variant == 1) phase  = 1.0 - phase;
                     float lfoVal =  lfo.getValue(phase);
-                    pixels[i] += params->gradient->get(255*lfoVal) * lfoVal * transition.getValue();
+                    pixels[i] += params->getGradient(255*lfoVal) * lfoVal * transition.getValue();
                 }
             }
         }
