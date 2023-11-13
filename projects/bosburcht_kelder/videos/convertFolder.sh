@@ -1,0 +1,1 @@
+for f in ~/Downloads/Renders_kelder/*; do python3 convert.py "$f" ; done

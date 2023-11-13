@@ -22,6 +22,26 @@
 #include <vector>
 #include "videos/Gradient_circle.hpp"
 #include "videos/driehoek_v1.hpp"
+#include "videos/Heen_en_weer_1.hpp"
+#include "videos/Heen_en_weer_2.hpp"
+#include "videos/Heen_en_weer_3.hpp"
+#include "videos/Heen_en_weer_4.hpp"
+#include "videos/Noise_1.hpp"
+#include "videos/Noise_2.hpp"
+#include "videos/Noise_3.hpp"
+#include "videos/Schuine_lijnen_1.hpp"
+#include "videos/Spiraal_1.hpp"
+#include "videos/Spiraal_2.hpp"
+#include "videos/Spiraal_3.hpp"
+#include "videos/Spiraal_4.hpp"
+#include "videos/Wipe_1.hpp"
+#include "videos/Wipe_2.hpp"
+#include "videos/Wipe_3.hpp"
+#include "videos/Wipe_4.hpp"
+#include "videos/Wipe_5.hpp"
+#include "videos/X_1.hpp"
+#include "videos/X_2.hpp"
+#include "videos/X_3.hpp"
 
 LUT *columnsLut = nullptr; // new ColourCorrectionLUT(1, 255, 200, 200, 200);
 LUT *incandescentLut8 = new IncandescentLUT(2.5, 255, 24);
@@ -110,8 +130,30 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_CEILING2, .slot = 6, .pattern = new Patterns::FlashesPattern()},
             {.column = COL_CEILING2, .slot = 7, .pattern = new Patterns::StrobePattern()},
 
-            {.column = COL_VIDEO, .slot = 0, .pattern = new VideoPattern(&anim_driehoek_v1)},
-            {.column = COL_VIDEO, .slot = 1, .pattern = new VideoPalettePattern(&anim_driehoek_v1)},
+            // {.column = COL_VIDEO, .slot = 0, .pattern = new VideoPattern(&anim_driehoek_v1)},
+            // {.column = COL_VIDEO, .slot = 1, .pattern = new VideoPalettePattern(&anim_driehoek_v1)},
+            // {.column = COL_VIDEO, .slot = 2, .pattern = new VideoPalettePattern(&anim_Noise_3)},
+
+            {.column = COL_VIDEO, .slot = 0 , .pattern = new VideoPalettePattern(&anim_Heen_en_weer_1,"Heen en weer 1")},
+            {.column = COL_VIDEO, .slot = 1 , .pattern = new VideoPalettePattern(&anim_Heen_en_weer_2,"Heen en weer 2")},
+            {.column = COL_VIDEO, .slot = 2 , .pattern = new VideoPalettePattern(&anim_Heen_en_weer_3,"Heen en weer 3")},
+            {.column = COL_VIDEO, .slot = 3 , .pattern = new VideoPalettePattern(&anim_Heen_en_weer_4,"Heen en weer 4")},
+            {.column = COL_VIDEO, .slot = 4 , .pattern = new VideoPalettePattern(&anim_Noise_1,"Noise 1")},
+            {.column = COL_VIDEO, .slot = 5 , .pattern = new VideoPalettePattern(&anim_Noise_2,"Noise 2")},
+            {.column = COL_VIDEO, .slot = 6 , .pattern = new VideoPalettePattern(&anim_Noise_3,"Noise 3")},
+            {.column = COL_VIDEO, .slot = 7 , .pattern = new VideoPalettePattern(&anim_Schuine_lijnen_1,"Schuine lijnen 1")},
+            {.column = COL_VIDEO, .slot = 8 , .pattern = new VideoPalettePattern(&anim_Spiraal_1,"Spiraal 1")},
+            {.column = COL_VIDEO, .slot = 9 , .pattern = new VideoPalettePattern(&anim_Spiraal_2,"Spiraal 2")},
+            {.column = COL_VIDEO, .slot = 10, .pattern = new VideoPalettePattern(&anim_Spiraal_3,"Spiraal 3")},
+            {.column = COL_VIDEO, .slot = 11, .pattern = new VideoPalettePattern(&anim_Spiraal_4,"Spiraal 4")},
+            {.column = COL_VIDEO, .slot = 12, .pattern = new VideoPalettePattern(&anim_Wipe_1,"Wipe 1")},
+            {.column = COL_VIDEO, .slot = 13, .pattern = new VideoPalettePattern(&anim_Wipe_2,"Wipe 2")},
+            {.column = COL_VIDEO, .slot = 14, .pattern = new VideoPalettePattern(&anim_Wipe_3,"Wipe 3")},
+            {.column = COL_VIDEO, .slot = 15, .pattern = new VideoPalettePattern(&anim_Wipe_4,"Wipe 4")},
+            {.column = COL_VIDEO, .slot = 16, .pattern = new VideoPalettePattern(&anim_Wipe_5,"Wipe 5")},
+            {.column = COL_VIDEO, .slot = 17, .pattern = new VideoPalettePattern(&anim_X_1,"X 1")},
+            {.column = COL_VIDEO, .slot = 18, .pattern = new VideoPalettePattern(&anim_X_2,"X 2")},
+            {.column = COL_VIDEO, .slot = 19, .pattern = new VideoPalettePattern(&anim_X_3,"X 3")},
 
             {.column = COL_MASK, .slot = 0, .pattern = new Patterns::GlowPulseMaskPattern()},
             {.column = COL_MASK, .slot = 1, .pattern = new Patterns::SinChaseMaskPattern()},

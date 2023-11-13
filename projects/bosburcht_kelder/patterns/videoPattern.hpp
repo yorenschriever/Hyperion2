@@ -54,13 +54,16 @@ public:
         for (int i = 0; i < width; i++)
         {
             int animationIndex = (frame * animation->pixels + i) * animation->depth;
+            if (animationIndex+2 >= animation->pixelData.size())
+                return;
+
             pixels[i] = (RGBA)RGB(
                             animation->pixelData[animationIndex + 0],
                             animation->pixelData[animationIndex + 1],
                             animation->pixelData[animationIndex + 2]) *
                         transition.getValue();
             if (animation->depth==4)
-                pixels[i] = pixels[i] * (float(animation->pixelData[animationIndex + 2])/255.);
+                pixels[i] = pixels[i] * (float(animation->pixelData[animationIndex + 3])/255.);
         }
     }
 };
@@ -74,9 +77,9 @@ class VideoPalettePattern : public Pattern<RGBA>
     Animation *animation;
 
 public:
-    VideoPalettePattern(Animation *animation)
+    VideoPalettePattern(Animation *animation, char* name)
     {
-        this->name = "Video palette";
+        this->name = name;
         this->animation = animation;
     }
 
@@ -92,10 +95,13 @@ public:
         for (int i = 0; i < width; i++)
         {
             int animationIndex = (frame * animation->pixels + i) * animation->depth;
+            if (animationIndex+2 >= animation->pixelData.size())
+                return;
 
             pixels[i] += params->getPrimaryColour() * (float(animation->pixelData[animationIndex + 0]) / 255.);
             pixels[i] += params->getSecondaryColour() * (float(animation->pixelData[animationIndex + 1]) / 255.);
-            pixels[i] += params->getHighlightColour() * (float(animation->pixelData[animationIndex + 2]) / 255.);
+            //pixels[i] += params->getHighlightColour() * (float(animation->pixelData[animationIndex + 2]) / 255.);
+            pixels[i] += params->getGradient(0) * (float(animation->pixelData[animationIndex + 2]) / 255.);
 
             pixels[i] = pixels[i] * transition.getValue();
         }
