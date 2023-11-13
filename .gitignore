@@ -46,3 +46,4 @@ sdkconfig.old
 **/*.srl
 
 wifi-credentials.hpp
+**/videos/processed/*
