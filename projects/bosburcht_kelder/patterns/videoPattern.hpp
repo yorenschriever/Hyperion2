@@ -77,7 +77,7 @@ class VideoPalettePattern : public Pattern<RGBA>
     Animation *animation;
 
 public:
-    VideoPalettePattern(Animation *animation, char* name)
+    VideoPalettePattern(Animation *animation, const char* name)
     {
         this->name = name;
         this->animation = animation;
