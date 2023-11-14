@@ -101,7 +101,7 @@ public:
             pixels[i] += params->getPrimaryColour() * (float(animation->pixelData[animationIndex + 0]) / 255.);
             pixels[i] += params->getSecondaryColour() * (float(animation->pixelData[animationIndex + 1]) / 255.);
             //pixels[i] += params->getHighlightColour() * (float(animation->pixelData[animationIndex + 2]) / 255.);
-            pixels[i] += params->getGradient(0) * (float(animation->pixelData[animationIndex + 2]) / 255.);
+            pixels[i] += params->getGradientf(0.25) * (float(animation->pixelData[animationIndex + 2]) / 255.);
 
             pixels[i] = pixels[i] * transition.getValue();
         }

@@ -1,5 +1,6 @@
 from turtle import *
 from math import sqrt, cos, asin
+import json
 
 turtle = Turtle()
 
@@ -40,6 +41,9 @@ for point in turtle.trail:
 f.write("};\n\n")
 f.close()
 
+points = list(map(lambda p: {'x': p['x'] * scale,'y': p['y'] * scale }, turtle.trail))
+with open("ceilingMap.json", "w") as outfile:
+    json.dump(points, outfile)
 
 
 #=================

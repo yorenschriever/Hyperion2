@@ -33,7 +33,7 @@ with open(dir+"/../mapping/ceilingMap.json", "r") as infile:
 
 def convertCoordinates(c):
     return [
-        int(((c['x']*0.785)+1.022)*width/2), 
+        int(((c['x']*0.75)+0.998)*width/2), 
         int(((c['y']*1.05)+1)*height/2)
     ]
 
@@ -41,10 +41,9 @@ points = list(map(convertCoordinates, pointsJson))
 
 # ret, frame = cap.read()
 # for p in points:
-#     cv2.circle(frame, [p[0],p[1]], 2, [255,255,255], 1)
+#     cv2.circle(frame, [p[0],p[1]], 5, [255,255,255], 1)
 # cv2.imshow('image',frame)
 # cv2.waitKey(0)
-
 # exit()
 
 # process frames
