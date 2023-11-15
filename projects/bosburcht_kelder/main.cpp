@@ -43,6 +43,17 @@
 #include "videos/processed/X_2.hpp"
 #include "videos/processed/X_3.hpp"
 
+#include "videos/processed/Checkerboard_mask_1.hpp"
+#include "videos/processed/Checkerboard_mask_2.hpp"
+#include "videos/processed/Spiraal_mask_1.hpp"
+#include "videos/processed/Spiraal_mask_2.hpp"
+#include "videos/processed/Spiraal_mask_3.hpp"
+#include "videos/processed/Spiraal_mask_4.hpp"
+#include "videos/processed/Stripes_mask_1.hpp"
+#include "videos/processed/Stripes_mask_2.hpp"
+#include "videos/processed/Wave_mask_1.hpp"
+#include "videos/processed/Wave_mask_2.hpp"
+
 LUT *columnsLut = nullptr; // new ColourCorrectionLUT(1, 255, 200, 200, 200);
 LUT *incandescentLut8 = new IncandescentLUT(2.5, 255, 24);
 
@@ -155,8 +166,19 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_VIDEO, .slot = 18, .pattern = new VideoPalettePattern(&anim_X_2,"X 2")},
             {.column = COL_VIDEO, .slot = 19, .pattern = new VideoPalettePattern(&anim_X_3,"X 3")},
 
-            {.column = COL_MASK, .slot = 0, .pattern = new Patterns::GlowPulseMaskPattern()},
-            {.column = COL_MASK, .slot = 1, .pattern = new Patterns::SinChaseMaskPattern()},
+            {.column = COL_MASK, .slot = 0,  .pattern = new Patterns::GlowPulseMaskPattern()},
+            {.column = COL_MASK, .slot = 1,  .pattern = new Patterns::SinChaseMaskPattern()},
+            {.column = COL_MASK, .slot = 2,  .pattern = new VideoPattern(&anim_Stripes_mask_1,"Stripes mask 1")},
+            {.column = COL_MASK, .slot = 3,  .pattern = new VideoPattern(&anim_Stripes_mask_2,"Stripes mask 2")},
+            {.column = COL_MASK, .slot = 4, .pattern = new VideoPattern(&anim_Wave_mask_1,"Wave mask 1")},
+            {.column = COL_MASK, .slot = 5, .pattern = new VideoPattern(&anim_Wave_mask_2,"Wave mask 2")},
+            {.column = COL_MASK, .slot = 6,  .pattern = new VideoPattern(&anim_Checkerboard_mask_1,"Checkerboard mask 1")},
+            {.column = COL_MASK, .slot = 7,  .pattern = new VideoPattern(&anim_Checkerboard_mask_2,"Checkerboard mask 2")},
+            {.column = COL_MASK, .slot = 8,  .pattern = new VideoPattern(&anim_Spiraal_mask_1,"Spiraal mask 1")},
+            {.column = COL_MASK, .slot = 9,  .pattern = new VideoPattern(&anim_Spiraal_mask_2,"Spiraal mask 2")},
+            {.column = COL_MASK, .slot = 10,  .pattern = new VideoPattern(&anim_Spiraal_mask_3,"Spiraal mask 3")},
+            {.column = COL_MASK, .slot = 11,  .pattern = new VideoPattern(&anim_Spiraal_mask_4,"Spiraal mask 4")},
+
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},

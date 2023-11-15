@@ -36,9 +36,9 @@ class VideoPattern : public Pattern<RGBA>
     Animation *animation;
 
 public:
-    VideoPattern(Animation *animation)
+    VideoPattern(Animation *animation, const char* name="Video")
     {
-        this->name = "Video";
+        this->name = name;
         this->animation = animation;
     }
 

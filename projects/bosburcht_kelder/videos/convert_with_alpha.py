@@ -13,6 +13,7 @@ videoPathAlpha = sys.argv[2]
 videoPath = sys.argv[1]
 videoFilename = os.path.basename(videoPath)
 videoName = os.path.splitext(videoFilename)[0]
+videoName = videoName.replace(" ","_")
 
 dir = os.path.dirname(__file__)
 
@@ -30,7 +31,7 @@ height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
 channels = 4
     
 # read pixel map and convert coordinates
-with open(dir+"/../mapping/map.json", "r") as infile:
+with open(dir+"/../mapping/ceilingMap.json", "r") as infile:
     pointsJson = json.load(infile)
 
 def convertCoordinates(c):
