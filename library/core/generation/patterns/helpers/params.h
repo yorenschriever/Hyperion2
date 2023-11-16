@@ -5,15 +5,16 @@
 #include <string>
 
 Palette defaultPalette{
-    .primary = RGB(255, 0, 0),
-    .secondary = RGB(0, 255, 0),
-    .highlight = RGB(255, 255, 255),
     .gradient = Gradient({
         {.position = 0, .color = RGB(0, 0, 0)},        // Black
         {.position = 128, .color = RGB(255, 0, 0)},    // Red
         {.position = 224, .color = RGB(255, 255, 0)},  // Bright yellow
         {.position = 255, .color = RGB(255, 255, 255)} // Full white
-    })};
+    }),
+    .primary = RGB(255, 0, 0),
+    .secondary = RGB(0, 255, 0),
+    .highlight = RGB(255, 255, 255),
+    .name=""};
 
 
 class Params

@@ -1,6 +1,7 @@
 #include "core/distribution/inputs/inputSlicer.hpp"
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 #include "core/distribution/luts/incandescentLut.hpp"
+#include "core/distribution/luts/laserLut.hpp"
 #include "core/distribution/outputs/neopixelOutput.hpp"
 #include "core/distribution/outputs/spiOutput.hpp"
 #include "core/generation/pixelMapSplitter3d.hpp"
@@ -20,6 +21,10 @@
 #include "animation.hpp"
 #include "setViewParams.hpp"
 #include <vector>
+
+#define WITHVIDEO 1
+
+#if WITHVIDEO
 #include "videos/Gradient_circle.hpp"
 #include "videos/driehoek_v1.hpp"
 #include "videos/processed/Heen_en_weer_1.hpp"
@@ -53,14 +58,17 @@
 #include "videos/processed/Stripes_mask_2.hpp"
 #include "videos/processed/Wave_mask_1.hpp"
 #include "videos/processed/Wave_mask_2.hpp"
+#endif
 
 LUT *columnsLut = nullptr; // new ColourCorrectionLUT(1, 255, 200, 200, 200);
 LUT *incandescentLut8 = new IncandescentLUT(2.5, 255, 24);
+LUT *laserLut = new LaserLUT(0.5, 4096, 3048);
 
 void addPaletteColumn(Hyperion *hyp);
 
 void addColanderPipe(Hyperion *);
 void addCeilingPipe(Hyperion *);
+void addLaserPipe(Hyperion *);
 
 #define COL_PALETTE 0
 #define COL_COLANDER1 1
@@ -70,6 +78,7 @@ void addCeilingPipe(Hyperion *);
 #define COL_VIDEO 5
 #define COL_MASK 6
 #define COL_FLASH 7
+#define COL_LASER 8
 
 typedef struct
 {
@@ -87,6 +96,7 @@ int main()
 
     addColanderPipe(hyp);
     addCeilingPipe(hyp);
+    addLaserPipe(hyp);
 
     // Tempo::AddSource(new ConstantTempo(120));
 
@@ -107,6 +117,7 @@ int main()
     hyp->hub.setColumnName(COL_VIDEO, "Video");
     hyp->hub.setColumnName(COL_MASK, "Mask");
     hyp->hub.setColumnName(COL_FLASH, "Flash");
+    hyp->hub.setColumnName(COL_LASER, "Laser");
 
     hyp->start();
     setViewParams(hyp);
@@ -145,6 +156,7 @@ void addCeilingPipe(Hyperion *hyp)
             // {.column = COL_VIDEO, .slot = 1, .pattern = new VideoPalettePattern(&anim_driehoek_v1)},
             // {.column = COL_VIDEO, .slot = 2, .pattern = new VideoPalettePattern(&anim_Noise_3)},
 
+#if WITHVIDEO
             {.column = COL_VIDEO, .slot = 0 , .pattern = new VideoPalettePattern(&anim_Heen_en_weer_1,"Heen en weer 1")},
             {.column = COL_VIDEO, .slot = 1 , .pattern = new VideoPalettePattern(&anim_Heen_en_weer_2,"Heen en weer 2")},
             {.column = COL_VIDEO, .slot = 2 , .pattern = new VideoPalettePattern(&anim_Heen_en_weer_3,"Heen en weer 3")},
@@ -165,9 +177,12 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_VIDEO, .slot = 17, .pattern = new VideoPalettePattern(&anim_X_1,"X 1")},
             {.column = COL_VIDEO, .slot = 18, .pattern = new VideoPalettePattern(&anim_X_2,"X 2")},
             {.column = COL_VIDEO, .slot = 19, .pattern = new VideoPalettePattern(&anim_X_3,"X 3")},
+#endif
 
             {.column = COL_MASK, .slot = 0,  .pattern = new Patterns::GlowPulseMaskPattern()},
             {.column = COL_MASK, .slot = 1,  .pattern = new Patterns::SinChaseMaskPattern()},
+
+#if WITHVIDEO
             {.column = COL_MASK, .slot = 2,  .pattern = new VideoPattern(&anim_Stripes_mask_1,"Stripes mask 1")},
             {.column = COL_MASK, .slot = 3,  .pattern = new VideoPattern(&anim_Stripes_mask_2,"Stripes mask 2")},
             {.column = COL_MASK, .slot = 4, .pattern = new VideoPattern(&anim_Wave_mask_1,"Wave mask 1")},
@@ -178,7 +193,7 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_MASK, .slot = 9,  .pattern = new VideoPattern(&anim_Spiraal_mask_2,"Spiraal mask 2")},
             {.column = COL_MASK, .slot = 10,  .pattern = new VideoPattern(&anim_Spiraal_mask_3,"Spiraal mask 3")},
             {.column = COL_MASK, .slot = 11,  .pattern = new VideoPattern(&anim_Spiraal_mask_4,"Spiraal mask 4")},
-
+#endif
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
@@ -269,7 +284,7 @@ void addColanderPipe(Hyperion *hyp)
         {
             {0, nbytes, true},
             {0, nbytes, false},
-            {0, nbytes, false},
+            // {0, nbytes, false},
         });
 
     auto pipe = new ConvertPipe<Monochrome,Monochrome>(
@@ -287,6 +302,33 @@ void addColanderPipe(Hyperion *hyp)
     //     new ConvertPipe<Monochrome, RGB>(
     //         splitInput->getInput(2),
     //         new MonitorOutput(&hyp->webServer, &colanderMap)));
+}
+
+void addLaserPipe(Hyperion *hyp)
+{
+    int nleds = 12;
+    int nbytes = nleds * sizeof(Monochrome);
+
+    auto input = new ControlHubInput<Monochrome>(
+        nleds,
+        &hyp->hub,
+        {
+            {.column = COL_LASER, .slot = 0, .pattern = new Colander::OnPattern()},
+            {.column = COL_LASER, .slot = 1, .pattern = new Colander::SinPattern()},
+            {.column = COL_LASER, .slot = 2, .pattern = new Colander::BeatSingleFadePattern()},
+            {.column = COL_LASER, .slot = 3, .pattern = new Colander::BeatMultiFadePattern()},
+            {.column = COL_LASER, .slot = 4, .pattern = new Colander::BeatAllFadePattern()},
+            {.column = COL_LASER, .slot = 5, .pattern = new Colander::BeatStepPattern()},
+            {.column = COL_LASER, .slot = 6, .pattern = new Colander::LFOPattern<PWM>()},
+            {.column = COL_LASER, .slot = 7, .pattern = new Colander::LFOPattern<SawDown>()},
+        });
+
+    auto pipe = new ConvertPipe<Monochrome,Monochrome>(
+       input,
+        new UDPOutput("hyperslave7.local", 9620, 60),
+        laserLut);
+    hyp->addPipe(pipe);
+
 }
 
 void addPaletteColumn(Hyperion *hyp)
