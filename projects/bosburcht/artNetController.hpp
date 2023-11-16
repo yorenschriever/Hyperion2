@@ -2,7 +2,6 @@
 #include "artNet.hpp"
 #include "core/generation/controlHub/controlHub.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
-#include <semaphore>
 #include "thread.hpp"
 
 class ArtNetController
@@ -14,7 +13,7 @@ public:
         this->hub = hub;
         this->universe = ArtNet::getInstance()->addUniverse(universe);
         this->universe->subscribe(onFrameCallback, this);
-        Thread::create(handleFrameTask, "artNetController",Thread::control,4096,this,6);
+        //Thread::create(handleFrameTask, "artNetController",Thread::control,4096,this,6);
     }
 
     void linkToPalette(Palette *palette)
@@ -28,14 +27,15 @@ private:
     uint8_t lastFrame[512];
     const int channelsPerColumn = 25;
     Palette *palette = nullptr;
-    std::binary_semaphore frameToProcess{0};
+    // std::binary_semaphore frameToProcess{0};
     const char * TAG  ="Artnet";
     uint8_t sequence;
 
     static void onFrameCallback(void *params)
     {
         auto instance = (ArtNetController *)(params);
-        instance->frameToProcess.release();
+        //instance->frameToProcess.release();
+        instance->handleFrame();
     }
 
     inline bool changed(int channel)
@@ -51,15 +51,15 @@ private:
         return false;
     }
 
-    static void handleFrameTask(void* params)
-    {
-        auto instance = (ArtNetController *)(params);
-        while(true)
-        {
-            instance->frameToProcess.acquire();
-            instance->handleFrame();
-        }
-    }
+    // static void handleFrameTask(void* params)
+    // {
+    //     auto instance = (ArtNetController *)(params);
+    //     while(true)
+    //     {
+    //         instance->frameToProcess.acquire();
+    //         instance->handleFrame();
+    //     }
+    // }
 
     bool sequenceNumberIncreased()
     {

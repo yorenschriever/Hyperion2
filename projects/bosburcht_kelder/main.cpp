@@ -22,11 +22,9 @@
 #include "setViewParams.hpp"
 #include <vector>
 
-#define WITHVIDEO 1
+#define WITHVIDEO 0
 
 #if WITHVIDEO
-#include "videos/Gradient_circle.hpp"
-#include "videos/driehoek_v1.hpp"
 #include "videos/processed/Heen_en_weer_1.hpp"
 #include "videos/processed/Heen_en_weer_2.hpp"
 #include "videos/processed/Heen_en_weer_3.hpp"
@@ -34,26 +32,26 @@
 #include "videos/processed/Noise_1.hpp"
 #include "videos/processed/Noise_2.hpp"
 #include "videos/processed/Noise_3.hpp"
-#include "videos/processed/Schuine_lijnen_1.hpp"
-#include "videos/processed/Spiraal_1.hpp"
-#include "videos/processed/Spiraal_2.hpp"
-#include "videos/processed/Spiraal_3.hpp"
-#include "videos/processed/Spiraal_4.hpp"
-#include "videos/processed/Wipe_1.hpp"
-#include "videos/processed/Wipe_2.hpp"
-#include "videos/processed/Wipe_3.hpp"
-#include "videos/processed/Wipe_4.hpp"
-#include "videos/processed/Wipe_5.hpp"
-#include "videos/processed/X_1.hpp"
-#include "videos/processed/X_2.hpp"
-#include "videos/processed/X_3.hpp"
+// #include "videos/processed/Schuine_lijnen_1.hpp"
+// #include "videos/processed/Spiraal_1.hpp"
+// #include "videos/processed/Spiraal_2.hpp"
+// #include "videos/processed/Spiraal_3.hpp"
+// #include "videos/processed/Spiraal_4.hpp"
+// #include "videos/processed/Wipe_1.hpp"
+// #include "videos/processed/Wipe_2.hpp"
+// #include "videos/processed/Wipe_3.hpp"
+// #include "videos/processed/Wipe_4.hpp"
+// #include "videos/processed/Wipe_5.hpp"
+// #include "videos/processed/X_1.hpp"
+// #include "videos/processed/X_2.hpp"
+// #include "videos/processed/X_3.hpp"
 
-#include "videos/processed/Checkerboard_mask_1.hpp"
-#include "videos/processed/Checkerboard_mask_2.hpp"
-#include "videos/processed/Spiraal_mask_1.hpp"
-#include "videos/processed/Spiraal_mask_2.hpp"
-#include "videos/processed/Spiraal_mask_3.hpp"
-#include "videos/processed/Spiraal_mask_4.hpp"
+// #include "videos/processed/Checkerboard_mask_1.hpp"
+// #include "videos/processed/Checkerboard_mask_2.hpp"
+// #include "videos/processed/Spiraal_mask_1.hpp"
+// #include "videos/processed/Spiraal_mask_2.hpp"
+// #include "videos/processed/Spiraal_mask_3.hpp"
+// #include "videos/processed/Spiraal_mask_4.hpp"
 #include "videos/processed/Stripes_mask_1.hpp"
 #include "videos/processed/Stripes_mask_2.hpp"
 #include "videos/processed/Wave_mask_1.hpp"
@@ -164,35 +162,34 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_VIDEO, .slot = 4 , .pattern = new VideoPalettePattern(&anim_Noise_1,"Noise 1")},
             {.column = COL_VIDEO, .slot = 5 , .pattern = new VideoPalettePattern(&anim_Noise_2,"Noise 2")},
             {.column = COL_VIDEO, .slot = 6 , .pattern = new VideoPalettePattern(&anim_Noise_3,"Noise 3")},
-            {.column = COL_VIDEO, .slot = 7 , .pattern = new VideoPalettePattern(&anim_Schuine_lijnen_1,"Schuine lijnen 1")},
-            {.column = COL_VIDEO, .slot = 8 , .pattern = new VideoPalettePattern(&anim_Spiraal_1,"Spiraal 1")},
-            {.column = COL_VIDEO, .slot = 9 , .pattern = new VideoPalettePattern(&anim_Spiraal_2,"Spiraal 2")},
-            {.column = COL_VIDEO, .slot = 10, .pattern = new VideoPalettePattern(&anim_Spiraal_3,"Spiraal 3")},
-            {.column = COL_VIDEO, .slot = 11, .pattern = new VideoPalettePattern(&anim_Spiraal_4,"Spiraal 4")},
-            {.column = COL_VIDEO, .slot = 12, .pattern = new VideoPalettePattern(&anim_Wipe_1,"Wipe 1")},
-            {.column = COL_VIDEO, .slot = 13, .pattern = new VideoPalettePattern(&anim_Wipe_2,"Wipe 2")},
-            {.column = COL_VIDEO, .slot = 14, .pattern = new VideoPalettePattern(&anim_Wipe_3,"Wipe 3")},
-            {.column = COL_VIDEO, .slot = 15, .pattern = new VideoPalettePattern(&anim_Wipe_4,"Wipe 4")},
-            {.column = COL_VIDEO, .slot = 16, .pattern = new VideoPalettePattern(&anim_Wipe_5,"Wipe 5")},
-            {.column = COL_VIDEO, .slot = 17, .pattern = new VideoPalettePattern(&anim_X_1,"X 1")},
-            {.column = COL_VIDEO, .slot = 18, .pattern = new VideoPalettePattern(&anim_X_2,"X 2")},
-            {.column = COL_VIDEO, .slot = 19, .pattern = new VideoPalettePattern(&anim_X_3,"X 3")},
-#endif
+            // {.column = COL_VIDEO, .slot = 7 , .pattern = new VideoPalettePattern(&anim_Schuine_lijnen_1,"Schuine lijnen 1")},
+            // {.column = COL_VIDEO, .slot = 8 , .pattern = new VideoPalettePattern(&anim_Spiraal_1,"Spiraal 1")},
+            // {.column = COL_VIDEO, .slot = 9 , .pattern = new VideoPalettePattern(&anim_Spiraal_2,"Spiraal 2")},
+            // {.column = COL_VIDEO, .slot = 10, .pattern = new VideoPalettePattern(&anim_Spiraal_3,"Spiraal 3")},
+            // {.column = COL_VIDEO, .slot = 11, .pattern = new VideoPalettePattern(&anim_Spiraal_4,"Spiraal 4")},
+            // {.column = COL_VIDEO, .slot = 12, .pattern = new VideoPalettePattern(&anim_Wipe_1,"Wipe 1")},
+            // {.column = COL_VIDEO, .slot = 13, .pattern = new VideoPalettePattern(&anim_Wipe_2,"Wipe 2")},
+            // {.column = COL_VIDEO, .slot = 14, .pattern = new VideoPalettePattern(&anim_Wipe_3,"Wipe 3")},
+            // {.column = COL_VIDEO, .slot = 15, .pattern = new VideoPalettePattern(&anim_Wipe_4,"Wipe 4")},
+            // {.column = COL_VIDEO, .slot = 16, .pattern = new VideoPalettePattern(&anim_Wipe_5,"Wipe 5")},
+            // {.column = COL_VIDEO, .slot = 17, .pattern = new VideoPalettePattern(&anim_X_1,"X 1")},
+            // {.column = COL_VIDEO, .slot = 18, .pattern = new VideoPalettePattern(&anim_X_2,"X 2")},
+            // {.column = COL_VIDEO, .slot = 19, .pattern = new VideoPalettePattern(&anim_X_3,"X 3")},
+#endif 
 
             {.column = COL_MASK, .slot = 0,  .pattern = new Patterns::GlowPulseMaskPattern()},
             {.column = COL_MASK, .slot = 1,  .pattern = new Patterns::SinChaseMaskPattern()},
-
 #if WITHVIDEO
             {.column = COL_MASK, .slot = 2,  .pattern = new VideoPattern(&anim_Stripes_mask_1,"Stripes mask 1")},
             {.column = COL_MASK, .slot = 3,  .pattern = new VideoPattern(&anim_Stripes_mask_2,"Stripes mask 2")},
             {.column = COL_MASK, .slot = 4, .pattern = new VideoPattern(&anim_Wave_mask_1,"Wave mask 1")},
             {.column = COL_MASK, .slot = 5, .pattern = new VideoPattern(&anim_Wave_mask_2,"Wave mask 2")},
-            {.column = COL_MASK, .slot = 6,  .pattern = new VideoPattern(&anim_Checkerboard_mask_1,"Checkerboard mask 1")},
-            {.column = COL_MASK, .slot = 7,  .pattern = new VideoPattern(&anim_Checkerboard_mask_2,"Checkerboard mask 2")},
-            {.column = COL_MASK, .slot = 8,  .pattern = new VideoPattern(&anim_Spiraal_mask_1,"Spiraal mask 1")},
-            {.column = COL_MASK, .slot = 9,  .pattern = new VideoPattern(&anim_Spiraal_mask_2,"Spiraal mask 2")},
-            {.column = COL_MASK, .slot = 10,  .pattern = new VideoPattern(&anim_Spiraal_mask_3,"Spiraal mask 3")},
-            {.column = COL_MASK, .slot = 11,  .pattern = new VideoPattern(&anim_Spiraal_mask_4,"Spiraal mask 4")},
+            // {.column = COL_MASK, .slot = 6,  .pattern = new VideoPattern(&anim_Checkerboard_mask_1,"Checkerboard mask 1")},
+            // {.column = COL_MASK, .slot = 7,  .pattern = new VideoPattern(&anim_Checkerboard_mask_2,"Checkerboard mask 2")},
+            // {.column = COL_MASK, .slot = 8,  .pattern = new VideoPattern(&anim_Spiraal_mask_1,"Spiraal mask 1")},
+            // {.column = COL_MASK, .slot = 9,  .pattern = new VideoPattern(&anim_Spiraal_mask_2,"Spiraal mask 2")},
+            // {.column = COL_MASK, .slot = 10,  .pattern = new VideoPattern(&anim_Spiraal_mask_3,"Spiraal mask 3")},
+            // {.column = COL_MASK, .slot = 11,  .pattern = new VideoPattern(&anim_Spiraal_mask_4,"Spiraal mask 4")},
 #endif
 
             {.column = COL_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
