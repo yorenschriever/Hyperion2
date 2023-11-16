@@ -88,7 +88,7 @@ int main()
     addColanderPipe(hyp);
     addCeilingPipe(hyp);
 
-    Tempo::AddSource(new ConstantTempo(120));
+    // Tempo::AddSource(new ConstantTempo(120));
 
     // select first palette
     hyp->hub.buttonPressed(COL_PALETTE, 1);
