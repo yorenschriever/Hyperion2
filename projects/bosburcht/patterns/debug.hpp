@@ -168,6 +168,39 @@ namespace Patterns
         }
     };
 
+class Gamma : public Pattern<RGBA>
+    {
+    public:
+        int gradientSize=10;
+        Gamma(int gradientSize)
+        {
+            this->gradientSize = gradientSize;
+            this->name = "Gamma";
+        }
 
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            float gammaCorrection = params->getAmount(0.5,4);
+            int dimR = params->getOffset(10,255);
+            int dimG = params->getVariant(10,255);
+            int dimB = params->getIntensity(10,255);
+
+            Log::info("Gamma", "Correction parameters: gamma=%f, \tR=%d, \tG=%d, \tB=%d\t(remove existing correction first)", gammaCorrection, dimR, dimG, dimB);
+
+            for (int i = 0; i < width; i++)
+            {
+                int pos = (i % gradientSize) * 255 / gradientSize;
+                pixels[i] = RGB(
+                    pow((float)pos*dimR / 255. / 255., gammaCorrection) * 255,
+                    pow((float)pos*dimG / 255. / 255., gammaCorrection) * 255,
+                    pow((float)pos*dimB / 255. / 255., gammaCorrection) * 255
+                );
+      
+            }
+        }
+    };
 
 }

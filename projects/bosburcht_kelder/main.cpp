@@ -224,7 +224,7 @@ void addCeilingPipe(Hyperion *hyp)
     auto splitMap = new PixelMapSplitter3d(&ceilingMap3dCombined, {nleds / 2, nleds / 2});
     for (int i = 0; i < 2; i++)
     {
-        auto pipe = new ConvertPipe<RGBA, RGB>(
+        auto pipe = new ConvertPipe<RGBA, GBR>(
             splitInput->getInput(splitInput->size() - 3 + i),
             new MonitorOutput3d(&hyp->webServer, splitMap->getMap(i)));
         hyp->addPipe(pipe);

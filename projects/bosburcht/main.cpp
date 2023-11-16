@@ -230,7 +230,7 @@ void addWindowPipe(Hyperion *hyp)
 
     for (int i = 0; i < splitInput->size() - 2; i++)
     {
-        auto pipe = new ConvertPipe<RGBA, BGR>(
+        auto pipe = new ConvertPipe<RGBA, GBR>(
             splitInput->getInput(i),
             new UDPOutput(slaves[i].host, slaves[i].port, 60),
             columnsLut);
@@ -307,6 +307,7 @@ void addChandelierPipe(Hyperion *hyp)
             {.column = COL_DEBUG, .slot = 3, .pattern = new Patterns::OneColor(RGB(0, 0, 255), "Blue")},
             {.column = COL_DEBUG, .slot = 4, .pattern = new Patterns::OneColor(RGB(255, 255, 255), "White")},
             {.column = COL_DEBUG, .slot = 5, .pattern = new Patterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = COL_DEBUG, .slot = 9, .pattern = new Patterns::Gamma(60)},
         });
 
     auto splitInput = new InputSlicer(
@@ -425,6 +426,7 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_DEBUG, .slot = 4, .pattern = new Patterns::OneColor(RGB(255, 255, 255), "White")},
             {.column = COL_DEBUG, .slot = 5, .pattern = new Patterns::OneColor(RGB(127, 127, 127), "White 50%")},
             {.column = COL_DEBUG, .slot = 6, .pattern = new Patterns::PaletteGradient(ceilingMappedIndices)},
+            {.column = COL_DEBUG, .slot = 9, .pattern = new Patterns::Gamma(60)},
         });
 
     auto splitInput = new InputSlicer(
@@ -439,7 +441,7 @@ void addCeilingPipe(Hyperion *hyp)
 
     for (int i = 0; i < splitInput->size() - 1; i++)
     {
-        auto pipe = new ConvertPipe<RGBA, BGR>(
+        auto pipe = new ConvertPipe<RGBA, GBR>(
             splitInput->getInput(i),
             new UDPOutput("hyperslave3.local", 9611 + i, 45),
             columnsLut);

@@ -33,6 +33,7 @@ class GRBW;
 class GRB;
 class BGR;
 class RBG;
+class GBR;
 class Monochrome12;
 class RGB12;
 class RGBA;
@@ -138,6 +139,7 @@ public:
     operator GRB();
     operator BGR();
     operator RBG();
+    operator GBR();
     operator Monochrome();
     operator Monochrome12();
     operator RGBA();
@@ -257,6 +259,41 @@ public:
     }
 
     uint8_t R, B, G;
+};
+
+class GBR : Colour
+{
+public:
+    GBR()
+    {
+        this->G = 0;
+        this->B = 0;
+        this->R = 0;
+        
+    }
+
+    GBR(uint8_t G, uint8_t B, uint8_t R)
+    {   
+        this->G = G;
+        this->B = B;
+        this->R = R;
+    }
+
+    inline void ApplyLut(LUT *lut)
+    {
+        G = lut->luts[0 % lut->Dimension][G];
+        B = lut->luts[1 % lut->Dimension][B];
+        R = lut->luts[2 % lut->Dimension][R];
+    }
+
+    inline void dim(uint8_t value)
+    {
+        G = (G * value) >> 8;
+        B = (B * value) >> 8;
+        R = (R * value) >> 8;
+    }
+
+    uint8_t G, B, R;
 };
 
 class RGB12 : Colour
@@ -504,6 +541,7 @@ public:
     operator GRB();
     operator BGR();
     operator RBG();
+    operator GBR();
     operator RGBWAmber();
     operator RGBWAmberUV();
 
@@ -872,6 +910,7 @@ inline RGBA::operator RGB() { return RGB(R * A / 255, G * A / 255, B * A / 255);
 inline RGBA::operator GRB() { return GRB(G * A / 255, R * A / 255, B * A / 255); }
 inline RGBA::operator BGR() { return BGR(B * A / 255, G * A / 255, R * A / 255); }
 inline RGBA::operator RBG() { return RBG(R * A / 255, B * A / 255, G * A / 255); }
+inline RGBA::operator GBR() { return GBR(G * A / 255, B * A / 255, R * A / 255); }
 inline RGBA::operator RGBWAmber()
 {
     // return RGBWAmber(R*A/255, G*A/255, B*A/255, 0,0);
@@ -904,6 +943,7 @@ inline RGB::operator Monochrome12() { return Monochrome12(((R + G + B) * CONV8TO
 inline RGB::operator GRB() { return GRB(G, R, B); }
 inline RGB::operator BGR() { return BGR(B, G, R); }
 inline RGB::operator RBG() { return RBG(R, B, G); }
+inline RGB::operator GBR() { return GBR(G, B, R); }
 inline RGB::operator RGBA() { return RGBA(R, G, B, 255); }
 inline RGB::operator GRBW()
 {
