@@ -27,23 +27,26 @@
 #include "midiController.hpp"
 #include "patterns/videoPattern.hpp"
 
-// #include "videos/processed/Kapel_Cirkels_1.hpp"
-// #include "videos/processed/Kapel_Cirkels_2.hpp"
-// #include "videos/processed/Kapel_Cirkels_3.hpp"
-// #include "videos/processed/Kapel_Cirkels_4.hpp"
-// #include "videos/processed/Kapel_Cirkels_5.hpp"
-// #include "videos/processed/Kapel_Cirkels_6.hpp"
-// #include "videos/processed/Kapel_Cirkels_7.hpp"
-// #include "videos/processed/Kapel_Grid_1.hpp"
-// #include "videos/processed/Kapel_Grid_2.hpp"
-// #include "videos/processed/Kapel_Grid_3.hpp"
-// #include "videos/processed/Kapel_Grid_4.hpp"
-// #include "videos/processed/Kapel_Heen_en_Weer_1.hpp"
-// #include "videos/processed/Kapel_Heen_en_Weer_2.hpp"
-// #include "videos/processed/Kapel_Heen_en_Weer_3.hpp"
-// #include "videos/processed/Kapel_Noise_1.hpp"
-// #include "videos/processed/Kapel_Noise_2.hpp"
-// #include "videos/processed/Kapel_Squares_1.hpp"
+#define WITHVIDEO 1
+
+#if WITHVIDEO
+#include "videos/processed/Kapel_Cirkels_1.hpp"
+#include "videos/processed/Kapel_Cirkels_2.hpp"
+#include "videos/processed/Kapel_Cirkels_3.hpp"
+#include "videos/processed/Kapel_Cirkels_4.hpp"
+#include "videos/processed/Kapel_Cirkels_5.hpp"
+#include "videos/processed/Kapel_Cirkels_6.hpp"
+#include "videos/processed/Kapel_Cirkels_7.hpp"
+#include "videos/processed/Kapel_Grid_1.hpp"
+#include "videos/processed/Kapel_Grid_2.hpp"
+#include "videos/processed/Kapel_Grid_3.hpp"
+#include "videos/processed/Kapel_Grid_4.hpp"
+#include "videos/processed/Kapel_Heen_en_Weer_1.hpp"
+#include "videos/processed/Kapel_Heen_en_Weer_2.hpp"
+#include "videos/processed/Kapel_Heen_en_Weer_3.hpp"
+#include "videos/processed/Kapel_Noise_1.hpp"
+#include "videos/processed/Kapel_Noise_2.hpp"
+#include "videos/processed/Kapel_Squares_1.hpp"
 #include "videos/processed/Kapel_Triangle_1.hpp"
 #include "videos/processed/Kapel_Wave_1.hpp"
 #include "videos/processed/Kapel_Wave_2.hpp"
@@ -52,6 +55,7 @@
 #include "videos/processed/Kapel_XX_1.hpp"
 #include "videos/processed/Kapel_XX_2.hpp"
 #include "videos/processed/Kapel_XX_3.hpp"
+#endif
 
 LUT *columnsLut = nullptr; // new ColourCorrectionLUT(1, 255, 200, 200, 200);
 
@@ -367,6 +371,7 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_CEILING, .slot = 9, .pattern = new Patterns::RibbenFlashPattern()},
             {.column = COL_CEILING, .slot = 10, .pattern = new Patterns::CeilingChase()},
 
+#if WITHVIDEO
             {.column = COL_VIDEO, .slot = 0, .pattern = new VideoPalettePattern(&anim_Kapel_Triangle_1,"Triangle 1")},
             {.column = COL_VIDEO, .slot = 1, .pattern = new VideoPalettePattern(&anim_Kapel_Wave_1,"Wave 1")},
             {.column = COL_VIDEO, .slot = 2, .pattern = new VideoPalettePattern(&anim_Kapel_Wave_2,"Wave 2")},
@@ -375,22 +380,23 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_VIDEO, .slot = 5, .pattern = new VideoPalettePattern(&anim_Kapel_XX_1,"XX 1")},
             {.column = COL_VIDEO, .slot = 6, .pattern = new VideoPalettePattern(&anim_Kapel_XX_2,"XX 2")},
             {.column = COL_VIDEO, .slot = 7, .pattern = new VideoPalettePattern(&anim_Kapel_XX_3,"XX 3")},
-            // {.column = COL_VIDEO, .slot = 8, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_1,"Cirkels 1")},
-            // {.column = COL_VIDEO, .slot = 9, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_3,"Cirkels 3")},
-            // {.column = COL_VIDEO, .slot = 10, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_4,"Cirkels 4")},
-            // {.column = COL_VIDEO, .slot = 11, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_5,"Cirkels 5")},
-            // {.column = COL_VIDEO, .slot = 12, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_6,"Cirkels 6")},
-            // {.column = COL_VIDEO, .slot = 13, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_7,"Cirkels 7")},
-            // {.column = COL_VIDEO, .slot = 14, .pattern = new VideoPalettePattern(&anim_Kapel_Heen_en_Weer_1,"Heen_en_Weer 1")},
-            // {.column = COL_VIDEO, .slot = 15, .pattern = new VideoPalettePattern(&anim_Kapel_Heen_en_Weer_2,"Heen_en_Weer 2")},
-            // {.column = COL_VIDEO, .slot = 16, .pattern = new VideoPalettePattern(&anim_Kapel_Heen_en_Weer_3,"Heen_en_Weer 3")},
-            // {.column = COL_VIDEO, .slot = 17, .pattern = new VideoPalettePattern(&anim_Kapel_Noise_1,"Noise 1")},
-            // {.column = COL_VIDEO, .slot = 18, .pattern = new VideoPalettePattern(&anim_Kapel_Noise_2,"Noise 2")},
-            // {.column = COL_VIDEO, .slot = 19, .pattern = new VideoPalettePattern(&anim_Kapel_Squares_1,"Squares 1")},
-            // {.column = COL_VIDEO, .slot = 20, .pattern = new VideoPalettePattern(&anim_Kapel_Grid_1,"Grid 1")},
-            // {.column = COL_VIDEO, .slot = 21, .pattern = new VideoPalettePattern(&anim_Kapel_Grid_2,"Grid 2")},
-            // {.column = COL_VIDEO, .slot = 22, .pattern = new VideoPalettePattern(&anim_Kapel_Grid_3,"Grid 3")},
-            // {.column = COL_VIDEO, .slot = 23, .pattern = new VideoPalettePattern(&anim_Kapel_Grid_4,"Grid 4")},
+            {.column = COL_VIDEO, .slot = 8, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_1,"Cirkels 1")},
+            {.column = COL_VIDEO, .slot = 9, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_3,"Cirkels 3")},
+            {.column = COL_VIDEO, .slot = 10, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_4,"Cirkels 4")},
+            {.column = COL_VIDEO, .slot = 11, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_5,"Cirkels 5")},
+            {.column = COL_VIDEO, .slot = 12, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_6,"Cirkels 6")},
+            {.column = COL_VIDEO, .slot = 13, .pattern = new VideoPalettePattern(&anim_Kapel_Cirkels_7,"Cirkels 7")},
+            {.column = COL_VIDEO, .slot = 14, .pattern = new VideoPalettePattern(&anim_Kapel_Heen_en_Weer_1,"Heen_en_Weer 1")},
+            {.column = COL_VIDEO, .slot = 15, .pattern = new VideoPalettePattern(&anim_Kapel_Heen_en_Weer_2,"Heen_en_Weer 2")},
+            {.column = COL_VIDEO, .slot = 16, .pattern = new VideoPalettePattern(&anim_Kapel_Heen_en_Weer_3,"Heen_en_Weer 3")},
+            {.column = COL_VIDEO, .slot = 17, .pattern = new VideoPalettePattern(&anim_Kapel_Noise_1,"Noise 1")},
+            {.column = COL_VIDEO, .slot = 18, .pattern = new VideoPalettePattern(&anim_Kapel_Noise_2,"Noise 2")},
+            {.column = COL_VIDEO, .slot = 19, .pattern = new VideoPalettePattern(&anim_Kapel_Squares_1,"Squares 1")},
+            {.column = COL_VIDEO, .slot = 20, .pattern = new VideoPalettePattern(&anim_Kapel_Grid_1,"Grid 1")},
+            {.column = COL_VIDEO, .slot = 21, .pattern = new VideoPalettePattern(&anim_Kapel_Grid_2,"Grid 2")},
+            {.column = COL_VIDEO, .slot = 22, .pattern = new VideoPalettePattern(&anim_Kapel_Grid_3,"Grid 3")},
+            {.column = COL_VIDEO, .slot = 23, .pattern = new VideoPalettePattern(&anim_Kapel_Grid_4,"Grid 4")},
+#endif 
 
             {.column = COL_ALL, .slot = 0, .pattern = new Patterns::GlitchPattern()},
             {.column = COL_ALL, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},

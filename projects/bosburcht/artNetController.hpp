@@ -2,6 +2,7 @@
 #include "artNet.hpp"
 #include "core/generation/controlHub/controlHub.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
+// #include <semaphore>
 #include "thread.hpp"
 
 class ArtNetController
@@ -87,7 +88,7 @@ private:
             // ie dmx channel 1 will be fader for column 0
             //    dmx channel 2 will be the first pattern in column 1 etc.
             //  be aware that dmx is 1-based, while the channels arrays is 0-based.
-            int channelIndex = col * 20;
+            int channelIndex = col * channelsPerColumn;
             if (changed(channelIndex))
             {
                 hub->dim(col, ch(channelIndex));

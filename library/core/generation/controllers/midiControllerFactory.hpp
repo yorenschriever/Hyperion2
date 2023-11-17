@@ -15,6 +15,8 @@ public:
     {
         if (name.compare("APC MINI")==0)
             return std::unique_ptr<ApcMiniController>(new ApcMiniController(hub, device));
+        if (name.compare("APC mini mk2 Control")==0)
+            return std::unique_ptr<ApcMiniController>(new ApcMiniController(hub, device));
         if (name.compare("MIDI Mix")==0)
             return std::unique_ptr<MidiMixController>(new MidiMixController(hub,device));
         if (name.compare("nanoKONTROL2 SLIDER/KNOB")==0)
