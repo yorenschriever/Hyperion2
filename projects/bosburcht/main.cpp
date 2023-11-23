@@ -27,7 +27,7 @@
 #include "midiController.hpp"
 #include "patterns/videoPattern.hpp"
 
-#define WITHVIDEO 1
+#define WITHVIDEO 0
 
 #if WITHVIDEO
 #include "videos/processed/Kapel_Cirkels_1.hpp"
@@ -57,7 +57,8 @@
 #include "videos/processed/Kapel_XX_3.hpp"
 #endif
 
-LUT *columnsLut = nullptr; // new ColourCorrectionLUT(1, 255, 200, 200, 200);
+//2.7 gamma experimentally determined in dark environment
+LUT *columnsLut = new ColourCorrectionLUT(2.7, 255, 255, 255, 255);
 
 auto cwindowMap3dCombined = windowMap3dCombined.toCylindricalXZ(0, chandelierYOffset);
 auto cchandelierMap3dCombined = chandelierMap3dCombined.toCylindricalXZ(0, chandelierYOffset);
@@ -75,11 +76,11 @@ void addCeilingPipe(Hyperion *);
 #define COL_CHANDELIER 2
 #define COL_CEILING 3
 #define COL_ALL 4
-#define COL_ARTNET 5
+#define COL_VIDEO 5
 #define COL_MASK 6
 #define COL_FLASH 7
 #define COL_DEBUG 8
-#define COL_VIDEO 9
+#define COL_ARTNET 9
 
 typedef struct
 {

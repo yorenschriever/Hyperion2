@@ -22,7 +22,7 @@ private:
     const int MIDI_CHANNEL = 0;
 
     const int OFF = 0;
-    const int GREEN = 1;
+    const int GREEN = 21; //21 is compatible with apcmini mk2
     const int GREEN_BLINK = 2;
     const int RED = 3;
     const int RED_BLINK = 4;
