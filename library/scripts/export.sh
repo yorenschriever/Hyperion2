@@ -7,5 +7,6 @@
 export HYPERION_LIB_DIR="$(cd "$(dirname "$0")/../"; pwd)"
 alias build='$HYPERION_LIB_DIR/scripts/build.sh'
 alias run='$HYPERION_LIB_DIR/scripts/run.sh'
+alias debug='$HYPERION_LIB_DIR/scripts/debug.sh'
 
 # echo "HYPERION_LIB_DIR = "$HYPERION_LIB_DIR
