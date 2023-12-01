@@ -35,6 +35,7 @@ body {
     } */
 }
 
+.controller {
 .activation {
     grid-area: activation;
 }
@@ -110,7 +111,7 @@ body {
     filter: hue-rotate(90deg);
 }
 
-.columnHeader, .paramsHeader, .tempo {
+.columnHeader, .paramsHeader {
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 10pt;
@@ -131,6 +132,27 @@ body {
     border-bottom:1px solid #444;
     text-align: center;
     margin-bottom: 6px;  
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    background: #053a5f;
+    border-radius: 15px;    
+}
+
+input[type="range"]::-moz-range-track {
+    background: #053a5f;
+    border-radius: 15px;
+}
+}
+
+.tempo {
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 10pt;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
 }
 
 .tempo {
@@ -164,14 +186,4 @@ body {
 @keyframes beat1 {
     from {background-color: #ccc;}
     to {background-color: #000000;}
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-    background: #053a5f;
-    border-radius: 15px;    
-}
-
-input[type="range"]::-moz-range-track {
-    background: #053a5f;
-    border-radius: 15px;
 }

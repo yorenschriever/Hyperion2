@@ -41,11 +41,18 @@ public:
         this->connectionHandler = connectionHandler;
         this->connectionUserData = connectionUserData;
     }
+    virtual void onDisconnect(WebsocketConnectionHandler disconnectionHandler, void* disconnectionUserData=0)
+    {
+        this->disconnectionHandler = disconnectionHandler;
+        this->disconnectionUserData = disconnectionUserData;
+    }
 
 protected:
     WebsocketMessageHandler handler = NULL;
     WebsocketConnectionHandler connectionHandler = NULL;
+    WebsocketConnectionHandler disconnectionHandler = NULL;
     void* userData;
     void* connectionUserData;
+    void* disconnectionUserData;
     WebsocketServer(){}
 };

@@ -91,7 +91,7 @@ typedef struct
 int main()
 {
     auto hyp = new Hyperion();
-    hyp->midiControllerFactory = new CustomMidiControllerFactory();
+    hyp->setMidiControllerFactory(new CustomMidiControllerFactory());
 
     // hyp->hub.addParams(new Params("second params"));
 

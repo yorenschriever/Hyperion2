@@ -6,6 +6,7 @@
 #include "core/distribution/pipes/convertPipe.hpp"
 #include "core/distribution/pipes/pipe.hpp"
 #include "core/generation/controllers/midiController.hpp"
+#include "core/generation/controllers/midiBridge.hpp"
 #include "core/generation/controllers/midiControllerFactory.hpp"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"
 #include "core/generation/patterns/helpers/tempo/midiClockTempo.h"
@@ -42,6 +43,7 @@ public:
         bool midi;
         bool tempo;
         bool web;
+        bool midiBridge;
     };
 
     static const Config maximal;
@@ -64,6 +66,8 @@ public:
             setup_midi();
         if (config.web)
             setup_web();
+        if (config.midiBridge)
+            setup_midi_bridge();
         if (config.tempo)
             setup_tempo();
 
@@ -96,9 +100,22 @@ public:
         }
     }
 
+    virtual void setMidiControllerFactory(MidiControllerFactory * midiControllerFactory)
+    {
+        this->midiControllerFactory = midiControllerFactory;
+    }
+
+    virtual MidiControllerFactory* getMidiControllerFactory()
+    {
+        if (midiControllerFactory == nullptr)
+            midiControllerFactory = new MidiControllerFactory();
+        
+        return midiControllerFactory;
+    }
+
     ControlHub hub;
     WebServer *webServer;
-    MidiControllerFactory *midiControllerFactory = nullptr;
+    
 
 private:
     virtual void check_safe_mode()
@@ -183,18 +200,13 @@ private:
     {
         Log::info(TAG, "setup midi");
 
-        if (midiControllerFactory == nullptr)
-        {
-            midiControllerFactory = new MidiControllerFactory();
-        }
-
         auto midi = Midi::getInstance();
         if (midi)
             midi->onDeviceCreatedDestroyed(
                 [](MidiDevice *device, std::string name, void *userData)
                 {
                     auto hyp = (Hyperion *)userData;
-                    auto controller = hyp->midiControllerFactory->create(device, name, &hyp->hub);
+                    auto controller = hyp->getMidiControllerFactory()->create(device, name, &hyp->hub);
                     hyp->midiControllers.insert({device, std::move(controller)});
                 },
                 [](MidiDevice *device, std::string name, void *userData)
@@ -213,6 +225,28 @@ private:
         webServer = WebServer::createInstance();
 
         hub.subscribe(new WebsocketController(&hub, webServer));
+    }
+
+    virtual void setup_midi_bridge()
+    {
+        Log::info(TAG, "setup midi bridge");
+        auto midiBridge = new MidiBridge(webServer);
+
+        midiBridge->onDeviceCreatedDestroyed(
+            [](MidiDevice *device, std::string name, void *userData)
+            {
+                auto hyp = (Hyperion *)userData;
+                auto controller = hyp->getMidiControllerFactory()->create(device, name, &hyp->hub);
+                hyp->midiControllers.insert({device, std::move(controller)});
+            },
+            [](MidiDevice *device, std::string name, void *userData)
+            {
+                auto hyp = (Hyperion *)userData;
+                // because midiController contains a smart pointer to the midiDevice
+                // this will also automatically delete the device
+                hyp->midiControllers.erase(device);
+            },
+            this);
     }
 
     static void UpdateDisplayTask(void *parameter)
@@ -302,6 +336,7 @@ private:
     std::vector<Pipe *> pipes;
     std::map<MidiDevice *, std::unique_ptr<MidiController>> midiControllers;
     std::map<MidiDevice *, MidiClockTempo *> midiClockTempos;
+    MidiControllerFactory *midiControllerFactory = nullptr;
 };
 
 const Hyperion::Config Hyperion::minimal = {
@@ -320,6 +355,7 @@ const Hyperion::Config Hyperion::normal = {
     .midi = true,
     .tempo = true,
     .web = true,
+    .midiBridge = true,
 };
 
 const Hyperion::Config Hyperion::maximal = {
@@ -329,4 +365,5 @@ const Hyperion::Config Hyperion::maximal = {
     .midi = true,
     .tempo = true,
     .web = true,
+    .midiBridge = true,
 };

@@ -45,7 +45,7 @@ int main()
 {
   auto hyp = new Hyperion();
   // tell hyperion to use our custom midiControllerFactory
-  hyp->midiControllerFactory = new CustomMidiControllerFactory();
+  hyp->setMidiControllerFactory(new CustomMidiControllerFactory());
 
   // the rest of the code is a simple controller, so you can see that you device actually connects to something.
   auto pipe = new ConvertPipe<RGBA, RGB>(

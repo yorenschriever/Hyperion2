@@ -1334,6 +1334,9 @@ public:
 
     void on_disconnect(WS *session) override
     {
+        if (disconnectionHandler != nullptr)
+            disconnectionHandler(session, this, disconnectionUserData);
+
         m.lock();
         clients.erase(session);
         m.unlock();

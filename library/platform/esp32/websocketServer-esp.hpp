@@ -235,6 +235,9 @@ private:
         {
             Log::info(TAG, "client disconnected.");// number of clients before disconnect: %d", sockfd, server->clients.size());
 
+            if (server->disconnectionHandler != nullptr)
+                server->disconnectionHandler((RemoteWebsocketClient *)sockfd, server, server->disconnectionUserData);
+
             server->clients_mutex.lock();
             auto client = server->findClient(req->handle, sockfd);
             server->clients.erase(client);
