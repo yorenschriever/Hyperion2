@@ -83,18 +83,6 @@ body {
     background-color: green;
 }
 
-.controllerState {
-    position: fixed;
-    top:8px;
-    left:8px;
-    padding: 3pt;
-    background-color: red;
-    color: white;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 10pt;
-    z-index:100;
-}
-
 .fader {
     -webkit-appearance: slider-vertical;
     width:100%;
@@ -145,6 +133,8 @@ input[type="range"]::-moz-range-track {
 }
 }
 
+
+
 .tempo {
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -186,4 +176,19 @@ input[type="range"]::-moz-range-track {
 @keyframes beat1 {
     from {background-color: #ccc;}
     to {background-color: #000000;}
+}
+
+
+
+
+.controllerState {
+    position: fixed;
+    top:8px;
+    left:8px;
+    padding: 3pt;
+    background-color: red;
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 10pt;
+    z-index:100;
 }
