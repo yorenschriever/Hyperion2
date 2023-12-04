@@ -14,10 +14,11 @@ class WebsocketInput : public Input
 {
 
 public:
-    WebsocketInput(WebServer **server, std::string path)
+    WebsocketInput(WebServer **server, std::string path, bool ack = false)
     {
         this->server = server;
         this->path = path;
+        this->ack = ack;
     }
 
     virtual void begin() override
@@ -48,6 +49,9 @@ public:
         if (!frameReady)
             return 0;
 
+        if (ack)
+            socket->sendAll("OK");
+
         frameReady = false;
 
         memcpy(dataPtr, buffer, std::min(dataSize, buffersize));
@@ -64,6 +68,7 @@ private:
     int bufferSize=0;
     unsigned int dataSize=0;
     bool frameReady = false;
+    bool ack= false;
     std::unique_ptr<WebsocketServer> socket=0;
     WebServer **server;
     std::string path;

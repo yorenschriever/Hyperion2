@@ -14,7 +14,10 @@ Load this project onto a hyper that is connected to a string of leds,
 then navigate to
 https://pixelmapper.local/pixelmapper/
 
-and start the mapping process.
+click 'add websocket device'
+- hostname: pixelmapper.local
+- pixel count: the number of leds you connected
+click 'Capture>>'
 
 In the last step, you can export a .hpp file with a pixelMap that you 
 can use in your other projects.
@@ -33,7 +36,7 @@ int main()
   Network::setHostName("pixelmapper");
 
   auto pipe = new ConvertPipe<Monochrome, RGB>(
-      new WebsocketInput(&hyp->webServer,"/ws/map"),
+      new WebsocketInput(&hyp->webServer,"/ws/map",true),
       new NeopixelOutput(1)
       );
 
