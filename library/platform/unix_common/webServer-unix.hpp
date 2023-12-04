@@ -49,6 +49,7 @@ class WebSocketServerSessionReceiver
 public:
     virtual void on_connect(any_session *session) = 0;
     virtual void on_receive(any_session *session, std::string message) = 0;
+    virtual void on_receive_binary(any_session *session, uint8_t * data, int len) =0;
     virtual void on_disconnect(any_session *session) = 0;
 };
 
@@ -153,7 +154,7 @@ path_cat(
 template <class Body, class Allocator>
 http::message_generator
 handle_request(
-    beast::string_view doc_root,
+    std::vector<std::string const> doc_root,
     http::request<Body, http::basic_fields<Allocator>> &&req,
     PathMap *paths)
 {
@@ -252,17 +253,26 @@ handle_request(
             }
         }
 
-        // Build the path to the requested file
-        std::string path = path_cat(doc_root, req.target());
-        if (req.target().back() == '/')
-            path.append("index.html");
-
-        // Attempt to open the file
         beast::error_code ec;
         http::file_body::value_type body;
-        body.open(path.c_str(), beast::file_mode::scan, ec);
+        std::string path;
+        for(auto doc_root_entry: doc_root)
+        {
 
-        // Handle the case where the file doesn't exist
+            // Build the path to the requested file
+            auto doc_root_sv = std::string_view(doc_root_entry.data(), doc_root_entry.size());
+            path = path_cat(doc_root_sv, req.target());
+            if (req.target().back() == '/')
+                path.append("index.html");
+
+            // Attempt to open the file
+            body.open(path.c_str(), beast::file_mode::scan, ec);
+
+            // If there is no error, the file is found
+            if (!ec)
+                break;
+        }
+
         if (ec == beast::errc::no_such_file_or_directory)
             return not_found(req.target());
 
@@ -440,6 +450,9 @@ private:
         {
             // Log::info("", "Got string: %s", buffer_.data());
             receiver->on_receive(this, boost::beast::buffers_to_string(buffer_.data()));
+        } else {
+            auto data = boost::beast::buffers_to_string(buffer_.data());
+            receiver->on_receive_binary(this, (uint8_t*) data.c_str(), data.length());
         }
         buffer_.consume(buffer_.size());
 
@@ -569,7 +582,7 @@ void make_websocket_session(
 template <class Derived>
 class http_session
 {
-    std::shared_ptr<std::string const> doc_root_;
+    std::shared_ptr<std::vector<std::string const>> doc_root_;
     PathMap *paths_;
     PathMapWs *wsPaths_;
 
@@ -595,7 +608,7 @@ public:
     // Construct the session
     http_session(
         beast::flat_buffer buffer,
-        std::shared_ptr<std::string const> const &doc_root,
+        std::shared_ptr<std::vector<std::string const>> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : doc_root_(doc_root), buffer_(std::move(buffer)), paths_(paths), wsPaths_(wsPaths)
@@ -745,7 +758,7 @@ public:
     plain_http_session(
         beast::tcp_stream &&stream,
         beast::flat_buffer &&buffer,
-        std::shared_ptr<std::string const> const &doc_root,
+        std::shared_ptr<std::vector<std::string const>> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : http_session<plain_http_session>(
@@ -803,7 +816,7 @@ public:
         beast::tcp_stream &&stream,
         ssl::context &ctx,
         beast::flat_buffer &&buffer,
-        std::shared_ptr<std::string const> const &doc_root,
+        std::shared_ptr<std::vector<std::string const>> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : http_session<ssl_http_session>(
@@ -892,7 +905,7 @@ class detect_session : public std::enable_shared_from_this<detect_session>
 {
     beast::tcp_stream stream_;
     ssl::context &ctx_;
-    std::shared_ptr<std::string const> doc_root_;
+    std::shared_ptr<std::vector<std::string const>> doc_root_;
     beast::flat_buffer buffer_;
     PathMap *paths_;
     PathMapWs *wsPaths_;
@@ -901,7 +914,7 @@ public:
     explicit detect_session(
         tcp::socket &&socket,
         ssl::context &ctx,
-        std::shared_ptr<std::string const> const &doc_root,
+        std::shared_ptr<std::vector<std::string const >> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : stream_(std::move(socket)), ctx_(ctx), doc_root_(doc_root), paths_(paths), wsPaths_(wsPaths)
@@ -974,7 +987,7 @@ class listener : public std::enable_shared_from_this<listener>
     net::io_context &ioc_;
     ssl::context &ctx_;
     tcp::acceptor acceptor_;
-    std::shared_ptr<std::string const> doc_root_;
+    std::shared_ptr<std::vector<std::string const>> doc_root_;
     PathMap *paths_;
     PathMapWs *wsPaths_;
 
@@ -983,7 +996,7 @@ public:
         net::io_context &ioc,
         ssl::context &ctx,
         tcp::endpoint endpoint,
-        std::shared_ptr<std::string const> const &doc_root,
+        std::shared_ptr<std::vector<std::string const>> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : ioc_(ioc), ctx_(ctx), acceptor_(net::make_strand(ioc)), doc_root_(doc_root), paths_(paths), wsPaths_(wsPaths)
@@ -1072,10 +1085,12 @@ private:
 class WebServerUnix : public WebServer
 {
 public:
-    WebServerUnix(std::string root, int port)
+    WebServerUnix(std::vector<std::string const> root, int port)
     {
-        Log::info(TAG, "Starting web server on port %d. root=%s", port, root.c_str());
-        auto const doc_root = std::make_shared<std::string>(root);
+        Log::info(TAG, "Starting web server on port %d", port);
+        for (auto root_entry : root)
+            Log::info(TAG, "Web server root=%s", root_entry.c_str());
+        auto const doc_root = std::make_shared<std::vector<std::string const>>(root);
         std::thread{std::bind(
                         &start_server,
                         port,
@@ -1109,7 +1124,7 @@ private:
         int portArg,
         PathMap *paths,
         PathMapWs *wsPaths,
-        std::shared_ptr<std::string const> const &doc_root)
+        std::shared_ptr<std::vector<std::string const>> const &doc_root)
     {
         // Log::info(TAG, "Starting server");
 
@@ -1330,6 +1345,12 @@ public:
     {
         if (handler != nullptr)
             handler(session, this, message, userData);
+    }
+
+    void on_receive_binary(WS *session, uint8_t * data, int len) override
+    {
+        if (binaryHandler != nullptr)
+            binaryHandler(session, this, data, len, binaryUserData);
     }
 
     void on_disconnect(WS *session) override

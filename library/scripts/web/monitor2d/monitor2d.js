@@ -36,12 +36,13 @@ export const Monitor2dApp = (props) => {
 
             const scene = sceneRef.current;
             scene?.forEach(scenePart => {
-                if (scenePart.colors) {
-                    scenePart.positions.forEach((position, i) => {
-                        const color = `rgb(${scenePart.colors[i * 3]},${scenePart.colors[i * 3 + 1]},${scenePart.colors[i * 3 + 2]})`
-                        drawCircle(canvas.current, ctx, position.x, position.y, r, color)
-                    })
-                }
+                scenePart.positions.forEach((position, i) => {
+                    const color = 
+                        (scenePart.colors && (i+1)*3 <= scenePart.colors.length) ? 
+                            `rgb(${scenePart.colors[i * 3]},${scenePart.colors[i * 3 + 1]},${scenePart.colors[i * 3 + 2]})` : 
+                            `rgb(0,0,0)`
+                    drawCircle(canvas.current, ctx, position.x, position.y, r, color)
+                })
             })
 
             window.requestAnimationFrame(() => drawCanvas());

@@ -50,6 +50,9 @@ public:
     static const Config normal;
     static const Config minimal;
 
+    bool https = false;
+    uint16_t port = 80;
+
     virtual void start(Config config = normal)
     {
         Log::info(TAG, "Start");
@@ -111,6 +114,13 @@ public:
             midiControllerFactory = new MidiControllerFactory();
         
         return midiControllerFactory;
+    }
+
+    // this setting if the webserver is spun up as HTTP or HTTPS
+    void useHttps(bool useHttps = true)
+    {
+        this->port = useHttps? 443:80;
+        this->https = useHttps;
     }
 
     ControlHub hub;
@@ -222,7 +232,7 @@ private:
     virtual void setup_web()
     {
         Log::info(TAG, "setup web");
-        webServer = WebServer::createInstance();
+        webServer = WebServer::createInstance(this->port, this->https);
 
         hub.subscribe(new WebsocketController(&hub, webServer));
     }
@@ -346,6 +356,7 @@ const Hyperion::Config Hyperion::minimal = {
     .midi = false,
     .tempo = false,
     .web = false,
+    .midiBridge = false,
 };
 
 const Hyperion::Config Hyperion::normal = {

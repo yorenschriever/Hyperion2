@@ -42,15 +42,21 @@ if (${ESP_PLATFORM})
     target_compile_options(${COMPONENT_LIB} PUBLIC "-Wno-maybe-uninitialized")
 
     file(GLOB_RECURSE WWW_FILES RELATIVE $ENV{HYPERION_LIB_DIR}/scripts/web $ENV{HYPERION_LIB_DIR}/scripts/web/*)
+    file(GLOB_RECURSE WWW_FILES_PROJECT RELATIVE ${CMAKE_SOURCE_DIR}/web ${CMAKE_SOURCE_DIR}/web/*)
     foreach(WWW_FILE ${WWW_FILES})
         list(APPEND GZIP_COMMANDS
                 COMMAND gzip -9 ${CMAKE_BINARY_DIR}/spiffs_image/${WWW_FILE} )
     endforeach()
-    add_custom_target(copy-and-compress-files ALL DEPENDS $ENV{HYPERION_LIB_DIR}/scripts/web
+    foreach(WWW_FILE ${WWW_FILES_PROJECT})
+    list(APPEND GZIP_COMMANDS
+            COMMAND gzip -9 ${CMAKE_BINARY_DIR}/spiffs_image/${WWW_FILE} )
+    endforeach()
+    add_custom_target(copy-and-compress-files ALL DEPENDS $ENV{HYPERION_LIB_DIR}/scripts/web ${CMAKE_SOURCE_DIR}/web
             # clean up
             COMMAND rm -rf ${CMAKE_BINARY_DIR}/spiffs_image
             # copy spiffs files to build folder
             COMMAND ${CMAKE_COMMAND} -E copy_directory $ENV{HYPERION_LIB_DIR}/scripts/web ${CMAKE_BINARY_DIR}/spiffs_image
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_BINARY_DIR}/spiffs_image
             # create gzip encoded www files
             ${GZIP_COMMANDS}
             )
@@ -99,6 +105,7 @@ else ()
     target_include_directories(Hyperion PRIVATE $ENV{BOOST_DIR})
 
     target_compile_definitions(Hyperion PUBLIC WEBSERVER_ROOT="$ENV{HYPERION_LIB_DIR}/scripts/web")
+    target_compile_definitions(Hyperion PUBLIC WEBSERVER_PROJECT_ROOT="${CMAKE_SOURCE_DIR}/web")
 
     target_include_directories(Hyperion PUBLIC ${CMAKE_BINARY_DIR}/cert)
     if("$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key" IS_NEWER_THAN "${CMAKE_BINARY_DIR}/cert/hyperion.key.h")
