@@ -230,7 +230,7 @@ const ParamFader = ({ name, value, paramsSlotIndex }) => {
 }
 
 const Tempo = () => {
-    const [source, setSource] = useState("[none]");
+    const [source, setSource] = useState("None");
     useSocket("/ws/tempo", msg => {
         msg = JSON.parse(msg)
         //console.log(msg);
@@ -242,7 +242,8 @@ const Tempo = () => {
         // trigger a DOM reflow 
         void element.offsetWidth; 
         
-        element.classList.add((msg.beatNr % 4==0)?"beat1":"beat");
+        if (msg.beatNr !== -1)
+            element.classList.add((msg.beatNr % 4==0)?"beat1":"beat");
         setSource(msg.sourceName);
     });
 

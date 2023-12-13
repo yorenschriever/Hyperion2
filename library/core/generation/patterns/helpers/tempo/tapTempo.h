@@ -7,11 +7,19 @@
 
 class TapTempo : public AbstractTempo
 {
-
+private:
+    static TapTempo * instance;
 public:
     TapTempo(){
         sourceName="Tap";
     };
+
+    static TapTempo * getInstance()
+    {
+        if (!instance)
+            instance = new TapTempo();
+        return instance;
+    }
 
     void Stop()
     {
@@ -91,3 +99,6 @@ private:
             beat(newBeatNr, period / 1000);
     }
 };
+
+
+TapTempo * TapTempo::instance = nullptr;

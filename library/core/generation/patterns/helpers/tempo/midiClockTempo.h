@@ -14,7 +14,7 @@ class MidiClockTempo : public AbstractTempo, public IMidiListener
 public:
     MidiClockTempo()
     {
-        sourceName = "Midi";
+        sourceName = "Midi clock";
         //Log::info(TAG, "midi clock tempo created");
     }
 

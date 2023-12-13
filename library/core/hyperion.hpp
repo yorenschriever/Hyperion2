@@ -13,6 +13,7 @@
 #include "core/generation/controllers/dinMidiControllerFactory.hpp"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"
 #include "core/generation/patterns/helpers/tempo/midiClockTempo.h"
+#include "core/generation/patterns/helpers/tempo/proDJLinkTempo.h"
 #include "core/generation/patterns/helpers/tempo/tapTempo.h"
 #include "core/generation/patterns/helpers/tempo/tempo.h"
 #include "core/generation/patterns/helpers/tempo/websocketTempo.h"
@@ -167,9 +168,9 @@ private:
         Log::info(TAG, "setup tempo");
 
         // add tempo sources in order of importance. first has highest priority
-        // Tempo::AddSource(ProDJLinkTempo::getInstance());
+        Tempo::AddSource(ProDJLinkTempo::getInstance());
         // Tempo::AddSource(MidiClockTempo::getInstance());
-        // Tempo::AddSource(TapTempo::getInstance());
+        Tempo::AddSource(TapTempo::getInstance());
         // Tempo::AddSource(UdpTempo::getInstance());
 
         // Midi::Initialize();
@@ -207,6 +208,7 @@ private:
 
         auto websocketTempo = new WebsocketTempo(this->webServer);
         Tempo::AddListener(websocketTempo);
+        Tempo::AddSource(websocketTempo);
     }
 
     virtual void setup_midi()

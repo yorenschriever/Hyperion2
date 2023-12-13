@@ -12,11 +12,18 @@
 //only works if the tracks are analyzed with recordbox.
 class ProDJLinkTempo : public AbstractTempo
 {
-
+private:
+    static ProDJLinkTempo * instance;
 public:
     ProDJLinkTempo()
     {
         sourceName = "ProDJLink";
+    }
+
+    static ProDJLinkTempo *getInstance(){
+        if (!instance)
+            instance = new ProDJLinkTempo();
+        return instance;
     }
 
 private:
@@ -30,7 +37,7 @@ private:
     void TempoTask() 
     {
         //https://djl-analysis.deepsymmetry.org/djl-analysis/beats.html#_footnoteref_1
-        int len = syncSocket.recv(buffer, sizeof(buffer));
+        int len = syncSocket.receive(buffer, sizeof(buffer));
         if (len > 0)
         {
             int device = buffer[0x5f];
@@ -58,10 +65,10 @@ private:
             Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d\r\n", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
         }
 
-        len = statusSocket.recv(buffer,sizeof(buffer));
+        len = statusSocket.receive(buffer,sizeof(buffer));
         if (len > 0)
         {
-            //Log::info(TAG,"status %x, %x\r\n", len, buffer[0x0a]);
+            Log::info(TAG,"status %x, %x\r\n", len, buffer[0x0a]);
             if (len == 0x11c && buffer[0x0a] == 0x0a)
             {
                 int device = buffer[0x21];
@@ -106,13 +113,13 @@ private:
 
         uint32_t ip = Ethernet::getIp().toUint32();
 
-        memcpy(buffer + 0x26, Ethernet::getMac(), 6);
+        memcpy(buffer + 0x26, Ethernet::getMac().octets, 6);
         memcpy(buffer + 0x2c, &ip, 4);
 
 
-
+        auto broadcastIp = IPAddress::broadcast();
         statusSocket.send(
-            &IPAddress::fromIPString("255.255.255.255"),
+            &broadcastIp,
             PRO_DJ_LINK_PORT_KEEP_ALIVE,
             buffer,
             sizeof(buffer));
@@ -122,5 +129,9 @@ private:
         // this2->statusSocket.endPacket();
 
         lastKeepAlive = Utils::millis();
+
+        // Log::info(TAG,"send keepalive");
     }
 };
+
+ProDJLinkTempo *ProDJLinkTempo::instance = nullptr;

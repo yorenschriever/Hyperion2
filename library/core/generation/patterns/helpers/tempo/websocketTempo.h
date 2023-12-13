@@ -20,11 +20,13 @@ public:
 
     void OnBeat(int beatNr, const char *sourceName) override
     {
-        socket->sendAll("{\
+            socket->sendAll(
+                "{\
             \"beatNr\": %d,\
             \"sourceName\": \"%s\"\
         }",
-                        beatNr, sourceName);
+                beatNr, sourceName);
+        lastBeatSent = Utils::millis();
     }
 
     friend class Tempo;
@@ -32,7 +34,14 @@ public:
 private:
     std::unique_ptr<WebsocketServer> socket;
 
-    void TempoTask() override {}
+    unsigned long lastBeatSent = 0;
+    void TempoTask() override
+    {
+        if (Utils::millis() - lastBeatSent > 1000)
+        {
+            OnBeat(Tempo::GetBeatNumber(), Tempo::SourceName());
+        }
+    }
 
     // static void connectionHandler(RemoteWebsocketClient *client, WebsocketServer *server, void *userData)
     // {
