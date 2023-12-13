@@ -22,8 +22,10 @@ On DIN midi connections, however, we dont have an instance name. The device will
 and you manually have to tell which device you will connect. You do this by subclassing the MidiControllerFactory,
 and setting that instance in the hyperion object.
 
-See the example below
-*/
+See the example CustomMidiControllerFactory below
+
+Because this pattern is very likely to occur, a similar class is available in the library, called DinMidiControllerFactory.
+This class takes a generic argument of midi controller class that you can to instantiate on the din port.
 
 // Create the subclass
 class CustomMidiControllerFactory : public MidiControllerFactory
@@ -41,11 +43,14 @@ public:
   }
 };
 
+*/
+
 int main()
 {
   auto hyp = new Hyperion();
   // tell hyperion to use our custom midiControllerFactory
-  hyp->setMidiControllerFactory(new CustomMidiControllerFactory());
+  //hyp->setMidiControllerFactory(new CustomMidiControllerFactory());
+  hyp->setMidiControllerFactory(new DinMidiControllerFactory<ApcMiniController>());
 
   // the rest of the code is a simple controller, so you can see that you device actually connects to something.
   auto pipe = new ConvertPipe<RGBA, RGB>(

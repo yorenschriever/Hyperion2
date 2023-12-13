@@ -42,21 +42,30 @@ if (${ESP_PLATFORM})
     target_compile_options(${COMPONENT_LIB} PUBLIC "-Wno-maybe-uninitialized")
 
     file(GLOB_RECURSE WWW_FILES RELATIVE $ENV{HYPERION_LIB_DIR}/scripts/web $ENV{HYPERION_LIB_DIR}/scripts/web/*)
-    file(GLOB_RECURSE WWW_FILES_PROJECT RELATIVE ${CMAKE_SOURCE_DIR}/web ${CMAKE_SOURCE_DIR}/web/*)
     foreach(WWW_FILE ${WWW_FILES})
         list(APPEND GZIP_COMMANDS
                 COMMAND gzip -9 ${CMAKE_BINARY_DIR}/spiffs_image/${WWW_FILE} )
     endforeach()
-    foreach(WWW_FILE ${WWW_FILES_PROJECT})
-    list(APPEND GZIP_COMMANDS
-            COMMAND gzip -9 ${CMAKE_BINARY_DIR}/spiffs_image/${WWW_FILE} )
-    endforeach()
-    add_custom_target(copy-and-compress-files ALL DEPENDS $ENV{HYPERION_LIB_DIR}/scripts/web ${CMAKE_SOURCE_DIR}/web
+
+    # see if there is a /web folder in the project directory and add it to the image as well
+    set(WWW_DIR_PROJECT ${CMAKE_SOURCE_DIR}/web)
+    if(EXISTS ${WWW_DIR_PROJECT})
+        file(GLOB_RECURSE WWW_FILES_PROJECT RELATIVE ${WWW_DIR_PROJECT} ${WWW_DIR_PROJECT}/*)
+        foreach(WWW_FILE ${WWW_FILES_PROJECT})
+            list(APPEND GZIP_COMMANDS COMMAND gzip -9 ${CMAKE_BINARY_DIR}/spiffs_image/${WWW_FILE} )
+        endforeach()
+        set(WWW_FILES_PROJECT_DEPENDS ${WWW_DIR_PROJECT})
+        set(WWW_FILES_PROJECT_COMMAND COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_BINARY_DIR}/spiffs_image)
+    endif()
+
+
+    add_custom_target(copy-and-compress-files ALL DEPENDS $ENV{HYPERION_LIB_DIR}/scripts/web ${WWW_FILES_PROJECT_DEPENDS}
             # clean up
             COMMAND rm -rf ${CMAKE_BINARY_DIR}/spiffs_image
             # copy spiffs files to build folder
             COMMAND ${CMAKE_COMMAND} -E copy_directory $ENV{HYPERION_LIB_DIR}/scripts/web ${CMAKE_BINARY_DIR}/spiffs_image
-            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_BINARY_DIR}/spiffs_image
+            # copy the /web folder in the project directory, if it exists
+            ${WWW_FILES_PROJECT_COMMAND}
             # create gzip encoded www files
             ${GZIP_COMMANDS}
             )
