@@ -1,5 +1,6 @@
 import { html, useState, createContext, useContext, useCallback , useEffect} from '../common/preact-standalone.js'
 import { useSocket } from '../common/socket.js'
+import { useLongPress} from "./useLongPress.js"
 
 const set = (obj, path, value) => {
     if (!path || path == "") return value;
@@ -231,7 +232,7 @@ const ParamFader = ({ name, value, paramsSlotIndex }) => {
 
 const Tempo = () => {
     const [source, setSource] = useState("None");
-    useSocket("/ws/tempo", msg => {
+    const [send] = useSocket("/ws/tempo", msg => {
         msg = JSON.parse(msg)
         //console.log(msg);
 
@@ -247,5 +248,15 @@ const Tempo = () => {
         setSource(msg.sourceName);
     });
 
-    return html`<div class="tempo" id="tempo">Tempo source: ${source}</div>`
+    const onLongPress = () => {
+        send(`{"type":"stop"}`)
+    };
+
+    const onClick = () => {
+        send(`{"type":"tap"}`)
+    }
+
+    const longPressEvent = useLongPress(onLongPress, onClick, {delay:500});
+
+    return html`<div class="tempo" id="tempo" ...${longPressEvent}>Tempo source: ${source}</div>`
 }
