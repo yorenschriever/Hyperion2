@@ -29,18 +29,22 @@ public:
 private:
     Socket syncSocket = Socket(PRO_DJ_LINK_PORT_SYNC);
     Socket statusSocket = Socket(PRO_DJ_LINK_PORT_STATUS);
+    Socket keepAliveSocket = Socket(PRO_DJ_LINK_PORT_KEEP_ALIVE);
     unsigned long lastKeepAlive = 0; //when the last keep alive was sent to the other players
-    int master = 0;                  //the cd player that is currently tempo master
+    int master = -1;                  //the cd player that is currently tempo master
     uint8_t buffer[1500]; //TODO should only need 0x11c bytes, test
 
     //this task handles all communication with the cd players
     void TempoTask() 
     {
         //https://djl-analysis.deepsymmetry.org/djl-analysis/beats.html#_footnoteref_1
+
+        //TODO make this a while loop
         int len = syncSocket.receive(buffer, sizeof(buffer));
         if (len > 0)
         {
             int device = buffer[0x5f];
+            if (master==-1) master = device;
             if (len == 0x60 && buffer[0x0a] == 0x28 && device == master)
             {
                 beat();
@@ -79,6 +83,12 @@ private:
                     Log::info(TAG,"master handoff to %d", device);
                 }
             }
+        }
+
+        len = keepAliveSocket.receive(buffer,sizeof(buffer));
+        if (len > 0)
+        {
+            Log::info(TAG,"got keep alive %x, %x\r\n", len, buffer[0x0a]);
         }
 
         if (Utils::millis() - lastKeepAlive > 300 && Ethernet::isConnected())
