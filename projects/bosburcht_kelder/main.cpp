@@ -18,11 +18,12 @@
 #include "patterns/common.hpp"
 #include "patterns/mask.hpp"
 #include "patterns/videoPattern.hpp"
+#include "patterns/debug.hpp"
 #include "animation.hpp"
 #include "setViewParams.hpp"
 #include <vector>
 
-#define WITHVIDEO 0
+#define WITHVIDEO 1
 
 #if WITHVIDEO
 #include "videos/processed/Heen_en_weer_1.hpp"
@@ -77,6 +78,7 @@ void addLaserPipe(Hyperion *);
 #define COL_MASK 6
 #define COL_FLASH 7
 #define COL_LASER 8
+#define COL_DEBUG 9
 
 typedef struct
 {
@@ -116,6 +118,7 @@ int main()
     hyp->hub.setColumnName(COL_MASK, "Mask");
     hyp->hub.setColumnName(COL_FLASH, "Flash");
     hyp->hub.setColumnName(COL_LASER, "Laser");
+    hyp->hub.setColumnName(COL_DEBUG, "Debug");
 
     hyp->start();
     setViewParams(hyp);
@@ -202,6 +205,7 @@ void addCeilingPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 7, .pattern = new Patterns::StrobeHighlightPattern()},
             {.column = COL_FLASH, .slot = 8, .pattern = new Patterns::WindowGlitchPattern()},
 
+            {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(1, 600)},
 
 
         });
@@ -213,10 +217,10 @@ void addCeilingPipe(Hyperion *hyp)
             {1 * nbytes / 8, nbytes / 8, true},
             {2 * nbytes / 8, nbytes / 8, true},
             {3 * nbytes / 8, nbytes / 8, true},
-            {0 * nbytes / 8, nbytes / 8, true},
-            {1 * nbytes / 8, nbytes / 8, true},
-            {2 * nbytes / 8, nbytes / 8, true},
-            {3 * nbytes / 8, nbytes / 8, true},
+            {4 * nbytes / 8, nbytes / 8, true},
+            {5 * nbytes / 8, nbytes / 8, true},
+            {6 * nbytes / 8, nbytes / 8, true},
+            {7 * nbytes / 8, nbytes / 8, true},
 
             {0 * nbytes / 2, nbytes / 2, false},
             {1 * nbytes / 2, nbytes / 2, false},
@@ -226,9 +230,9 @@ void addCeilingPipe(Hyperion *hyp)
 
     for (int i = 0; i < 8; i++)
     {
-        auto pipe = new ConvertPipe<RGBA, BGR>(
+        auto pipe = new ConvertPipe<RGBA, GBR>(
             splitInput->getInput(i),
-            new UDPOutput("hyperslave5.local", 9611 + i, 45),
+            new UDPOutput("hyperslave2.local", 9611 + i, 45),
             columnsLut);
         hyp->addPipe(pipe);
     }
@@ -236,7 +240,7 @@ void addCeilingPipe(Hyperion *hyp)
     auto splitMap = new PixelMapSplitter3d(&ceilingMap3dCombined, {nleds / 2, nleds / 2});
     for (int i = 0; i < 2; i++)
     {
-        auto pipe = new ConvertPipe<RGBA, GBR>(
+        auto pipe = new ConvertPipe<RGBA, RGB>(
             splitInput->getInput(splitInput->size() - 3 + i),
             new MonitorOutput3d(&hyp->webServer, splitMap->getMap(i)));
         hyp->addPipe(pipe);
@@ -286,8 +290,8 @@ void addColanderPipe(Hyperion *hyp)
 
     auto pipe = new ConvertPipe<Monochrome,Monochrome>(
         splitInput->getInput(0),
-        new UDPOutput("hyperslave6.local", 9619, 60),
-        incandescentLut8);
+        new UDPOutput("hyperslave6.local", 9619, 60));
+        //incandescentLut8);
     hyp->addPipe(pipe);
 
     hyp->addPipe(
