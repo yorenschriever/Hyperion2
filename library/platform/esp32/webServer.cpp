@@ -1,7 +1,7 @@
 #include "webServer.hpp"
 #include "webServer-esp.hpp"
 
-WebServer* WebServer::createInstance(int port)
+WebServer* WebServer::createInstance(int port, bool secure)
 {
-    return new WebServerEsp(port, false);
+    return new WebServerEsp(port, secure);
 }

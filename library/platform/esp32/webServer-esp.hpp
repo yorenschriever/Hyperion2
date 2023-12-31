@@ -306,6 +306,10 @@ private:
             return httpd_resp_set_type(req, "application/javascript");
         if (IS_FILE_EXT(filename, ".json"))
             return httpd_resp_set_type(req, "application/json");
+        if (IS_FILE_EXT(filename, ".wasm"))
+            return httpd_resp_set_type(req, "application/wasm");
+        if (IS_FILE_EXT(filename, ".css"))
+            return httpd_resp_set_type(req, "	text/css");
 
         /* This is a limited set only */
         /* For any other type always set as plain text */

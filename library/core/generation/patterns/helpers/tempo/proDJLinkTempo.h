@@ -12,28 +12,39 @@
 //only works if the tracks are analyzed with recordbox.
 class ProDJLinkTempo : public AbstractTempo
 {
-
+private:
+    static ProDJLinkTempo * instance;
 public:
     ProDJLinkTempo()
     {
         sourceName = "ProDJLink";
     }
 
+    static ProDJLinkTempo *getInstance(){
+        if (!instance)
+            instance = new ProDJLinkTempo();
+        return instance;
+    }
+
 private:
     Socket syncSocket = Socket(PRO_DJ_LINK_PORT_SYNC);
     Socket statusSocket = Socket(PRO_DJ_LINK_PORT_STATUS);
+    Socket keepAliveSocket = Socket(PRO_DJ_LINK_PORT_KEEP_ALIVE);
     unsigned long lastKeepAlive = 0; //when the last keep alive was sent to the other players
-    int master = 0;                  //the cd player that is currently tempo master
+    int master = -1;                  //the cd player that is currently tempo master
     uint8_t buffer[1500]; //TODO should only need 0x11c bytes, test
 
     //this task handles all communication with the cd players
     void TempoTask() 
     {
         //https://djl-analysis.deepsymmetry.org/djl-analysis/beats.html#_footnoteref_1
-        int len = syncSocket.recv(buffer, sizeof(buffer));
+
+        //TODO make this a while loop
+        int len = syncSocket.receive(buffer, sizeof(buffer));
         if (len > 0)
         {
             int device = buffer[0x5f];
+            if (master==-1) master = device;
             if (len == 0x60 && buffer[0x0a] == 0x28 && device == master)
             {
                 beat();
@@ -58,10 +69,10 @@ private:
             Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d\r\n", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
         }
 
-        len = statusSocket.recv(buffer,sizeof(buffer));
+        len = statusSocket.receive(buffer,sizeof(buffer));
         if (len > 0)
         {
-            //Log::info(TAG,"status %x, %x\r\n", len, buffer[0x0a]);
+            Log::info(TAG,"status %x, %x\r\n", len, buffer[0x0a]);
             if (len == 0x11c && buffer[0x0a] == 0x0a)
             {
                 int device = buffer[0x21];
@@ -72,6 +83,12 @@ private:
                     Log::info(TAG,"master handoff to %d", device);
                 }
             }
+        }
+
+        len = keepAliveSocket.receive(buffer,sizeof(buffer));
+        if (len > 0)
+        {
+            Log::info(TAG,"got keep alive %x, %x\r\n", len, buffer[0x0a]);
         }
 
         if (Utils::millis() - lastKeepAlive > 300 && Ethernet::isConnected())
@@ -106,13 +123,13 @@ private:
 
         uint32_t ip = Ethernet::getIp().toUint32();
 
-        memcpy(buffer + 0x26, Ethernet::getMac(), 6);
+        memcpy(buffer + 0x26, Ethernet::getMac().octets, 6);
         memcpy(buffer + 0x2c, &ip, 4);
 
 
-
+        auto broadcastIp = IPAddress::broadcast();
         statusSocket.send(
-            &IPAddress::fromIPString("255.255.255.255"),
+            &broadcastIp,
             PRO_DJ_LINK_PORT_KEEP_ALIVE,
             buffer,
             sizeof(buffer));
@@ -122,5 +139,9 @@ private:
         // this2->statusSocket.endPacket();
 
         lastKeepAlive = Utils::millis();
+
+        // Log::info(TAG,"send keepalive");
     }
 };
+
+ProDJLinkTempo *ProDJLinkTempo::instance = nullptr;

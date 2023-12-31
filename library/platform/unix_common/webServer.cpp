@@ -1,9 +1,10 @@
 #include "webServer.hpp"
 #include "webServer-unix.hpp"
 
-WebServer* WebServer::createInstance(int port)
+WebServer* WebServer::createInstance(int port, bool secure)
 {
-    return new WebServerUnix(WEBSERVER_ROOT, port);
+    //bool 'secure' is ignored, instead both, https and http calls wil be answered on this port
+    return new WebServerUnix({WEBSERVER_PROJECT_ROOT, WEBSERVER_ROOT}, port);
 }
 
 std::unique_ptr<WebsocketServer> WebsocketServer::createInstance(WebServer *server, const char * path)

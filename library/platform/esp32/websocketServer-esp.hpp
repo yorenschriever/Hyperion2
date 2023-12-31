@@ -235,6 +235,9 @@ private:
         {
             Log::info(TAG, "client disconnected.");// number of clients before disconnect: %d", sockfd, server->clients.size());
 
+            if (server->disconnectionHandler != nullptr)
+                server->disconnectionHandler((RemoteWebsocketClient *)sockfd, server, server->disconnectionUserData);
+
             server->clients_mutex.lock();
             auto client = server->findClient(req->handle, sockfd);
             server->clients.erase(client);
@@ -257,6 +260,15 @@ private:
 
             if (server->handler != nullptr)
                 server->handler(client, server, std::string((const char *)ws_pkt.payload, ws_pkt.len), server->userData);
+        }
+        else if (ws_pkt.type == HTTPD_WS_TYPE_BINARY)
+        {
+            // Log::info(TAG, "Received packet with message: %s. hd=%d, fd=%d", ws_pkt.payload, (int)req->handle, httpd_req_to_sockfd(req));
+
+            auto client = server->findClient(req->handle, sockfd);
+
+            if (server->binaryHandler != nullptr)
+                server->binaryHandler(client, server, ws_pkt.payload, ws_pkt.len, server->binaryUserData);
         }
 
         free(buf);

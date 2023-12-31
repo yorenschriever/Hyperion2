@@ -2,6 +2,7 @@
 #include "artNet.hpp"
 #include "core/generation/controlHub/controlHub.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
+// #include <semaphore>
 #include "thread.hpp"
 
 class ArtNetController
@@ -83,11 +84,11 @@ private:
         {
             if (col==0) continue; //ignore palette column for now.
 
-            // Each column will start with an address for the alpha, and then 19 channels for the patterns.
+            // Each column will start with an address for the alpha, and then 24 channels for the patterns.
             // ie dmx channel 1 will be fader for column 0
             //    dmx channel 2 will be the first pattern in column 1 etc.
             //  be aware that dmx is 1-based, while the channels arrays is 0-based.
-            int channelIndex = col * 20;
+            int channelIndex = col * channelsPerColumn;
             if (changed(channelIndex))
             {
                 hub->dim(col, ch(channelIndex));
@@ -149,10 +150,6 @@ private:
             if (totalWidth>0){
                 int width1Norm = 255 * ch(paletteStartChannel + 6) / totalWidth;
                 int width2Norm = 255 * ch(paletteStartChannel + 7) / totalWidth;
-
-                // int endpos = ch(paletteStartChannel + 8);
-                // pos1 = endpos * ch(paletteStartChannel + 6) / totalWidth;
-                // pos2 = pos1 + endpos * ch(paletteStartChannel + 7) / totalWidth; 
                 pos1 = 255 - width1Norm- width2Norm;
                 pos2 = 255 - width1Norm ;
             } else{
@@ -160,10 +157,10 @@ private:
             }
 
             palette->gradient = Gradient({
-                {.position = 0, .color = RGB(0, 0, 0)},         // Darkest
+                {.position = 0, .color = RGB(0, 0, 0)},          // Darkest
                 {.position = pos1, .color = palette->secondary}, // ..
                 {.position = pos2, .color = palette->primary},   // ..
-                {.position = 255, .color = palette->highlight}  // Brightest
+                {.position = 255, .color = palette->highlight}   // Brightest
             });
         }
 

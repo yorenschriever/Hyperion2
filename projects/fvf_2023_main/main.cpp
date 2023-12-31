@@ -72,7 +72,7 @@ int main()
     hyp->hub.setFlashColumn(0, false, true);
     hyp->hub.setForcedSelection(0);
 
-    hyp->midiControllerFactory = new MidiControllerFactoryFvf();
+    hyp->setMidiControllerFactory(new MidiControllerFactoryFvf());
 
     hyp->start();
     while (1)

@@ -8,7 +8,7 @@ class WebServerResponseBuilder;
 class WebServer
 {
 public:
-    static WebServer *createInstance(int port = 80);
+    static WebServer *createInstance(int port = 80, bool secure = false);
 
     virtual ~WebServer() = default;
 

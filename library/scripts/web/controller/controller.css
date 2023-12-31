@@ -35,6 +35,7 @@ body {
     } */
 }
 
+.controller {
 .activation {
     grid-area: activation;
 }
@@ -82,18 +83,6 @@ body {
     background-color: green;
 }
 
-.controllerState {
-    position: fixed;
-    top:8px;
-    left:8px;
-    padding: 3pt;
-    background-color: red;
-    color: white;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 10pt;
-    z-index:100;
-}
-
 .fader {
     -webkit-appearance: slider-vertical;
     width:100%;
@@ -110,7 +99,7 @@ body {
     filter: hue-rotate(90deg);
 }
 
-.columnHeader, .paramsHeader, .tempo {
+.columnHeader, .paramsHeader {
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 10pt;
@@ -133,6 +122,29 @@ body {
     margin-bottom: 6px;  
 }
 
+input[type="range"]::-webkit-slider-runnable-track {
+    background: #053a5f;
+    border-radius: 15px;    
+}
+
+input[type="range"]::-moz-range-track {
+    background: #053a5f;
+    border-radius: 15px;
+}
+}
+
+
+
+.tempo {
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 10pt;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+
 .tempo {
     width:120px;
     height:50px;
@@ -146,6 +158,7 @@ body {
 
     padding: 6px;
     z-index: 101;
+    text-wrap:wrap;
 }
 
 .beat {
@@ -166,12 +179,17 @@ body {
     to {background-color: #000000;}
 }
 
-input[type="range"]::-webkit-slider-runnable-track {
-    background: #053a5f;
-    border-radius: 15px;    
-}
 
-input[type="range"]::-moz-range-track {
-    background: #053a5f;
-    border-radius: 15px;
+
+
+.controllerState {
+    position: fixed;
+    top:8px;
+    left:8px;
+    padding: 3pt;
+    background-color: red;
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 10pt;
+    z-index:100;
 }

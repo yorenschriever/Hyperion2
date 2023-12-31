@@ -1,0 +1,35 @@
+#toolbar {
+    position: fixed;
+    left:16px;
+    bottom: 16px;
+    padding: 8px;
+    display: flex;
+    gap:16px;
+    flex-direction:row;
+    border: 1px solid #444;
+    background-color: #222;
+    color:#eee;
+    border-radius: 5px;
+}
+
+#toolbar svg {
+    width:1cm;
+    height:1cm;
+}
+
+#toolbar a {
+    transition: color 0.5s;
+    color:#666;
+}
+
+#toolbar a.active{ 
+    color:#fff;
+}
+
+#toolbar a.disabled{ 
+    color:#333;
+}
+
+#toolbar a.error{ 
+    color:red;
+}

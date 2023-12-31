@@ -1,0 +1,29 @@
+{
+  "short_name": "Pixelmapper",
+  "name": "Pixelmapper",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo200.png",
+      "type": "image/png",
+      "sizes": "200x200"
+    },
+    {
+      "src": "logo400.png",
+      "type": "image/png",
+      "sizes": "400x400"
+    }
+  ],
+  "start_url": ".",
+
+  "theme_color": "#000000",
+  "background_color": "#000000",
+
+
+  "display":      "standalone"
+
+}

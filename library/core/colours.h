@@ -758,8 +758,8 @@ public:
         // other = top
 
         // take LTP values from top layer
-        pan = other.pan;
-        tilt = other.tilt;
+        pan += other.pan;
+        tilt += other.tilt;
 
         // HTP for uv channel
         uv = std::max(uv, other.uv);
