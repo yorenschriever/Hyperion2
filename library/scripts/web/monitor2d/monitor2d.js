@@ -4,7 +4,6 @@ import { Socket } from '../common/socket.js'
 export const Monitor2dApp = (props) => {
     const canvas = useRef(null);
     const sceneRef = useRef(null);
-    const r = 0.01;
 
     const runtimeSessionId = useRef();
 
@@ -41,6 +40,7 @@ export const Monitor2dApp = (props) => {
                         (scenePart.colors && (i+1)*3 <= scenePart.colors.length) ? 
                             `rgb(${scenePart.colors[i * 3]},${scenePart.colors[i * 3 + 1]},${scenePart.colors[i * 3 + 2]})` : 
                             `rgb(0,0,0)`
+                    const r = scenePart.size;
                     drawCircle(canvas.current, ctx, position.x, position.y, r, color)
                 })
             })

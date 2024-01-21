@@ -1,16 +1,26 @@
 #pragma once
+#include "colours.h"
+#include "core/distribution/inputs/inputSlicer.hpp"
+#include "core/distribution/inputs/inputSplitter.hpp"
 #include "core/distribution/inputs/udpInput.hpp"
+#include "core/distribution/luts/colourCorrectionLut.hpp"
+#include "core/distribution/luts/gammaLut.hpp"
+#include "core/distribution/luts/incandescentLut.hpp"
+#include "core/distribution/luts/laserLut.hpp"
+#include "core/distribution/outputs/dmxOutput.hpp"
 #include "core/distribution/outputs/monitorOutput.hpp"
 #include "core/distribution/outputs/monitorOutput3d.hpp"
-#include "core/distribution/outputs/udpOutput.hpp"
+#include "core/distribution/outputs/neopixelOutput.hpp"
 #include "core/distribution/outputs/pwmOutput.hpp"
-#include "core/distribution/outputs/dmxOutput.hpp"
+#include "core/distribution/outputs/spiOutput.hpp"
+#include "core/distribution/outputs/udpOutput.hpp"
 #include "core/distribution/pipes/convertPipe.hpp"
 #include "core/distribution/pipes/pipe.hpp"
-#include "core/generation/controllers/midiController.hpp"
-#include "core/generation/controllers/midiBridge.hpp"
-#include "core/generation/controllers/midiControllerFactory.hpp"
 #include "core/generation/controllers/dinMidiControllerFactory.hpp"
+#include "core/generation/controllers/midiBridge.hpp"
+#include "core/generation/controllers/midiController.hpp"
+#include "core/generation/controllers/midiControllerFactory.hpp"
+#include "core/generation/palettes.hpp"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"
 #include "core/generation/patterns/helpers/tempo/midiClockTempo.h"
 #include "core/generation/patterns/helpers/tempo/proDJLinkTempo.h"
@@ -18,7 +28,9 @@
 #include "core/generation/patterns/helpers/tempo/tempo.h"
 #include "core/generation/patterns/helpers/tempo/websocketTempo.h"
 #include "core/generation/pixelMap.hpp"
+#include "core/generation/pixelMapSplitter3d.hpp"
 #include "distribution/inputs/controlHubInput.hpp"
+#include "distribution/inputs/patternCycleInput.hpp"
 #include "distribution/outputs/neopixelOutput.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
 #include "generation/controllers/websocketController.hpp"
@@ -28,9 +40,10 @@
 #include "platform/includes/network.hpp"
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
-#include "webServer.hpp"
-#include "webServerResponseBuilder.hpp"
-#include "websocketServer.hpp"
+#include "platform/includes/thread.hpp"
+#include "platform/includes/webServer.hpp"
+#include "platform/includes/webServerResponseBuilder.hpp"
+#include "platform/includes/websocketServer.hpp"
 #include <memory>
 #include <vector>
 
@@ -168,7 +181,7 @@ private:
         Log::info(TAG, "setup tempo");
 
         // add tempo sources in order of importance. first has highest priority
-        Tempo::AddSource(ProDJLinkTempo::getInstance());
+        // Tempo::AddSource(ProDJLinkTempo::getInstance());
         // Tempo::AddSource(MidiClockTempo::getInstance());
         Tempo::AddSource(TapTempo::getInstance());
         // Tempo::AddSource(UdpTempo::getInstance());
