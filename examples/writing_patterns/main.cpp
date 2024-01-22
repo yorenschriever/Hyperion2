@@ -1,6 +1,5 @@
 #include "core/hyperion.hpp"
 #include "mapping/haloMap.hpp"
-#include "palettes.hpp"
 #include "patterns.hpp"
 
 // forward declarations. This lets us call the functions before we defined them.
@@ -106,8 +105,8 @@ void addPaletteColumn(Hyperion *hyp)
         0,          //Column index (0 based)
         0,          //If you are using multiple parameters you can choose one here. Here we dont, so we choose 0
         {           //The list of palettes
-            heatmap,
-            sunset1,
+            &heatmap,
+            &sunset1,
         });
     hyp->hub.subscribe(paletteColumn);
 }

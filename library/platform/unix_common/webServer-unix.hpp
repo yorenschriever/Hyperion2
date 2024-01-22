@@ -63,6 +63,8 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 using PathMap = std::map<std::string, WebServerResponseBuilder *>;
 using PathMapWs = std::map<std::string, WebSocketServerSessionReceiver *>;
 
+using DocRoots_t = std::vector<std::string>;
+
 // Return a reasonable mime type based on the extension of a file.
 beast::string_view
 mime_type(beast::string_view path) //;
@@ -154,7 +156,7 @@ path_cat(
 template <class Body, class Allocator>
 http::message_generator
 handle_request(
-    std::vector<std::string const> doc_root,
+    DocRoots_t doc_root,
     http::request<Body, http::basic_fields<Allocator>> &&req,
     PathMap *paths)
 {
@@ -582,7 +584,7 @@ void make_websocket_session(
 template <class Derived>
 class http_session
 {
-    std::shared_ptr<std::vector<std::string const>> doc_root_;
+    std::shared_ptr<DocRoots_t> doc_root_;
     PathMap *paths_;
     PathMapWs *wsPaths_;
 
@@ -608,7 +610,7 @@ public:
     // Construct the session
     http_session(
         beast::flat_buffer buffer,
-        std::shared_ptr<std::vector<std::string const>> const &doc_root,
+        std::shared_ptr<DocRoots_t> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : doc_root_(doc_root), buffer_(std::move(buffer)), paths_(paths), wsPaths_(wsPaths)
@@ -758,7 +760,7 @@ public:
     plain_http_session(
         beast::tcp_stream &&stream,
         beast::flat_buffer &&buffer,
-        std::shared_ptr<std::vector<std::string const>> const &doc_root,
+        std::shared_ptr<DocRoots_t> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : http_session<plain_http_session>(
@@ -816,7 +818,7 @@ public:
         beast::tcp_stream &&stream,
         ssl::context &ctx,
         beast::flat_buffer &&buffer,
-        std::shared_ptr<std::vector<std::string const>> const &doc_root,
+        std::shared_ptr<DocRoots_t> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : http_session<ssl_http_session>(
@@ -905,7 +907,7 @@ class detect_session : public std::enable_shared_from_this<detect_session>
 {
     beast::tcp_stream stream_;
     ssl::context &ctx_;
-    std::shared_ptr<std::vector<std::string const>> doc_root_;
+    std::shared_ptr<DocRoots_t> doc_root_;
     beast::flat_buffer buffer_;
     PathMap *paths_;
     PathMapWs *wsPaths_;
@@ -914,7 +916,7 @@ public:
     explicit detect_session(
         tcp::socket &&socket,
         ssl::context &ctx,
-        std::shared_ptr<std::vector<std::string const >> const &doc_root,
+        std::shared_ptr<DocRoots_t> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : stream_(std::move(socket)), ctx_(ctx), doc_root_(doc_root), paths_(paths), wsPaths_(wsPaths)
@@ -987,7 +989,7 @@ class listener : public std::enable_shared_from_this<listener>
     net::io_context &ioc_;
     ssl::context &ctx_;
     tcp::acceptor acceptor_;
-    std::shared_ptr<std::vector<std::string const>> doc_root_;
+    std::shared_ptr<DocRoots_t> doc_root_;
     PathMap *paths_;
     PathMapWs *wsPaths_;
 
@@ -996,7 +998,7 @@ public:
         net::io_context &ioc,
         ssl::context &ctx,
         tcp::endpoint endpoint,
-        std::shared_ptr<std::vector<std::string const>> const &doc_root,
+        std::shared_ptr<DocRoots_t> const &doc_root,
         PathMap *paths,
         PathMapWs *wsPaths)
         : ioc_(ioc), ctx_(ctx), acceptor_(net::make_strand(ioc)), doc_root_(doc_root), paths_(paths), wsPaths_(wsPaths)
@@ -1085,12 +1087,12 @@ private:
 class WebServerUnix : public WebServer
 {
 public:
-    WebServerUnix(std::vector<std::string const> root, int port)
+    WebServerUnix(DocRoots_t root, int port)
     {
         Log::info(TAG, "Starting web server on port %d", port);
         for (auto root_entry : root)
             Log::info(TAG, "Web server root=%s", root_entry.c_str());
-        auto const doc_root = std::make_shared<std::vector<std::string const>>(root);
+        auto const doc_root = std::make_shared<DocRoots_t>(root);
         std::thread{std::bind(
                         &start_server,
                         port,
@@ -1124,7 +1126,7 @@ private:
         int portArg,
         PathMap *paths,
         PathMapWs *wsPaths,
-        std::shared_ptr<std::vector<std::string const>> const &doc_root)
+        std::shared_ptr<DocRoots_t> const &doc_root)
     {
         // Log::info(TAG, "Starting server");
 
