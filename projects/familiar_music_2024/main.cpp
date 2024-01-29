@@ -166,6 +166,7 @@ void addPaletteColumn(Hyperion *hyp)
             &retro,
             &tunnel,
             &plumBath,
+            &matrix,
 
             &sunset6,
             &sunset7,
