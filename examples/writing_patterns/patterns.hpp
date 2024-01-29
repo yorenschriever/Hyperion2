@@ -334,13 +334,11 @@ namespace ExamplePatterns
             for (int i = 0; i < width; i++)
             {
                 // It is also easy to change this fade into a chase by providing an argument to getValue.
-                // this parameter is similar to the phase paramater in lfo:
-                // if you pass 0, all pixels will start fading immediately
-                // if you pass 1, the pixel will start after waiting 1 duration
-                // if you pass 2, the pixel will start after 2 fade durations, etc..
-                // In other words: the bigger the value: the slower the movement
+                // this parameter is the start delay in milliseconds.
+                // This means that the fade will wait X milliseconds after the trigger to start fading.
+                // By passing a slightly different delay for each pixel it will create a chase effect.
                 float phase = ((float)i) / width;
-                pixels[i] = params->getPrimaryColour() * fade.getValue(0.5 * phase);
+                pixels[i] = params->getPrimaryColour() * fade.getValue(500 * phase);
             }
         }
     };
@@ -521,7 +519,6 @@ namespace ExamplePatterns
             // as a moving chase. The length of the tail is determined by the time it takes the
             // fade to fade out and the amount the chase has 'moved forward'.
             // The tail length is therefore dependent on maxDelay and the duration.
-            // setChaseLength will help you set the tail length
             float maxDelay = params->getVelocity(2000, 500);
             fade.setTailLength(params->getSize(0, 2), maxDelay);
 
