@@ -24,10 +24,10 @@
 #define COL_FAIRYLIGHT_PINSPOT 3
 #define COL_LASERS 4
 #define COL_BULBS 5
-#define COL_LEDSTER 6
-#define COL_STROBES 7
-#define COL_LED1 8
-#define COL_LED2 9
+#define COL_LEDSTER 8
+#define COL_STROBES 9
+#define COL_LED1 6
+#define COL_LED2 7
 
 void addColanderPipe(Hyperion *hyp);
 void addLaserPipe(Hyperion *hyp);
@@ -206,10 +206,11 @@ void addBulbPipe(Hyperion *hyp)
       });
 
   hyp->addPipe(
-      new ConvertPipe<Monochrome, Monochrome>(
+      new ConvertPipe<Monochrome, Monochrome12>(
           splitInput->getInput(0),
-          new DMXOutput(256),
-          GammaLut8));
+          //new DMXOutput(256),
+          new UDPOutput("hyperslave4.local",9620,60),
+          GammaLut12));
 
   hyp->addPipe(
       new ConvertPipe<Monochrome, Monochrome12>(
@@ -246,7 +247,8 @@ void addFairylightPinspotPipe(Hyperion *hyp)
                   {.column = COL_FAIRYLIGHT_PINSPOT, .slot = 7, .pattern = new FastStrobePattern()},
 
               }),
-          new PWMOutput(12),
+          //new PWMOutput(12),
+          new UDPOutput("hyperslave4.local",9621,60),
           GammaLut12));
 }
 
@@ -320,7 +322,7 @@ void addLed1Column(Hyperion *hyp)
     int ports[] = {9611,9613,9616,9617};
     for (int i = 0; i < splitInput->size() - 1; i++)
     {
-        auto pipe = new ConvertPipe<RGBA, BGR>(
+        auto pipe = new ConvertPipe<RGBA, GBR>(
             splitInput->getInput(i),
             new UDPOutput("hyperslave5.local", ports[i], 60),
             ledLut);
@@ -384,7 +386,7 @@ void addLed2Column(Hyperion *hyp)
     int ports[] = {9612,9614,9615,9618};
     for (int i = 0; i < splitInput->size() - 1; i++)
     {
-        auto pipe = new ConvertPipe<RGBA, BGR>(
+        auto pipe = new ConvertPipe<RGBA, GBR>(
             splitInput->getInput(i),
             new UDPOutput("hyperslave5.local",ports[i],60),
             

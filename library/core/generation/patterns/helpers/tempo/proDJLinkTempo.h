@@ -44,7 +44,7 @@ private:
         if (len > 0)
         {
             int device = buffer[0x5f];
-            if (master==-1) master = device;
+            if (master==-1 && buffer[0x5c] != 16) master = device;
             if (len == 0x60 && buffer[0x0a] == 0x28 && device == master)
             {
                 beat();
@@ -66,7 +66,7 @@ private:
                 }
             }
             validSignal=true;
-            Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d\r\n", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
+            // Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d\r\n", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
         }
 
         len = statusSocket.receive(buffer,sizeof(buffer));
@@ -88,7 +88,7 @@ private:
         len = keepAliveSocket.receive(buffer,sizeof(buffer));
         if (len > 0)
         {
-            Log::info(TAG,"got keep alive %x, %x\r\n", len, buffer[0x0a]);
+            // Log::info(TAG,"got keep alive %x, %x\r\n", len, buffer[0x0a]);
         }
 
         if (Utils::millis() - lastKeepAlive > 300 && Ethernet::isConnected())
