@@ -335,12 +335,12 @@ Palette plumBath{
 
 Palette matrix{
     .gradient = Gradient({
-  {.position  =  0, .color = RGB(   50,  0, 43)},  
-  {.position  =127, .color = RGB(  140,  0,129)},  
-  {.position  =190, .color = RGB(  255,  0,230)},  
-  {.position  =255, .color = RGB(   213,111,25)} 
+  {.position  =  0, .color = RGB(  0, 50,   43)},  
+  {.position  =127, .color = RGB(  0,140,  129)},  
+  {.position  =190, .color = RGB(  0,255,  230)},  
+  {.position  =255, .color = RGB(  111, 213,25)} 
     }),
-    .primary =   RGB(  140,  0,129),
-    .secondary = RGB(   213,111,25),
+    .primary =   RGB(  0,140,129),
+    .secondary = RGB(  111, 213,25),
     .highlight = RGB(255, 255, 255),
     .name = "Matrix"};

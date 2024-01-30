@@ -38,20 +38,27 @@ public:
 
     void onControllerChange(uint8_t channel, uint8_t controller, uint8_t value) override
     {
-        //Log::info(TAG, "onControllerChange %d %d", controller, value);
+        if (controller < 32)
+            controller -= 16;
+        else
+            controller -= (42 - 12);
 
-        if (controller == 16)
-            return hub->setVelocity(0,scale127toFloat(value));
-        if (controller == 20)
-            return hub->setAmount(0,scale127toFloat(value));
-        if (controller == 24)
-            return hub->setSize(0,scale127toFloat(value));
-        if (controller == 28)
-            return hub->setOffset(0,scale127toFloat(value));
-        if (controller == 46)
-            return hub->setVariant(0,scale127toFloat(value));
-        if (controller == 50)
-            return hub->setIntensity(0,scale127toFloat(value));
+        int col = (controller) /4;
+        int row = (controller) % 4;
+
+        if (col >= 8) return;
+
+        // Log::info(TAG, "onControllerChange %d %d = %d", col, row, value);
+
+        if (row==3)
+            return hub->setVelocity(col,scale127toFloat(value));
+        if (row==2)
+            return hub->setAmount(col,scale127toFloat(value));
+        if (row==1)
+            return hub->setSize(col,scale127toFloat(value));
+        if (row==0)
+            return hub->setOffset(col,scale127toFloat(value));
+
     }
     void onSystemRealtime(uint8_t message) override {}
     void onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override {}

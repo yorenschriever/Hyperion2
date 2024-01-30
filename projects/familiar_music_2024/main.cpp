@@ -20,6 +20,7 @@ void addChandelierPipe(Hyperion *);
 #define COL_CHANDELIER_2 2
 #define COL_CHANDELIER_3 3
 #define COL_CHANDELIER_MASK 4
+#define COL_CHANDELIER_STROBES 6
 #define COL_CHANDELIER_FLASH 7
 #define COL_DEBUG 8
 
@@ -27,10 +28,28 @@ int main()
 {
     auto hyp = new Hyperion();
     
+    // Tempo::AddSource(new ConstantTempo(120));
+
+    // hyp->hub.getParams(0)->name = "Bottom";
+    hyp->hub.addParams(new Params("Bottom"));
+    hyp->hub.addParams(new Params("Mid"));
+    hyp->hub.addParams(new Params("Top"));
+    hyp->hub.addParams(new Params("Mask"));
+    hyp->hub.addParams(new Params());
+    hyp->hub.addParams(new Params("Flash"));
+    hyp->hub.addParams(new Params("Flash"));
+
     addPaletteColumn(hyp);
     addChandelierPipe(hyp);
 
-    // Tempo::AddSource(new ConstantTempo(120));
+    hyp->hub.setColumnName(COL_PALETTE, "Palette");
+    hyp->hub.setColumnName(COL_CHANDELIER_1, "Bottom");
+    hyp->hub.setColumnName(COL_CHANDELIER_2, "Mid");
+    hyp->hub.setColumnName(COL_CHANDELIER_3, "Top");
+    hyp->hub.setColumnName(COL_CHANDELIER_MASK, "Mask");
+    hyp->hub.setColumnName(COL_CHANDELIER_STROBES, "Strobes");
+    hyp->hub.setColumnName(COL_CHANDELIER_FLASH, "Flash");
+    hyp->hub.setColumnName(COL_DEBUG, "Debug");
 
     // select first palette
     hyp->hub.buttonPressed(COL_PALETTE, 0);
@@ -38,14 +57,6 @@ int main()
     hyp->hub.setForcedSelection(COL_PALETTE);
 
     hyp->hub.setFlashColumn(COL_CHANDELIER_FLASH, true, false);
-
-    hyp->hub.setColumnName(COL_PALETTE, "Palette");
-    hyp->hub.setColumnName(COL_CHANDELIER_1, "Bottom");
-    hyp->hub.setColumnName(COL_CHANDELIER_2, "Mid");
-    hyp->hub.setColumnName(COL_CHANDELIER_3, "Top");
-    hyp->hub.setColumnName(COL_CHANDELIER_MASK, "Mask");
-    hyp->hub.setColumnName(COL_CHANDELIER_FLASH, "Flash");
-    hyp->hub.setColumnName(COL_DEBUG, "Debug");
 
     hyp->start();
     setViewParams(hyp);
@@ -63,53 +74,62 @@ void addChandelierPipe(Hyperion *hyp)
         nleds,
         &hyp->hub,
         {
-            {.column = COL_CHANDELIER_1, .slot = 0, .pattern = new Patterns::StaticGradientPattern(&cchandelierMap3d)},
-            {.column = COL_CHANDELIER_1, .slot = 1, .pattern = new Patterns::BreathingGradientPattern(&cchandelierMap3d)},
-            {.column = COL_CHANDELIER_1, .slot = 2, .pattern = new Patterns::VerticallyIsolated(&chandelierMap3d)},
-            {.column = COL_CHANDELIER_1, .slot = 3, .pattern = new Patterns::GrowShrink(&chandelierMap3d)},
-            {.column = COL_CHANDELIER_1, .slot = 4, .pattern = new Patterns::Lighthouse(&cchandelierMap3d)},
-            {.column = COL_CHANDELIER_1, .slot = 5, .pattern = new Patterns::BarLFO()},
-            {.column = COL_CHANDELIER_1, .slot = 6, .pattern = new Patterns::RibbenClivePattern<NegativeCosFast>()},
-            {.column = COL_CHANDELIER_1, .slot = 7, .pattern = new Patterns::RibbenFlashPattern()},
+            {.column = COL_CHANDELIER_1, .paramsSlot=COL_CHANDELIER_1, .slot = 0, .pattern = new Patterns::StaticGradientPattern(&cchandelierMap3d)},
+            {.column = COL_CHANDELIER_1, .paramsSlot=COL_CHANDELIER_1, .slot = 1, .pattern = new Patterns::BreathingGradientPattern(&cchandelierMap3d)},
+            {.column = COL_CHANDELIER_1, .paramsSlot=COL_CHANDELIER_1, .slot = 2, .pattern = new Patterns::VerticallyIsolated(&chandelierMap3d)},
+            {.column = COL_CHANDELIER_1, .paramsSlot=COL_CHANDELIER_1, .slot = 3, .pattern = new Patterns::GrowShrink(&chandelierMap3d)},
+            {.column = COL_CHANDELIER_1, .paramsSlot=COL_CHANDELIER_1, .slot = 4, .pattern = new Patterns::Lighthouse(&cchandelierMap3d)},
+            {.column = COL_CHANDELIER_1, .paramsSlot=COL_CHANDELIER_1, .slot = 5, .pattern = new Patterns::BarLFO()},
+            {.column = COL_CHANDELIER_1, .paramsSlot=COL_CHANDELIER_1, .slot = 6, .pattern = new Patterns::RibbenClivePattern<NegativeCosFast>()},
+            {.column = COL_CHANDELIER_1, .paramsSlot=COL_CHANDELIER_1, .slot = 7, .pattern = new Patterns::RibbenFlashPattern()},
 
-            {.column = COL_CHANDELIER_2, .slot = 0, .pattern = new Patterns::GradientLFO()},
-            {.column = COL_CHANDELIER_2, .slot = 1, .pattern = new Patterns::FadeFromRandomChandelier()},
-            {.column = COL_CHANDELIER_2, .slot = 2, .pattern = new Patterns::RotatingRingsPattern(&chandelierMap3d)},
-            {.column = COL_CHANDELIER_2, .slot = 3, .pattern = new Patterns::OnBeatWindowChaseUpPattern(&chandelierMap3d)},
-            {.column = COL_CHANDELIER_2, .slot = 4, .pattern = new Patterns::HorizontalSin(&chandelierMap3d)},
-            {.column = COL_CHANDELIER_2, .slot = 5, .pattern = new Patterns::VerticalSin(&chandelierMap3d)},
-            {.column = COL_CHANDELIER_2, .slot = 6, .pattern = new Patterns::SinChase2Pattern()},
-            {.column = COL_CHANDELIER_2, .slot = 7, .pattern = new Patterns::FadeFromCenter()},
+            {.column = COL_CHANDELIER_2, .paramsSlot=COL_CHANDELIER_2, .slot = 0, .pattern = new Patterns::GradientLFO()},
+            {.column = COL_CHANDELIER_2, .paramsSlot=COL_CHANDELIER_2, .slot = 1, .pattern = new Patterns::FadeFromRandomChandelier()},
+            {.column = COL_CHANDELIER_2, .paramsSlot=COL_CHANDELIER_2, .slot = 2, .pattern = new Patterns::RotatingRingsPattern(&chandelierMap3d)},
+            {.column = COL_CHANDELIER_2, .paramsSlot=COL_CHANDELIER_2, .slot = 3, .pattern = new Patterns::OnBeatWindowChaseUpPattern(&chandelierMap3d)},
+            {.column = COL_CHANDELIER_2, .paramsSlot=COL_CHANDELIER_2, .slot = 4, .pattern = new Patterns::HorizontalSin(&chandelierMap3d)},
+            {.column = COL_CHANDELIER_2, .paramsSlot=COL_CHANDELIER_2, .slot = 5, .pattern = new Patterns::VerticalSin(&chandelierMap3d)},
+            {.column = COL_CHANDELIER_2, .paramsSlot=COL_CHANDELIER_2, .slot = 6, .pattern = new Patterns::SinChase2Pattern()},
+            {.column = COL_CHANDELIER_2, .paramsSlot=COL_CHANDELIER_2, .slot = 7, .pattern = new Patterns::FadeFromCenter()},
             // {.column = COL_CHANDELIER_2, .slot = 9, .pattern = new Patterns::SawChasePattern()},
             // {.column = COL_CHANDELIER_2, .slot = 10, .pattern = new Patterns::CeilingChase()},
             
-            {.column = COL_CHANDELIER_3, .slot = 0, .pattern = new Patterns::RadialGlitterFadePattern(&cchandelierMap3d)},
-            {.column = COL_CHANDELIER_3, .slot = 1, .pattern = new Patterns::SegmentChasePattern()},
-            {.column = COL_CHANDELIER_3, .slot = 2, .pattern = new Patterns::GlowPulsePattern()},
-            {.column = COL_CHANDELIER_3, .slot = 3, .pattern = new Patterns::GlitchPattern()},
-            {.column = COL_CHANDELIER_3, .slot = 4, .pattern = new Patterns::PixelGlitchPattern()},
-            {.column = COL_CHANDELIER_3, .slot = 5, .pattern = new Patterns::LineLaunch(&chandelierMap3d)},
-            {.column = COL_CHANDELIER_3, .slot = 6, .pattern = new Patterns::SegmentGlitchPattern()},
-            {.column = COL_CHANDELIER_3, .slot = 7, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_CHANDELIER_3, .paramsSlot=COL_CHANDELIER_3, .slot = 0, .pattern = new Patterns::RadialGlitterFadePattern(&cchandelierMap3d)},
+            {.column = COL_CHANDELIER_3, .paramsSlot=COL_CHANDELIER_3, .slot = 1, .pattern = new Patterns::SegmentChasePattern()},
+            {.column = COL_CHANDELIER_3, .paramsSlot=COL_CHANDELIER_3, .slot = 2, .pattern = new Patterns::GlowPulsePattern()},
+            {.column = COL_CHANDELIER_3, .paramsSlot=COL_CHANDELIER_3, .slot = 3, .pattern = new Patterns::GlitchPattern()},
+            {.column = COL_CHANDELIER_3, .paramsSlot=COL_CHANDELIER_3, .slot = 4, .pattern = new Patterns::PixelGlitchPattern()},
+            {.column = COL_CHANDELIER_3, .paramsSlot=COL_CHANDELIER_3, .slot = 5, .pattern = new Patterns::LineLaunch(&chandelierMap3d)},
+            {.column = COL_CHANDELIER_3, .paramsSlot=COL_CHANDELIER_3, .slot = 6, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_CHANDELIER_3, .paramsSlot=COL_CHANDELIER_3, .slot = 7, .pattern = new Patterns::FlashesPattern()},
             // {.column = COL_CHANDELIER_FG, .slot = 8, .pattern = new Patterns::StrobePattern()},
             // {.column = COL_CHANDELIER_FG, .slot = 8, .pattern = new Patterns::StrobeHighlightPattern()},
 
-            {.column = COL_CHANDELIER_MASK, .slot = 0, .pattern = new Patterns::GlowPulseMaskPattern()},
-            {.column = COL_CHANDELIER_MASK, .slot = 1, .pattern = new Patterns::SideWaveMask(nullptr)},
-            {.column = COL_CHANDELIER_MASK, .slot = 2, .pattern = new Patterns::SideWaveMask(zigzagIndices)}, 
-            {.column = COL_CHANDELIER_MASK, .slot = 3, .pattern = new Patterns::RotatingRingsMaskPattern(&chandelierMap3d)},
-            {.column = COL_CHANDELIER_MASK, .slot = 4, .pattern = new Patterns::SinChaseMaskPattern(zigzagIndices)},
-            {.column = COL_CHANDELIER_MASK, .slot = 5, .pattern = new Patterns::SinChaseMaskPattern(nullptr)},
+            {.column = COL_CHANDELIER_MASK, .paramsSlot=COL_CHANDELIER_MASK, .slot = 0, .pattern = new Patterns::GlowPulseMaskPattern()},
+            {.column = COL_CHANDELIER_MASK, .paramsSlot=COL_CHANDELIER_MASK, .slot = 1, .pattern = new Patterns::SideWaveMask(nullptr)},
+            {.column = COL_CHANDELIER_MASK, .paramsSlot=COL_CHANDELIER_MASK, .slot = 2, .pattern = new Patterns::SideWaveMask(zigzagIndices)}, 
+            {.column = COL_CHANDELIER_MASK, .paramsSlot=COL_CHANDELIER_MASK, .slot = 3, .pattern = new Patterns::RotatingRingsMaskPattern(&chandelierMap3d)},
+            {.column = COL_CHANDELIER_MASK, .paramsSlot=COL_CHANDELIER_MASK, .slot = 4, .pattern = new Patterns::SinChaseMaskPattern(zigzagIndices)},
+            {.column = COL_CHANDELIER_MASK, .paramsSlot=COL_CHANDELIER_MASK, .slot = 5, .pattern = new Patterns::SinChaseMaskPattern(nullptr)},
             // {.column = COL_CHANDELIER_MASK, .slot = 6, .pattern = new Patterns::GlowPulseMaskPattern()},
 
-            {.column = COL_CHANDELIER_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
-            {.column = COL_CHANDELIER_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
-            {.column = COL_CHANDELIER_FLASH, .slot = 2, .pattern = new Patterns::LineLaunch(&chandelierMap3d)},
-            {.column = COL_CHANDELIER_FLASH, .slot = 3, .pattern = new Patterns::FadingNoisePattern()},
-            {.column = COL_CHANDELIER_FLASH, .slot = 4, .pattern = new Patterns::SegmentGlitchPattern()},
-            {.column = COL_CHANDELIER_FLASH, .slot = 5, .pattern = new Patterns::FlashesPattern()},
-            {.column = COL_CHANDELIER_FLASH, .slot = 6, .pattern = new Patterns::StrobePattern()},
-            {.column = COL_CHANDELIER_FLASH, .slot = 7, .pattern = new Patterns::StrobeHighlightPattern()},
+            {.column = COL_CHANDELIER_STROBES, .paramsSlot=COL_CHANDELIER_STROBES, .slot = 0, .pattern = new Patterns::GlitchPattern()},
+            {.column = COL_CHANDELIER_STROBES, .paramsSlot=COL_CHANDELIER_STROBES, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
+            {.column = COL_CHANDELIER_STROBES, .paramsSlot=COL_CHANDELIER_STROBES, .slot = 2, .pattern = new Patterns::LineLaunch(&chandelierMap3d)},
+            {.column = COL_CHANDELIER_STROBES, .paramsSlot=COL_CHANDELIER_STROBES, .slot = 3, .pattern = new Patterns::FadingNoisePattern()},
+            {.column = COL_CHANDELIER_STROBES, .paramsSlot=COL_CHANDELIER_STROBES, .slot = 4, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_CHANDELIER_STROBES, .paramsSlot=COL_CHANDELIER_STROBES, .slot = 5, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_CHANDELIER_STROBES, .paramsSlot=COL_CHANDELIER_STROBES, .slot = 6, .pattern = new Patterns::StrobePattern()},
+            {.column = COL_CHANDELIER_STROBES, .paramsSlot=COL_CHANDELIER_STROBES, .slot = 7, .pattern = new Patterns::StrobeHighlightPattern()},
+
+            {.column = COL_CHANDELIER_FLASH, .paramsSlot=COL_CHANDELIER_FLASH, .slot = 0, .pattern = new Patterns::GlitchPattern()},
+            {.column = COL_CHANDELIER_FLASH, .paramsSlot=COL_CHANDELIER_FLASH, .slot = 1, .pattern = new Patterns::PixelGlitchPattern()},
+            {.column = COL_CHANDELIER_FLASH, .paramsSlot=COL_CHANDELIER_FLASH, .slot = 2, .pattern = new Patterns::LineLaunch(&chandelierMap3d)},
+            {.column = COL_CHANDELIER_FLASH, .paramsSlot=COL_CHANDELIER_FLASH, .slot = 3, .pattern = new Patterns::FadingNoisePattern()},
+            {.column = COL_CHANDELIER_FLASH, .paramsSlot=COL_CHANDELIER_FLASH, .slot = 4, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_CHANDELIER_FLASH, .paramsSlot=COL_CHANDELIER_FLASH, .slot = 5, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_CHANDELIER_FLASH, .paramsSlot=COL_CHANDELIER_FLASH, .slot = 6, .pattern = new Patterns::StrobePattern()},
+            {.column = COL_CHANDELIER_FLASH, .paramsSlot=COL_CHANDELIER_FLASH, .slot = 7, .pattern = new Patterns::StrobeHighlightPattern()},
             // {.column = COL_CHANDELIER_FLASH, .slot = 8, .pattern = new Patterns::RadialGlitterFadePattern(&cchandelierMap3d)},
 
             {.column = COL_DEBUG, .slot = 0, .pattern = new Patterns::ShowStarts(nleds/60/8)},
@@ -155,7 +175,7 @@ void addPaletteColumn(Hyperion *hyp)
     auto paletteColumn = new PaletteColumn(
         &hyp->hub,
         COL_PALETTE,
-        0,
+        {1,2,3,4,5,6,7},
         {
             &campfire,
             &pinkSunset,
