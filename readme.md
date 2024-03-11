@@ -18,6 +18,8 @@ You don't have to use them, but if you do, your pattern code will be clean and e
 
 ![](https://github.com/yorenschriever/Hyperion2/blob/main/docs/images/intallation-bosburcht.jpeg?raw=true)
 
+![](https://github.com/yorenschriever/Hyperion2/blob/main/docs/images/hyperhyper.png?raw=true)
+
 ## Target audience
 
 The target audience is people with a programming background, and ideally also one in electronics. 
