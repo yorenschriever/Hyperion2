@@ -342,7 +342,7 @@ void addLed1Column(Hyperion *hyp)
 
     for (int i = 0; i < splitInput->size() - 1; i++)
     {
-        auto pipe = new ConvertPipe<RGBA, BGR>(
+        auto pipe = new ConvertPipe<RGBA, GBR>(
             splitInput->getInput(i),
             // new NeopixelOutput(i+1),
             new UDPOutput("hyperslave1.local",9611 + i,60),
@@ -426,7 +426,7 @@ void addLed2Column(Hyperion *hyp)
 
     for (int i = 0; i < splitInput->size() - 1; i++)
     {
-        auto pipe = new ConvertPipe<RGBA, BGR>(
+        auto pipe = new ConvertPipe<RGBA, GBR>(
             splitInput->getInput(i),
             // new NeopixelOutput(i+1),
             new UDPOutput("hyperslave3.local",9611 + i,60),

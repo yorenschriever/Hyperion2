@@ -1,5 +1,5 @@
 
-rows = 16
+rows = 12
 cols = 6
 leds = 60
 
@@ -23,7 +23,7 @@ f.write("};")
 f.write("\n\n")
 
 f.write("PixelMap ledMap2 = {\n")
-write(8,16)
+write(8,12)
 f.write("};")
 
 f.close()
