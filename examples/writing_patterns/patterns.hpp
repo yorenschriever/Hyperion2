@@ -58,7 +58,7 @@ namespace ExamplePatterns
             for (int i = 0; i < width; i++)
             {
                 if (i < width / 3)
-                    pixels[i] = params->getPrimaryColour();
+                    pixels[i] = params->getPrimaryColour(); 
                 else if (i < 2 * width / 3)
                     pixels[i] = params->getSecondaryColour();
                 else
@@ -447,7 +447,7 @@ namespace ExamplePatterns
             // You can get their values from the params argument. By default they will be in the range 0-1,
             // but you can rescale it by providing a min and max argument.
 
-            lfo.setPeriod(params->getVelocity(5000, 500));
+            lfo.setPeriod(params->getVelocity(5000, 50));
             lfo.setDutyCycle(params->getSize(0.1, 0.9));
             int amount = params->getAmount(1, 4);
 

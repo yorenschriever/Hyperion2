@@ -17,6 +17,9 @@ public:
         int HEIGHT;
         int FADER0_CONTROLLER_NUMBER;
         int MASTER_DIM_FADER_CONTROLLER_NUMBER;
+        int VELOCITY_FADER_CONTROLLER_NUMBER;
+        //int AMOUNT_FADER_CONTROLLER_NUMBER;
+        int SIZE_FADER_CONTROLLER_NUMBER;
         int TAP_NOTE_NUMBER;
         int TAP_STOP_NOTE_NUMBER;
         int TAP_ALIGN_NOTE_NUMBER;
@@ -96,6 +99,22 @@ public:
             return;
         }
 
+        if (controller == make.VELOCITY_FADER_CONTROLLER_NUMBER)
+        {
+            hub->setVelocity(0, float(scale127to255(value))/255);
+            return;
+        }
+        // if (controller == make.AMOUNT_FADER_CONTROLLER_NUMBER)
+        // {
+        //     hub->setAmount(0, float(scale127to255(value))/255);
+        //     return;
+        // }
+        if (controller == make.SIZE_FADER_CONTROLLER_NUMBER)
+        {
+            hub->setSize(0, float(scale127to255(value))/255);
+            return;
+        }
+
         int column = controller - make.FADER0_CONTROLLER_NUMBER;
         if (column < 0 || column >= make.WIDTH)
             return;
@@ -152,6 +171,9 @@ ApcMiniController::Make ApcMiniController::MK1 = {
 
     .FADER0_CONTROLLER_NUMBER = 48,
     .MASTER_DIM_FADER_CONTROLLER_NUMBER = 56,
+    //.AMOUNT_FADER_CONTROLLER_NUMBER = 55,
+    .SIZE_FADER_CONTROLLER_NUMBER = 54,
+    .VELOCITY_FADER_CONTROLLER_NUMBER = 53,
 
     .TAP_NOTE_NUMBER = 98,
     .TAP_STOP_NOTE_NUMBER = 89,
@@ -169,6 +191,9 @@ ApcMiniController::Make ApcMiniController::MK2{
     .FADER0_CONTROLLER_NUMBER = 48,
     .MASTER_DIM_FADER_CONTROLLER_NUMBER = 56,
 
+    .SIZE_FADER_CONTROLLER_NUMBER = 55,
+    //.AMOUNT_FADER_CONTROLLER_NUMBER = 54,
+    .VELOCITY_FADER_CONTROLLER_NUMBER = 53,
     .TAP_NOTE_NUMBER = 0x76,
     .TAP_STOP_NOTE_NUMBER = 0x77,
     .TAP_ALIGN_NOTE_NUMBER = 0x7A,
