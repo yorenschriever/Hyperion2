@@ -5,7 +5,7 @@
 #include "core/hyperion.hpp"
 #include "distribution/inputs/patternInput.hpp"
 #include "mapping/crossMap.hpp"
-// #include "palettes.hpp"
+#include "palettes.hpp"
 #include "patterns.hpp"
 #include <vector>
 
