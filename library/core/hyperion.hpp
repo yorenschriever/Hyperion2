@@ -31,6 +31,7 @@
 #include "core/generation/pixelMapSplitter3d.hpp"
 #include "distribution/inputs/controlHubInput.hpp"
 #include "distribution/inputs/patternCycleInput.hpp"
+#include "core/distribution/inputs/switchableInput.hpp"
 #include "distribution/outputs/neopixelOutput.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
 #include "generation/controllers/websocketController.hpp"
