@@ -23,10 +23,10 @@
 #define COL_FAIRYLIGHT_PINSPOT 3
 #define COL_LASERS 4
 #define COL_BULBS 5
-#define COL_LEDSTER 6
-#define COL_STROBES 7
-#define COL_LED1 8
-#define COL_LED2 9
+#define COL_LEDSTER 8
+#define COL_STROBES 9
+#define COL_LED1 6
+#define COL_LED2 7
 
 void addColanderPipe(Hyperion *hyp);
 void addLaserPipe(Hyperion *hyp);
@@ -51,6 +51,9 @@ int main()
 
 //   hyp->setMidiControllerFactory(new DinMidiControllerFactory<ApcMiniController>());
 
+    hyp->hub.addParams(new Params("FF"));
+    hyp->hub.addParams(new Params("Laser"));
+
   addColanderPipe(hyp);
   addLaserPipe(hyp);
   addBulbPipe(hyp);
@@ -69,8 +72,8 @@ int main()
   hyp->hub.setColumnName(COL_BULBS, "Peertjes");
   hyp->hub.setColumnName(COL_LEDSTER, "Ledster");
   hyp->hub.setColumnName(COL_STROBES, "Strobes");
-  hyp->hub.setColumnName(COL_LED1, "LED 1");
-  hyp->hub.setColumnName(COL_LED2, "LED 2");
+  hyp->hub.setColumnName(COL_LED1, "Led plafond");
+  hyp->hub.setColumnName(COL_LED2, "FF");
 
 //   Tempo::AddSource(new ConstantTempo(120));
 
@@ -148,22 +151,22 @@ void addLaserPipe(Hyperion *hyp)
       12,
       &hyp->hub,
       {
-          {.column = COL_LASERS, .slot = 0, .pattern = new OnPattern(255)},
-          {.column = COL_LASERS, .slot = 1, .pattern = new LFOPattern<PWM>()},
-          {.column = COL_LASERS, .slot = 2, .pattern = new SinPattern()},
-          {.column = COL_LASERS, .slot = 3, .pattern = new BeatMultiFadePattern()},
-          {.column = COL_LASERS, .slot = 4, .pattern = new BeatShakePattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 0, .pattern = new OnPattern(255)},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 1, .pattern = new LFOPattern<PWM>()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 2, .pattern = new SinPattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 3, .pattern = new BeatMultiFadePattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 4, .pattern = new BeatShakePattern()},
 
-          {.column = COL_LASERS, .slot = 5, .pattern = new BlinderPattern()},
-          {.column = COL_LASERS, .slot = 6, .pattern = new FastStrobePattern()},
-          {.column = COL_LASERS, .slot = 7, .pattern = new SlowStrobePattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 5, .pattern = new BlinderPattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 6, .pattern = new FastStrobePattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 7, .pattern = new SlowStrobePattern()},
 
-          {.column = COL_LASERS, .slot = 8, .pattern = new GlowPattern()},
-          {.column = COL_LASERS, .slot = 9, .pattern = new BeatAllFadePattern()},
-          {.column = COL_LASERS, .slot = 10, .pattern = new BeatSingleFadePattern()},
-          {.column = COL_LASERS, .slot = 11, .pattern = new GlitchPattern()},
-          {.column = COL_LASERS, .slot = 12, .pattern = new BeatStepPattern()},
-          {.column = COL_LASERS, .slot = 13, .pattern = new FastStrobePattern2()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 8, .pattern = new GlowPattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 9, .pattern = new BeatAllFadePattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 10, .pattern = new BeatSingleFadePattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 11, .pattern = new GlitchPattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 12, .pattern = new BeatStepPattern()},
+          {.column = COL_LASERS, .paramsSlot=2, .slot = 13, .pattern = new FastStrobePattern2()},
       });
 
   auto pipe = new ConvertPipe<Monochrome, Monochrome12>(
@@ -367,30 +370,38 @@ void addLed2Column(Hyperion *hyp)
         nleds,
         &hyp->hub,
         {
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::CeilingChase()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::Fireworks()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::Chaser()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::SegmentChasePattern()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::Fireworks()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::Chaser()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::CeilingChase()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::GlowPulsePattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::GlitchPattern()},
 
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::GlitchPattern()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::FadingNoisePattern()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::StrobeHighlightPattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::FlashesPattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::PixelGlitchPattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::StrobeHighlightPattern()},
 
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::GlowPulsePattern()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::BarLFO()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::GradientLFO()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::FadeFromRandom()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::RibbenClivePattern<NegativeCosFast>()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::RibbenFlashPattern()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::PixelGlitchPattern()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::SegmentGlitchPattern()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::StrobePattern()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::SinChasePattern()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::SawChasePattern()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::FadeFromCenter()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::SideWave()},
-            {.column = COL_LED2, .slot = i++, .pattern = new Patterns::SinChase2Pattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::SinChase2Pattern()},
+           
+            
+            
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::SegmentChasePattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::FadingNoisePattern()},
+            
+
+            
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::BarLFO()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::GradientLFO()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::FadeFromRandom()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::RibbenClivePattern<NegativeCosFast>()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::RibbenFlashPattern()},
+           
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::SegmentGlitchPattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::StrobePattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::SinChasePattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::SawChasePattern()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::FadeFromCenter()},
+            {.column = COL_LED2, .paramsSlot=1, .slot = i++, .pattern = new Patterns::SideWave()},
+           
         });
 
 #if (ESP_PLATFORM)
@@ -510,7 +521,7 @@ void addPaletteColumn(Hyperion *hyp)
   auto paletteColumn = new PaletteColumn(
       &hyp->hub,
       0,
-      0,
+      {0,1},
       {
           &pinkSunset,
           &heatmap,

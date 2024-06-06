@@ -8,7 +8,7 @@
 #include "setViewParams.hpp"
 
 //2.7 gamma experimentally determined in dark environment
-LUT *ledbarLut = new ColourCorrectionLUT(2.7, 255, 255, 255, 255);
+LUT *ledbarLut = new ColourCorrectionLUT(1.8, 255, 255, 255, 255);
 
 auto cchandelierMap3d = chandelierMap3d.toCylindricalXZ();
 
