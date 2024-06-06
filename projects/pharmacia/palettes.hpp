@@ -1,7 +1,7 @@
 #pragma once
 #include "colours.h"
 #include "generation/controlHub/paletteColumn.hpp"
-#include "gradient.hpp"
+#include "generation/gradient.hpp"
 
 // https://webgradients.com/
 // https://color.adobe.com/create/color-wheel
