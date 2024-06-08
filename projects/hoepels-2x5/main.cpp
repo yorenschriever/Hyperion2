@@ -1,6 +1,7 @@
 #include "core/hyperion.hpp"
 #include "mapping/ledMap.hpp"
 #include "patterns.hpp"
+#include "masks.hpp"
 
 void addPaletteColumn(Hyperion *hyp);
 
@@ -56,12 +57,49 @@ int main()
     // auto inputAuto = new PatternCycleInput<Monochrome>(ledMap.size(), patterns,
     // 3 * 60 * 1000);
 
-    auto inputControlled = new ControlHubInput<RGBA>(ledMap.size(), &hyp->hub, 1, patterns);
+    // auto inputControlled = new ControlHubInput<RGBA>(ledMap.size(), &hyp->hub, 1, patterns);
+
+    auto input = new ControlHubInput<RGBA>(ledMap.size(), &hyp->hub, {
+        {.column = 1, .slot = 0, .pattern = new Hoepels::MonochromePattern()},
+        {.column = 1, .slot = 1, .pattern = new Hoepels::StereochromePattern()},
+        {.column = 1, .slot = 2, .pattern = new Hoepels::GradientPattern()},
+
+        {.column = 2, .slot = 0, .pattern = new Hoepels::HoepelsTransition()},
+        {.column = 2, .slot = 1, .pattern = new Hoepels::SinStripPattern()},
+        {.column = 2, .slot = 2, .pattern = new Hoepels::SinStripPattern2()},
+
+        {.column = 3, .slot = 0, .pattern = new Hoepels::OnbeatFadeAllPattern()},
+        {.column = 3, .slot = 1, .pattern = new Hoepels::OnbeatFadePattern()},
+        {.column = 3, .slot = 2, .pattern = new Hoepels::FireworkPattern()},
+
+        {.column = 4, .slot = 0, .pattern = new Hoepels::SinPattern()},
+        {.column = 4, .slot = 1, .pattern = new Hoepels::AntichasePattern()},
+        {.column = 4, .slot = 2, .pattern = new Hoepels::ChasePattern()},
+
+        {.column = 5, .slot = 0, .pattern = new Hoepels::ClivePattern<SinFast>(0, 500, 2000)},
+        {.column = 5, .slot = 1, .pattern = new Hoepels::ClivePattern<SinFast>(1, 10, 2000)},
+        {.column = 5, .slot = 2, .pattern = new Hoepels::GlowPulsePattern()},
+
+        {.column = 6, .slot = 0, .pattern = new Masks::SinChaseMaskPattern()},
+        {.column = 6, .slot = 1, .pattern = new Masks::GlowPulseMaskPattern()},
+
+        {.column = 7, .slot = 0, .pattern = new Hoepels::SlowStrobePattern()},
+        {.column = 7, .slot = 1, .pattern = new Hoepels::SquareGlitchPattern()},
+        {.column = 7, .slot = 2, .pattern = new Hoepels::ClivePattern<SawDown>(1, 25, 500, 1, 0.1)},
+
+    });
+
 
     // select first palette
     hyp->hub.buttonPressed(0, 0);
     hyp->hub.setColumnName(0, "Palette");
-    hyp->hub.setColumnName(1, "Patterns");
+    hyp->hub.setColumnName(1, "Static");
+    hyp->hub.setColumnName(2, "Sin");
+    hyp->hub.setColumnName(3, "Beat");
+    hyp->hub.setColumnName(4, "Chase");
+    hyp->hub.setColumnName(5, "Glow");
+    hyp->hub.setColumnName(6, "Mask");
+    hyp->hub.setColumnName(7, "Flash");
     hyp->hub.setFlashColumn(0, false, true);
     hyp->hub.setFlashColumn(1, false, true);
     hyp->hub.setForcedSelection(0);
@@ -74,7 +112,7 @@ int main()
     //         [](){return hyp->hub.findSlot(autoColumn,0)->activated;}
     //     );
 
-    auto input = inputControlled;
+    // auto input = inputControlled;
 
     const int sz = 100 * sizeof(RGBA);
     auto splitInput = new InputSlicer(

@@ -294,7 +294,7 @@ namespace Hoepels
         }
 
         const int numStrips = 10;
-        LFO<SinFast> lfo = LFO<SinFast>(5000);
+        LFO<Glow> lfo = LFO<Glow>(5000);
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
@@ -308,11 +308,15 @@ namespace Hoepels
             // lfo.setPeriod(params->getVelocity(10000, 500));
             RGBA col = params->getSecondaryColour() * transition.getValue();
 
+            lfo.setPeriod(params->getVelocity(10000,2000));
+            lfo.setDutyCycle(params->getSize());
+            int amount = params->getAmount(1,5);
+
             for (int hoepel = 0; hoepel < 10; hoepel++)
             {
                 for (int led = 0; led < 50; led++)
                 {
-                    pixels[hoepel * 50 + led] = col * lfo.getValue((float)led / 50 + (float)hoepel / 20);
+                    pixels[hoepel * 50 + led] = col * lfo.getValue(amount *(float)led / 50 + (float)hoepel / 20);
                 }
             }
         }
@@ -327,7 +331,7 @@ namespace Hoepels
         }
 
         const int numStrips = 10;
-        LFO<SinFast> lfo = LFO<SinFast>(5000);
+        LFO<Glow> lfo = LFO<Glow>(5000);
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
@@ -339,6 +343,8 @@ namespace Hoepels
                 return;
 
             lfo.setPeriod(params->getVelocity(10000, 500));
+            lfo.setDutyCycle(params->getSize());
+            int amount = params->getAmount(1,5);
 
             RGBA col = params->getSecondaryColour() * transition.getValue();
 
@@ -348,7 +354,7 @@ namespace Hoepels
                 // float frq = hoepel % 2 ==0 ? 1 : 2;
                 for (int led = 0; led < 50; led++)
                 {
-                    pixels[hoepel * 50 + led] = col * lfo.getValue(dir * (float)led / 50 + (float)hoepel / 20);
+                    pixels[hoepel * 50 + led] = col * lfo.getValue(amount * dir * (float)led / 50 + (float)hoepel / 20);
                 }
             }
         }
@@ -492,7 +498,7 @@ namespace Hoepels
         }
 
         const int numStrips = 10;
-        LFO<SawDown> lfo = LFO<SawDown>(5000);
+        LFO<SoftSawDown> lfo = LFO<SoftSawDown>(5000);
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
@@ -503,6 +509,10 @@ namespace Hoepels
                 return;
 
             lfo.setPeriod(params->getVelocity(5000, 500));
+            lfo.setDutyCycle(params->getSize());
+            int amount = params->getAmount(1,3);
+            lfo.setSoftEdgeWidth(amount * 1./50);
+            
             RGBA col = params->getPrimaryColour() * transition.getValue();
 
             for (int hoepel = 0; hoepel < 10; hoepel++)
@@ -510,7 +520,7 @@ namespace Hoepels
                 float dir = 1; // hoepel % 2 ==0 ? 1 : -1;
                 for (int led = 0; led < 50; led++)
                 {
-                    pixels[hoepel * 50 + led] = col * lfo.getValue(dir * (float)led / 50);
+                    pixels[hoepel * 50 + led] = col * lfo.getValue(amount * dir * (float)led / 50);
                 }
             }
         }
@@ -525,7 +535,7 @@ namespace Hoepels
         }
 
         const int numStrips = 10;
-        LFO<SawDown> lfo = LFO<SawDown>(5000);
+        LFO<SoftSawDown> lfo = LFO<SoftSawDown>(5000);
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
@@ -536,6 +546,9 @@ namespace Hoepels
                 return;
 
             lfo.setPeriod(params->getVelocity(5000, 500));
+            lfo.setDutyCycle(params->getSize());
+            int amount = params->getAmount(1,3);
+            lfo.setSoftEdgeWidth(amount * 1./50);
             RGBA col = params->getSecondaryColour() * transition.getValue();
 
             for (int hoepel = 0; hoepel < 10; hoepel++)
@@ -543,7 +556,7 @@ namespace Hoepels
                 float dir = hoepel % 2 == 0 ? 1 : -1;
                 for (int led = 0; led < 50; led++)
                 {
-                    pixels[hoepel * 50 + led] = col * lfo.getValue(dir * (float)led / 50);
+                    pixels[hoepel * 50 + led] = col * lfo.getValue(amount * dir * (float)led / 50);
                 }
             }
         }
@@ -648,6 +661,8 @@ namespace Hoepels
             if (tempo.Triggered())
                 fade.reset();
 
+            fade.setDuration(params->getVelocity(2000,200));
+
             RGBA col = params->getPrimaryColour() * fade.getValue() * transition.getValue();
             for (int i = 0; i < width; i++)
                 pixels[i] += col;
@@ -687,6 +702,7 @@ namespace Hoepels
 
             for (int i = 0; i < 5; i++)
             {
+                fade[i].setDuration(params->getVelocity(2000,200));
                 RGBA col = params->getSecondaryColour() * fade[i].getValue() * transition.getValue();
                 for (int j = 0; j < 100; j++)
                     pixels[i * 100 + j] += col;
