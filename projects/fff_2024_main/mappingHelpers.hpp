@@ -5,11 +5,11 @@
 
 //helper functions to map the bottom (z=-0.45) - top (z=0.45) to range 0-1
 float fromTop(float y){
-    return (y + 0.45)/0.9;
+    return (y + 0.1)/1.1;
 }
 
 float fromBottom(float y){
-    return (0.45 - y)/0.9;
+    return (0.1 - y)/1.1;
 }
 
 float around(float th){
