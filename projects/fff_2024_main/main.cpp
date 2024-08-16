@@ -46,7 +46,7 @@ int main()
     // hyp->setMidiControllerFactory(new MidiControllerFactoryFvf());
 
     hyp->start();
-    // setViewParams(hyp);
+    setViewParams(hyp);
     while (1)
         Thread::sleep(1000);
 }
@@ -63,7 +63,7 @@ void addTrianglesPipe(Hyperion *hyp)
             {.column = 1, .slot = 2, .pattern = new Max::RadialFadePattern(&cTriangleMap3d)},
             {.column = 1, .slot = 3, .pattern = new Max::RadialGlitterFadePattern(&cTriangleMap3d)},
             {.column = 1, .slot = 4, .pattern = new Max::AngularFadePattern(&cTriangleMap3d)},
-            {.column = 1, .slot = 5, .pattern = new Max::GrowingStrobePattern(&cTriangleMap3d)},
+            // {.column = 1, .slot = 5, .pattern = new Max::GrowingStrobePattern(&cTriangleMap3d)},
 
             {.column = 2, .slot = 0, .pattern = new Min::RibbenClivePattern<Glow>(10000, 1, 0.15)},
             {.column = 2, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
@@ -76,30 +76,28 @@ void addTrianglesPipe(Hyperion *hyp)
             {.column = 3, .slot = 0, .pattern = new Low::HorizontalSin(&cTriangleMap3d)},
             {.column = 3, .slot = 1, .pattern = new Low::VerticallyIsolated(&cTriangleMap3d)},
             {.column = 3, .slot = 2, .pattern = new Low::HorizontalSaw(&cTriangleMap3d)},
-            {.column = 3, .slot = 3, .pattern = new Low::StaticGradientPattern(&triangleMap3d)},
-            {.column = 3, .slot = 4, .pattern = new Low::OnBeatColumnChaseUpPattern(&triangleMap3d)},
+            {.column = 3, .slot = 3, .pattern = new Low::RadialSaw(&cTriangleMap3d)},
+            {.column = 3, .slot = 4, .pattern = new Low::StaticGradientPattern(&triangleMap3d)},
             {.column = 3, .slot = 5, .pattern = new Low::GrowShrink(&cTriangleMap3d)},
             {.column = 3, .slot = 6, .pattern = new Low::RotatingRingsPattern(&cTriangleMap3d)},
             {.column = 3, .slot = 7, .pattern = new Low::GlowPulsePattern(&triangleMap3d)},
 
-            {.column = 4, .slot = 0, .pattern = new Mid::HaloOnBeat(&cTriangleMap3d)},
-            {.column = 4, .slot = 1, .pattern = new Mid::Halo(&cTriangleMap3d)},
-            {.column = 4, .slot = 2, .pattern = new Mid::SnowflakePatternColumn(&cTriangleMap3d)},
-            {.column = 4, .slot = 3, .pattern = new Mid::TakkenChase(&cTriangleMap3d)},
-            {.column = 4, .slot = 5, .pattern = new Mid::Lighthouse(&cTriangleMap3d)},
-            {.column = 4, .slot = 6, .pattern = new Mid::FireworksPattern(&triangleMap3d)},
-            {.column = 4, .slot = 7, .pattern = new Mid::DoubleFlash(&cTriangleMap3d)},
+            {.column = 4, .slot = 0, .pattern = new Mid::SnowflakePatternColumn(&cTriangleMap3d)},
+            {.column = 4, .slot = 1, .pattern = new Mid::TopChase(&cTriangleMap3d)},
+            {.column = 4, .slot = 2, .pattern = new Mid::Lighthouse(&cTriangleMap3d)},
+            {.column = 4, .slot = 3, .pattern = new Mid::FireworksPattern(&triangleMap3d)},
 
             {.column = 5, .slot = 0, .pattern = new Hi::DotBeatPattern(&cTriangleMap3d)},
-            {.column = 5, .slot = 5, .pattern = new Hi::XY(&triangleMap3d)},
+            {.column = 5, .slot = 1, .pattern = new Hi::XY(&triangleMap3d)},
+            {.column = 5, .slot = 2, .pattern = new Hi::Z(&triangleMap3d)},
 
             {.column = 7, .slot = 0, .pattern = new Flash::FlashesPattern()},
             {.column = 7, .slot = 1, .pattern = new Flash::SquareGlitchPattern(&triangleMap3d)},
-            {.column = 7, .slot = 3, .pattern = new Flash::PixelGlitchPattern()},
-            {.column = 7, .slot = 4, .pattern = new Max::GrowingStrobePattern(&cTriangleMap3d)},
-            {.column = 7, .slot = 5, .pattern = new Flash::StrobeHighlightPattern()},
-            {.column = 7, .slot = 6, .pattern = new Flash::StrobePattern()},
-            {.column = 7, .slot = 7, .pattern = new Flash::FadingNoisePattern()},
+            {.column = 7, .slot = 2, .pattern = new Flash::PixelGlitchPattern()},
+            {.column = 7, .slot = 3, .pattern = new Max::GrowingStrobePattern(&cTriangleMap3d)},
+            {.column = 7, .slot = 4, .pattern = new Flash::StrobeHighlightPattern()},
+            {.column = 7, .slot = 5, .pattern = new Flash::StrobePattern()},
+            {.column = 7, .slot = 6, .pattern = new Flash::FadingNoisePattern()},
 
             {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
             {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},

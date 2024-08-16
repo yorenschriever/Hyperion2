@@ -34,9 +34,6 @@ namespace Hi
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                if (map->y(index) < 0.44)
-                    continue;
-
                 float x_norm = (map->x(index)+1)/2;
                 float z_norm = (map->z(index)+1)/2;
 
@@ -50,7 +47,45 @@ namespace Hi
         }
     };
 
-    
+
+class Z : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        PixelMap3d *map;
+        LFO<Sin> lfoX = LFO<Sin>(2000);
+        LFO<Sin> lfoZ = LFO<Sin>(2000);
+
+    public:
+        Z(PixelMap3d *map)
+        {
+            this->map = map;
+            this->name="Z";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+ 
+            auto col = params->getSecondaryColour() * transition.getValue();
+            float size = params->getSize(0.01,0.03);
+            lfoX.setPeriod(params->getVelocity(4*20000,2000));
+            lfoZ.setPeriod(params->getVelocity(4*14000,1400));
+
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
+            {
+                float y_norm = (map->y(index)+1)/2;
+
+                float dim = softEdge(abs(y_norm - lfoX.getValue()), size);
+
+                pixels[index] = col * dim;
+            }
+        }
+    };
+
+
     class DotBeatPattern : public Pattern<RGBA>
     {
         Transition transition = Transition(

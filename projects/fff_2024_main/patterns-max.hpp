@@ -231,7 +231,7 @@ namespace Max
     class GrowingStrobePattern : public Pattern<RGBA>
     {
         PixelMap3d::Cylindrical *map;
-        FadeDown fade = FadeDown(5000);
+        FadeDown fade = FadeDown(1000);
 
     public:
         GrowingStrobePattern(PixelMap3d::Cylindrical *map)

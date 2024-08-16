@@ -9,7 +9,7 @@ float fromTop(float y){
 }
 
 float fromBottom(float y){
-    return (0.1 - y)/1.1;
+    return 1.0 - fromTop(y);
 }
 
 float around(float th){

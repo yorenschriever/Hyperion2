@@ -152,13 +152,44 @@ namespace Low
 
             lfo.setPeriod(params->getVelocity(5000,500));
             lfo.setDutyCycle(params->getSize(0.06,1));
-            bool orientationHorizontal = params->getVariant() > 0.5;
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 RGBA color = params->getPrimaryColour(); 
-                float lfoArg = orientationHorizontal ? around(map->th(index)) : fromTop(map->z(index));
-                pixels[index] = color * lfo.getValue(lfoArg) * fromBottom(map->z(index)) * transition.getValue();
+                float lfoArg = fromTop(map->z(index));
+                pixels[index] = color * lfo.getValue(lfoArg) * transition.getValue();
+            }
+        }
+    };
+
+    class RadialSaw : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        LFO<SawDown> lfo;
+        PixelMap3d::Cylindrical *map;
+
+    public:
+        RadialSaw(PixelMap3d::Cylindrical *map)
+        {
+            this->map = map;
+            this->name = "Radial saw";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params* params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            lfo.setPeriod(params->getVelocity(5000,500));
+            lfo.setDutyCycle(params->getSize(0.06,1));
+
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
+            {
+                RGBA color = params->getPrimaryColour(); 
+                float lfoArg = around(map->th(index));
+                pixels[index] = color * lfo.getValue(lfoArg) * transition.getValue();
             }
         }
     };
@@ -261,10 +292,6 @@ namespace Low
 
             for (int index = 0; index < width; index++)
             {
-                int angle = around(map->th(index)) * 3600;
-                if ((angle+300) % 600 > 0)
-                    continue;
-
                 int z255 = fromBottom(map->z(index)) * 255;
                 pixels[index] = params->getGradient(z255)* transition.getValue(z255,255);
             }

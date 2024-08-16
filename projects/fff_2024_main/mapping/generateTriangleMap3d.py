@@ -17,7 +17,7 @@ def drawLedLine():
 
 def drawTriangle(pitch, yaw):
     turtle.setPosition(0,0,0)
-    turtle.setRotation(yaw, pitch, 0)
+    turtle.setRotation(yaw + 90, pitch, 0)
     turtle.move(domeRadius, False)
 
     # correct center point

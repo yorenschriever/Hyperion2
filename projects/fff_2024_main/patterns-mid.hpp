@@ -178,7 +178,7 @@ namespace Mid
         }
     };
 
-    class TakkenChase : public Pattern<RGBA>
+    class TopChase : public Pattern<RGBA>
     {
         Transition transition = Transition(
             200, Transition::none, 0,
@@ -187,10 +187,10 @@ namespace Mid
         PixelMap3d::Cylindrical *map;
 
     public:
-        TakkenChase(PixelMap3d::Cylindrical *map)
+        TopChase(PixelMap3d::Cylindrical *map)
         {
             this->map = map;
-            this->name = "Takken chase";
+            this->name = "Top chase";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -204,14 +204,9 @@ namespace Mid
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                // skip the vertical beams. this pattern uses only the horizontal and angled ones
-                int angle = around(map->th(index)) * 3600;
-                if ((angle + 300) % 600 == 0)
-                    continue;
-
                 float lfoVal = lfo.getValue(-amount * around(map->th(index)));
                 RGBA color = params->getGradient(lfoVal * 255);
-                pixels[index] = color * lfoVal * fromMid(map->operator[](index)) * transition.getValue();
+                pixels[index] = color * lfoVal * fromTop(map->operator[](index).z) * transition.getValue();
             }
         }
     };
@@ -354,7 +349,7 @@ namespace Mid
             for (int i = 0; i < 6; i++)
                 fade[i].duration = params->getSize(100, 500);
 
-            float size = params->getSize(0.1,0.5);
+            float size = params->getSize(0.5,1.5);
 
             for (int i = 0; i < width; i++)
             {
