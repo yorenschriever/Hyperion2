@@ -1,5 +1,6 @@
 from turtle3d import *
 from math import sqrt
+import os
 
 turtle = Turtle3d()
 
@@ -62,7 +63,8 @@ triangles = [
 for triangle in triangles:
     drawTriangle(triangle[0],triangle[1])
 
-f = open("triangleMap3d.hpp", "w")
+dir = os.path.dirname(os.path.realpath(__file__))
+f = open(os.path.join(dir,"triangleMap3d.hpp"), "w")
 f.write("PixelMap3d triangleMap3d = {\n")
 for point in turtle.trail:
     f.write("    {.x = " + str(point['x'] * scale) + ", .y = " + str(point['z'] * scale) + ", .z = " + str(point['y'] * scale) + "},\n")

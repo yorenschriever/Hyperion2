@@ -1,11 +1,13 @@
 #include "core/hyperion.hpp"
 #include "mapping/triangleMap3d.hpp"
+#include "mapping/singleTriangleMap.hpp"
 #include "patterns-flash.hpp"
 #include "patterns-hi.hpp"
 #include "patterns-low.hpp"
 #include "patterns-max.hpp"
 #include "patterns-mid.hpp"
 #include "patterns-min.hpp"
+#include "patterns-mask.hpp"
 #include "patterns-flash.hpp"
 #include "patterns-test.hpp"
 #include "setViewParams.hpp"
@@ -91,6 +93,13 @@ void addTrianglesPipe(Hyperion *hyp)
             {.column = 5, .slot = 1, .pattern = new Hi::XY(&triangleMap3d)},
             {.column = 5, .slot = 2, .pattern = new Hi::Z(&triangleMap3d)},
 
+            {.column = 6, .slot = 0, .pattern = new Mask::SinChaseMaskPattern()},
+            {.column = 6, .slot = 1, .pattern = new Mask::GlowPulseMaskPattern()},
+            {.column = 6, .slot = 2, .pattern = new Mask::XY(&triangleMap3d)},
+            {.column = 6, .slot = 3, .pattern = new Mask::HorizontalSaw(&cTriangleMap3d)},
+            {.column = 6, .slot = 4, .pattern = new Mask::RadialSaw(&cTriangleMap3d)},
+            {.column = 6, .slot = 5, .pattern = new Mask::FireworksPattern(&triangleMap3d)},
+
             {.column = 7, .slot = 0, .pattern = new Flash::FlashesPattern()},
             {.column = 7, .slot = 1, .pattern = new Flash::SquareGlitchPattern(&triangleMap3d)},
             {.column = 7, .slot = 2, .pattern = new Flash::PixelGlitchPattern()},
@@ -157,15 +166,15 @@ void addTrianglesPipe(Hyperion *hyp)
     //     hyp->addPipe(pipe);
     // }
 
-    // hyp->addPipe(
-    //     new ConvertPipe<RGBA, RGB>(
-    //         splitInput->getInput(12),
-    //         new MonitorOutput3d(&hyp->webServer,&columnMap3d)));
-
     hyp->addPipe(
         new ConvertPipe<RGBA, RGB>(
             trianglesInput,
             new MonitorOutput3d(&hyp->webServer,&triangleMap3d)));
+
+    // hyp->addPipe(
+    //     new ConvertPipe<RGBA, RGB>(
+    //         trianglesInput,
+    //         new MonitorOutput(&hyp->webServer,&singleTriangleMap)));
 }
 
 void addPaletteColumn(Hyperion *hyp)
