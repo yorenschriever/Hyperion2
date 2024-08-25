@@ -1,14 +1,14 @@
 #include "core/hyperion.hpp"
-#include "mapping/triangleMap3d.hpp"
+#include "mapping/DMXMap3d.hpp"
 #include "mapping/singleTriangleMap.hpp"
+#include "mapping/triangleMap3d.hpp"
 #include "patterns-flash.hpp"
 #include "patterns-hi.hpp"
 #include "patterns-low.hpp"
+#include "patterns-mask.hpp"
 #include "patterns-max.hpp"
 #include "patterns-mid.hpp"
 #include "patterns-min.hpp"
-#include "patterns-mask.hpp"
-#include "patterns-flash.hpp"
 #include "patterns-test.hpp"
 #include "setViewParams.hpp"
 
@@ -18,6 +18,13 @@ LUT *trianglesLut = new ColourCorrectionLUT(1.8, 255, 200, 200, 200);
 
 void addPaletteColumn(Hyperion *hyp);
 void addTrianglesPipe(Hyperion *hyp);
+void addLedparPipe(Hyperion *hyp);
+void addBlinderPipe(Hyperion *hyp);
+void addEyesPipe(Hyperion *hyp);
+
+const int LEDPAR_COLUMN = 9;
+const int BLINDER_COLUMN = 10;
+const int EYES_COLUMN = 11;
 
 int main()
 {
@@ -25,6 +32,9 @@ int main()
 
     addPaletteColumn(hyp);
     addTrianglesPipe(hyp);
+    addLedparPipe(hyp);
+    addBlinderPipe(hyp);
+    addEyesPipe(hyp);
 
     Tempo::AddSource(new ConstantTempo(120));
 
@@ -39,6 +49,9 @@ int main()
     hyp->hub.setColumnName(5, "Hi");
     hyp->hub.setColumnName(6, "Halo");
     hyp->hub.setColumnName(7, "Flash");
+    hyp->hub.setColumnName(LEDPAR_COLUMN, "Led par");
+    hyp->hub.setColumnName(BLINDER_COLUMN, "Blinder");
+    hyp->hub.setColumnName(EYES_COLUMN, "Eyes");
     hyp->hub.setColumnName(8, "Debug");
 
     hyp->hub.setFlashColumn(7);
@@ -48,11 +61,11 @@ int main()
     // hyp->setMidiControllerFactory(new MidiControllerFactoryFvf());
 
     hyp->start();
-    setViewParams(hyp);
+    setViewParams(hyp, &viewParamsFront);
+    // setViewParams(hyp, viewParamsTop);
     while (1)
         Thread::sleep(1000);
 }
-
 
 void addTrianglesPipe(Hyperion *hyp)
 {
@@ -169,12 +182,81 @@ void addTrianglesPipe(Hyperion *hyp)
     hyp->addPipe(
         new ConvertPipe<RGBA, RGB>(
             trianglesInput,
-            new MonitorOutput3d(&hyp->webServer,&triangleMap3d)));
+            new MonitorOutput3d(&hyp->webServer, &triangleMap3d)));
 
     // hyp->addPipe(
     //     new ConvertPipe<RGBA, RGB>(
     //         trianglesInput,
     //         new MonitorOutput(&hyp->webServer,&singleTriangleMap)));
+}
+
+void addLedparPipe(Hyperion *hyp)
+{
+    auto ledparInput = new ControlHubInput<RGBA>(
+        ledparMap3d.size(),
+        &hyp->hub,
+        {
+            {.column = LEDPAR_COLUMN, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            {.column = LEDPAR_COLUMN, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = LEDPAR_COLUMN, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = LEDPAR_COLUMN, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = LEDPAR_COLUMN, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = LEDPAR_COLUMN, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = LEDPAR_COLUMN, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+            {.column = LEDPAR_COLUMN, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            {.column = LEDPAR_COLUMN, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+        });
+
+    hyp->addPipe(
+        new ConvertPipe<RGBA, RGB>(
+            ledparInput,
+            new MonitorOutput3d(&hyp->webServer, &ledparMap3d, 60, 0.05)));
+}
+
+void addBlinderPipe(Hyperion *hyp)
+{
+    auto blinderInput = new ControlHubInput<RGBA>(
+        blinderMap3d.size(),
+        &hyp->hub,
+        {
+            {.column = BLINDER_COLUMN, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            {.column = BLINDER_COLUMN, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = BLINDER_COLUMN, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = BLINDER_COLUMN, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = BLINDER_COLUMN, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = BLINDER_COLUMN, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = BLINDER_COLUMN, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+            {.column = BLINDER_COLUMN, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            {.column = BLINDER_COLUMN, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+        });
+
+    hyp->addPipe(
+        new ConvertPipe<RGBA, RGB>(
+            blinderInput,
+            new MonitorOutput3d(&hyp->webServer, &blinderMap3d, 60, 0.05)));
+}
+
+void addEyesPipe(Hyperion *hyp)
+{
+    auto eyesInput = new ControlHubInput<RGBA>(
+        eyesMap3d.size(),
+        &hyp->hub,
+        {
+            {.column = EYES_COLUMN, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            {.column = EYES_COLUMN, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = EYES_COLUMN, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = EYES_COLUMN, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = EYES_COLUMN, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = EYES_COLUMN, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = EYES_COLUMN, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+            {.column = EYES_COLUMN, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            {.column = EYES_COLUMN, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+        });
+
+    hyp->addPipe(
+        new ConvertPipe<RGBA, RGB>(
+            eyesInput,
+            new MonitorOutput3d(&hyp->webServer, &eyesMap3d, 60, 0.05)));
 }
 
 void addPaletteColumn(Hyperion *hyp)
@@ -213,4 +295,3 @@ void addPaletteColumn(Hyperion *hyp)
         });
     hyp->hub.subscribe(paletteColumn);
 }
-

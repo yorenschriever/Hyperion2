@@ -3,8 +3,24 @@
 #include "webServer.hpp"
 #include "webServerResponseBuilder.hpp"
 
+class ViewParams : public WebServerResponseBuilder
+{
+    std::string viewParams;
+
+public:
+    ViewParams(std::string viewParams)
+    {
+        this->viewParams = viewParams;
+    }
+
+    void build(Writer write, void *userData) override
+    {
+        write(this->viewParams.c_str(), viewParams.length(), userData);
+    }
+};
+
 // top view
-const char viewParams[] = "\n\
+ViewParams viewParamsTop = ViewParams("\n\
 export const viewParams = {\n\
     clearColor: [0.1, 0.1, 0.1, 1.0],\n\
     fieldOfView: (80 * Math.PI) / 180,\n\
@@ -28,74 +44,36 @@ export const viewParams = {\n\
             vector: [0,1,0]\n\
         }\n\
     ]\n\
-};\n";
+};\n");
 
 // Front view
-// const char viewParams[] = "\n\
-// export const viewParams = {\n\
-//     clearColor: [0.1, 0.1, 0.1, 1.0],\n\
-//     fieldOfView: (80 * Math.PI) / 180,\n\
-//     gridZ: -0.35,\n\
-//     transform: [\n\
-//         {\n\
-//             //move 2 units back\n\
-//             type:'translate',\n\
-//             amount: [0,0.2,-1.5]\n\
-//         },\n\
-//         {\n\
-//             // look slightly from below\n\
-//             type:'rotate',\n\
-//             amount: (_t)=>-0.0,\n\
-//             vector:[1,0,0]\n\
-//         },\n\
-//         {\n\
-//             //rotate the scene\n\
-//             type:'rotate',\n\
-//             amount: (t)=>0,\n\
-//             vector: [0,1,0]\n\
-//         }\n\
-//     ]\n\
-// };\n";
+ViewParams viewParamsFront = ViewParams("\n\
+export const viewParams = {\n\
+    clearColor: [0.1, 0.1, 0.1, 1.0],\n\
+    fieldOfView: (80 * Math.PI) / 180,\n\
+    gridZ: -0.35,\n\
+    transform: [\n\
+        {\n\
+            //move back\n\
+            type:'translate',\n\
+            amount: [0,-0.1,-1.9]\n\
+        },\n\
+        {\n\
+            // look slightly from above\n\
+            type:'rotate',\n\
+            amount: (_t)=>0.2,\n\
+            vector:[1,0,0]\n\
+        },\n\
+        {\n\
+            //rotate the scene\n\
+            type:'rotate',\n\
+            amount: (t)=>0,\n\
+            vector: [0,1,0]\n\
+        }\n\
+    ]\n\
+};\n");
 
-//Best for chandelier solo view
-// const char viewParams[] = "\n\
-// export const viewParams = {\n\
-//     clearColor: [0.1, 0.1, 0.1, 1.0],\n\
-//     fieldOfView: (40 * Math.PI) / 180,\n\
-//     gridZ: -0.35,\n\
-//     transform: [\n\
-//         {\n\
-//             //move 2 units back\n\
-//             type:'translate',\n\
-//             amount: [0,0.0,-4.0]\n\
-//         },\n\
-//         {\n\
-//             // look slightly from below\n\
-//             type:'rotate',\n\
-//             amount: (_t)=>0.0,\n\
-//             vector:[1,0,0]\n\
-//         },\n\
-//         {\n\
-//             //rotate the scene\n\
-//             type:'rotate',\n\
-//             amount: (t)=>0,\n\
-//             vector: [0,1,0]\n\
-//         }\n\
-//     ]\n\
-// };\n";
-
-class ViewParams: public WebServerResponseBuilder
+void setViewParams(Hyperion *hyp, ViewParams *vp)
 {
-    public:
-    void build(Writer write, void* userData) override
-    {
-        write(viewParams,sizeof(viewParams)-1, userData);
-    }
-};
-
-auto vp = new ViewParams();
-
-void setViewParams(Hyperion *hyp)
-{
-    hyp->webServer->addPath("/monitor/view-params.js",vp);
+    hyp->webServer->addPath("/monitor/view-params.js", vp);
 }
