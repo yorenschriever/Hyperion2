@@ -11,6 +11,8 @@
 #include "patterns-min.hpp"
 #include "patterns-test.hpp"
 #include "setViewParams.hpp"
+#include "video.hpp"
+#include "videoPattern.hpp"
 
 auto cTriangleMap3d = triangleMap3d.toCylindricalXZ();
 
@@ -25,6 +27,7 @@ void addEyesPipe(Hyperion *hyp);
 const int LEDPAR_COLUMN = 9;
 const int BLINDER_COLUMN = 10;
 const int EYES_COLUMN = 11;
+const int VIDEO_COLUMN = 12;
 
 int main()
 {
@@ -52,6 +55,7 @@ int main()
     hyp->hub.setColumnName(LEDPAR_COLUMN, "Led par");
     hyp->hub.setColumnName(BLINDER_COLUMN, "Blinder");
     hyp->hub.setColumnName(EYES_COLUMN, "Eyes");
+    hyp->hub.setColumnName(VIDEO_COLUMN, "Video");
     hyp->hub.setColumnName(8, "Debug");
 
     hyp->hub.setFlashColumn(7);
@@ -130,6 +134,12 @@ void addTrianglesPipe(Hyperion *hyp)
             {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
             {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
             {.column = 8, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+
+            {.column = VIDEO_COLUMN, .slot = 0, .pattern = new VideoPalettePattern("video/processed/DriehoekLos_Cirkels_01.bin","DriehoekLos_Cirkels"),},
+            {.column = VIDEO_COLUMN, .slot = 1, .pattern = new VideoPalettePattern("video/processed/DriehoekLos_Wipe_01.bin","DriehoekLos_Wipe_01"),},
+            {.column = VIDEO_COLUMN, .slot = 2, .pattern = new BgPattern(),},
+            {.column = VIDEO_COLUMN, .slot = 3, .pattern = new VideoPattern("videos/processed/Kapel_Cirkels_1.bin","Cirkels"),},
+            
         });
 
     // // Create 1 inout and split it up in 12,

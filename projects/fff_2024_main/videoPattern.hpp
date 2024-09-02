@@ -9,7 +9,6 @@
 #include <iostream>
 #include <math.h>
 #include <vector>
-
 class BgPattern : public Pattern<RGBA>
 {
 
@@ -131,7 +130,10 @@ public:
         if (frame >= video.frames)
             frame = 0;
 
-        for (int i = 0; i < width; i++)
+        if (width != video.pixels)
+            Log::error("VIDEO", "Incorrect number of pixels in video: video file contains %d. Expected: %d", video.pixels, width);
+
+        for (int i = 0; i < std::min(width, video.pixels); i++)
         {
             int animationIndex = (frame * video.pixels + i) * video.depth;
 

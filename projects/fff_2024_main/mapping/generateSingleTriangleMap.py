@@ -1,6 +1,7 @@
 from turtle import *
 from math import sqrt, cos, asin
 import os
+import json
 
 turtle = Turtle()
 
@@ -40,6 +41,10 @@ for point in turtle.trail:
     f.write("    {.x = " + str(point['x']) + ", .y = " + str(point['y']) + "},\n")
 f.write("};\n\n")
 f.close()
+
+points = list(map(lambda p: {'x': p['x'] ,'y': p['y'] }, turtle.trail))
+with open("singleTriangleMap.json", "w") as outfile:
+    json.dump(points, outfile)
 
 #export to image for video mask
 

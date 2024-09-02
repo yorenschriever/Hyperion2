@@ -17,6 +17,8 @@ videoName = videoName.replace(" ","_")
 
 dir = os.path.dirname(__file__)
 
+mapPath = sys.argv[2]
+
 print ("Reading files:", videoPath, videoPathAlpha)
 
 # read video file
@@ -31,7 +33,7 @@ height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
 channels = 4
     
 # read pixel map and convert coordinates
-with open(dir+"/../mapping/map.json", "r") as infile:
+with open(dir+mapPath, "r") as infile:
     pointsJson = json.load(infile)
 
 def convertCoordinates(c):
