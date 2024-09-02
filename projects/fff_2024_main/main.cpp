@@ -138,7 +138,7 @@ void addTrianglesPipe(Hyperion *hyp)
             {.column = VIDEO_COLUMN, .slot = 0, .pattern = new VideoPalettePattern("video/processed/DriehoekLos_Cirkels_01.bin","DriehoekLos_Cirkels"),},
             {.column = VIDEO_COLUMN, .slot = 1, .pattern = new VideoPalettePattern("video/processed/DriehoekLos_Wipe_01.bin","DriehoekLos_Wipe_01"),},
             {.column = VIDEO_COLUMN, .slot = 2, .pattern = new BgPattern(),},
-            {.column = VIDEO_COLUMN, .slot = 3, .pattern = new VideoPattern("videos/processed/Kapel_Cirkels_1.bin","Cirkels"),},
+            {.column = VIDEO_COLUMN, .slot = 3, .pattern = new VideoPattern("video/processed/Mask_Noise_01.bin","Mask_Noise_01"),},
             
         });
 

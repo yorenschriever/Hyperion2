@@ -7,7 +7,7 @@ import sys
 import os
 import struct
 
-if (len(sys.argv)!=3):
+if (len(sys.argv)!=4):
     raise Exception('call convert_with_alpha.sh to start conversion. eg ./convert_with_alpha.sh myVideo.mp4')
 videoPathAlpha = sys.argv[2]
 videoPath = sys.argv[1]
@@ -17,7 +17,7 @@ videoName = videoName.replace(" ","_")
 
 dir = os.path.dirname(__file__)
 
-mapPath = sys.argv[2]
+mapPath = sys.argv[3]
 
 print ("Reading files:", videoPath, videoPathAlpha)
 
