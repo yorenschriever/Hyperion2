@@ -116,10 +116,10 @@ private:
                 case UART_BREAK:
                     // break detected
                     // clear queue und flush received bytes
+                    instance->copy_fully_filled_buffer_to_rx_buffer();
                     uart_flush_input(instance->dmx_uart_num);
                     xQueueReset(instance->dmx_rx_queue);
                     instance->dmx_state = DMX_BREAK;
-                    instance->copy_fully_filled_buffer_to_rx_buffer();
                     break;
                 case UART_FRAME_ERR:
                 case UART_PARITY_ERR:

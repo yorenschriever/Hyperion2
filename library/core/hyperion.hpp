@@ -3,6 +3,8 @@
 #include "core/distribution/inputs/inputSlicer.hpp"
 #include "core/distribution/inputs/inputSplitter.hpp"
 #include "core/distribution/inputs/udpInput.hpp"
+#include "core/distribution/inputs/dmxInput.hpp"
+#include "core/distribution/inputs/patternInput.hpp"
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 #include "core/distribution/luts/gammaLut.hpp"
 #include "core/distribution/luts/incandescentLut.hpp"
