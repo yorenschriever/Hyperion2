@@ -1,5 +1,6 @@
 #include "core/hyperion.hpp"
 #include "mapping/DMXMap3d.hpp"
+#include "mapping/ophanimMap.hpp"
 #include "mapping/singleTriangleMap.hpp"
 #include "mapping/triangleMap3d.hpp"
 #include "patterns-flash.hpp"
@@ -9,6 +10,7 @@
 #include "patterns-max.hpp"
 #include "patterns-mid.hpp"
 #include "patterns-min.hpp"
+#include "patterns-ophanim.hpp"
 #include "patterns-test.hpp"
 #include "setViewParams.hpp"
 #include "video.hpp"
@@ -23,11 +25,13 @@ void addTrianglesPipe(Hyperion *hyp);
 void addLedparPipe(Hyperion *hyp);
 void addBlinderPipe(Hyperion *hyp);
 void addEyesPipe(Hyperion *hyp);
+void addOphanimPipe(Hyperion *hyp);
 
 const int LEDPAR_COLUMN = 9;
 const int BLINDER_COLUMN = 10;
 const int EYES_COLUMN = 11;
 const int VIDEO_COLUMN = 12;
+const int OPHANIM_COLUMN = 13;
 
 int main()
 {
@@ -38,6 +42,7 @@ int main()
     addLedparPipe(hyp);
     addBlinderPipe(hyp);
     addEyesPipe(hyp);
+    addOphanimPipe(hyp);
 
     Tempo::AddSource(new ConstantTempo(120));
 
@@ -56,6 +61,7 @@ int main()
     hyp->hub.setColumnName(BLINDER_COLUMN, "Blinder");
     hyp->hub.setColumnName(EYES_COLUMN, "Eyes");
     hyp->hub.setColumnName(VIDEO_COLUMN, "Video");
+    hyp->hub.setColumnName(OPHANIM_COLUMN, "Ophanim");
     hyp->hub.setColumnName(8, "Debug");
 
     hyp->hub.setFlashColumn(7);
@@ -135,11 +141,27 @@ void addTrianglesPipe(Hyperion *hyp)
             {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
             {.column = 8, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
 
-            {.column = VIDEO_COLUMN, .slot = 0, .pattern = new VideoPalettePattern("video/processed/DriehoekLos_Cirkels_01.bin","DriehoekLos_Cirkels"),},
-            {.column = VIDEO_COLUMN, .slot = 1, .pattern = new VideoPalettePattern("video/processed/DriehoekLos_Wipe_01.bin","DriehoekLos_Wipe_01"),},
-            {.column = VIDEO_COLUMN, .slot = 2, .pattern = new BgPattern(),},
-            {.column = VIDEO_COLUMN, .slot = 3, .pattern = new VideoPattern("video/processed/Mask_Noise_01.bin","Mask_Noise_01"),},
-            
+            {
+                .column = VIDEO_COLUMN,
+                .slot = 0,
+                .pattern = new VideoPalettePattern("video/processed/DriehoekLos_Cirkels_01.bin", "DriehoekLos_Cirkels"),
+            },
+            {
+                .column = VIDEO_COLUMN,
+                .slot = 1,
+                .pattern = new VideoPalettePattern("video/processed/DriehoekLos_Wipe_01.bin", "DriehoekLos_Wipe_01"),
+            },
+            {
+                .column = VIDEO_COLUMN,
+                .slot = 2,
+                .pattern = new BgPattern(),
+            },
+            {
+                .column = VIDEO_COLUMN,
+                .slot = 3,
+                .pattern = new VideoPattern("video/processed/Mask_Noise_01.bin", "Mask_Noise_01"),
+            },
+
         });
 
     // // Create 1 inout and split it up in 12,
@@ -267,6 +289,80 @@ void addEyesPipe(Hyperion *hyp)
         new ConvertPipe<RGBA, RGB>(
             eyesInput,
             new MonitorOutput3d(&hyp->webServer, &eyesMap3d, 60, 0.05)));
+}
+
+void addOphanimPipe(Hyperion *hyp)
+{
+    auto ring1Input = new ControlHubInput<RGBA>(
+        ring1Map.size(),
+        &hyp->hub,
+        {
+        {.column = OPHANIM_COLUMN, .slot = 0, .pattern = new Ophanim::MonochromePattern()},
+        {.column = OPHANIM_COLUMN, .slot = 1, .pattern = new Ophanim::StereochromePattern()},
+        {.column = OPHANIM_COLUMN, .slot = 2, .pattern = new Ophanim::GradientPattern()},
+        {.column = OPHANIM_COLUMN, .slot = 3, .pattern = new Ophanim::HoepelsTransition()},
+        {.column = OPHANIM_COLUMN, .slot = 4, .pattern = new Ophanim::SinStripPattern()},
+        {.column = OPHANIM_COLUMN, .slot = 5, .pattern = new Ophanim::SinStripPattern2()},
+        {.column = OPHANIM_COLUMN, .slot = 6, .pattern = new Ophanim::OnbeatFadeAllPattern()},
+        {.column = OPHANIM_COLUMN, .slot = 7, .pattern = new Ophanim::OnbeatFadePattern()},
+        {.column = OPHANIM_COLUMN, .slot = 8, .pattern = new Ophanim::FireworkPattern()},
+        {.column = OPHANIM_COLUMN, .slot = 9, .pattern = new Ophanim::SinPattern()},
+        {.column = OPHANIM_COLUMN, .slot = 10, .pattern = new Ophanim::AntichasePattern()},
+        {.column = OPHANIM_COLUMN, .slot = 11, .pattern = new Ophanim::ChasePattern()},
+        {.column = OPHANIM_COLUMN, .slot = 12, .pattern = new Ophanim::ClivePattern<SinFast>(0, 500, 2000)},
+        {.column = OPHANIM_COLUMN, .slot = 13, .pattern = new Ophanim::ClivePattern<SinFast>(1, 10, 2000)},
+        {.column = OPHANIM_COLUMN, .slot = 14, .pattern = new Ophanim::GlowPulsePattern()},
+        // {.column = OPHANIM_COLUMN, .slot = 0, .pattern = new Ophanim::SinChaseMaskPattern()},
+        // {.column = OPHANIM_COLUMN, .slot = 1, .pattern = new Ophanim::GlowPulseMaskPattern()},
+        {.column = OPHANIM_COLUMN, .slot = 15, .pattern = new Ophanim::SlowStrobePattern()},
+        {.column = OPHANIM_COLUMN, .slot = 16, .pattern = new Ophanim::SquareGlitchPattern()},
+        {.column = OPHANIM_COLUMN, .slot = 17, .pattern = new Ophanim::ClivePattern<SawDown>(1, 25, 500, 1, 0.1)},
+        });
+
+    hyp->addPipe(
+        new ConvertPipe<RGBA, RGB>(
+            ring1Input,
+            new MonitorOutput(&hyp->webServer, &ring1Map, 60, 0.025)));
+
+    auto ring2Input = new ControlHubInput<RGBA>(
+        ring2Map.size(),
+        &hyp->hub,
+        {
+            {.column = OPHANIM_COLUMN, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            {.column = OPHANIM_COLUMN, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = OPHANIM_COLUMN, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = OPHANIM_COLUMN, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = OPHANIM_COLUMN, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = OPHANIM_COLUMN, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = OPHANIM_COLUMN, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+            {.column = OPHANIM_COLUMN, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            {.column = OPHANIM_COLUMN, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+        });
+
+    hyp->addPipe(
+        new ConvertPipe<RGBA, RGB>(
+            ring2Input,
+            new MonitorOutput(&hyp->webServer, &ring2Map, 60, 0.025)));
+
+    auto ring3Input = new ControlHubInput<RGBA>(
+        ring3Map.size(),
+        &hyp->hub,
+        {
+            {.column = OPHANIM_COLUMN, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            {.column = OPHANIM_COLUMN, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = OPHANIM_COLUMN, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = OPHANIM_COLUMN, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = OPHANIM_COLUMN, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = OPHANIM_COLUMN, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = OPHANIM_COLUMN, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+            {.column = OPHANIM_COLUMN, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            {.column = OPHANIM_COLUMN, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+        });
+
+    hyp->addPipe(
+        new ConvertPipe<RGBA, RGB>(
+            ring3Input,
+            new MonitorOutput(&hyp->webServer, &ring3Map, 60, 0.025)));
 }
 
 void addPaletteColumn(Hyperion *hyp)
