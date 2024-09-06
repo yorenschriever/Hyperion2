@@ -112,13 +112,15 @@ class VideoPalettePattern : public Pattern<RGBA>
         200, Transition::none, 0,
         1000, Transition::none, 0);
     int frame = 0;
+    int offsetGroupSize;
     Video video;
 
 public:
-    VideoPalettePattern(const char *filename, const char *name = "Video")
+    VideoPalettePattern(const char *filename, const char *name = "Video", int offsetGroupSize=180)
     {
         this->name = name;
         this->video = readVideo(filename);
+        this->offsetGroupSize = offsetGroupSize;
     }
 
     inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -126,16 +128,22 @@ public:
         if (!transition.Calculate(active))
             return;
 
+        if (width != video.pixels)
+            Log::error("VIDEO", "Incorrect number of pixels in video: video file contains %d. Expected: %d", video.pixels, width);
+
         frame++;
         if (frame >= video.frames)
             frame = 0;
 
-        if (width != video.pixels)
-            Log::error("VIDEO", "Incorrect number of pixels in video: video file contains %d. Expected: %d", video.pixels, width);
-
         for (int i = 0; i < std::min(width, video.pixels); i++)
         {
-            int animationIndex = (frame * video.pixels + i) * video.depth;
+            int offsetGroupCount = width / offsetGroupSize;
+            int offsetGroup = i/offsetGroupSize;
+
+            int frameOffset = params->getOffset(-1,1) * video.frames * offsetGroup / offsetGroupCount;
+            int frameWithOffset = (frame + video.frames + frameOffset) % video.frames;
+
+            int animationIndex = (frameWithOffset * video.pixels + i) * video.depth;
 
             pixels[i] += params->getPrimaryColour() * (float(video.pixelData[animationIndex + 0]) / 255.);
             pixels[i] += params->getSecondaryColour() * (float(video.pixelData[animationIndex + 1]) / 255.);

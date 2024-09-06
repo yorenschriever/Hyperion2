@@ -79,6 +79,7 @@ int main()
 
 void addTrianglesPipe(Hyperion *hyp)
 {
+    int i=0;
     auto trianglesInput = new ControlHubInput<RGBA>(
         triangleMap3d.size(),
         &hyp->hub,
@@ -141,26 +142,73 @@ void addTrianglesPipe(Hyperion *hyp)
             {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
             {.column = 8, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
 
-            {
-                .column = VIDEO_COLUMN,
-                .slot = 0,
-                .pattern = new VideoPalettePattern("video/processed/DriehoekLos_Cirkels_01.bin", "DriehoekLos_Cirkels"),
-            },
-            {
-                .column = VIDEO_COLUMN,
-                .slot = 1,
-                .pattern = new VideoPalettePattern("video/processed/DriehoekLos_Wipe_01.bin", "DriehoekLos_Wipe_01"),
-            },
-            {
-                .column = VIDEO_COLUMN,
-                .slot = 2,
-                .pattern = new BgPattern(),
-            },
-            {
-                .column = VIDEO_COLUMN,
-                .slot = 3,
-                .pattern = new VideoPattern("video/processed/Mask_Noise_01.bin", "Mask_Noise_01"),
-            },
+            // {
+            //     .column = VIDEO_COLUMN,
+            //     .slot = 0,
+            //     .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Cirkels_01.bin", "DriehoekLos_Cirkels"),
+            // },
+            // {
+            //     .column = VIDEO_COLUMN,
+            //     .slot = 1,
+            //     .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Wipe_01.bin", "DriehoekLos_Wipe_01"),
+            // },
+            // {
+            //     .column = VIDEO_COLUMN,
+            //     .slot = 2,
+            //     .pattern = new BgPattern(),
+            // },
+            // {
+            //     .column = VIDEO_COLUMN,
+            //     .slot = 3,
+            //     .pattern = new VideoPattern("videos/processed/Mask_Noise_01.bin", "Mask_Noise_01"),
+            // },
+            
+
+
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Cirkels_01.bin", "DriehoekLos_Cirkels_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Cirkels_02.bin", "DriehoekLos_Cirkels_02")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Cirkels_03.bin", "DriehoekLos_Cirkels_03")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Cirkels_04.bin", "DriehoekLos_Cirkels_04")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Cirkels_05.bin", "DriehoekLos_Cirkels_05")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Grid_01.bin", "DriehoekLos_Grid_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Grid_02.bin", "DriehoekLos_Grid_02")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Grid_03.bin", "DriehoekLos_Grid_03")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Grid_04.bin", "DriehoekLos_Grid_04")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Heen_en_Weer_01.bin", "DriehoekLos_Heen_en_Weer_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Heen_en_Weer_02.bin", "DriehoekLos_Heen_en_Weer_02")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Noise_01.bin", "DriehoekLos_Noise_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Noise_02.bin", "DriehoekLos_Noise_02")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Noise_03.bin", "DriehoekLos_Noise_03")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Spiraal_01.bin", "DriehoekLos_Spiraal_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Spiraal_02.bin", "DriehoekLos_Spiraal_02")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Tracer_01.bin", "DriehoekLos_Tracer_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Triangle_01.bin", "DriehoekLos_Triangle_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Triangle_02.bin", "DriehoekLos_Triangle_02")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Triangle_03.bin", "DriehoekLos_Triangle_03")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Triangle_04.bin", "DriehoekLos_Triangle_04")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Wave_01.bin", "DriehoekLos_Wave_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Wave_02.bin", "DriehoekLos_Wave_02")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Wave_03.bin", "DriehoekLos_Wave_03")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Wave_04.bin", "DriehoekLos_Wave_04")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Wipe_01.bin", "DriehoekLos_Wipe_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Wipe_02.bin", "DriehoekLos_Wipe_02")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Wipe_03.bin", "DriehoekLos_Wipe_03")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Wipe_04.bin", "DriehoekLos_Wipe_04")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekLos_Wipe_05.bin", "DriehoekLos_Wipe_05")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekenGroep_Fade_01.bin", "DriehoekenGroep_Fade_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekenGroep_Noise_01_[kan_90_-_180_graden_gedraaid].bin", "")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekenGroep_Noise_02_[kan_90_-_180_graden_gedraaid].bin", "")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekenGroep_Tracer_01.bin", "DriehoekenGroep_Tracer_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekenGroep_Tracer_02.bin", "DriehoekenGroep_Tracer_02")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekenGroep_Wipe_01_[kan_90_-_180_graden_gedraaid].bin", "")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPalettePattern("videos/processed/DriehoekenGroep_Wipe_02_[kan_90_-_180_graden_gedraaid].bin", "")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPattern("videos/processed/Mask_DriehoekenGroep_Fade_01.bin", "Mask_DriehoekenGroep_Fade_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPattern("videos/processed/Mask_DriehoekenGroep_Fade_02.bin", "Mask_DriehoekenGroep_Fade_02")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPattern("videos/processed/Mask_DriehoekenGroep_Tracer_01.bin", "Mask_DriehoekenGroep_Tracer_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPattern("videos/processed/Mask_DriehoekenGroep_Wipe_01.bin", "Mask_DriehoekenGroep_Wipe_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPattern("videos/processed/Mask_Noise_01.bin", "Mask_Noise_01")},
+{ .column = VIDEO_COLUMN, .slot = i++, .pattern = new VideoPattern("videos/processed/Mask_Spiraal_01.bin", "Mask_Spiraal_01")},
+
 
         });
 
