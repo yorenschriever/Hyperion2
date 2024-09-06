@@ -20,6 +20,7 @@ public:
         int TAP_NOTE_NUMBER;
         int TAP_STOP_NOTE_NUMBER;
         int TAP_ALIGN_NOTE_NUMBER;
+        int TOGGLE_COLUMN_OFFSET_NOTE_NUMBER;
         int MIDI_CHANNEL;
         int OFF;
         int GREEN;
@@ -32,6 +33,19 @@ private:
     ControlHub *hub;
     MidiDevice *midi;
     Make make;
+    int columnOffset=0;
+
+    void toggleColumnOffset()
+    {
+        bool hasOffset = columnOffset != 0;
+        hasOffset = !hasOffset;
+
+        Log::info("APCMINI", "Toggle not offset. on=%d", hasOffset);
+        
+        columnOffset = hasOffset ? 8:0;
+        setLeds();
+        midi->sendNoteOn(make.MIDI_CHANNEL, make.TOGGLE_COLUMN_OFFSET_NOTE_NUMBER, hasOffset ? make.GREEN : make.OFF);
+    }
 
     void handleKeyPress(int note, bool isOn)
     {
@@ -41,8 +55,11 @@ private:
             return TapTempo::getInstance()->Stop();
         if (note == make.TAP_ALIGN_NOTE_NUMBER && isOn)
             return TapTempo::getInstance()->Align();
+        
+        if (note == make.TOGGLE_COLUMN_OFFSET_NOTE_NUMBER && isOn)
+            return toggleColumnOffset();
 
-        int column = note % make.WIDTH;
+        int column = note % make.WIDTH + columnOffset;
         int row = make.HEIGHT - 1 - note / make.WIDTH;
 
         // Log::info("APCMINI", "keypress %d %d (%d %d)", note, isOn, column, row);
@@ -92,19 +109,27 @@ public:
 
         if (controller == make.MASTER_DIM_FADER_CONTROLLER_NUMBER)
         {
+            // Only the first device should control the master dim
+            // to avoid flickering when 2 devices have their fader in a different
+            // position and send an update every now and then
+            if (columnOffset!=0) 
+                return;
+
             hub->setMasterDim(scale127to255(value));
             return;
         }
 
-        int column = controller - make.FADER0_CONTROLLER_NUMBER;
+        int column = controller - make.FADER0_CONTROLLER_NUMBER ;
         if (column < 0 || column >= make.WIDTH)
             return;
+        column += columnOffset;
         hub->dim(column, scale127to255(value));
     }
     void onSystemRealtime(uint8_t message) override {}
 
     void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) override
     {
+        columnIndex -= columnOffset;
         if (columnIndex < 0 || columnIndex > make.WIDTH - 1)
             return;
         if (slotIndex < 0 || slotIndex > make.HEIGHT - 1)
@@ -124,9 +149,9 @@ public:
         {
             for (int y = 0; y < make.HEIGHT; y++)
             {
-                auto slot = hub->findSlot(x, y);
+                auto slot = hub->findSlot(x + columnOffset, y);
                 bool isOn = slot && slot->activated;
-                onHubSlotActiveChange(x, y, isOn);
+                onHubSlotActiveChange(x + columnOffset, y, isOn);
             }
             midi->waitTxDone();
             Thread::sleep(5);
@@ -157,6 +182,8 @@ ApcMiniController::Make ApcMiniController::MK1 = {
     .TAP_STOP_NOTE_NUMBER = 89,
     .TAP_ALIGN_NOTE_NUMBER = 88,
 
+    .TOGGLE_COLUMN_OFFSET_NOTE_NUMBER = 82,
+
     .MIDI_CHANNEL = 0,
 
     .OFF = 0,
@@ -172,6 +199,8 @@ ApcMiniController::Make ApcMiniController::MK2{
     .TAP_NOTE_NUMBER = 0x76,
     .TAP_STOP_NOTE_NUMBER = 0x77,
     .TAP_ALIGN_NOTE_NUMBER = 0x7A,
+
+    .TOGGLE_COLUMN_OFFSET_NOTE_NUMBER = 0x70,
 
     .MIDI_CHANNEL = 0,
 
