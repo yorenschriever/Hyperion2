@@ -206,56 +206,69 @@ void addTrianglesPipe(Hyperion *hyp)
 
         });
 
-    // // Create 1 inout and split it up in 12,
-    // // because UDPOutput is limited by a maximum transfer size of 2*1440 bytes
-    // auto splitInput = new InputSlicer(
-    //     columnsInput,
-    //     {{0 * sizeof(RGBA), 360 * sizeof(RGBA), true},
-    //      {360 * sizeof(RGBA), 120 * sizeof(RGBA), true},
-    //      {480 * sizeof(RGBA), 360 * sizeof(RGBA), true},
-    //      {840 * sizeof(RGBA), 120 * sizeof(RGBA), true},
-    //      {960 * sizeof(RGBA), 360 * sizeof(RGBA), true},
-    //      {1320 * sizeof(RGBA), 120 * sizeof(RGBA), true},
-    //      {1440 * sizeof(RGBA), 360 * sizeof(RGBA), true},
-    //      {1800 * sizeof(RGBA), 120 * sizeof(RGBA), true},
-    //      {1920 * sizeof(RGBA), 360 * sizeof(RGBA), true},
-    //      {2280 * sizeof(RGBA), 120 * sizeof(RGBA), true},
-    //      {2400 * sizeof(RGBA), 360 * sizeof(RGBA), true},
-    //      {2760 * sizeof(RGBA), 120 * sizeof(RGBA), true},
-    //      {0, 6 * 8 * 60 * sizeof(RGBA), false}});
+    int triangleSize = 3*60 * sizeof(RGBA);
+    const int numSlices = 16;
 
-    // typedef struct
-    // {
-    //     const char *host;
-    //     const unsigned short port;
-    // } Slave;
-    // Slave slaves[] = {
-    //     {.host = "hyperslave1.local", .port = 9611}, // rode kolom
-    //     {.host = "hyperslave1.local", .port = 9612}, // rode punt
-    //     {.host = "hyperslave1.local", .port = 9613}, // groene kolom
-    //     {.host = "hyperslave1.local", .port = 9614}, // groene punt
-    //     {.host = "hyperslave5.local", .port = 9611}, // blauwe kolom
-    //     {.host = "hyperslave5.local", .port = 9612}, // blauwe punt
-    //     {.host = "hyperslave5.local", .port = 9613}, // azuur kolom
-    //     {.host = "hyperslave5.local", .port = 9614}, // azuur punt
-    //     {.host = "hyperslave3.local", .port = 9611}, // paars kolom
-    //     {.host = "hyperslave3.local", .port = 9612}, // paars punt
-    //     {.host = "hyperslave3.local", .port = 9613}, // geel kolom
-    //     {.host = "hyperslave3.local", .port = 9614}, // geel punt
-    // };
+    auto splitInput = new InputSlicer(
+        trianglesInput,
+        {
+         {0  * triangleSize, 1 * triangleSize, true},
+         {1  * triangleSize, 1 * triangleSize, true},
+         {2  * triangleSize, 1 * triangleSize, true},
+         {3  * triangleSize, 1 * triangleSize, true},
+         {4  * triangleSize, 1 * triangleSize, true},
+         {5  * triangleSize, 1 * triangleSize, true},
+         {6  * triangleSize, 1 * triangleSize, true},
+         {7  * triangleSize, 1 * triangleSize, true},
+         {8  * triangleSize, 1 * triangleSize, true},
+         {9  * triangleSize, 1 * triangleSize, true},
+         {10 * triangleSize, 1 * triangleSize, true},
+         {11 * triangleSize, 1 * triangleSize, true},
+         {12  * triangleSize, 1 * triangleSize, true},
+         {13  * triangleSize, 1 * triangleSize, true},
+         {14  * triangleSize, 1 * triangleSize, true},
+         {15  * triangleSize, 1 * triangleSize, true},
 
-    // for (int i = 0; i < splitInput->size() - 1; i++)
-    // {
-    //     auto pipe = new ConvertPipe<RGBA, RGB>(
-    //         splitInput->getInput(i),
-    //         new UDPOutput(slaves[i].host, slaves[i].port, 60),
-    //         trianglesLut);
-    //     hyp->addPipe(pipe);
-    // }
+         {0, 16 * triangleSize, false}});
+
+    typedef struct
+    {
+        const char *host;
+        const unsigned short port;
+    } Slave;
+    Slave slaves[numSlices] = {
+        {.host = "hyperslave1.local", .port = 9611}, 
+        {.host = "hyperslave1.local", .port = 9612}, 
+        {.host = "hyperslave1.local", .port = 9613}, 
+        {.host = "hyperslave1.local", .port = 9614}, 
+        {.host = "hyperslave1.local", .port = 9615}, 
+        {.host = "hyperslave1.local", .port = 9616}, 
+        {.host = "hyperslave1.local", .port = 9617}, 
+        {.host = "hyperslave1.local", .port = 9618}, 
+
+        {.host = "hyperslave5.local", .port = 9611}, 
+        {.host = "hyperslave5.local", .port = 9612}, 
+        {.host = "hyperslave5.local", .port = 9613}, 
+        {.host = "hyperslave5.local", .port = 9614}, 
+
+        {.host = "hyperslave3.local", .port = 9611}, 
+        {.host = "hyperslave3.local", .port = 9612}, 
+        {.host = "hyperslave3.local", .port = 9613}, 
+        {.host = "hyperslave3.local", .port = 9614}, 
+    };
+
+    for (int i = 0; i < numSlices; i++)
+    {
+        auto pipe = new ConvertPipe<RGBA, BGR>(
+            splitInput->getInput(i),
+            new UDPOutput(slaves[i].host, slaves[i].port, 60),
+            trianglesLut);
+        hyp->addPipe(pipe);
+    }
 
     hyp->addPipe(
         new ConvertPipe<RGBA, RGB>(
-            trianglesInput,
+            splitInput->getInput(numSlices),
             new MonitorOutput3d(&hyp->webServer, &triangleMap3d)));
 
     // hyp->addPipe(
@@ -333,6 +346,8 @@ void addTrianglesPipe(Hyperion *hyp)
 //             new MonitorOutput3d(&hyp->webServer, &eyesMap3d, 60, 0.05)));
 // }
 
+const char * ophanimHost = "hyperslave7.local";
+
 void addOphanimPipe(Hyperion *hyp)
 {
     auto ring1Input = new ControlHubInput<RGBA>(
@@ -383,9 +398,30 @@ void addOphanimPipe(Hyperion *hyp)
             // {.column = COL_OPHANIM, .slot = 17, .pattern = new Ophanim::ClivePattern<SawDown>(1, 25, 500, 1, 0.1)},
         });
 
+    // hyp->addPipe(
+    //     new ConvertPipe<RGBA, RGB>(
+    //         ring1Input,
+    //         new MonitorOutput(&hyp->webServer, &ring1Map, 60, 0.025)));
+
+    // hyp->addPipe(new ConvertPipe<RGBA, BGR>(
+    //         ring1Input,
+    //         new UDPOutput(ophanimHost, 9611, 60),
+    //         trianglesLut));
+
+    const int ring1Size = 2*180*sizeof(RGBA);
+    auto ring1SplitInput = new InputSlicer(
+        ring1Input,
+        {{0, ring1Size, true},
+         {0, ring1Size, false}});
+
+    hyp->addPipe(new ConvertPipe<RGBA, BGR>(
+            ring1SplitInput->getInput(0),
+            new UDPOutput(ophanimHost, 9611, 60),
+            trianglesLut));
+
     hyp->addPipe(
         new ConvertPipe<RGBA, RGB>(
-            ring1Input,
+            ring1SplitInput->getInput(1),
             new MonitorOutput(&hyp->webServer, &ring1Map, 60, 0.025)));
 
     auto ring2Input = new ControlHubInput<Monochrome>(
@@ -415,9 +451,29 @@ void addOphanimPipe(Hyperion *hyp)
             
         });
 
+    // hyp->addPipe(
+    //     new ConvertPipe<Monochrome, RGB>(
+    //         ring2Input,
+    //         new MonitorOutput(&hyp->webServer, &ring2Map, 60, 0.025)));
+
+        // hyp->addPipe(new Pipe(
+        //     ring2Input,
+        //     new UDPOutput(ophanimHost, 9621, 60)));
+
+    const int ring2Size = 24*sizeof(Monochrome);
+    auto ring2SplitInput = new InputSlicer(
+        ring2Input,
+        {{0, ring2Size, true},
+         {0, ring2Size, false}});
+
+    hyp->addPipe(new ConvertPipe<Monochrome, Monochrome>(
+            ring2SplitInput->getInput(0),
+            new UDPOutput(ophanimHost, 9621, 60)
+            ));
+
     hyp->addPipe(
         new ConvertPipe<Monochrome, RGB>(
-            ring2Input,
+            ring2SplitInput->getInput(1),
             new MonitorOutput(&hyp->webServer, &ring2Map, 60, 0.025)));
 
     auto ring3Input = new ControlHubInput<RGBA>(
@@ -452,10 +508,32 @@ void addOphanimPipe(Hyperion *hyp)
             {.column = COL_DEBUG, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
         });
 
+    // hyp->addPipe(
+    //     new ConvertPipe<RGBA, RGB>(
+    //         ring3Input,
+    //         new MonitorOutput(&hyp->webServer, &ring3Map, 60, 0.025)));
+
+    // hyp->addPipe(new ConvertPipe<RGBA, BGR>(
+    //         ring3Input,
+    //         new UDPOutput(ophanimHost, 9615, 60),
+    //         trianglesLut));
+
+    const int ring3Size = 2*152*sizeof(RGBA);
+    auto ring3SplitInput = new InputSlicer(
+        ring3Input,
+        {{0, ring3Size, true},
+         {0, ring3Size, false}});
+
+    hyp->addPipe(new ConvertPipe<RGBA, BGR>(
+            ring3SplitInput->getInput(0),
+            new UDPOutput(ophanimHost, 9615, 60),
+            trianglesLut));
+
     hyp->addPipe(
         new ConvertPipe<RGBA, RGB>(
-            ring3Input,
+            ring3SplitInput->getInput(1),
             new MonitorOutput(&hyp->webServer, &ring3Map, 60, 0.025)));
+
 }
 
 void addPaletteColumn(Hyperion *hyp)

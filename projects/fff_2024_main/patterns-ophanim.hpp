@@ -7,7 +7,7 @@
 #include <math.h>
 #include <vector>
 
-const int RINGSIZE = 500;
+// const int RINGSIZE = 500;
 
 namespace Ophanim
 {
@@ -66,219 +66,219 @@ namespace Ophanim
         }
     };
 
-    class GradientPattern : public Pattern<RGBA>
-    {
-    public:
-        GradientPattern()
-        {
-            this->name = "Gradient";
-        }
+    // class GradientPattern : public Pattern<RGBA>
+    // {
+    // public:
+    //     GradientPattern()
+    //     {
+    //         this->name = "Gradient";
+    //     }
 
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
+    //     Transition transition = Transition(
+    //         200, Transition::none, 0,
+    //         1000, Transition::none, 0);
 
-        void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-        {
-            if (!transition.Calculate(active))
-                return;
+    //     void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    //     {
+    //         if (!transition.Calculate(active))
+    //             return;
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
-            {
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    RGBA col = params->getPrimaryColour() + (params->getSecondaryColour() * abs(float(led - RINGSIZE/2) / RINGSIZE/2));
-                    pixels[hoepel * RINGSIZE + led] = col * transition.getValue();
-                }
-            }
-        }
-    };
+    //         for (int hoepel = 0; hoepel < 2; hoepel++)
+    //         {
+    //             for (int led = 0; led < RINGSIZE; led++)
+    //             {
+    //                 RGBA col = params->getPrimaryColour() + (params->getSecondaryColour() * abs(float(led - RINGSIZE/2) / RINGSIZE/2));
+    //                 pixels[hoepel * RINGSIZE + led] = col * transition.getValue();
+    //             }
+    //         }
+    //     }
+    // };
 
-    class Rainbow : public Pattern<RGBA>
-    {
-    public:
-        Rainbow()
-        {
-            this->name = "Rainbow";
-        }
+    // class Rainbow : public Pattern<RGBA>
+    // {
+    // public:
+    //     Rainbow()
+    //     {
+    //         this->name = "Rainbow";
+    //     }
 
-        LFO<SawDown> lfo;
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
+    //     LFO<SawDown> lfo;
+    //     Transition transition = Transition(
+    //         200, Transition::none, 0,
+    //         1000, Transition::none, 0);
 
-        void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-        {
-            if (!transition.Calculate(active))
-                return;
+    //     void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    //     {
+    //         if (!transition.Calculate(active))
+    //             return;
 
-            lfo.setPeriod(params->getVelocity(10000, 500));
+    //         lfo.setPeriod(params->getVelocity(10000, 500));
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
-            {
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    RGBA col = Hue(led * 255 / RINGSIZE + lfo.getValue() * 255);
-                    pixels[hoepel * RINGSIZE + led] = col * transition.getValue();
-                }
-            }
-        }
-    };
+    //         for (int hoepel = 0; hoepel < 2; hoepel++)
+    //         {
+    //             for (int led = 0; led < RINGSIZE; led++)
+    //             {
+    //                 RGBA col = Hue(led * 255 / RINGSIZE + lfo.getValue() * 255);
+    //                 pixels[hoepel * RINGSIZE + led] = col * transition.getValue();
+    //             }
+    //         }
+    //     }
+    // };
 
-    class Rainbow2 : public Pattern<RGBA>
-    {
-    public:
-        Rainbow2()
-        {
-            this->name = "Rainbow2";
-        }
+    // class Rainbow2 : public Pattern<RGBA>
+    // {
+    // public:
+    //     Rainbow2()
+    //     {
+    //         this->name = "Rainbow2";
+    //     }
 
-        LFO<SawDown> lfo;
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
+    //     LFO<SawDown> lfo;
+    //     Transition transition = Transition(
+    //         200, Transition::none, 0,
+    //         1000, Transition::none, 0);
 
-        void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-        {
-            if (!transition.Calculate(active))
-                return;
+    //     void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    //     {
+    //         if (!transition.Calculate(active))
+    //             return;
 
-            lfo.setPeriod(params->getVelocity(10000, 500));
+    //         lfo.setPeriod(params->getVelocity(10000, 500));
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
-            {
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    int hoepel2 = hoepel / 2;
-                    RGBA col = Hue(hoepel2 * 255 / 5 + lfo.getValue() * 255);
-                    pixels[hoepel * RINGSIZE + led] = col * transition.getValue();
-                }
-            }
-        }
-    };
+    //         for (int hoepel = 0; hoepel < 2; hoepel++)
+    //         {
+    //             for (int led = 0; led < RINGSIZE; led++)
+    //             {
+    //                 int hoepel2 = hoepel / 2;
+    //                 RGBA col = Hue(hoepel2 * 255 / 5 + lfo.getValue() * 255);
+    //                 pixels[hoepel * RINGSIZE + led] = col * transition.getValue();
+    //             }
+    //         }
+    //     }
+    // };
 
-    class Rainbow3 : public Pattern<RGBA>
-    {
-    public:
-        Rainbow3()
-        {
-            this->name = "Rainbow3";
-        }
+    // class Rainbow3 : public Pattern<RGBA>
+    // {
+    // public:
+    //     Rainbow3()
+    //     {
+    //         this->name = "Rainbow3";
+    //     }
 
-        LFO<SawDown> lfo;
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
-        const int hoepelmapping[10] = {0, 7,
-                                       2, 9,
-                                       4, 1,
-                                       6, 3,
-                                       8, 5};
+    //     LFO<SawDown> lfo;
+    //     Transition transition = Transition(
+    //         200, Transition::none, 0,
+    //         1000, Transition::none, 0);
+    //     const int hoepelmapping[10] = {0, 7,
+    //                                    2, 9,
+    //                                    4, 1,
+    //                                    6, 3,
+    //                                    8, 5};
 
-        void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-        {
-            if (!transition.Calculate(active))
-                return;
+    //     void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    //     {
+    //         if (!transition.Calculate(active))
+    //             return;
 
-            lfo.setPeriod(params->getVelocity(10000, 500));
+    //         lfo.setPeriod(params->getVelocity(10000, 500));
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
-            {
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    RGBA col = Hue(hoepelmapping[hoepel] * 255 / 10 + lfo.getValue() * 255);
-                    pixels[hoepel * RINGSIZE + led] = col * transition.getValue();
-                }
-            }
-        }
-    };
+    //         for (int hoepel = 0; hoepel < 2; hoepel++)
+    //         {
+    //             for (int led = 0; led < RINGSIZE; led++)
+    //             {
+    //                 RGBA col = Hue(hoepelmapping[hoepel] * 255 / 10 + lfo.getValue() * 255);
+    //                 pixels[hoepel * RINGSIZE + led] = col * transition.getValue();
+    //             }
+    //         }
+    //     }
+    // };
 
-    class HoepelsBase : public Pattern<RGBA>
-    {
-    public:
-        HoepelsBase()
-        {
-            this->name = "Base";
-        }
+    // class HoepelsBase : public Pattern<RGBA>
+    // {
+    // public:
+    //     HoepelsBase()
+    //     {
+    //         this->name = "Base";
+    //     }
 
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
-        BeatWatcher tempo;
-        FadeDown fade[10] = {
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd),
-            FadeDown(1400, WaitAtEnd)};
-        int count = 0;
+    //     Transition transition = Transition(
+    //         200, Transition::none, 0,
+    //         1000, Transition::none, 0);
+    //     BeatWatcher tempo;
+    //     FadeDown fade[10] = {
+    //         FadeDown(1400, WaitAtEnd),
+    //         FadeDown(1400, WaitAtEnd),
+    //         FadeDown(1400, WaitAtEnd),
+    //         FadeDown(1400, WaitAtEnd),
+    //         FadeDown(1400, WaitAtEnd),
+    //         FadeDown(1400, WaitAtEnd),
+    //         FadeDown(1400, WaitAtEnd),
+    //         FadeDown(1400, WaitAtEnd),
+    //         FadeDown(1400, WaitAtEnd),
+    //         FadeDown(1400, WaitAtEnd)};
+    //     int count = 0;
 
-        void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-        {
-            if (!transition.Calculate(active))
-                return;
+    //     void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    //     {
+    //         if (!transition.Calculate(active))
+    //             return;
 
-            if (tempo.Triggered())
-            {
-                count = (count + 1) % 10;
-                fade[count].reset();
-            }
+    //         if (tempo.Triggered())
+    //         {
+    //             count = (count + 1) % 10;
+    //             fade[count].reset();
+    //         }
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
-            {
-                // RGBA col = params->getPrimaryColour() * fade[hoepel].getValue() * transition.getValue();
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    RGBA col = params->getHighlightColour() * fade[hoepel].getValue(led * RINGSIZE) * transition.getValue();
-                    pixels[hoepel * RINGSIZE + led] = col;
-                }
-            }
-        }
-    };
+    //         for (int hoepel = 0; hoepel < 2; hoepel++)
+    //         {
+    //             // RGBA col = params->getPrimaryColour() * fade[hoepel].getValue() * transition.getValue();
+    //             for (int led = 0; led < RINGSIZE; led++)
+    //             {
+    //                 RGBA col = params->getHighlightColour() * fade[hoepel].getValue(led * RINGSIZE) * transition.getValue();
+    //                 pixels[hoepel * RINGSIZE + led] = col;
+    //             }
+    //         }
+    //     }
+    // };
 
-    class HoepelsTransition : public Pattern<RGBA>
-    {
-    public:
-        HoepelsTransition()
-        {
-            this->name = "Transition";
-        }
+    // class HoepelsTransition : public Pattern<RGBA>
+    // {
+    // public:
+    //     HoepelsTransition()
+    //     {
+    //         this->name = "Transition";
+    //     }
 
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
-        BeatWatcher tempo;
-        Transition chase[2] = {
-            Transition(1050, Transition::fromSides, 500, 1050, Transition::fromCenter, 1000),
-            Transition(1050, Transition::fromSides, 500, 1050, Transition::fromCenter, 1000)};
-        int count = 0;
-        Permute perm = Permute(10);
+    //     Transition transition = Transition(
+    //         200, Transition::none, 0,
+    //         1000, Transition::none, 0);
+    //     BeatWatcher tempo;
+    //     Transition chase[2] = {
+    //         Transition(1050, Transition::fromSides, 500, 1050, Transition::fromCenter, 1000),
+    //         Transition(1050, Transition::fromSides, 500, 1050, Transition::fromCenter, 1000)};
+    //     int count = 0;
+    //     Permute perm = Permute(10);
 
-        void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-        {
-            if (!transition.Calculate(active))
-                return;
+    //     void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    //     {
+    //         if (!transition.Calculate(active))
+    //             return;
 
-            for (int i = 0; i < 2; i++)
-            {
-                chase[i].Calculate(Tempo::GetBeatNumber() % 10 == perm.at[i]);
-            }
+    //         for (int i = 0; i < 2; i++)
+    //         {
+    //             chase[i].Calculate(Tempo::GetBeatNumber() % 10 == perm.at[i]);
+    //         }
 
-            int hoepel=0;
-            {
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    RGBA col = params->getPrimaryColour() * chase[hoepel].getValue(led, RINGSIZE) * transition.getValue();
-                    pixels[hoepel * RINGSIZE + led] = col;
-                }
-            }
-        }
-    };
+    //         int hoepel=0;
+    //         {
+    //             for (int led = 0; led < RINGSIZE; led++)
+    //             {
+    //                 RGBA col = params->getPrimaryColour() * chase[hoepel].getValue(led, RINGSIZE) * transition.getValue();
+    //                 pixels[hoepel * RINGSIZE + led] = col;
+    //             }
+    //         }
+    //     }
+    // };
 
     class SinStripPattern : public Pattern<RGBA>
     {
@@ -309,7 +309,7 @@ namespace Ophanim
 
             for (int led = 0; led < width; led++)
             {
-                pixels[ led] = col * lfo.getValue(amount *(float)led / RINGSIZE);
+                pixels[ led] = col * lfo.getValue(amount *(float)led / width);
             }
             
         }
@@ -343,102 +343,102 @@ namespace Ophanim
 
             for (int led = 0; led < width; led++)
             {
-                pixels[led] = col * lfo.getValue(amount * -1 * (float)led / RINGSIZE + (float)1 / 20);
+                pixels[led] = col * lfo.getValue(amount * -1 * (float)led / width + (float)1 / 20);
             }
     
         }
     };
 
-    class FirePattern : public Pattern<RGBA>
-    {
-    public:
-        FirePattern()
-        {
-            this->name = "Fire";
-        }
+    // class FirePattern : public Pattern<RGBA>
+    // {
+    // public:
+    //     FirePattern()
+    //     {
+    //         this->name = "Fire";
+    //     }
 
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
-        BeatWatcher tempo;
-        Transition chase[2] = {
-            Transition(150, Transition::fromCenter, 150, 150, Transition::fromCenter, 150),
-            Transition(150, Transition::fromCenter, 150, 150, Transition::fromCenter, 150)};
-        int count = 0;
-        Permute perm = Permute(10);
-        Timeline timeline = Timeline();
+    //     Transition transition = Transition(
+    //         200, Transition::none, 0,
+    //         1000, Transition::none, 0);
+    //     BeatWatcher tempo;
+    //     Transition chase[2] = {
+    //         Transition(150, Transition::fromCenter, 150, 150, Transition::fromCenter, 150),
+    //         Transition(150, Transition::fromCenter, 150, 150, Transition::fromCenter, 150)};
+    //     int count = 0;
+    //     Permute perm = Permute(10);
+    //     Timeline timeline = Timeline();
 
-        void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-        {
-            timeline.FrameStart();
+    //     void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    //     {
+    //         timeline.FrameStart();
 
-            if (!transition.Calculate(active))
-                return;
+    //         if (!transition.Calculate(active))
+    //             return;
 
-            if (tempo.Triggered())
-                timeline.reset();
+    //         if (tempo.Triggered())
+    //             timeline.reset();
 
-            for (int i = 0; i < 2; i++)
-            {
-                chase[i].Calculate(timeline.GetTimelinePosition() < i * RINGSIZE);
-            }
+    //         for (int i = 0; i < 2; i++)
+    //         {
+    //             chase[i].Calculate(timeline.GetTimelinePosition() < i * RINGSIZE);
+    //         }
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
-            {
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    RGBA col = params->getSecondaryColour() * chase[hoepel].getValue(led, RINGSIZE) * transition.getValue();
-                    pixels[hoepel * RINGSIZE + led] = col;
-                }
-            }
-        }
-    };
+    //         for (int hoepel = 0; hoepel < 2; hoepel++)
+    //         {
+    //             for (int led = 0; led < RINGSIZE; led++)
+    //             {
+    //                 RGBA col = params->getSecondaryColour() * chase[hoepel].getValue(led, RINGSIZE) * transition.getValue();
+    //                 pixels[hoepel * RINGSIZE + led] = col;
+    //             }
+    //         }
+    //     }
+    // };
 
-    class FireworkPattern : public Pattern<RGBA>
-    {
-    public:
-        FireworkPattern()
-        {
-            this->name = "Firework";
-        }
+    // class FireworkPattern : public Pattern<RGBA>
+    // {
+    // public:
+    //     FireworkPattern()
+    //     {
+    //         this->name = "Firework";
+    //     }
 
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
-        BeatWatcher tempo;
-        FadeDown fade[2] = {FadeDown(400, WaitAtEnd), FadeDown(400, WaitAtEnd)};
-        Permute perm[2] = {Permute(10), Permute(10)};
+    //     Transition transition = Transition(
+    //         200, Transition::none, 0,
+    //         1000, Transition::none, 0);
+    //     BeatWatcher tempo;
+    //     FadeDown fade[2] = {FadeDown(400, WaitAtEnd), FadeDown(400, WaitAtEnd)};
+    //     Permute perm[2] = {Permute(10), Permute(10)};
 
-        void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-        {
-            if (!transition.Calculate(active))
-                return;
+    //     void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    //     {
+    //         if (!transition.Calculate(active))
+    //             return;
 
-            if (tempo.Triggered())
-            {
-                int which = abs(Tempo::GetBeatNumber()) % 2;
-                fade[which].reset();
-                perm[which].permute();
-            }
+    //         if (tempo.Triggered())
+    //         {
+    //             int which = abs(Tempo::GetBeatNumber()) % 2;
+    //             fade[which].reset();
+    //             perm[which].permute();
+    //         }
 
-            // RGBA baseCol = params->getHighlightColour() * transition.getValue();
-            for (int hoepel = 0; hoepel < 2; hoepel++)
-            {
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    float fadeValue = 0;
-                    for (int i = 0; i < 2; i++)
-                    {
-                        int rotled = (perm[i].at[hoepel] * 1 + led) % RINGSIZE;
-                        int mirrorled = abs(rotled - RINGSIZE/2);
-                        fadeValue += fade[i].getValue(mirrorled * mirrorled / 0.5);
-                    }
-                    RGBA col = params->getGradientf(fadeValue) * fadeValue;
-                    pixels[hoepel * 50 + led] = col;
-                }
-            }
-        }
-    };
+    //         // RGBA baseCol = params->getHighlightColour() * transition.getValue();
+    //         for (int hoepel = 0; hoepel < 2; hoepel++)
+    //         {
+    //             for (int led = 0; led < RINGSIZE; led++)
+    //             {
+    //                 float fadeValue = 0;
+    //                 for (int i = 0; i < 2; i++)
+    //                 {
+    //                     int rotled = (perm[i].at[hoepel] * 1 + led) % RINGSIZE;
+    //                     int mirrorled = abs(rotled - RINGSIZE/2);
+    //                     fadeValue += fade[i].getValue(mirrorled * mirrorled / 0.5);
+    //                 }
+    //                 RGBA col = params->getGradientf(fadeValue) * fadeValue;
+    //                 pixels[hoepel * 50 + led] = col;
+    //             }
+    //         }
+    //     }
+    // };
 
     class SinPattern : public Pattern<RGBA>
     {
@@ -462,7 +462,7 @@ namespace Ophanim
 
             lfo.setPeriod(params->getVelocity(5000, 500));
 
-            for (int led = 0; led < RINGSIZE; led++)
+            for (int led = 0; led < width; led++)
                 pixels[led] = params->getPrimaryColour() * lfo.getValue() * transition.getValue();
         }
     };
@@ -496,7 +496,7 @@ namespace Ophanim
             float dir = 1; // hoepel % 2 ==0 ? 1 : -1;
             for (int led = 0; led < width; led++)
             {
-                pixels[led] = col * lfo.getValue(amount * dir * (float)led / RINGSIZE);
+                pixels[led] = col * lfo.getValue(amount * dir * (float)led / width);
             }
             
         }
@@ -529,9 +529,9 @@ namespace Ophanim
 
             int hoepel=0;
             float dir = hoepel % 2 == 0 ? 1 : -1;
-            for (int led = 0; led < RINGSIZE; led++)
+            for (int led = 0; led < width; led++)
             {
-                pixels[hoepel * RINGSIZE + led] = col * lfo.getValue(amount * dir * (float)led / RINGSIZE);
+                pixels[led] = col * lfo.getValue(amount * dir * (float)led / width);
             }
             
         }

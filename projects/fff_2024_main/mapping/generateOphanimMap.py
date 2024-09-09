@@ -16,7 +16,7 @@ ring1.extend(drawCircle(2*180, 0.95))
 # ring1.extend(drawCircle(500, 0.85))
 
 # Ring 2
-ring2 = drawCircle(30, 0.70)
+ring2 = drawCircle(24, 0.70)
 
 # Ring 3, binnenste
 ring3 = []
