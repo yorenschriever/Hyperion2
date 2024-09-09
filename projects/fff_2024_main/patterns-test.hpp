@@ -26,19 +26,20 @@ namespace TestPatterns
             if (!active)
                 return;
 
-            RGBA colors[6] = {
+            RGBA colors[7] = {
                 RGBA(255, 0, 0, 255),
                 RGBA(0, 255, 0, 255),
                 RGBA(0, 0, 255, 255),
                 RGBA(0, 255, 255, 255),
                 RGBA(255, 0, 255, 255),
                 RGBA(255, 255, 0, 255),
+                RGBA(255, 255, 255, 255),
             };
 
             for (int i = 0; i < width; i++)
             {
                 if (i % segmentSize < 20)
-                    pixels[i] = colors[(i / (3*60))%6] * (1. - (((float)(i % segmentSize)) / 20.));
+                    pixels[i] = colors[(i / (3*60))%7] * (1. - (((float)(i % segmentSize)) / 20.));
             }
         }
     };
