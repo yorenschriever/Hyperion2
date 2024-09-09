@@ -10,18 +10,18 @@ def drawCircle(amount, radius, xc=0, yc=0):
         result.append({'x': x, 'y': y})
     return result
 
-# Ring 1
+# Ring 1, buitenste
 ring1 = []
-ring1.extend(drawCircle(500, 0.95))
+ring1.extend(drawCircle(2*180, 0.95))
 # ring1.extend(drawCircle(500, 0.85))
 
 # Ring 2
 ring2 = drawCircle(30, 0.70)
 
-# Ring 3
+# Ring 3, binnenste
 ring3 = []
 # ring3.extend(drawCircle(500, 0.55))
-ring3.extend(drawCircle(500, 0.45))
+ring3.extend(drawCircle(2*152, 0.45))
 
 
 def writePoints(name, points, scale=1.):

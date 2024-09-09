@@ -12,6 +12,7 @@
 #include "patterns-min.hpp"
 #include "patterns-ophanim.hpp"
 #include "patterns-test.hpp"
+#include "patterns-monochrome.hpp"
 #include "setViewParams.hpp"
 #include "video.hpp"
 #include "videoPattern.hpp"
@@ -38,8 +39,9 @@ const int COL_FLASH = 7;
 
 const int COL_PALETTE2 = 8;
 const int COL_OPHANIM = 9;
-const int COL_OPHANIM_VIDEO = 10;
-const int COL_OPHANIM_MASK = 11;
+// const int COL_OPHANIM_VIDEO = 10;
+const int COL_OPHANIM_MASK = 10;
+const int COL_OPHANIM_HALO = 11;
 const int COL_OPHANIM_FLASH = 12;
 const int COL_a = 13;
 const int COL_b = 14;
@@ -73,12 +75,13 @@ int main()
     hyp->hub.setColumnName(COL_FLASH, "Flash");
 
     hyp->hub.setColumnName(COL_OPHANIM, "Oph");
-    hyp->hub.setColumnName(COL_OPHANIM_VIDEO, "Oph Video");
+    // hyp->hub.setColumnName(COL_OPHANIM_VIDEO, "Oph Video");
     hyp->hub.setColumnName(COL_OPHANIM_MASK, "Oph Mask");
     hyp->hub.setColumnName(COL_OPHANIM_FLASH, "Oph Flash");
+    hyp->hub.setColumnName(COL_OPHANIM_HALO, "Oph Halo");
 
     hyp->hub.setColumnName(COL_DEBUG, "Debug");
-    hyp->hub.setColumnName(COL_DEBUG2, "Debug Oph");
+    // hyp->hub.setColumnName(COL_DEBUG2, "Debug Oph");
 
     hyp->hub.setFlashColumn(COL_FLASH);
     hyp->hub.setFlashColumn(COL_OPHANIM_FLASH);
@@ -337,25 +340,47 @@ void addOphanimPipe(Hyperion *hyp)
         &hyp->hub,
         {
             {.column = COL_OPHANIM, .slot = 0, .pattern = new Ophanim::MonochromePattern()},
-            {.column = COL_OPHANIM, .slot = 1, .pattern = new Ophanim::StereochromePattern()},
-            {.column = COL_OPHANIM, .slot = 2, .pattern = new Ophanim::GradientPattern()},
-            {.column = COL_OPHANIM, .slot = 3, .pattern = new Ophanim::HoepelsTransition()},
+            {.column = COL_OPHANIM, .slot = 1, .pattern = new Ophanim::StereochromePattern(0)},
+            {.column = COL_OPHANIM, .slot = 2, .pattern = new Ophanim::SinPattern()},
+            {.column = COL_OPHANIM, .slot = 3, .pattern = new Ophanim::ChasePattern()},
             {.column = COL_OPHANIM, .slot = 4, .pattern = new Ophanim::SinStripPattern()},
             {.column = COL_OPHANIM, .slot = 5, .pattern = new Ophanim::SinStripPattern2()},
             {.column = COL_OPHANIM, .slot = 6, .pattern = new Ophanim::OnbeatFadeAllPattern()},
-            {.column = COL_OPHANIM, .slot = 7, .pattern = new Ophanim::OnbeatFadePattern()},
-            {.column = COL_OPHANIM, .slot = 8, .pattern = new Ophanim::FireworkPattern()},
-            {.column = COL_OPHANIM, .slot = 9, .pattern = new Ophanim::SinPattern()},
-            {.column = COL_OPHANIM, .slot = 10, .pattern = new Ophanim::AntichasePattern()},
-            {.column = COL_OPHANIM, .slot = 11, .pattern = new Ophanim::ChasePattern()},
-            {.column = COL_OPHANIM, .slot = 12, .pattern = new Ophanim::ClivePattern<SinFast>(0, 500, 2000)},
-            {.column = COL_OPHANIM, .slot = 13, .pattern = new Ophanim::ClivePattern<SinFast>(1, 10, 2000)},
-            {.column = COL_OPHANIM, .slot = 14, .pattern = new Ophanim::GlowPulsePattern()},
-            // {.column = OPHANIM_COLUMN, .slot = 0, .pattern = new Ophanim::SinChaseMaskPattern()},
-            // {.column = OPHANIM_COLUMN, .slot = 1, .pattern = new Ophanim::GlowPulseMaskPattern()},
-            {.column = COL_OPHANIM, .slot = 15, .pattern = new Ophanim::SlowStrobePattern()},
-            {.column = COL_OPHANIM, .slot = 16, .pattern = new Ophanim::SquareGlitchPattern()},
-            {.column = COL_OPHANIM, .slot = 17, .pattern = new Ophanim::ClivePattern<SawDown>(1, 25, 500, 1, 0.1)},
+            {.column = COL_OPHANIM, .slot = 7, .pattern = new Ophanim::SlowStrobePattern()},
+
+            {.column = COL_OPHANIM_MASK, .slot = 0, .pattern = new Ophanim::SinChaseMaskPattern()},
+            {.column = COL_OPHANIM_MASK, .slot = 1, .pattern = new Ophanim::GlowPulseMaskPattern()},
+
+            {.column = COL_OPHANIM_FLASH, .slot = 0, .pattern = new Ophanim::MonochromePattern()},
+            {.column = COL_OPHANIM_FLASH, .slot = 1, .pattern = new Ophanim::SquareGlitchPattern()},
+            {.column = COL_OPHANIM_FLASH, .slot = 2, .pattern = new Ophanim::OnbeatFadeAllPattern()},
+
+            {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            {.column = COL_DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = COL_DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = COL_DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = COL_DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = COL_DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = COL_DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+            {.column = COL_DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            {.column = COL_DEBUG, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+
+            // {.column = COL_OPHANIM, .slot = 6, .pattern = new Ophanim::GradientPattern()},
+            // {.column = COL_OPHANIM, .slot = 7, .pattern = new Ophanim::HoepelsTransition()},
+
+            
+            // {.column = COL_OPHANIM, .slot = 9, .pattern = new Ophanim::OnbeatFadePattern()},
+            // {.column = COL_OPHANIM, .slot = 10, .pattern = new Ophanim::FireworkPattern()},
+            
+            // {.column = COL_OPHANIM, .slot = 11, .pattern = new Ophanim::AntichasePattern()},
+           
+            // {.column = COL_OPHANIM, .slot = 12, .pattern = new Ophanim::ClivePattern<SinFast>(0, 500, 2000)},
+            // {.column = COL_OPHANIM, .slot = 13, .pattern = new Ophanim::ClivePattern<SinFast>(1, 10, 2000)},
+            // {.column = COL_OPHANIM, .slot = 14, .pattern = new Ophanim::GlowPulsePattern()},
+
+            // 
+            // {.column = COL_OPHANIM, .slot = 16, .pattern = new Ophanim::SquareGlitchPattern()},
+            // {.column = COL_OPHANIM, .slot = 17, .pattern = new Ophanim::ClivePattern<SawDown>(1, 25, 500, 1, 0.1)},
         });
 
     hyp->addPipe(
@@ -363,23 +388,35 @@ void addOphanimPipe(Hyperion *hyp)
             ring1Input,
             new MonitorOutput(&hyp->webServer, &ring1Map, 60, 0.025)));
 
-    auto ring2Input = new ControlHubInput<RGBA>(
+    auto ring2Input = new ControlHubInput<Monochrome>(
         ring2Map.size(),
         &hyp->hub,
         {
-            {.column = COL_OPHANIM, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
-            {.column = COL_OPHANIM, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
-            {.column = COL_OPHANIM, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
-            {.column = COL_OPHANIM, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
-            {.column = COL_OPHANIM, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
-            {.column = COL_OPHANIM, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-            {.column = COL_OPHANIM, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
-            {.column = COL_OPHANIM, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
-            {.column = COL_OPHANIM, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+            {.column = COL_OPHANIM_HALO, .slot = 0, .pattern = new MonochromePatterns::BlinderPattern()},
+            {.column = COL_OPHANIM_HALO, .slot = 1, .pattern = new MonochromePatterns::SinPattern()},
+            {.column = COL_OPHANIM_HALO, .slot = 2, .pattern = new MonochromePatterns::GlowPattern()},
+            {.column = COL_OPHANIM_HALO, .slot = 3, .pattern = new MonochromePatterns::LFOPattern<SoftSawDown>("Soft Saw Down")},
+            {.column = COL_OPHANIM_HALO, .slot = 4, .pattern = new MonochromePatterns::BeatShakePattern()},
+            {.column = COL_OPHANIM_HALO, .slot = 5, .pattern = new MonochromePatterns::BeatMultiFadePattern()},
+            {.column = COL_OPHANIM_HALO, .slot = 6, .pattern = new MonochromePatterns::LFOPattern<Glow>("Neg Cos")},
+            {.column = COL_OPHANIM_HALO, .slot = 7, .pattern = new MonochromePatterns::BeatSingleFadePattern()},
+
+            {.column = COL_OPHANIM_FLASH, .slot = 4, .pattern = new MonochromePatterns::OnPattern()},
+            {.column = COL_OPHANIM_FLASH, .slot = 5, .pattern = new MonochromePatterns::GlitchPattern()},
+            {.column = COL_OPHANIM_FLASH, .slot = 6, .pattern = new MonochromePatterns::BeatAllFadePattern()},
+
+            {.column = COL_OPHANIM_HALO, .slot = 8, .pattern = new MonochromePatterns::LFOPattern<Sin>("Sin")},
+            {.column = COL_OPHANIM_HALO, .slot = 9, .pattern = new MonochromePatterns::LFOPattern<PWM>("PWM")},
+            {.column = COL_OPHANIM_HALO, .slot = 10, .pattern = new MonochromePatterns::BeatStepPattern()},
+            {.column = COL_OPHANIM_HALO, .slot = 11, .pattern = new MonochromePatterns::SlowStrobePattern()},
+            {.column = COL_OPHANIM_HALO, .slot = 12, .pattern = new MonochromePatterns::BeatAllFadePattern()},
+            {.column = COL_OPHANIM_HALO, .slot = 13, .pattern = new MonochromePatterns::OnPattern()},
+
+            
         });
 
     hyp->addPipe(
-        new ConvertPipe<RGBA, RGB>(
+        new ConvertPipe<Monochrome, RGB>(
             ring2Input,
             new MonitorOutput(&hyp->webServer, &ring2Map, 60, 0.025)));
 
@@ -387,15 +424,32 @@ void addOphanimPipe(Hyperion *hyp)
         ring3Map.size(),
         &hyp->hub,
         {
-            {.column = COL_OPHANIM, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
-            {.column = COL_OPHANIM, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
-            {.column = COL_OPHANIM, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
-            {.column = COL_OPHANIM, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
-            {.column = COL_OPHANIM, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
-            {.column = COL_OPHANIM, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-            {.column = COL_OPHANIM, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
-            {.column = COL_OPHANIM, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
-            {.column = COL_OPHANIM, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+            {.column = COL_OPHANIM, .slot = 0, .pattern = new Ophanim::MonochromePattern()},
+            {.column = COL_OPHANIM, .slot = 1, .pattern = new Ophanim::StereochromePattern(1)},
+            {.column = COL_OPHANIM, .slot = 2, .pattern = new Ophanim::SinPattern()},
+            {.column = COL_OPHANIM, .slot = 3, .pattern = new Ophanim::ChasePattern()},
+            {.column = COL_OPHANIM, .slot = 4, .pattern = new Ophanim::SinStripPattern()},
+            {.column = COL_OPHANIM, .slot = 5, .pattern = new Ophanim::SinStripPattern2()},
+            {.column = COL_OPHANIM, .slot = 6, .pattern = new Ophanim::OnbeatFadeAllPattern()},
+            
+            {.column = COL_OPHANIM, .slot = 7, .pattern = new Ophanim::SlowStrobePattern()},
+
+            {.column = COL_OPHANIM_MASK, .slot = 0, .pattern = new Ophanim::SinChaseMaskPattern()},
+            {.column = COL_OPHANIM_MASK, .slot = 1, .pattern = new Ophanim::GlowPulseMaskPattern()},
+
+            {.column = COL_OPHANIM_FLASH, .slot = 0, .pattern = new Ophanim::MonochromePattern()},
+            {.column = COL_OPHANIM_FLASH, .slot = 1, .pattern = new Ophanim::SquareGlitchPattern()},
+            {.column = COL_OPHANIM_FLASH, .slot = 2, .pattern = new Ophanim::OnbeatFadeAllPattern()},
+
+            {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            {.column = COL_DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = COL_DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = COL_DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = COL_DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = COL_DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = COL_DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+            {.column = COL_DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            {.column = COL_DEBUG, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
         });
 
     hyp->addPipe(

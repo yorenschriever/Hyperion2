@@ -38,7 +38,7 @@ namespace TestPatterns
             for (int i = 0; i < width; i++)
             {
                 if (i % segmentSize < 20)
-                    pixels[i] = colors[i / 480] * (1. - (((float)(i % segmentSize)) / 20.));
+                    pixels[i] = colors[(i / (3*60))%6] * (1. - (((float)(i % segmentSize)) / 20.));
             }
         }
     };

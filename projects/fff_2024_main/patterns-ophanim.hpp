@@ -39,10 +39,12 @@ namespace Ophanim
 
     class StereochromePattern : public Pattern<RGBA>
     {
+        int hoepel;
     public:
-        StereochromePattern()
+        StereochromePattern(int hoepel)
         {
             this->name = "Stereochrome";
+            this->hoepel=hoepel;
         }
 
         Transition transition = Transition(
@@ -54,14 +56,13 @@ namespace Ophanim
             if (!transition.Calculate(active))
                 return;
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
-            {
+
                 RGBA col = ((hoepel % 2 == 0) ? params->getPrimaryColour() : params->getSecondaryColour()) * transition.getValue();
-                for (int led = 0; led < RINGSIZE; led++)
+                for (int led = 0; led < width; led++)
                 {
-                    pixels[hoepel * RINGSIZE + led] = col;
+                    pixels[led] = col;
                 }
-            }
+            
         }
     };
 
@@ -268,7 +269,7 @@ namespace Ophanim
                 chase[i].Calculate(Tempo::GetBeatNumber() % 10 == perm.at[i]);
             }
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
+            int hoepel=0;
             {
                 for (int led = 0; led < RINGSIZE; led++)
                 {
@@ -306,13 +307,11 @@ namespace Ophanim
             lfo.setDutyCycle(params->getSize());
             int amount = params->getAmount(1,5);
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
+            for (int led = 0; led < width; led++)
             {
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    pixels[hoepel * RINGSIZE + led] = col * lfo.getValue(amount *(float)led / RINGSIZE + (float)hoepel / (RINGSIZE/2));
-                }
+                pixels[ led] = col * lfo.getValue(amount *(float)led / RINGSIZE);
             }
+            
         }
     };
 
@@ -342,15 +341,11 @@ namespace Ophanim
 
             RGBA col = params->getSecondaryColour() * transition.getValue();
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
+            for (int led = 0; led < width; led++)
             {
-                float dir = hoepel % 2 == 0 ? 1 : -2;
-                // float frq = hoepel % 2 ==0 ? 1 : 2;
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    pixels[hoepel * RINGSIZE + led] = col * lfo.getValue(amount * dir * (float)led / RINGSIZE + (float)hoepel / 20);
-                }
+                pixels[led] = col * lfo.getValue(amount * -1 * (float)led / RINGSIZE + (float)1 / 20);
             }
+    
         }
     };
 
@@ -466,12 +461,9 @@ namespace Ophanim
                 return;
 
             lfo.setPeriod(params->getVelocity(5000, 500));
-            for (int hoepel = 0; hoepel < 2; hoepel++)
-            {
-                RGBA col = params->getPrimaryColour() * lfo.getValue((float)(hoepel) / 10) * transition.getValue();
-                for (int led = 0; led < RINGSIZE; led++)
-                    pixels[hoepel * RINGSIZE + led] = col;
-            }
+
+            for (int led = 0; led < RINGSIZE; led++)
+                pixels[led] = params->getPrimaryColour() * lfo.getValue() * transition.getValue();
         }
     };
 
@@ -496,19 +488,17 @@ namespace Ophanim
 
             lfo.setPeriod(params->getVelocity(5000, 500));
             lfo.setDutyCycle(params->getSize());
-            int amount = params->getAmount(1,3);
+            int amount = params->getAmount(1,5);
             lfo.setSoftEdgeWidth(amount * 1./50);
             
             RGBA col = params->getPrimaryColour() * transition.getValue();
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
+            float dir = 1; // hoepel % 2 ==0 ? 1 : -1;
+            for (int led = 0; led < width; led++)
             {
-                float dir = 1; // hoepel % 2 ==0 ? 1 : -1;
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    pixels[hoepel * RINGSIZE + led] = col * lfo.getValue(amount * dir * (float)led / RINGSIZE);
-                }
+                pixels[led] = col * lfo.getValue(amount * dir * (float)led / RINGSIZE);
             }
+            
         }
     };
 
@@ -537,14 +527,13 @@ namespace Ophanim
             lfo.setSoftEdgeWidth(amount * 1./50);
             RGBA col = params->getSecondaryColour() * transition.getValue();
 
-            for (int hoepel = 0; hoepel < 2; hoepel++)
+            int hoepel=0;
+            float dir = hoepel % 2 == 0 ? 1 : -1;
+            for (int led = 0; led < RINGSIZE; led++)
             {
-                float dir = hoepel % 2 == 0 ? 1 : -1;
-                for (int led = 0; led < RINGSIZE; led++)
-                {
-                    pixels[hoepel * RINGSIZE + led] = col * lfo.getValue(amount * dir * (float)led / RINGSIZE);
-                }
+                pixels[hoepel * RINGSIZE + led] = col * lfo.getValue(amount * dir * (float)led / RINGSIZE);
             }
+            
         }
     };
 
@@ -743,6 +732,66 @@ namespace Ophanim
                     pixels[perm.at[index]] = params->getSecondaryColour() * lfo.getValue(float(Transition::fromCenter(index, width, 1000)) / -1000) * transition.getValue(index, width);
                 else
                     pixels[perm.at[index]] = (params->getSecondaryColour() + (params->getHighlightColour() * (val - 1) / 0.025)) * transition.getValue(index, width);
+            }
+        }
+    };
+
+
+class SinChaseMaskPattern : public Pattern<RGBA>
+    {
+
+        Transition transition;
+        LFO<Glow> lfo;
+
+    public:
+        SinChaseMaskPattern()
+        {
+            this->name = "Sin chase Mask";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            lfo.setDutyCycle(params->getSize(0.1, 1));
+            lfo.setPeriod(params->getVelocity(4000, 500));
+            int amount = params->getAmount(1, 3);
+            float offset = params->getOffset(0, 5);
+
+            for (int i = 0; i < width; i++)
+            {
+                float phase = ((float)i / width) * amount * 48 + float(i % (width / 2)) * offset / width;
+                pixels[i] = RGBA(0, 0, 0, 255) * (1. - lfo.getValue(phase)) * transition.getValue();
+            }
+        }
+    };
+
+    class GlowPulseMaskPattern : public Pattern<RGBA>
+    {
+        Permute perm;
+        LFO<Glow> lfo = LFO<Glow>(10000);
+        Transition transition;
+
+    public:
+        GlowPulseMaskPattern()
+        {
+            this->name = "Glow pulse mask";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
+
+            float amount = params->getAmount(0.005, 0.1);
+            lfo.setPeriod(params->getVelocity(3000, 500) / amount);
+            lfo.setDutyCycle(amount);
+            perm.setSize(width);
+
+            for (int index = 0; index < width; index++)
+            {
+                pixels[perm.at[index]] = RGBA(0, 0, 0, 255) * (1. - lfo.getValue(float(index) / width)) * transition.getValue(index, width);
             }
         }
     };
