@@ -3,7 +3,6 @@
 #include "generation/pixelMap.hpp"
 #include "utils.hpp"
 
-//helper functions to map the bottom (z=-0.45) - top (z=0.45) to range 0-1
 float fromTop(float y){
     return (y + 0.1)/1.1;
 }
