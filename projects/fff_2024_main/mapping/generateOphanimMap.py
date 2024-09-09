@@ -13,14 +13,14 @@ def drawCircle(amount, radius, xc=0, yc=0):
 # Ring 1
 ring1 = []
 ring1.extend(drawCircle(500, 0.95))
-ring1.extend(drawCircle(500, 0.85))
+# ring1.extend(drawCircle(500, 0.85))
 
 # Ring 2
 ring2 = drawCircle(30, 0.70)
 
 # Ring 3
 ring3 = []
-ring3.extend(drawCircle(500, 0.55))
+# ring3.extend(drawCircle(500, 0.55))
 ring3.extend(drawCircle(500, 0.45))
 
 
