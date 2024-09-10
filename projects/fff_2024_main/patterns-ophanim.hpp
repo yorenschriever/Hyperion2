@@ -9,6 +9,13 @@
 
 // const int RINGSIZE = 500;
 
+int remap(int i, int width)
+{
+    if (i < width/2) 
+        return i;
+    return width+width/2-i-1;
+}
+
 namespace Ophanim
 {
 
@@ -309,7 +316,7 @@ namespace Ophanim
 
             for (int led = 0; led < width; led++)
             {
-                pixels[ led] = col * lfo.getValue(amount *(float)led / width);
+                pixels[remap(led,width)] = col * lfo.getValue(amount *(float)led / width);
             }
             
         }
@@ -343,7 +350,7 @@ namespace Ophanim
 
             for (int led = 0; led < width; led++)
             {
-                pixels[led] = col * lfo.getValue(amount * -1 * (float)led / width + (float)1 / 20);
+                pixels[remap(led,width)] = col * lfo.getValue(amount * -1 * (float)led / width + (float)1 / 20);
             }
     
         }
@@ -496,7 +503,7 @@ namespace Ophanim
             float dir = 1; // hoepel % 2 ==0 ? 1 : -1;
             for (int led = 0; led < width; led++)
             {
-                pixels[led] = col * lfo.getValue(amount * dir * (float)led / width);
+                pixels[remap(led,width)] = col * lfo.getValue(amount * dir * (float)led / width);
             }
             
         }
@@ -761,8 +768,8 @@ class SinChaseMaskPattern : public Pattern<RGBA>
 
             for (int i = 0; i < width; i++)
             {
-                float phase = ((float)i / width) * amount * 48 + float(i % (width / 2)) * offset / width;
-                pixels[i] = RGBA(0, 0, 0, 255) * (1. - lfo.getValue(phase)) * transition.getValue();
+                float phase = ((float)i / width) * amount * 2 + float(i % (width / 2)) * offset / width;
+                pixels[remap(i,width)] = RGBA(0, 0, 0, 255) * (1. - lfo.getValue(phase)) * transition.getValue();
             }
         }
     };

@@ -346,10 +346,11 @@ void addTrianglesPipe(Hyperion *hyp)
 //             new MonitorOutput3d(&hyp->webServer, &eyesMap3d, 60, 0.05)));
 // }
 
-const char * ophanimHost = "hyperslave7.local";
+const char * ophanimHost = "hyperslave6.local";
 
 void addOphanimPipe(Hyperion *hyp)
 {
+    const int ring1Size = 2*152;
     auto ring1Input = new ControlHubInput<RGBA>(
         ring1Map.size(),
         &hyp->hub,
@@ -370,7 +371,7 @@ void addOphanimPipe(Hyperion *hyp)
             {.column = COL_OPHANIM_FLASH, .slot = 1, .pattern = new Ophanim::SquareGlitchPattern()},
             {.column = COL_OPHANIM_FLASH, .slot = 2, .pattern = new Ophanim::OnbeatFadeAllPattern()},
 
-            {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(ring1Size/2)},
             {.column = COL_DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
             {.column = COL_DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
             {.column = COL_DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
@@ -408,20 +409,25 @@ void addOphanimPipe(Hyperion *hyp)
     //         new UDPOutput(ophanimHost, 9611, 60),
     //         trianglesLut));
 
-    const int ring1Size = 2*180*sizeof(RGBA);
     auto ring1SplitInput = new InputSlicer(
         ring1Input,
-        {{0, ring1Size, true},
-         {0, ring1Size, false}});
+        {{0, ring1Size/2*sizeof(RGBA), true},
+         {ring1Size/2*sizeof(RGBA), ring1Size/2*sizeof(RGBA), true},
+         {0, ring1Size*sizeof(RGBA), false}});
 
-    hyp->addPipe(new ConvertPipe<RGBA, BGR>(
+    hyp->addPipe(new ConvertPipe<RGBA, GBR>(
             ring1SplitInput->getInput(0),
-            new UDPOutput(ophanimHost, 9611, 60),
+            new UDPOutput(ophanimHost, 9613, 60),
+            trianglesLut));
+
+    hyp->addPipe(new ConvertPipe<RGBA, GBR>(
+            ring1SplitInput->getInput(1),
+            new UDPOutput(ophanimHost, 9614, 60),
             trianglesLut));
 
     hyp->addPipe(
         new ConvertPipe<RGBA, RGB>(
-            ring1SplitInput->getInput(1),
+            ring1SplitInput->getInput(2),
             new MonitorOutput(&hyp->webServer, &ring1Map, 60, 0.025)));
 
     auto ring2Input = new ControlHubInput<Monochrome>(
@@ -476,6 +482,7 @@ void addOphanimPipe(Hyperion *hyp)
             ring2SplitInput->getInput(1),
             new MonitorOutput(&hyp->webServer, &ring2Map, 60, 0.025)));
 
+    const int ring3Size = 2*127;
     auto ring3Input = new ControlHubInput<RGBA>(
         ring3Map.size(),
         &hyp->hub,
@@ -497,7 +504,7 @@ void addOphanimPipe(Hyperion *hyp)
             {.column = COL_OPHANIM_FLASH, .slot = 1, .pattern = new Ophanim::SquareGlitchPattern()},
             {.column = COL_OPHANIM_FLASH, .slot = 2, .pattern = new Ophanim::OnbeatFadeAllPattern()},
 
-            {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(ring3Size/2)},
             {.column = COL_DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
             {.column = COL_DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
             {.column = COL_DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
@@ -518,20 +525,26 @@ void addOphanimPipe(Hyperion *hyp)
     //         new UDPOutput(ophanimHost, 9615, 60),
     //         trianglesLut));
 
-    const int ring3Size = 2*152*sizeof(RGBA);
+    
     auto ring3SplitInput = new InputSlicer(
         ring3Input,
-        {{0, ring3Size, true},
-         {0, ring3Size, false}});
+        {{0, ring3Size/2*sizeof(RGBA), true},
+         {ring3Size/2*sizeof(RGBA), ring3Size/2*sizeof(RGBA), true},
+         {0, ring3Size*sizeof(RGBA), false}});
 
-    hyp->addPipe(new ConvertPipe<RGBA, BGR>(
+    hyp->addPipe(new ConvertPipe<RGBA, GBR>(
             ring3SplitInput->getInput(0),
-            new UDPOutput(ophanimHost, 9615, 60),
+            new UDPOutput(ophanimHost, 9611, 60),
+            trianglesLut));
+
+    hyp->addPipe(new ConvertPipe<RGBA, GBR>(
+            ring3SplitInput->getInput(1),
+            new UDPOutput(ophanimHost, 9612, 60),
             trianglesLut));
 
     hyp->addPipe(
         new ConvertPipe<RGBA, RGB>(
-            ring3SplitInput->getInput(1),
+            ring3SplitInput->getInput(2),
             new MonitorOutput(&hyp->webServer, &ring3Map, 60, 0.025)));
 
 }
