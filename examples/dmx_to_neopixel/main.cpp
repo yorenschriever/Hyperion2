@@ -19,8 +19,9 @@
  * - You can make 8 strings with 64 dmx channels by using all Neopixel outputs
  * etc..
  *
- * Color space encoding will be passed as is. So if you connect an RGB led strip,
- * channel 1 will be R, 2 will be G and 3 will be B.
+ * Color space encoding can be modified with the convertPipe. 
+ * If you connect a RBG ledstrip, R must be mapped to channel 1, G to 2, B to 3.
+
  */
 
 int main()
@@ -29,7 +30,7 @@ int main()
 
   for (int i = 0; i < 8; i++)
   {
-    hyp->addPipe(new Pipe(
+    hyp->addPipe(new ConvertPipe<RGB,GBR>(
         new DMXInput(1 + i * 64),
         new NeopixelOutput(i + 1)));
   }
