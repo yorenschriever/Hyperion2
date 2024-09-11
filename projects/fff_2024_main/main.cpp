@@ -207,27 +207,19 @@ void addTrianglesPipe(Hyperion *hyp)
         });
 
     int triangleSize = 3*60 * sizeof(RGBA);
-    const int numSlices = 16;
+    const int numSlices = 8;
 
     auto splitInput = new InputSlicer(
         trianglesInput,
         {
-         {0  * triangleSize, 1 * triangleSize, true},
-         {1  * triangleSize, 1 * triangleSize, true},
-         {2  * triangleSize, 1 * triangleSize, true},
-         {3  * triangleSize, 1 * triangleSize, true},
-         {4  * triangleSize, 1 * triangleSize, true},
-         {5  * triangleSize, 1 * triangleSize, true},
-         {6  * triangleSize, 1 * triangleSize, true},
-         {7  * triangleSize, 1 * triangleSize, true},
-         {8  * triangleSize, 1 * triangleSize, true},
-         {9  * triangleSize, 1 * triangleSize, true},
-         {10 * triangleSize, 1 * triangleSize, true},
-         {11 * triangleSize, 1 * triangleSize, true},
-         {12  * triangleSize, 1 * triangleSize, true},
-         {13  * triangleSize, 1 * triangleSize, true},
-         {14  * triangleSize, 1 * triangleSize, true},
-         {15  * triangleSize, 1 * triangleSize, true},
+         {0  * triangleSize, 2 * triangleSize, true},
+         {2  * triangleSize, 2 * triangleSize, true},
+         {4  * triangleSize, 2 * triangleSize, true},
+         {6  * triangleSize, 2 * triangleSize, true},
+         {8  * triangleSize, 2 * triangleSize, true},
+         {10 * triangleSize, 2 * triangleSize, true},
+         {12 * triangleSize, 2 * triangleSize, true},
+         {14 * triangleSize, 2 * triangleSize, true},
 
          {0, 16 * triangleSize, false}});
 
@@ -241,20 +233,20 @@ void addTrianglesPipe(Hyperion *hyp)
         {.host = "hyperslave1.local", .port = 9612}, 
         {.host = "hyperslave1.local", .port = 9613}, 
         {.host = "hyperslave1.local", .port = 9614}, 
-        {.host = "hyperslave1.local", .port = 9615}, 
-        {.host = "hyperslave1.local", .port = 9616}, 
-        {.host = "hyperslave1.local", .port = 9617}, 
-        {.host = "hyperslave1.local", .port = 9618}, 
+        // {.host = "hyperslave1.local", .port = 9615}, 
+        // {.host = "hyperslave1.local", .port = 9616}, 
+        // {.host = "hyperslave1.local", .port = 9617}, 
+        // {.host = "hyperslave1.local", .port = 9618}, 
 
-        {.host = "hyperslave5.local", .port = 9611}, 
-        {.host = "hyperslave5.local", .port = 9612}, 
-        {.host = "hyperslave5.local", .port = 9613}, 
-        {.host = "hyperslave5.local", .port = 9614}, 
+        {.host = "hyperslave1.local", .port = 9611}, 
+        {.host = "hyperslave2.local", .port = 9612}, 
+        {.host = "hyperslave2.local", .port = 9613}, 
+        {.host = "hyperslave2x.local", .port = 9614}, 
 
-        {.host = "hyperslave3.local", .port = 9611}, 
-        {.host = "hyperslave3.local", .port = 9612}, 
-        {.host = "hyperslave3.local", .port = 9613}, 
-        {.host = "hyperslave3.local", .port = 9614}, 
+        // {.host = "hyperslave3.local", .port = 9611}, 
+        // {.host = "hyperslave3.local", .port = 9612}, 
+        // {.host = "hyperslave3.local", .port = 9613}, 
+        // {.host = "hyperslave3.local", .port = 9614}, 
     };
 
     for (int i = 0; i < numSlices; i++)
