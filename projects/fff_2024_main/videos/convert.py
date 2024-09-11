@@ -16,6 +16,7 @@ videoName = videoName.replace(" ","_")
 dir = os.path.dirname(__file__)
 
 mapPath = sys.argv[2]
+outFolder = sys.argv[3]
 
 print ("Reading file:", videoPath)
 
@@ -53,7 +54,7 @@ pixels = len(points)
 print ("frames=",frames, "pixels=",pixels,"channels=",channels)
 
 # process frames
-outName = dir+"/processed/"+videoName+".bin"
+outName = os.path.join(dir, "processed", outFolder, videoName+".bin") #dir+"/processed/"+videoName+".bin"
 print ("Saving to file:", outName)
 f = open(outName, "wb")
 f.write(struct.pack('>hhB', frames, pixels, channels))

@@ -1,6 +1,7 @@
 from turtle import *
 from math import pi, cos, sin
 import os
+import json
 
 def drawCircle(amount, radius, xc=0, yc=0):
     result = []
@@ -49,6 +50,13 @@ writePoints("ring2Map", ring2)
 writePoints("ring3Map", ring3)
 f.close()
 
+points = list(map(lambda p: {'x': p['x'] ,'y': p['y'] }, ring1))
+with open(os.path.join(dir, "ophanimRing1Map.json"), "w") as outfile:
+    json.dump(points, outfile)
+
+points = list(map(lambda p: {'x': p['x'] ,'y': p['y'] }, ring3))
+with open(os.path.join(dir, "ophanimRing3Map.json"), "w") as outfile:
+    json.dump(points, outfile)
 
 #export to image for video mask
 
