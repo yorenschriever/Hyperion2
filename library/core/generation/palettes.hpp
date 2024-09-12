@@ -150,7 +150,7 @@ Palette campfire{
         {.position = 255, .color = RGB(0xF27405)},
 
     }),
-    .primary = RGB(0x014040),
+    .primary = RGB(0x03A678),
     .secondary = RGB(0x731702),
     .highlight = RGB(255, 255, 255),
     .name = "Campfire"};

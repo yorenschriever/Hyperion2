@@ -597,22 +597,25 @@ void addPaletteColumn(Hyperion *hyp)
         0,
         0,
         {
-            &campfire,
+            
             &pinkSunset,
             &sunset8,
-            &heatmap,
+            &campfire,
             &heatmap2,
             &sunset2,
-            &retro,
+            &sunset7,
             &tunnel,
+            &redSalvation,
+            &plumBath,
+            
 
             &sunset6,
-            &sunset7,
+            
             &sunset1,
             &coralTeal,
             &deepBlueOcean,
-            &redSalvation,
-            &plumBath,
+            
+            &heatmap,
             &sunset4,
             &candy,
             &sunset3,
@@ -623,6 +626,8 @@ void addPaletteColumn(Hyperion *hyp)
             &purpleGreen,
             &sunset5,
             &salmonOnIce,
+            &sunset2,
+            &retro,
         });
     hyp->hub.subscribe(paletteColumn);
 }
