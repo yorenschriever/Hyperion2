@@ -20,6 +20,7 @@
 auto cTriangleMap3d = triangleMap3d.toCylindricalXZ();
 
 LUT *trianglesLut = new ColourCorrectionLUT(1.8, 255, 200, 200, 200);
+LUT *ophanimLut = new GammaLUT(3, 255);
 
 void addPaletteColumn(Hyperion *hyp);
 void addTrianglesPipe(Hyperion *hyp);
@@ -37,17 +38,14 @@ const int COL_VIDEO2 = 5;
 const int COL_MASK = 6;
 const int COL_FLASH = 7;
 
-const int COL_PALETTE2 = 8;
+// const int COL_PALETTE2 = 8;
 const int COL_OPHANIM = 9;
-const int COL_OPHANIM_VIDEO = 13;
-const int COL_OPHANIM_MASK = 10;
-const int COL_OPHANIM_HALO = 11;
+const int COL_OPHANIM_VIDEO = 10;
+const int COL_OPHANIM_MASK = 11;
 const int COL_OPHANIM_FLASH = 12;
-const int COL_a = 13;
-const int COL_b = 14;
-const int COL_c = 15;
+const int COL_OPHANIM_HALO = 13;
+
 const int COL_DEBUG = 16;
-const int COL_DEBUG2 = 17;
 
 int main()
 {
@@ -207,19 +205,21 @@ void addTrianglesPipe(Hyperion *hyp)
         });
 
     int triangleSize = 3*60 * sizeof(RGBA);
-    const int numSlices = 8;
+    const int numSlices = 9;
 
     auto splitInput = new InputSlicer(
         trianglesInput,
         {
-         {0  * triangleSize, 2 * triangleSize, true},
-         {2  * triangleSize, 2 * triangleSize, true},
-         {4  * triangleSize, 2 * triangleSize, true},
-         {6  * triangleSize, 2 * triangleSize, true},
-         {8  * triangleSize, 2 * triangleSize, true},
-         {10 * triangleSize, 2 * triangleSize, true},
-         {12 * triangleSize, 2 * triangleSize, true},
-         {14 * triangleSize, 2 * triangleSize, true},
+         {0  * triangleSize, 2 * triangleSize, true},//1.2
+         {2  * triangleSize, 2 * triangleSize, true},//1.3
+         {4  * triangleSize, 2 * triangleSize, true},//1.4
+
+         {6  * triangleSize, 2 * triangleSize, true},//2.1
+         {8  * triangleSize, 1 * triangleSize, true},//2.2
+         {9  * triangleSize, 1 * triangleSize, true},//2.3
+         {10 * triangleSize, 2 * triangleSize, true},//2.5
+         {12 * triangleSize, 2 * triangleSize, true},//2.6
+         {14 * triangleSize, 1 * triangleSize, true},//2.7
 
          {0, 16 * triangleSize, false}});
 
@@ -229,19 +229,16 @@ void addTrianglesPipe(Hyperion *hyp)
         const unsigned short port;
     } Slave;
     Slave slaves[numSlices] = {
-        {.host = "hyperslave1.local", .port = 9611}, 
         {.host = "hyperslave1.local", .port = 9612}, 
         {.host = "hyperslave1.local", .port = 9613}, 
         {.host = "hyperslave1.local", .port = 9614}, 
-        // {.host = "hyperslave1.local", .port = 9615}, 
-        // {.host = "hyperslave1.local", .port = 9616}, 
-        // {.host = "hyperslave1.local", .port = 9617}, 
-        // {.host = "hyperslave1.local", .port = 9618}, 
-
-        {.host = "hyperslave1.local", .port = 9611}, 
-        {.host = "hyperslave2.local", .port = 9612}, 
+         
+        {.host = "hyperslave2.local", .port = 9611}, 
+        {.host = "hyperslave2.local", .port = 9612},
         {.host = "hyperslave2.local", .port = 9613}, 
-        {.host = "hyperslave2x.local", .port = 9614}, 
+        {.host = "hyperslave2.local", .port = 9615}, 
+        {.host = "hyperslave2.local", .port = 9616}, 
+        {.host = "hyperslave2.local", .port = 9617}, 
 
         // {.host = "hyperslave3.local", .port = 9611}, 
         // {.host = "hyperslave3.local", .port = 9612}, 
@@ -462,16 +459,16 @@ void addOphanimPipe(Hyperion *hyp)
             {.column = COL_OPHANIM_HALO, .slot = 6, .pattern = new MonochromePatterns::LFOPattern<Glow>("Neg Cos")},
             {.column = COL_OPHANIM_HALO, .slot = 7, .pattern = new MonochromePatterns::BeatSingleFadePattern()},
 
-            {.column = COL_OPHANIM_FLASH, .slot = 4, .pattern = new MonochromePatterns::OnPattern()},
-            {.column = COL_OPHANIM_FLASH, .slot = 5, .pattern = new MonochromePatterns::GlitchPattern()},
-            {.column = COL_OPHANIM_FLASH, .slot = 6, .pattern = new MonochromePatterns::BeatAllFadePattern()},
-
             {.column = COL_OPHANIM_HALO, .slot = 8, .pattern = new MonochromePatterns::LFOPattern<Sin>("Sin")},
             {.column = COL_OPHANIM_HALO, .slot = 9, .pattern = new MonochromePatterns::LFOPattern<PWM>("PWM")},
             {.column = COL_OPHANIM_HALO, .slot = 10, .pattern = new MonochromePatterns::BeatStepPattern()},
             {.column = COL_OPHANIM_HALO, .slot = 11, .pattern = new MonochromePatterns::SlowStrobePattern()},
             {.column = COL_OPHANIM_HALO, .slot = 12, .pattern = new MonochromePatterns::BeatAllFadePattern()},
             {.column = COL_OPHANIM_HALO, .slot = 13, .pattern = new MonochromePatterns::OnPattern()},
+
+            {.column = COL_OPHANIM_FLASH, .slot = 4, .pattern = new MonochromePatterns::OnPattern()},
+            {.column = COL_OPHANIM_FLASH, .slot = 5, .pattern = new MonochromePatterns::GlitchPattern()},
+            {.column = COL_OPHANIM_FLASH, .slot = 6, .pattern = new MonochromePatterns::BeatAllFadePattern()},
 
             
         });
@@ -493,7 +490,8 @@ void addOphanimPipe(Hyperion *hyp)
 
     hyp->addPipe(new ConvertPipe<Monochrome, Monochrome>(
             ring2SplitInput->getInput(0),
-            new UDPOutput(ophanimHost, 9621, 60)
+            new UDPOutput(ophanimHost, 9621, 60),
+            ophanimLut
             ));
 
     hyp->addPipe(
