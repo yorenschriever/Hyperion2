@@ -11,9 +11,11 @@
 
 int remap(int i, int width)
 {
-    if (i < width/2) 
-        return i;
-    return width+width/2-i-1;
+    return i;
+
+    // if (i < width/2) 
+    //     return i;
+    // return width+width/2-i-1;
 }
 
 namespace Ophanim
