@@ -265,7 +265,7 @@ namespace Low
             {
                 if (index % density != 0)
                    continue;
-                float fade = Utils::constrain_f(fromBottom(map->y(perm.at[index]) - fadeSize),0,1);
+                float fade = 1;//Utils::constrain_f(fromBottom(map->y(perm.at[index]) - fadeSize),0,1);
                 pixels[perm.at[index]] = params->getPrimaryColour() * fade * lfo.getValue(float(index)/width) * transition.getValue(index, width);
             }
         }

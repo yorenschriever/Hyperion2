@@ -38,14 +38,14 @@ const int COL_VIDEO2 = 5;
 const int COL_MASK = 6;
 const int COL_FLASH = 7;
 
-// const int COL_PALETTE2 = 8;
+const int COL_PALETTE2 = 8;
 const int COL_OPHANIM = 9;
 const int COL_OPHANIM_VIDEO = 10;
 const int COL_OPHANIM_MASK = 11;
 const int COL_OPHANIM_FLASH = 12;
 const int COL_OPHANIM_HALO = 13;
 
-const int COL_DEBUG = 16;
+// const int COL_DEBUG = 16;
 
 int main()
 {
@@ -78,7 +78,7 @@ int main()
     hyp->hub.setColumnName(COL_OPHANIM_FLASH, "Oph Flash");
     hyp->hub.setColumnName(COL_OPHANIM_HALO, "Oph Halo");
 
-    hyp->hub.setColumnName(COL_DEBUG, "Debug");
+    // hyp->hub.setColumnName(COL_DEBUG, "Debug");
     // hyp->hub.setColumnName(COL_DEBUG2, "Debug Oph");
 
     hyp->hub.setFlashColumn(COL_FLASH);
@@ -192,15 +192,15 @@ void addTrianglesPipe(Hyperion *hyp)
             {.column = COL_FLASH, .slot = 5, .pattern = new Flash::StrobePattern()},
             {.column = COL_FLASH, .slot = 6, .pattern = new Flash::FadingNoisePattern()},
 
-            {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
-            {.column = COL_DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
-            {.column = COL_DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
-            {.column = COL_DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
-            {.column = COL_DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
-            {.column = COL_DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-            {.column = COL_DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
-            {.column = COL_DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
-            {.column = COL_DEBUG, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+            // {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+            // {.column = COL_DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            // {.column = COL_DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            // {.column = COL_DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            // {.column = COL_DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            // {.column = COL_DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            // {.column = COL_DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+            // {.column = COL_DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            // {.column = COL_DEBUG, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
 
         });
 
@@ -229,9 +229,9 @@ void addTrianglesPipe(Hyperion *hyp)
         const unsigned short port;
     } Slave;
     Slave slaves[numSlices] = {
-        {.host = "hyperslave1.local", .port = 9612}, 
-        {.host = "hyperslave1.local", .port = 9613}, 
-        {.host = "hyperslave1.local", .port = 9614}, 
+        {.host = "hyperslave3.local", .port = 9612}, 
+        {.host = "hyperslave3.local", .port = 9613}, 
+        {.host = "hyperslave3.local", .port = 9614}, 
          
         {.host = "hyperslave2.local", .port = 9611}, 
         {.host = "hyperslave2.local", .port = 9612},
@@ -387,15 +387,15 @@ void addOphanimPipe(Hyperion *hyp)
             {.column = COL_OPHANIM_FLASH, .slot = 1, .pattern = new Ophanim::SquareGlitchPattern()},
             {.column = COL_OPHANIM_FLASH, .slot = 2, .pattern = new Ophanim::OnbeatFadeAllPattern()},
 
-            {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(ring1Size/2)},
-            {.column = COL_DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
-            {.column = COL_DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
-            {.column = COL_DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
-            {.column = COL_DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
-            {.column = COL_DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-            {.column = COL_DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
-            {.column = COL_DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
-            {.column = COL_DEBUG, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+            // {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(ring1Size/2)},
+            // {.column = COL_DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            // {.column = COL_DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            // {.column = COL_DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            // {.column = COL_DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            // {.column = COL_DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            // {.column = COL_DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+            // {.column = COL_DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            // {.column = COL_DEBUG, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
 
             // {.column = COL_OPHANIM, .slot = 6, .pattern = new Ophanim::GradientPattern()},
             // {.column = COL_OPHANIM, .slot = 7, .pattern = new Ophanim::HoepelsTransition()},
@@ -433,12 +433,12 @@ void addOphanimPipe(Hyperion *hyp)
 
     hyp->addPipe(new ConvertPipe<RGBA, GBR>(
             ring1SplitInput->getInput(0),
-            new UDPOutput(ophanimHost, 9613, 60),
+            new UDPOutput(ophanimHost, 9611, 60),
             trianglesLut));
 
     hyp->addPipe(new ConvertPipe<RGBA, GBR>(
             ring1SplitInput->getInput(1),
-            new UDPOutput(ophanimHost, 9614, 60),
+            new UDPOutput(ophanimHost, 9612, 60),
             trianglesLut));
 
     hyp->addPipe(
@@ -545,15 +545,15 @@ void addOphanimPipe(Hyperion *hyp)
             {.column = COL_OPHANIM_FLASH, .slot = 1, .pattern = new Ophanim::SquareGlitchPattern()},
             {.column = COL_OPHANIM_FLASH, .slot = 2, .pattern = new Ophanim::OnbeatFadeAllPattern()},
 
-            {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(ring3Size/2)},
-            {.column = COL_DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
-            {.column = COL_DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
-            {.column = COL_DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
-            {.column = COL_DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
-            {.column = COL_DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-            {.column = COL_DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
-            {.column = COL_DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
-            {.column = COL_DEBUG, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+            // {.column = COL_DEBUG, .slot = 0, .pattern = new TestPatterns::ShowStarts(ring3Size/2)},
+            // {.column = COL_DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            // {.column = COL_DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            // {.column = COL_DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            // {.column = COL_DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            // {.column = COL_DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            // {.column = COL_DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+            // {.column = COL_DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+            // {.column = COL_DEBUG, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
         });
 
     // hyp->addPipe(
@@ -575,12 +575,12 @@ void addOphanimPipe(Hyperion *hyp)
 
     hyp->addPipe(new ConvertPipe<RGBA, GBR>(
             ring3SplitInput->getInput(0),
-            new UDPOutput(ophanimHost, 9611, 60),
+            new UDPOutput(ophanimHost, 9613, 60),
             trianglesLut));
 
     hyp->addPipe(new ConvertPipe<RGBA, GBR>(
             ring3SplitInput->getInput(1),
-            new UDPOutput(ophanimHost, 9612, 60),
+            new UDPOutput(ophanimHost, 9614, 60),
             trianglesLut));
 
     hyp->addPipe(

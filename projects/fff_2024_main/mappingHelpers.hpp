@@ -4,7 +4,7 @@
 #include "utils.hpp"
 
 float fromTop(float y){
-    return (y + 0.1)/1.1;
+    return (y - 0.1)/0.9;
 }
 
 float fromBottom(float y){
