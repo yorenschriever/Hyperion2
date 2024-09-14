@@ -19,7 +19,7 @@ private:
     int sock = 0;
 
 public:
-    Socket(uint16_t port = 0, int addr_family = AF_INET, int receive_timeout=0)
+    Socket(uint16_t port = 0, int addr_family = AF_INET, int receive_timeout=0, bool broadcast=false)
     {
         int err;
         this->addr_family = addr_family;
@@ -68,6 +68,11 @@ public:
                 Log::error(TAG, "unable to bind to port %d. error code %d", port, sock);
             }
         }
+
+        if (broadcast){
+            int broadcastEnable=1;
+            setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
+        }
     }
 
     int send(IPAddress *destination, uint16_t port, uint8_t *payload, unsigned int len)
@@ -107,7 +112,7 @@ public:
                 Log::error(TAG, "cannot use ipv4 socket for this ipaddress");
                 return -1;
             }
-            // Log::info(TAG,"sending to %s", destination->toString().c_str());
+            //Log::info(TAG,"sending to %s:%d", destination->toString().c_str(), port);
             auto dest_addr = *(&destination->ip4);
             dest_addr.sin_port = htons(port);
             err = ::sendto(sock, (void *)payload, len, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
@@ -138,6 +143,7 @@ public:
         if (len < 0 && errno != EWOULDBLOCK)
         {
             Log::error(TAG, "error during recvfrom: errno: %d", errno);
+            return 0;
         }
 
         return len;
@@ -166,16 +172,17 @@ public:
         if (ms == 0)
         {
             const int flags = fcntl(sock, F_GETFL, 0);
-            if (flags < 0)
+            if (flags == -1)
             {
                 Log::error(TAG, "unable to set non blocking node");
                 return -1;
             }
-            if (fcntl(sock, F_SETFL, flags | O_NONBLOCK) < 0)
+            if (fcntl(sock, F_SETFL, flags | O_NONBLOCK) != 0)
             {
                 Log::error(TAG, "unable to set non blocking mode");
                 return -1;
             }
+            return 0;
         }
 
         struct timeval timeout;

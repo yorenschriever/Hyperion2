@@ -43,8 +43,10 @@ private:
     Socket syncSocket = Socket(PRO_DJ_LINK_PORT_SYNC);
     Socket statusSocket = Socket(PRO_DJ_LINK_PORT_STATUS);
     Socket keepAliveSocket = Socket(PRO_DJ_LINK_PORT_KEEP_ALIVE);
+    Socket keepAliveSocket2 = Socket(0,AF_INET,5, true);
     unsigned long lastKeepAlive = 0; // when the last keep alive was sent to the other players
     int master = -1;                 // the cd player that is currently tempo master
+    int lastbeat = -1;
     uint8_t buffer[1500];            // newer cdj versions tend to send longer and longer packets, allocate enough buffer for forward compatibility
     const char proDjLinkHeader[10] = {0x51, 0x73, 0x70, 0x74, 0x31, 0x57, 0x6d, 0x4a, 0x4f, 0x4c};
 
@@ -56,7 +58,7 @@ private:
     void TempoTask()
     {
         int len;
-        while ((len = syncSocket.receive(buffer, sizeof(buffer))))
+        while (len = syncSocket.receive(buffer, sizeof(buffer)) > 0)
         {
             if (!(isProDjLink(buffer) && buffer[PACKET_TYPE_INDICATOR] == PACKET_TYPE_BEAT))
                 continue;
@@ -69,9 +71,11 @@ private:
             if (master == -1 && beatNumber != 16)
                 master = device;
 
-            if (device == master)
+            if (device == master && lastbeat != beatNumber)
             {
                 beat();
+                lastbeat = beatNumber;
+                Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
 
                 // adjust the beat counter if it is not in sync with the beat counter of the cdj anymore.
                 int beatMod4cdj = beatNumber - 1;   // beat number 0-3 from the cdj
@@ -90,12 +94,12 @@ private:
                 }
             }
             validSignal = true;
-            // Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d\r\n", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
+            // Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
         }
 
-        while ((len = statusSocket.receive(buffer, sizeof(buffer))))
+        while (len = statusSocket.receive(buffer, sizeof(buffer)) > 0)
         {
-            // Log::info(TAG, "status %x, %x\r\n", len, buffer[PACKET_TYPE_INDICATOR]);
+            // Log::info(TAG, "status %x, %x", len, buffer[PACKET_TYPE_INDICATOR]);
 
             if (!(isProDjLink(buffer) && buffer[PACKET_TYPE_INDICATOR] == PACKET_TYPE_STATUS))
                 continue;
@@ -105,17 +109,22 @@ private:
             if (isMaster && master != device)
             {
                 master = device;
+                lastbeat = -1;
                 Log::info(TAG, "Master handoff to %d", device);
             }
         }
 
-        while ((len = keepAliveSocket.receive(buffer, sizeof(buffer))))
+        while (len = keepAliveSocket.receive(buffer, sizeof(buffer)) > 0)
         {
             // Log::info(TAG,"got keep alive %x, %x\r\n", len, buffer[0x0a]);
+            // Log::info(TAG,"received keepalive %d.%d.%d.%d", buffer[0x2c], buffer[0x2d],buffer[0x2e],buffer[0x2f]);
         }
 
-        if (Utils::millis() - lastKeepAlive > 300 && Ethernet::isConnected())
+        // Log::info(TAG,"keep alive? %lu, %lu,   %d, %d", Utils::millis(), lastKeepAlive, Utils::millis() - lastKeepAlive > 300, Ethernet::isConnected());
+        if (((Utils::millis() - lastKeepAlive) > 300) && Ethernet::isConnected()){
             SendKeepAlive();
+            lastKeepAlive = Utils::millis();
+        }
     }
 
     void SendKeepAlive()
@@ -129,7 +138,8 @@ private:
             0x06, 0x00,
 
             // device name
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
             // packet structure?
             1, 2,
@@ -151,21 +161,27 @@ private:
             // ?
             1, 0, 0, 0, 1, 0};
 
-        uint32_t ip = Ethernet::getIp().toUint32();
+        uint32_t ip = htonl(Ethernet::getIp().toUint32());
 
         memcpy(buffer + 0x26, Ethernet::getMac().octets, 6);
         memcpy(buffer + 0x2c, &ip, 4);
 
+        const bool cdj3000=true;
+        if (cdj3000){
+            buffer[0x30]=0x02;
+            buffer[0x35]=0x64;
+        }
+
         auto broadcastIp = IPAddress::broadcast();
-        statusSocket.send(
+        keepAliveSocket2.send(
             &broadcastIp,
             PRO_DJ_LINK_PORT_KEEP_ALIVE,
             buffer,
             sizeof(buffer));
 
-        lastKeepAlive = Utils::millis();
+        // Log::info(TAG,"sent keepalive %d.%d.%d.%d", buffer[0x2c], buffer[0x2d],buffer[0x2e],buffer[0x2f]);
+        // Log::info(TAG,"sent keepalive mac %x:%x:%x:%x:%x:%x", buffer[0x26], buffer[0x27],buffer[0x28],buffer[0x29],buffer[0x2a],buffer[0x2b]);
 
-        // Log::info(TAG,"send keepalive");
     }
 };
 
