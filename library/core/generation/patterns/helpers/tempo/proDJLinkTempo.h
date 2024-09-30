@@ -58,7 +58,7 @@ private:
     void TempoTask()
     {
         int len;
-        while (len = syncSocket.receive(buffer, sizeof(buffer)) > 0)
+        while ((len = syncSocket.receive(buffer, sizeof(buffer)) > 0))
         {
             if (!(isProDjLink(buffer) && buffer[PACKET_TYPE_INDICATOR] == PACKET_TYPE_BEAT))
                 continue;
@@ -97,7 +97,7 @@ private:
             // Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
         }
 
-        while (len = statusSocket.receive(buffer, sizeof(buffer)) > 0)
+        while ((len = statusSocket.receive(buffer, sizeof(buffer)) > 0))
         {
             // Log::info(TAG, "status %x, %x", len, buffer[PACKET_TYPE_INDICATOR]);
 
@@ -114,7 +114,7 @@ private:
             }
         }
 
-        while (len = keepAliveSocket.receive(buffer, sizeof(buffer)) > 0)
+        while ((len = keepAliveSocket.receive(buffer, sizeof(buffer)) > 0))
         {
             // Log::info(TAG,"got keep alive %x, %x\r\n", len, buffer[0x0a]);
             // Log::info(TAG,"received keepalive %d.%d.%d.%d", buffer[0x2c], buffer[0x2d],buffer[0x2e],buffer[0x2f]);
