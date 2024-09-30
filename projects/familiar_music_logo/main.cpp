@@ -1,9 +1,9 @@
 #include "hyperion.hpp"
 #include "mapping/bulbMap.hpp"
 #include "mapping/ledMap.hpp"
-#include "bulbPatterns.hpp"
 #include "ledPatterns.hpp"
 #include "patterns-monochrome.hpp"
+#include "patterns-monochrome-mapped.hpp"
 
 LUT *incandescentLut8 = new IncandescentLUT(2.5, 255, 24);
 
@@ -11,7 +11,10 @@ void addLedPipe(Hyperion *hyp);
 void addBulbPipe(Hyperion *hyp);
 
 #define COL_BULBS 0
-#define COL_LEDS 1
+#define COL_BULBS_MAPPED 1
+#define COL_LEDS 2
+
+PixelMap::Polar pBulbMap = bulbMap.toPolar();
 
 int main()
 {
@@ -21,6 +24,7 @@ int main()
   addLedPipe(hyp);
 
   hyp->hub.setColumnName(COL_BULBS, "Bulbs");
+  hyp->hub.setColumnName(COL_BULBS_MAPPED, "Bulbs mapped");
   hyp->hub.setColumnName(COL_LEDS, "Leds");
 
   hyp->start();
@@ -54,6 +58,10 @@ void addBulbPipe(Hyperion *hyp)
             {.column = COL_BULBS, .slot = 14, .pattern = new MonochromePatterns::OnPattern()},
             {.column = COL_BULBS, .slot = 15, .pattern = new MonochromePatterns::GlitchPattern()},
             {.column = COL_BULBS, .slot = 16, .pattern = new MonochromePatterns::BeatAllFadePattern()},
+
+            {.column = COL_BULBS_MAPPED, .slot = 0, .pattern = new MonochromeMappedPatterns::SinPattern(&bulbMap)},
+            {.column = COL_BULBS_MAPPED, .slot = 1, .pattern = new MonochromeMappedPatterns::RadialFadePattern(&pBulbMap)},
+
       });
 
   auto pipe = new ConvertPipe<Monochrome, RGB>(
