@@ -114,14 +114,17 @@ scale = 2./height
 xOffset = -1. + (height-width)/2 * scale
 yOffset = -1.
 
-f = open("bulbMap.hpp", "w")
+import os
+dir = os.path.dirname(os.path.realpath(__file__))
+
+f = open(os.path.join(dir, "bulbMap.hpp", "w"))
 f.write("PixelMap bulbMap = {\n")
 for point in bulbs:
     f.write("    {.x = " + str(point['x'] * scale + xOffset) + ", .y = " + str(point['y']*scale + yOffset) + "},\n")
 f.write("};\n\n")
 f.close()
 
-f = open("ledMap.hpp", "w")
+f = open(os.path.join(dir, "ledMap.hpp", "w"))
 f.write("PixelMap ledMap = {\n")
 for point in leds:
     f.write("    {.x = " + str(point['x'] * scale + xOffset) + ", .y = " + str(point['y']*scale + yOffset) + "},\n")

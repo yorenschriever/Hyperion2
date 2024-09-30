@@ -3,6 +3,7 @@
 #include "mapping/ledMap.hpp"
 #include "bulbPatterns.hpp"
 #include "ledPatterns.hpp"
+#include "patterns-monochrome.hpp"
 
 LUT *incandescentLut8 = new IncandescentLUT(2.5, 255, 24);
 
@@ -31,13 +32,31 @@ int main()
 void addBulbPipe(Hyperion *hyp)
 {
   auto input = new ControlHubInput<Monochrome>(
-      ledMap.size(),
+      bulbMap.size(),
       &hyp->hub,
       {
-          {.column = COL_BULBS, .slot = 0, .pattern = new BulbPatterns::OnPattern()},
+            {.column = COL_BULBS, .slot = 0, .pattern = new MonochromePatterns::BlinderPattern()},
+            {.column = COL_BULBS, .slot = 1, .pattern = new MonochromePatterns::SinPattern()},
+            {.column = COL_BULBS, .slot = 2, .pattern = new MonochromePatterns::GlowPattern()},
+            {.column = COL_BULBS, .slot = 3, .pattern = new MonochromePatterns::LFOPattern<SoftSawDown>("Soft Saw Down")},
+            {.column = COL_BULBS, .slot = 4, .pattern = new MonochromePatterns::BeatShakePattern()},
+            {.column = COL_BULBS, .slot = 5, .pattern = new MonochromePatterns::BeatMultiFadePattern()},
+            {.column = COL_BULBS, .slot = 6, .pattern = new MonochromePatterns::LFOPattern<Glow>("Neg Cos")},
+            {.column = COL_BULBS, .slot = 7, .pattern = new MonochromePatterns::BeatSingleFadePattern()},
+
+            {.column = COL_BULBS, .slot = 8, .pattern = new MonochromePatterns::LFOPattern<Sin>("Sin")},
+            {.column = COL_BULBS, .slot = 9, .pattern = new MonochromePatterns::LFOPattern<PWM>("PWM")},
+            {.column = COL_BULBS, .slot = 10, .pattern = new MonochromePatterns::BeatStepPattern()},
+            {.column = COL_BULBS, .slot = 11, .pattern = new MonochromePatterns::SlowStrobePattern()},
+            {.column = COL_BULBS, .slot = 12, .pattern = new MonochromePatterns::BeatAllFadePattern()},
+            {.column = COL_BULBS, .slot = 13, .pattern = new MonochromePatterns::OnPattern()},
+
+            {.column = COL_BULBS, .slot = 14, .pattern = new MonochromePatterns::OnPattern()},
+            {.column = COL_BULBS, .slot = 15, .pattern = new MonochromePatterns::GlitchPattern()},
+            {.column = COL_BULBS, .slot = 16, .pattern = new MonochromePatterns::BeatAllFadePattern()},
       });
 
-  auto pipe = new ConvertPipe<Monochrome, Monochrome>(
+  auto pipe = new ConvertPipe<Monochrome, RGB>(
       input,
       new MonitorOutput(&hyp->webServer, &bulbMap, 60, .03));
 
