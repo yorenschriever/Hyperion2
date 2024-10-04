@@ -1,15 +1,18 @@
 #include "hyperion.hpp"
 #include "mapping/bulbMap.hpp"
 #include "mapping/ledMap.hpp"
+#include "patterns-chevrons.hpp"
 #include "patterns-led.hpp"
 #include "patterns-monochrome-mapped.hpp"
 #include "patterns-monochrome.hpp"
 
 LUT *incandescentLut8 = new IncandescentLUT(2.5, 255, 24);
+LUT *trianglesLut = new ColourCorrectionLUT(1.8, 255, 200, 200, 200);
 
-void addLedPipe(Hyperion *hyp);
-void addBulbPipe(Hyperion *hyp);
+// void addLedPipe(Hyperion *hyp);
+// void addBulbPipe(Hyperion *hyp);
 void addLaserBarsPipe(Hyperion *hyp);
+void addChevronsPipe(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
 
 #define COL_PALETTE 0
@@ -17,6 +20,7 @@ void addPaletteColumn(Hyperion *hyp);
 #define COL_BULBS_MAPPED 2
 #define COL_LEDS 3
 #define COL_LASER_BARS 4
+#define COL_CHEVRONS 5
 
 PixelMap::Polar pBulbMap = bulbMap.toPolar();
 
@@ -25,8 +29,9 @@ int main()
     auto hyp = new Hyperion();
 
     addPaletteColumn(hyp);
-    addBulbPipe(hyp);
-    addLedPipe(hyp);
+    // addBulbPipe(hyp);
+    // addLedPipe(hyp);
+    addChevronsPipe(hyp);
     addLaserBarsPipe(hyp);
 
     hyp->hub.setColumnName(COL_PALETTE, "Palette");
@@ -34,6 +39,7 @@ int main()
     hyp->hub.setColumnName(COL_BULBS_MAPPED, "Bulbs mapped");
     hyp->hub.setColumnName(COL_LEDS, "Leds");
     hyp->hub.setColumnName(COL_LASER_BARS, "Lasers");
+    hyp->hub.setColumnName(COL_CHEVRONS, "Chevrons");
 
     hyp->hub.setFlashColumn(COL_PALETTE, false, true);
     hyp->hub.setForcedSelection(COL_PALETTE);
@@ -82,7 +88,7 @@ void addBulbPipe(Hyperion *hyp)
 
     //   auto pipe = new ConvertPipe<Monochrome, RGB>(
     //       input,
-    //       new UDPOutput("hyperslave3.local", 9615, 60));
+    //       new UDPOutput("hyperslave5.local", 9618, 60));
 
     hyp->addPipe(pipe);
 }
@@ -115,14 +121,14 @@ void addLedPipe(Hyperion *hyp)
 
     //   auto pipe = new ConvertPipe<RGBA, RGB>(
     //       input,
-    //       new UDPOutput("hyperslave3.local", 9611, 60));
+    //       new UDPOutput("hyperslave5.local", 9611, 60));
 
     hyp->addPipe(pipe);
 }
 
 void addLaserBarsPipe(Hyperion *hyp)
 {
-    const int numLasers = 30;
+    const int numLasers = 60;
     auto input = new ControlHubInput<Monochrome>(
         numLasers,
         &hyp->hub,
@@ -154,6 +160,54 @@ void addLaserBarsPipe(Hyperion *hyp)
         new UDPOutput("hyperslave2.local", 9611, 60));
 
     hyp->addPipe(pipe);
+}
+
+void addChevronsPipe(Hyperion *hyp)
+{
+    const int numLeds = 60 * 2 * 10;
+    auto input = new ControlHubInput<RGBA>(
+        numLeds,
+        &hyp->hub,
+        {
+
+            {.column = COL_CHEVRONS, .slot = 9, .pattern = new Chevrons::RibbenClivePattern<Glow>(10000, 1, 0.15)},
+            {.column = COL_CHEVRONS, .slot = 10, .pattern = new Chevrons::RibbenFlashPattern()},
+
+            {.column = COL_CHEVRONS, .slot = 0, .pattern = new LedPatterns::PalettePattern(0, "primary")},
+            {.column = COL_CHEVRONS, .slot = 1, .pattern = new LedPatterns::PalettePattern(1, "secondary")},
+            {.column = COL_CHEVRONS, .slot = 2, .pattern = new LedPatterns::GlowPulsePattern()},
+            {.column = COL_CHEVRONS, .slot = 3, .pattern = new LedPatterns::SegmentChasePattern()},
+            {.column = COL_CHEVRONS, .slot = 4, .pattern = new LedPatterns::FlashesPattern()},
+            {.column = COL_CHEVRONS, .slot = 5, .pattern = new LedPatterns::StrobePattern()},
+            {.column = COL_CHEVRONS, .slot = 6, .pattern = new LedPatterns::PixelGlitchPattern()},
+            {.column = COL_CHEVRONS, .slot = 7, .pattern = new LedPatterns::FadingNoisePattern()},
+            {.column = COL_CHEVRONS, .slot = 8, .pattern = new LedPatterns::StrobeHighlightPattern()},
+
+        });
+
+    int totalBytes = numLeds * sizeof(RGBA);
+
+    auto splitInput = new InputSlicer(
+        input, {
+        {0 * totalBytes / 4, totalBytes / 4, true}, 
+         {1 * totalBytes / 4, totalBytes / 4, true}, 
+         {2 * totalBytes / 4, totalBytes / 4, true}, 
+         {3 * totalBytes / 4, totalBytes / 4, true}
+        });
+
+    for (int i = 0; i < 4; i++)
+    {
+        auto pipe = new ConvertPipe<RGBA, GBR>(
+            splitInput->getInput(i),
+            new UDPOutput("hyperslave5.local", 9611 + i, 60),
+            trianglesLut);
+        hyp->addPipe(pipe);
+    }
+
+    // auto pipe = new ConvertPipe<RGBA, BGR>(
+    //     input,
+    //     new UDPOutput("hyperslave5.local", 9611, 60));
+    // hyp->addPipe(pipe);
 }
 
 void addPaletteColumn(Hyperion *hyp)
