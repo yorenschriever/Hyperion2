@@ -48,7 +48,7 @@ public:
 private:
     void ControlHubInput_(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns)
     {
-        this->length = length;
+        this->_length = length;
         this->slotPatterns = slotPatterns;
         this->hub = hub;
         this->ledData = (T_COLOUR *)malloc(length * sizeof(T_COLOUR));
@@ -72,9 +72,13 @@ private:
 
 public:
 
+    int length(){
+        return _length;
+    }
+
     void begin() override
     {
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < _length; i++)
             this->ledData[i] = T_COLOUR();
 
         for (auto slotPattern : slotPatterns)
@@ -83,8 +87,8 @@ public:
 
     int loadData(uint8_t *dataPtr, unsigned int buffersize) override
     {
-        int safeLength = std::min(length, (int)(buffersize / sizeof(T_COLOUR)));
-        if (safeLength != length)
+        int safeLength = std::min(_length, (int)(buffersize / sizeof(T_COLOUR)));
+        if (safeLength != _length)
         {
             Log::error("CONTROL_HUB_INPUT", "loadData buffer size not large enough");
         }
@@ -130,7 +134,7 @@ public:
     }
 
 private:
-    int length = 0;
+    int _length = 0;
     T_COLOUR *ledData;
 
     std::vector<SlotPattern> slotPatterns;
