@@ -1,0 +1,36 @@
+body {
+    background-color: #333;
+}
+
+.windows {
+    display: flex;
+    height:100%;
+    gap: 100px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.window {
+    position: relative;
+    width:200px;
+    height:255px;
+    background-color: #eee;
+    display: inline-block;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.shutterTop {
+    position: absolute;
+    top: 0;
+    width:100%;
+    background-color:#000;
+}
+
+.shutterBottom {
+    position: absolute;
+    bottom: 0;
+    width:100%;
+    background-color:#000;
+}
