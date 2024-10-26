@@ -1,27 +1,40 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
-    background-color: #333;
+    background-color: #191919;
+    width:  100%;
+    height: 100%;
+    padding: 25px;
+    overflow: hidden;
 }
 
 .windows {
     display: flex;
     height:100%;
-    gap: 100px;
+    width:100%;
+    gap: 20px;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-betweem;
+
+    /* background-color: red; */
 }
 
 .window {
     position: relative;
-    width:200px;
-    height:255px;
+
+    width:100%;
+    height:50%;
+
     background-color: #eee;
     display: inline-block;
     border-radius: 10px;
     overflow: hidden;
 }
 
-.shutterTop {
+ .shutterTop {
     position: absolute;
     top: 0;
     width:100%;
@@ -33,4 +46,15 @@ body {
     bottom: 0;
     width:100%;
     background-color:#000;
+} 
+
+ 
+/* .shutterTop {
+    left:-10px;
+    background-color:#300;
 }
+
+.shutterBottom {
+    right:-10px;
+    background-color:#030;
+}  */

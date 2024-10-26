@@ -12,14 +12,17 @@ int main()
         1,
         {
             new Window::SinPattern(),
-            // new Max::ChevronsPattern(&triangleMap3d),
-            // new Max::ChevronsPattern(&triangleMap3d)
+            new Window::SinGapPattern(),
+            new Window::FallingPattern(),
         }
     );
-    hyp->addPipe(new ConvertPipe<MotorPosition, MotorPosition>(
+    hyp->addPipe(new ConvertPipe<MotorPosition, MotorPositionOut>(
         input, 
         new WebsocketOutput(&hyp->webServer, "/ws/windows", 60)
         ));
+
+    // hyp->hub.setForcedSelection(1, true);
+    hyp->hub.setFlashColumn(1,false,true);
 
     hyp->start();
 

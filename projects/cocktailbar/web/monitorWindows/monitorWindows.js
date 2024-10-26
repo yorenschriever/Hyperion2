@@ -8,9 +8,11 @@ export const MonitorWindowsApp = () => {
 
         const data2 = new Uint8Array(data)
 
+        // console.log(data2);
+
         for(let i=0;i<4;i++){
-            document.getElementById(`shutterTop${i}`   ).style.height = data2[2*i+1]*100/255 + '%';
-            document.getElementById(`shutterBottom${i}`).style.height = data2[2*i+3]*100/255 + '%';
+            document.getElementById(`shutterTop${i}`   ).style.height = data2[4*i+1]*100/255 + '%';
+            document.getElementById(`shutterBottom${i}`).style.height = data2[4*i+3]*100/255 + '%';
         }
     };
 

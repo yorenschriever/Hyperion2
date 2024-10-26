@@ -1,0 +1,60 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="controller/controller.css">
+        <link rel="stylesheet" href="toolbar/toolbar.css">
+        <style>
+            #monitors {
+                position: fixed;
+                right:16px;
+                bottom: 16px;
+                display: flex;
+                gap:16px;
+                flex-direction:column;
+                max-height: calc(100vh - 32px);
+            }
+            
+            .monitor {
+                width: 640;
+                height: 480;
+                resize:both;
+                border: 1px solid #444;
+                z-index: 100; 
+            }
+        </style>
+        </link>
+        <title>Controller - Hyperion</title>
+        <script type="module">
+            import { ControllerApp } from "./controller/controller.js"
+            import { Toolbar } from "./toolbar/toolbar.js"
+            import { html, render } from './common/preact-standalone.js'
+
+            render(html`<${ControllerApp}/>`, document.getElementById('controller'));
+            render(html`<${Toolbar}/>`, document.getElementById('toolbar'));
+
+            const onBuildIdChange = () =>
+            {
+                window.location.reload();
+            }
+            window.onBuildIdChange=onBuildIdChange
+
+            const createIframe = (url, scene) => {
+                const iframe = document.createElement("iframe");
+                iframe.src = url
+                iframe.className = "monitor"
+                document.getElementById('monitors').appendChild(iframe)
+                iframe.contentWindow.scene = scene
+                iframe.contentWindow.onBuildIdChange = onBuildIdChange
+            }
+
+            fetch("./monitor2d/mapping.json").then(i=>i.json()).then(scene2d => {if (scene2d.length) createIframe("./monitor2d/", scene2d); });
+            fetch("./monitor/mapping.json"  ).then(i=>i.json()).then(scene3d => {if (scene3d.length) createIframe("./monitor/", scene3d); });
+            createIframe("./monitorWindows/", []);
+
+        </script>
+    </head>
+    <body>        
+        <div id="controller"></div>
+        <div id="monitors"></div>
+        <div id="toolbar"></div>
+    </body>
+</html>

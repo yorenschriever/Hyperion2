@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/colours.h"
+#include "MotorPositionOut.hpp"
 
 class MotorPosition : Colour
 {
@@ -8,17 +9,22 @@ public:
     MotorPosition()
     {
         this->position=0;
+        this->alpha=0;
     }
 
-    MotorPosition(uint16_t position)
+    MotorPosition(uint16_t position, uint8_t alpha)
     {
         this->position = position;
-
+        this->alpha = alpha;
+    }
+    
+    operator MotorPositionOut() { 
+        return MotorPositionOut((position * alpha / 255)); 
     }
 
     inline void dim(uint8_t value)
     {
-        //do nothing
+        alpha = (alpha * value) / 255;
     }
 
     inline void ApplyLut(LUT *lut)
@@ -38,15 +44,27 @@ public:
         // this = bottom
         // other = top
 
-        position = other.position;
+        int outA = other.alpha * 255 + (this->alpha * (255 - other.alpha));
+
+        if (outA == 0)
+        {
+            this->position = 0;
+            this->alpha = 0;
+            return *this;
+        }
+
+        this->position = ((other.position * other.alpha) * 255 + (this->position * this->alpha) * (255 - other.alpha)) / outA;
+        this->alpha = outA / 255;
 
         return *this;
     }
 
     MotorPosition operator*(float scale)
     {
-        return MotorPosition(position * scale);
+        return MotorPosition(position, scale * alpha);
     }
 
     uint16_t position = 0;
+    uint8_t alpha = 0;
 };
+
