@@ -30,6 +30,11 @@ MotorPosition toBottomPostion(float position, float width, float alpha)
     return MotorPosition(0xFFFF - constrained * 0xFFFF, 255 * alpha);
 }
 
+float addGapMargin(float pos, float gap)
+{
+    return -gap+pos*(1+2*gap);
+}
+
 namespace Window
 {
 
@@ -48,16 +53,23 @@ namespace Window
         {
             if (!transition.Calculate(active))
                return; // the fade out is done. we can skip calculating pattern data
+            
+            float velocity = params->getVelocity(20000, 2000);
+            float intensity = params->getIntensity();
 
+            float gap = params->getSize(0.05,0.5);
+            float amount = params->getAmount(1, 3.99);
 
-            lfo.setPeriod(params->getVelocity(6000, 500));
-            //lfo.setDutyCycle(params->getSize());
-            int amount = 1; //params->getAmount(1, 3.99);
+            lfo.setDutyCycle(intensity);
+            lfo.setPeriod(velocity / intensity * amount);
+            
 
             for (int index = 0; index < width; index+=2)
             {
-                pixels[index] = toTopPostion(lfo.getValue(amount * float(index) / width), 0.1, transition.getValue());
-                pixels[index+1] = toBottomPostion(lfo.getValue(amount * float(index) / width), 0.1,  transition.getValue());
+                float pos = lfo.getValue(amount * float(index) / width);
+                float pos2 = addGapMargin(pos, gap);
+                pixels[index] = toTopPostion(pos2, gap, transition.getValue());
+                pixels[index+1] = toBottomPostion(pos2, gap,  transition.getValue());
             }
 
         }
@@ -79,9 +91,18 @@ namespace Window
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
-            lfo.setPeriod(params->getVelocity(6000, 500));
-            lfo.setDutyCycle(params->getSize());
-            int amount = params->getAmount(1, 3.99);
+            // lfo.setPeriod(params->getVelocity(6000, 500));
+            // lfo.setDutyCycle(params->getSize());
+            // int amount = params->getAmount(1, 3.99);
+
+            float velocity = params->getVelocity(20000, 2000);
+            float intensity = params->getIntensity();
+
+            float gap = params->getSize(0.05,0.5);
+            float amount = params->getAmount(1, 3.99);
+
+            lfo.setDutyCycle(intensity);
+            lfo.setPeriod(velocity / intensity * amount);
 
             for (int index = 0; index < width; index+=2)
             {
@@ -110,12 +131,12 @@ namespace Window
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
-            int period = params->getVelocity(6000, 500);
+            int period = params->getVelocity(20000, 2000);
             float size = params->getSize();
             int amount = params->getAmount(1, 3.99);
 
-            lfo.setPeriod(period);
-            lfoDir.setPeriod(period);
+            lfo.setPeriod(period / size * amount);
+            lfoDir.setPeriod(period / size * amount);
             lfo.setDutyCycle(size);
             lfoDir.setDutyCycle(size);
             
@@ -129,8 +150,8 @@ namespace Window
                     gap = 0;
                 }
 
-                pixels[index]   = toTopPostion(   -gap+pos*(1+2*gap),gap, transition.getValue()); 
-                pixels[index+1] = toBottomPostion(-gap+pos*(1+2*gap),gap, transition.getValue());
+                pixels[index]   = toTopPostion(   addGapMargin(pos,gap),gap, transition.getValue()); 
+                pixels[index+1] = toBottomPostion(addGapMargin(pos,gap),gap, transition.getValue());
             }
 
         }
