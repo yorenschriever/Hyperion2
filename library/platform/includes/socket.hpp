@@ -120,7 +120,12 @@ public:
 
         if (err < 0)
         {
-            Log::error(TAG, "error occurred during sending. error code %d", err);
+            if (errno == 64){
+                //Client device is probably not connected. 
+                //Log::error(TAG, "no route to host");
+                return err;
+            }
+            Log::error(TAG, "error occurred during sending. error code %d, %d", err, errno);
             return err;
         }
         else

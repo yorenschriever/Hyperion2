@@ -14,7 +14,7 @@ public:
     int TimeBetweenBeats() { return timeBetweenBeats; }
 
     // time in ms
-    int TimeOfLastBeat() { return timeOfLastBeat; }
+    unsigned long TimeOfLastBeat() { return timeOfLastBeat; }
 
     bool HasSignal() { return validSignal && Utils::millis() - timeOfLastBeat < 2000; }
 

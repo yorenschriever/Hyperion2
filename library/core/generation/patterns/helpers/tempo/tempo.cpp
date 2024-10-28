@@ -79,11 +79,10 @@ float Tempo::GetProgress(int intervalSize)
     float fine = float(Utils::millis() - source->TimeOfLastBeat()) / float(source->TimeBetweenBeats());
     float result = (coarse + fine) / intervalSize;
 
-    if (result < 0)
-        return 0;
-    if (result > 1)
-        return 1;
-    return result;
+    // Log::info("Tempo", "beat: %d, last beat: %lu, time between beats: %d", source->GetBeatNumber(), source->TimeOfLastBeat(), source->TimeBetweenBeats());
+    // Log::info("Tempo", "coarse: %f, fine: %f, result: %f", coarse, fine, result);
+
+    return Utils::constrain_f(result, 0, 1);
 }
 
 AbstractTempo *Tempo::getActive()

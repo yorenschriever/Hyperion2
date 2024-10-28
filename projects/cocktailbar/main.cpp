@@ -74,6 +74,7 @@ void setupWindows(Hyperion *hyp)
             {.column = 2, .slot = 0, .pattern = new Window::SinPattern()},
             {.column = 2, .slot = 1, .pattern = new Window::SinGapPattern()},
             {.column = 2, .slot = 2, .pattern = new Window::FallingPattern()},
+            {.column = 2, .slot = 3, .pattern = new Window::SinTempoPattern()},
         });
 
     int nbytes = 8 * sizeof(MotorPosition);
@@ -170,6 +171,9 @@ void setupBulbs(Hyperion *hyp)
 int main()
 {
     auto hyp = new Hyperion();
+
+    //add constant temposource
+    Tempo::AddSource(new ConstantTempo(120));
 
     setupPalette(hyp);
     setupWindows(hyp);

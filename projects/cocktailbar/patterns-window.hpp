@@ -193,4 +193,45 @@ namespace Window
         }
     };
 
+    class SinTempoPattern : public Pattern<MotorPosition>
+    {
+        LFOTempo<NegativeCosFast> lfo;
+        Transition transition = Transition(transitionTime, transitionTime);
+
+    public:
+        SinTempoPattern()
+        {
+            this->name = "Sin tempo";
+        }
+
+        inline void Calculate(MotorPosition *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
+
+            // float velocity = params->getVelocity(20000, 2000);
+            // float intensity = params->getIntensity();
+
+            // float gap = params->getSize(0.05, 0.5);
+            // float amount = params->getAmount(1, 3.99);
+            float amount=1;
+            float gap=0.25;
+
+            // lfo.setDutyCycle(intensity);
+            // lfo.setPeriod(velocity / intensity * amount);
+
+            lfo.setPeriodExponential((int)params->getVelocity(6.99, 3),2);
+            // lfo.setPeriod(1000);
+            // lfo.setPeriod(1);
+
+            for (int index = 0; index < width; index += 2)
+            {
+                float pos = lfo.getValue(amount * float(index) / width);
+                float pos2 = addGapMargin(pos, gap);
+                pixels[index] = toTopPostion(pos2, gap, transition.getValue());
+                pixels[index + 1] = toBottomPostion(pos2, gap, transition.getValue());
+            }
+        }
+    };
+
 }

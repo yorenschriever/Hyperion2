@@ -64,7 +64,7 @@ private:
                 continue;
 
             int device = buffer[DEVICE_ID];
-            int beatNumber = buffer[BEAT_NUMBER];
+            int beatNumberCdj = buffer[BEAT_NUMBER];
 
             // if no master is set yet, make the cdj that sends the first beat the master
             // (except if beatNumber has value 16, which is a message all devices send on startup)
@@ -78,7 +78,7 @@ private:
                 Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
 
                 // adjust the beat counter if it is not in sync with the beat counter of the cdj anymore.
-                int beatMod4cdj = beatNumber - 1;   // beat number 0-3 from the cdj
+                int beatMod4cdj = beatNumberCdj - 1;   // beat number 0-3 from the cdj
                 int beatMod4local = beatNumber % 4; // beat number 0-3 from this Tempo class
                 int diff = beatMod4cdj - beatMod4local;
                 if (diff != 0)
