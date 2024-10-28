@@ -5,6 +5,7 @@
 #include "socket.hpp"
 #include "thread.hpp"
 #include <map>
+#include <algorithm>
 
 class ArtNetUniverse
 {
@@ -41,6 +42,7 @@ public:
     }
 
     virtual ArtNetUniverse *addUniverse(uint16_t port)=0;
+    virtual void send(const char *hostname, uint8_t net, uint8_t subnet, uint8_t universe, uint8_t *data_ptr, uint16_t size)=0;
 
     virtual ~ArtNet() = default;
 
@@ -61,6 +63,8 @@ protected:
 // Packet
 #define ART_NET_ID "Art-Net\0"
 #define ART_DMX_START 18
+
+#define PROTOCOL_VERSION 14
 
 struct artnet_reply_s
 {
@@ -101,6 +105,21 @@ struct artnet_reply_s
     uint8_t filler[26];
 } __attribute__((packed));
 
+
+//https://art-net.org.uk/downloads/art-net.pdf page 63
+struct artnet_dmx_s
+{
+    uint8_t id[8];
+    uint16_t opCode;
+    uint8_t protVerHi;
+    uint8_t protVerLo;
+    uint8_t sequence;
+    uint8_t physical;
+    uint16_t universe15bit;
+    uint16_t length;
+    uint8_t data[512];
+} __attribute__((packed));
+
 class GenericArtNet : public ArtNet
 {
 private:
@@ -137,6 +156,37 @@ public:
             universes.insert({port, uni});
         
         return &(universes.find(port)->second);
+    }
+
+    void send(const char *hostname, uint8_t net, uint8_t subnet, uint8_t universe, uint8_t *data_ptr, uint16_t size) override {
+        auto ip = IPAddress::fromHostname(hostname);
+
+        artnet_dmx_s packet;
+
+        memcpy(packet.id, ART_NET_ID, sizeof(ART_NET_ID));
+        // packet.opCode = htons(ART_DMX);
+        packet.opCode = ART_DMX;
+        packet.protVerHi = 0;
+        packet.protVerLo = PROTOCOL_VERSION;
+        packet.sequence = 0;
+        packet.physical = 0;
+
+        uint16_t universe15bit = ((uint16_t)net << 8) | ((uint16_t)subnet << 4) | universe;
+        //packet.universe15bit = htons(universe15bit);
+        packet.universe15bit = universe15bit;
+
+        // Log::info("","ArtNet: sending %d bytes to %s:%d", size, ip.toString().c_str(), ART_NET_PORT);
+        // Log::info("","ArtNet: universe %d", packet.universe15bit);
+        // Log::info("","ArtNet: opcode %x %x", packet.opCode & 0xFF, packet.opCode >> 8);
+        // Log::info("","ArtNet: %d %d %d %d", data_ptr[0], data_ptr[1], data_ptr[2], data_ptr[3]);
+
+        // packet.length = htons(size);
+        if (size > 512) size=512;
+
+        packet.length = size;
+        memcpy(packet.data, data_ptr, size);
+
+        sock.send(&ip, ART_NET_PORT, (uint8_t*) &packet, sizeof(artnet_dmx_s) - 512 + size);
     }
 
 private:

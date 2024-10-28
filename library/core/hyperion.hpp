@@ -16,6 +16,7 @@
 #include "core/distribution/outputs/pwmOutput.hpp"
 #include "core/distribution/outputs/spiOutput.hpp"
 #include "core/distribution/outputs/udpOutput.hpp"
+#include "core/distribution/outputs/artnetOutput.hpp"
 #include "core/distribution/pipes/convertPipe.hpp"
 #include "core/distribution/pipes/pipe.hpp"
 #include "core/generation/controllers/dinMidiControllerFactory.hpp"
