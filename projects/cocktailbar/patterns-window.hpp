@@ -1,18 +1,19 @@
 #pragma once
 
-#include "hyperion.hpp"
 #include "MotorPosition.hpp"
+#include "hyperion.hpp"
 #include <math.h>
 #include <vector>
 
-//Als de gordijnen niet helemaal goed aansluiten kan je hier extra overlap instellen
+const int transitionTime = 2500;
+
+// Als de gordijnen niet helemaal goed aansluiten kan je hier extra overlap instellen
 const float overlap = 0.05;
 
-//Beide motoren hebben een bereik van 0 tot 0xFFFF
-//0 is helemaal opgerold, 0xFFFF is helemaal afgerold
+// Beide motoren hebben een bereik van 0 tot 0xFFFF
+// 0 is helemaal opgerold, 0xFFFF is helemaal afgerold
 
-
-//map lfo position 0-1 to 0-0xFFFF
+// map lfo position 0-1 to 0-0xFFFF
 MotorPosition toTopPostion(float position, float width, float alpha)
 {
     float overlapped = position - width + overlap;
@@ -21,7 +22,7 @@ MotorPosition toTopPostion(float position, float width, float alpha)
     return MotorPosition(constrained * 0xFFFF, 255 * alpha);
 }
 
-//map lfo position 0-1 to 0xFFFF - 0
+// map lfo position 0-1 to 0xFFFF - 0
 MotorPosition toBottomPostion(float position, float width, float alpha)
 {
     float overlapped = position + width - overlap;
@@ -32,7 +33,7 @@ MotorPosition toBottomPostion(float position, float width, float alpha)
 
 float addGapMargin(float pos, float gap)
 {
-    return -gap+pos*(1+2*gap);
+    return -gap + pos * (1 + 2 * gap);
 }
 
 namespace Window
@@ -41,7 +42,7 @@ namespace Window
     class SinPattern : public Pattern<MotorPosition>
     {
         LFO<NegativeCosFast> lfo;
-        Transition transition = Transition(1000,1000);
+        Transition transition = Transition(transitionTime, transitionTime);
 
     public:
         SinPattern()
@@ -52,33 +53,31 @@ namespace Window
         inline void Calculate(MotorPosition *pixels, int width, bool active, Params *params) override
         {
             if (!transition.Calculate(active))
-               return; // the fade out is done. we can skip calculating pattern data
-            
+                return; // the fade out is done. we can skip calculating pattern data
+
             float velocity = params->getVelocity(20000, 2000);
             float intensity = params->getIntensity();
 
-            float gap = params->getSize(0.05,0.5);
+            float gap = params->getSize(0.05, 0.5);
             float amount = params->getAmount(1, 3.99);
 
             lfo.setDutyCycle(intensity);
             lfo.setPeriod(velocity / intensity * amount);
-            
 
-            for (int index = 0; index < width; index+=2)
+            for (int index = 0; index < width; index += 2)
             {
                 float pos = lfo.getValue(amount * float(index) / width);
                 float pos2 = addGapMargin(pos, gap);
                 pixels[index] = toTopPostion(pos2, gap, transition.getValue());
-                pixels[index+1] = toBottomPostion(pos2, gap,  transition.getValue());
+                pixels[index + 1] = toBottomPostion(pos2, gap, transition.getValue());
             }
-
         }
     };
 
     class SinGapPattern : public Pattern<MotorPosition>
     {
         LFO<NegativeCosFast> lfo;
-        Transition transition = Transition(1000,1000);
+        Transition transition = Transition(transitionTime, transitionTime);
 
     public:
         SinGapPattern()
@@ -98,19 +97,18 @@ namespace Window
             float velocity = params->getVelocity(20000, 2000);
             float intensity = params->getIntensity();
 
-            float gap = params->getSize(0.05,0.5);
+            float gap = params->getSize(0.05, 0.5);
             float amount = params->getAmount(1, 3.99);
 
             lfo.setDutyCycle(intensity);
             lfo.setPeriod(velocity / intensity * amount);
 
-            for (int index = 0; index < width; index+=2)
+            for (int index = 0; index < width; index += 2)
             {
-                float gap = 0.5*lfo.getValue(amount * float(index) / width);
-                pixels[index] = toTopPostion(0.5,gap, transition.getValue()); 
-                pixels[index+1] = toBottomPostion(0.5,gap, transition.getValue());
+                float gap = 0.5 * lfo.getValue(amount * float(index) / width);
+                pixels[index] = toTopPostion(0.5, gap, transition.getValue());
+                pixels[index + 1] = toBottomPostion(0.5, gap, transition.getValue());
             }
-
         }
     };
 
@@ -118,7 +116,7 @@ namespace Window
     {
         LFO<Tri> lfo;
         LFO<Square> lfoDir;
-        Transition transition = Transition(1000,1000);
+        Transition transition = Transition(transitionTime, transitionTime);
 
     public:
         FallingPattern()
@@ -131,29 +129,39 @@ namespace Window
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
-            int period = params->getVelocity(20000, 2000);
-            float size = params->getSize();
-            int amount = params->getAmount(1, 3.99);
+            // int period = params->getVelocity(20000, 2000);
+            // float size = params->getSize();
+            // int amount = params->getAmount(1, 3.99);
 
-            lfo.setPeriod(period / size * amount);
-            lfoDir.setPeriod(period / size * amount);
-            lfo.setDutyCycle(size);
-            lfoDir.setDutyCycle(size);
-            
-            for (int index = 0; index < width; index+=2)
+            // lfo.setPeriod(period / size * amount);
+            // lfoDir.setPeriod(period / size * amount);
+            // lfo.setDutyCycle(size);
+            // lfoDir.setDutyCycle(size);
+
+            float velocity = params->getVelocity(20000, 2000);
+            float intensity = params->getIntensity();
+
+            float gap = params->getSize(0.05, 0.5);
+            float amount = params->getAmount(1, 3.99);
+
+            lfo.setDutyCycle(intensity);
+            lfo.setPeriod(velocity / intensity * amount);
+            lfoDir.setDutyCycle(intensity);
+            lfoDir.setPeriod(velocity / intensity * amount);
+
+            for (int index = 0; index < width; index += 2)
             {
-                float gap = 0.1;
+                float gap2 = gap;
                 float phase = amount * float(index) / width;
-                float pos = lfo.getValue(phase);
-                if (lfoDir.getValue(phase) > 0.5)
+                float pos = 1. - lfo.getValue(phase);
+                if (lfoDir.getValue(phase) < 0.5)
                 {
-                    gap = 0;
+                    gap2 = 0;
                 }
 
-                pixels[index]   = toTopPostion(   addGapMargin(pos,gap),gap, transition.getValue()); 
-                pixels[index+1] = toBottomPostion(addGapMargin(pos,gap),gap, transition.getValue());
+                pixels[index] = toTopPostion(addGapMargin(pos, gap2), gap2, transition.getValue());
+                pixels[index + 1] = toBottomPostion(addGapMargin(pos, gap2), gap2, transition.getValue());
             }
-
         }
     };
 

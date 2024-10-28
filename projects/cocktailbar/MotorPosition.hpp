@@ -44,6 +44,13 @@ public:
         // this = bottom
         // other = top
 
+        if (other.alpha == 255)
+        {
+            alpha=255;
+            position = other.position;
+            return *this;
+        }
+
         int outA = other.alpha * 255 + (this->alpha * (255 - other.alpha));
 
         if (outA == 0)
@@ -55,6 +62,14 @@ public:
 
         this->position = ((other.position * other.alpha) * 255 + (this->position * this->alpha) * (255 - other.alpha)) / outA;
         this->alpha = outA / 255;
+
+        //Log::info("","alpha %d",  this->alpha);
+
+        if (alpha >= 254)
+            alpha = 255;
+
+        if (alpha <= 2)
+            alpha = 0;
 
         return *this;
     }

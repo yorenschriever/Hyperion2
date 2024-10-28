@@ -10,9 +10,12 @@ export const MonitorWindowsApp = () => {
 
         // console.log(data2);
 
+        const dataToPct = (d, i) =>(d[i+1]*256 + d[i])*100/(256*256-1);
+        // const dataToPct = (d, i) =>(d[i+1])*100/0x255;
+
         for(let i=0;i<4;i++){
-            document.getElementById(`shutterTop${i}`   ).style.height = data2[4*i+1]*100/255 + '%';
-            document.getElementById(`shutterBottom${i}`).style.height = data2[4*i+3]*100/255 + '%';
+            document.getElementById(`shutterTop${i}`   ).style.height = dataToPct(data2,4*i) + '%';
+            document.getElementById(`shutterBottom${i}`).style.height = dataToPct(data2,4*i+2) + '%';
         }
     };
 
