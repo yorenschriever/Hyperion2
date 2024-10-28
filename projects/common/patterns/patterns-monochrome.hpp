@@ -1,12 +1,5 @@
 #pragma once
-// #include "core/generation/patterns/helpers/fade.h"
-// #include "core/generation/patterns/helpers/interval.h"
-// #include "core/generation/patterns/helpers/timeline.h"
-// #include "core/generation/patterns/pattern.hpp"
-// #include "core/generation/pixelMap.hpp"
-// #include "platform/includes/utils.hpp"
 #include "hyperion.hpp"
-// #include "utils.hpp"
 #include <math.h>
 #include <vector>
 
@@ -42,7 +35,6 @@ public:
 
 class GlowPattern : public Pattern<Monochrome>
 {
-    int direction;
     Permute perm1 = Permute(0);
     Permute perm2 = Permute(0);
     Transition transition = Transition(
@@ -54,7 +46,6 @@ class GlowPattern : public Pattern<Monochrome>
 public:
     GlowPattern(int direction = 1)
     {
-        this->direction = direction;
         this->name = "Glow";
     }
 

@@ -86,18 +86,13 @@ namespace LedPatterns
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
-            // float density = 481./width;
-            int density2 = width / 481;
-            if (width == 96)
-                density2 = 10;
+            int density = 10; 
             lfo.setPeriod(params->getVelocity(10000, 500));
-            lfo.setDutyCycle(0.1);
+            lfo.setDutyCycle(params->getAmount(0, 1));
             perm.setSize(width);
 
             for (int index = 0; index < width; index++)
             {
-                if (index % density2 != 0)
-                    continue;
                 pixels[perm.at[index]] = params->getSecondaryColour() * lfo.getValue(float(index) / width) * transition.getValue(index, width);
             }
         }
@@ -107,20 +102,22 @@ namespace LedPatterns
     {
         Transition transition;
         Permute perm;
+        int segmentSize;
         LFO<SawDown> lfo = LFO<SawDown>(5000);
 
     public:
-        SegmentChasePattern()
+        SegmentChasePattern(int segmentSize = 60)
         {
             this->name = "Segment chase";
+            this->segmentSize = segmentSize;
         }
+
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
             if (!transition.Calculate(active))
                 return;
 
-            int segmentSize = 60;
             int numSegments = width / segmentSize;
 
             perm.setSize(numSegments);

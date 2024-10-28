@@ -29,6 +29,7 @@ class Colour
 
 class Monochrome;
 class RGB;
+class RGBW;
 class GRBW;
 class GRB;
 class BGR;
@@ -144,6 +145,7 @@ public:
     operator Monochrome12();
     operator RGBA();
     operator GRBW();
+    operator RGBW();
 
     uint8_t R, G, B;
 };
@@ -380,6 +382,44 @@ public:
     uint8_t G, R, B, W;
 };
 
+class RGBW : Colour
+{
+public:
+    RGBW()
+    {
+        this->R = 0;
+        this->G = 0;
+        this->B = 0;
+        this->W = 0;
+    }
+
+    RGBW(uint8_t R, uint8_t G, uint8_t B, uint8_t W)
+    {
+        this->R = R;
+        this->G = G;
+        this->B = B;
+        this->W = W;
+    }
+
+    inline void ApplyLut(LUT *lut)
+    {
+        R = lut->luts[0 % lut->Dimension][R];
+        G = lut->luts[1 % lut->Dimension][G];
+        B = lut->luts[2 % lut->Dimension][B];
+        W = lut->luts[3 % lut->Dimension][W];
+    }
+
+    inline void dim(uint8_t value)
+    {
+        R = (R * value) >> 8;
+        G = (G * value) >> 8;
+        B = (B * value) >> 8;
+        W = (W * value) >> 8;
+    }
+
+    uint8_t R, G, B, W;
+};
+
 class Monochrome12 : Colour
 {
 public:
@@ -542,6 +582,7 @@ public:
     operator BGR();
     operator RBG();
     operator GBR();
+    operator RGBW();
     operator RGBWAmber();
     operator RGBWAmberUV();
 
@@ -911,6 +952,15 @@ inline RGBA::operator GRB() { return GRB(G * A / 255, R * A / 255, B * A / 255);
 inline RGBA::operator BGR() { return BGR(B * A / 255, G * A / 255, R * A / 255); }
 inline RGBA::operator RBG() { return RBG(R * A / 255, B * A / 255, G * A / 255); }
 inline RGBA::operator GBR() { return GBR(G * A / 255, B * A / 255, R * A / 255); }
+inline RGBA::operator RGBW()
+{
+    uint8_t W = std::min(std::min(R, G), B);
+    return RGBW(
+        (R - W)* A / 255, 
+        (G - W)* A / 255, 
+        (B - W)* A / 255, 
+        W* A / 255);
+}
 inline RGBA::operator RGBWAmber()
 {
     // return RGBWAmber(R*A/255, G*A/255, B*A/255, 0,0);
@@ -949,6 +999,11 @@ inline RGB::operator GRBW()
 {
     uint8_t W = std::min(std::min(R, G), B);
     return GRBW(G - W, R - W, B - W, W);
+}
+inline RGB::operator RGBW()
+{
+    uint8_t W = std::min(std::min(R, G), B);
+    return RGBW(R - W, G - W, B - W, W);
 }
 
 inline RGB12::operator Monochrome() { return Monochrome((R + G + B) * CONV12TO8 / 3); }

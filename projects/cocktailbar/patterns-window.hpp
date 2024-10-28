@@ -39,6 +39,34 @@ float addGapMargin(float pos, float gap)
 namespace Window
 {
 
+    class StaticPattern : public Pattern<MotorPosition>
+    {
+        Transition transition = Transition(transitionTime, transitionTime);
+        float top; 
+        float bottom;
+
+    public:
+        StaticPattern(const char * name, float top, float bottom)
+        {
+            this->name = name;
+            this->top = top;
+            this->bottom = bottom;
+        }
+
+        inline void Calculate(MotorPosition *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
+
+            for (int index = 0; index < width; index += 2)
+            {
+                pixels[index] = toTopPostion(top, 0, transition.getValue());
+                pixels[index + 1] = toBottomPostion(bottom, 0, transition.getValue());
+            }
+        }
+    };
+
+
     class SinPattern : public Pattern<MotorPosition>
     {
         LFO<NegativeCosFast> lfo;

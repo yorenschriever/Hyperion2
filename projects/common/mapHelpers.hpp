@@ -11,7 +11,7 @@ PixelMap circleMap(int amount, float radius, float center_x=0, float center_y=0)
             .y = float(center_y + radius * sin(float(i) / amount * 2 * M_PI))
         });
     }
-    map.push_back({0,0});
+    // map.push_back({0,0});
     return map;
 }
 

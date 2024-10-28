@@ -13,7 +13,8 @@ void distributeAndMonitor(
     ControlHubInput<T_INPUT_COLOUR> *input,
     PixelMap *pixelMap,
     std::vector<Slave> slaves,
-    LUT *lut = nullptr)
+    LUT *lut = nullptr,
+    float monitorDotSize=0.01)
 {
     std::vector<InputSlicer::Slice> slices;
     int start = 0;
@@ -47,5 +48,5 @@ void distributeAndMonitor(
     hyp->addPipe(
         new ConvertPipe<T_INPUT_COLOUR, RGB>(
             splitInput->getInput(slices.size()-1),
-            new MonitorOutput(&hyp->webServer, pixelMap)));
+            new MonitorOutput(&hyp->webServer, pixelMap, 60, monitorDotSize)));
 }

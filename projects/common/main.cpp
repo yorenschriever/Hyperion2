@@ -6,6 +6,7 @@
 #include "distributeAndMonitor.hpp"
 #include "mapHelpers.hpp"
 #include "patterns/patterns-led.hpp"
+#include "patterns/patterns-monochrome.hpp"
 
 /* TODOs
  * - distributeAndMonitor3d
@@ -22,41 +23,88 @@
  * - add more examples
 */
 
-
-int main()
-{
-    auto hyp = new Hyperion();
-
+void setupLed(Hyperion * hyp) {
     const int columnIndex = 1;
 
     // auto map = circleMap(100, 0.5);
-    auto map = combineMaps({
-        circleMap(100, 0.5),
-        circleMap(100, 0.7),
-    });
+    PixelMap *map = new PixelMap(combineMaps({
+        circleMap(50, 0.5),
+        circleMap(50, 0.7),
+    }));
+
     // auto map = gridMap(5,5);
     // auto map = panelizeMap(circleMap(100, 1),2,2,1,1);
 
     auto input = new ControlHubInput<RGBA>(
-        map.size(),
+        map->size(),
         &hyp->hub,
         columnIndex,
         {
-            new LedPatterns::OnPattern({255,255,255},"White")
-            // new Max::ChevronsPattern(&triangleMap3d),
-            // new Max::ChevronsPattern(&triangleMap3d)
+            new LedPatterns::OnPattern({255,255,255},"White"),
+            new LedPatterns::PalettePattern(0,"Primary"),
+            new LedPatterns::PalettePattern(1,"Secondary"),
+            new LedPatterns::GlowPulsePattern(),
+            new LedPatterns::SegmentChasePattern(),
+            new LedPatterns::FlashesPattern(),
+            new LedPatterns::StrobePattern(),
+            new LedPatterns::PixelGlitchPattern(),
+            new LedPatterns::FadingNoisePattern(),
+            new LedPatterns::StrobeHighlightPattern(),
+            
+
         }
     );
-    distributeAndMonitor<GRB,RGBA>(hyp, input, &map, {
+    distributeAndMonitor<GRB,RGBA>(hyp, input, map, {
         {"hyperslave3.local", 9611, 25},
         {"hyperslave3.local", 9615, 25},
         {"hyperslave5.local", 9611, 25},
         {"hyperslave5.local", 9615, 25},
     });
 
-    hyp->hub.setColumnName(columnIndex, "test");
+    hyp->hub.setColumnName(columnIndex, "Led");
+}
 
+void setupMonochrome(Hyperion * hyp) {
+    const int columnIndex = 2;
 
+    auto map = new PixelMap(circleMap(30, 0.9));
+
+    auto input = new ControlHubInput<Monochrome>(
+        map->size(),
+        &hyp->hub,
+        columnIndex,
+        {
+            new MonochromePatterns::SinPattern(),
+            new MonochromePatterns::GlowPattern(),
+            new MonochromePatterns::FastStrobePattern(),
+            new MonochromePatterns::SlowStrobePattern(),
+            new MonochromePatterns::FastStrobePattern2(),
+            new MonochromePatterns::BlinderPattern(),
+            new MonochromePatterns::BeatAllFadePattern(),
+            new MonochromePatterns::BeatShakePattern(),
+            new MonochromePatterns::BeatSingleFadePattern(),
+            new MonochromePatterns::BeatMultiFadePattern(),
+            new MonochromePatterns::GlitchPattern(),
+            new MonochromePatterns::OnPattern(255),
+            new MonochromePatterns::LFOPattern<NegativeCosFast>("Sin"),
+            new MonochromePatterns::LFOPattern<SawDown>("SawDown"),
+            new MonochromePatterns::BeatStepPattern(),
+            new MonochromePatterns::GlowOriginalPattern(),
+        }
+    );
+    distributeAndMonitor<Monochrome,Monochrome>(hyp, input, map, {
+        {"hyperslave4.local", 9611, (int) map->size()},
+    });
+
+    hyp->hub.setColumnName(columnIndex, "Monochrome");
+}
+
+int main()
+{
+    auto hyp = new Hyperion();
+
+    setupLed(hyp);
+    setupMonochrome(hyp);
 
     // addPaletteColumn(hyp);
     // addTrianglesPipe(hyp);
