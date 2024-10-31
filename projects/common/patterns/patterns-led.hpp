@@ -86,9 +86,11 @@ namespace LedPatterns
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
-            int density = 10; 
-            lfo.setPeriod(params->getVelocity(10000, 500));
-            lfo.setDutyCycle(params->getAmount(0, 1));
+            float amount = params->getAmount();
+            float velocity = params->getVelocity(10000, 500);
+
+            lfo.setPeriod(velocity / amount);
+            lfo.setDutyCycle(amount);
             perm.setSize(width);
 
             for (int index = 0; index < width; index++)
@@ -228,7 +230,9 @@ namespace LedPatterns
             if (timeline.Happened(0))
                 perm.permute();
 
-            for (int index = 0; index < width / 30; index++)
+            int threshold = params->getAmount(0, width);
+
+            for (int index = 0; index < threshold; index++)
                 pixels[perm.at[index]] = params->getSecondaryColour() * transition.getValue();
         }
     };
@@ -289,6 +293,68 @@ namespace LedPatterns
 
             for (int index = 0; index < width; index++)
                 pixels[index] = color;
+        }
+    };
+
+class SinPattern : public Pattern<RGBA>
+{
+    LFO<NegativeCosFast> lfo;
+    Transition transition = Transition(
+        1000, Transition::none, 0,
+        1000, Transition::none, 0);
+
+public:
+    SinPattern()
+    {
+        this->name = "Sin";
+    }
+
+    inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+    {
+        if (!transition.Calculate(active))
+            return; // the fade out is done. we can skip calculating pattern data
+
+        float velocity = params->getVelocity(20000, 2000);
+        int amount = params->getAmount(1, 3.99);
+        float size = params->getSize(0.05, 0.5);
+
+        lfo.setPeriod(velocity * size * amount);
+        lfo.setDutyCycle(size);
+
+        for (int index = 0; index < width; index++)
+            pixels[index] = params->getSecondaryColour() * lfo.getValue(amount * float(index) / width) * transition.getValue(index, width);
+    }
+};
+
+    class GradientChasePattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        LFO<SawDown> lfo = LFO<SawDown>(5000);
+
+    public:
+        GradientChasePattern()
+        {
+            this->name = "Gradient chase";
+        }
+
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            float velocity = params->getVelocity(6000, 500);
+            int amount = params->getAmount(1, 2.99);
+            float size = params->getSize();
+
+            lfo.setPeriod(velocity / size * amount);
+            lfo.setDutyCycle(size);
+
+            for (int i=0;i<width;i++)
+            {
+                float lfoVal = lfo.getValue(amount * float(i) / width);
+                pixels[i] =  params->getGradient(lfoVal * 255) * lfoVal * transition.getValue();
+            }
         }
     };
 

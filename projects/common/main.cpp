@@ -50,7 +50,7 @@ void setupLed(Hyperion * hyp) {
             new LedPatterns::PixelGlitchPattern(),
             new LedPatterns::FadingNoisePattern(),
             new LedPatterns::StrobeHighlightPattern(),
-            
+            new LedPatterns::GradientChasePattern(),
 
         }
     );
@@ -74,7 +74,7 @@ void setupMonochrome(Hyperion * hyp) {
         &hyp->hub,
         columnIndex,
         {
-            new MonochromePatterns::SinPattern(),
+            // new MonochromePatterns::SinPattern(),
             new MonochromePatterns::GlowPattern(),
             new MonochromePatterns::FastStrobePattern(),
             new MonochromePatterns::SlowStrobePattern(),
@@ -89,7 +89,6 @@ void setupMonochrome(Hyperion * hyp) {
             new MonochromePatterns::LFOPattern<NegativeCosFast>("Sin"),
             new MonochromePatterns::LFOPattern<SawDown>("SawDown"),
             new MonochromePatterns::BeatStepPattern(),
-            new MonochromePatterns::GlowOriginalPattern(),
         }
     );
     distributeAndMonitor<Monochrome,Monochrome>(hyp, input, map, {

@@ -35,14 +35,12 @@ public:
 
 class GlowPattern : public Pattern<Monochrome>
 {
-    Permute perm1 = Permute(0);
-    Permute perm2 = Permute(0);
+    Permute perm;
+    LFO<Glow> lfo;
     Transition transition = Transition(
         1000, Transition::none, 0,
         2000, Transition::none, 0);
-    LFO<NegativeCosFast> lfo1;
-    LFO<NegativeCosFast> lfo2;
-
+    
 public:
     GlowPattern(int direction = 1)
     {
@@ -54,22 +52,20 @@ public:
         if (!transition.Calculate(active))
             return; // the fade out is done. we can skip calculating pattern data
 
-        perm1.setSize(width);
-        perm2.setSize(width);
+        perm.setSize(width);
+
+
+        float velocity = params->getVelocity(6000, 500);
+        float amount = params->getAmount();
+        lfo.setDutyCycle(amount);
+        lfo.setPeriod(velocity / amount);
+
 
         for (int index = 0; index < width; index++)
-        {
-            int velocity = params->getVelocity(1, 8);
-            float period1 = 1000 * 14.7 / velocity;
-            float period2 = 1000 * 15.3 / velocity;
-            float combined = std::max(
-                lfo1.getValue(float(perm1.at[index]) / width, period1),
-                lfo2.getValue(float(perm1.at[index]) / width, period2));
-
-            pixels[index] = Monochrome((uint8_t)(35.f + 220.f * combined)) * transition.getValue(index, width);
-        }
+            pixels[perm.at[index]] = Monochrome(255 * lfo.getValue(float(index)/width)) * transition.getValue(index, width);
     }
 };
+
 
 class FastStrobePattern : public Pattern<Monochrome>
 {
@@ -379,9 +375,13 @@ public:
         if (!transition.Calculate(active))
             return;
 
-        lfo.setPeriod(params->getVelocity(6000, 500));
-        lfo.setDutyCycle(params->getSize());
+        float velocity = params->getVelocity(6000, 500);
         int amount = params->getAmount(1, 3.99);
+        float size = params->getSize(0.1,1);
+
+
+        lfo.setPeriod(velocity / amount);
+        lfo.setDutyCycle(size);
 
         for (int index = 0; index < width; index++)
         {
@@ -417,43 +417,5 @@ public:
         }
     }
 };
-
-    class GlowOriginalPattern : public Pattern<Monochrome>
-    {
-        float direction;
-        Permute perm1 = Permute(0);
-        Permute perm2 = Permute(0);
-        Transition transition = Transition(
-            1000, Transition::none, 0,
-            2000, Transition::none, 0);
-        unsigned long start = Utils::millis();
-
-    public:
-        GlowOriginalPattern(int direction = 1)
-        {
-            this->direction = direction;
-            this->name = "Glow OG";
-        }
-
-        inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
-        {
-            if (!transition.Calculate(active))
-                return; // the fade out is done. we can skip calculating pattern data
-
-            perm1.setSize(width);
-            perm2.setSize(width);
-
-            for (int index = 0; index < width; index++)
-            {
-                unsigned long millis = Utils::millis() - start;
-                float period1 = float(perm1.at[index]) / float(width) * (2 * 3.1415) * 14.7 + 5.5;
-                float period2 = float(perm2.at[index]) / float(width) * (2 * 3.1415) * 15.3 + 3.5;
-                float combined = std::max(cos(period1 * float(millis) / (20000.f * direction)), cos(period2 * float(millis) / (20000.f * direction)));
-
-                pixels[index] = Monochrome((uint8_t)(150.f + 105.f * combined)) * transition.getValue(index, width);
-                //pixels[index] = Monochrome(150 + 105*combined);
-            }
-        }
-    };
 
 }
