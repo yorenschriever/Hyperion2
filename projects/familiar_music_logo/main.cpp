@@ -155,11 +155,28 @@ void addLaserBarsPipe(Hyperion *hyp)
 
         });
 
-    auto pipe = new ConvertPipe<Monochrome, Monochrome>(
-        input,
-        new UDPOutput("hyperslave2.local", 9611, 60));
+    // auto pipe = new ConvertPipe<Monochrome, Monochrome>(
+    //     input,
+    //     new UDPOutput("hyperslave2.local", 9611, 60));
 
-    hyp->addPipe(pipe);
+    // hyp->addPipe(pipe);
+
+    int totalBytes = numLasers * sizeof(Monochrome);
+
+    auto splitInput = new InputSlicer(
+        input, {
+        {0 * totalBytes / 2, totalBytes / 2, true}, 
+        {1 * totalBytes / 2, totalBytes / 2, true}, 
+        });
+
+    for (int i = 0; i < 2; i++)
+    {
+        auto pipe = new Pipe(
+            splitInput->getInput(i),
+            new UDPOutput("hyperslave3.local", 9611 + i*4, 60)
+        );
+        hyp->addPipe(pipe);
+    }
 }
 
 void addChevronsPipe(Hyperion *hyp)
@@ -189,20 +206,36 @@ void addChevronsPipe(Hyperion *hyp)
 
     auto splitInput = new InputSlicer(
         input, {
-        {0 * totalBytes / 4, totalBytes / 4, true}, 
-         {1 * totalBytes / 4, totalBytes / 4, true}, 
-         {2 * totalBytes / 4, totalBytes / 4, true}, 
-         {3 * totalBytes / 4, totalBytes / 4, true}
+        {0 * totalBytes / 2, totalBytes / 2, true}, 
+         {1 * totalBytes / 2, totalBytes / 2, true}, 
+
         });
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 2; i++)
     {
         auto pipe = new ConvertPipe<RGBA, GBR>(
             splitInput->getInput(i),
-            new UDPOutput("hyperslave5.local", 9611 + i, 60),
+            new UDPOutput("hyperslave2.local", 9611 + i*4, 60),
             trianglesLut);
         hyp->addPipe(pipe);
     }
+
+    // auto splitInput = new InputSlicer(
+    //     input, {
+    //     {0 * totalBytes / 4, totalBytes / 4, true}, 
+    //      {1 * totalBytes / 4, totalBytes / 4, true}, 
+    //      {2 * totalBytes / 4, totalBytes / 4, true}, 
+    //      {3 * totalBytes / 4, totalBytes / 4, true}
+    //     });
+
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     auto pipe = new ConvertPipe<RGBA, GBR>(
+    //         splitInput->getInput(i),
+    //         new UDPOutput("hyperslave5.local", 9611 + i, 60),
+    //         trianglesLut);
+    //     hyp->addPipe(pipe);
+    // }
 
     // auto pipe = new ConvertPipe<RGBA, BGR>(
     //     input,
