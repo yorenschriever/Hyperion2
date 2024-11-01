@@ -138,7 +138,7 @@ void setupLed(Hyperion *hyp)
         }
     );
     distributeAndMonitor<RGBW>(hyp, input, map, {
-        {"hyperslave3.local", 9619, (int) map->size()},
+        {"hyperslave5.local", 9619, (int) map->size()},
     }, nullptr, 0.05);
 
     hyp->hub.setColumnName(columnIndex1, "Led bg");
@@ -174,8 +174,13 @@ void setupBulbs(Hyperion *hyp)
             {.column = columnIndex2, .slot = 3, .pattern = new MonochromePatterns::SlowStrobePattern()},
         }
     );
+
+    // hyp->addPipe(new ConvertPipe<Monochrome, Monochrome>(
+    //     input,
+    //     new UDPOutput("hyperslave5.local", 9619, 60)));
+
     distributeAndMonitor<Monochrome>(hyp, input, map, {
-        {"hyperslave4.local", 9619, (int) map->size()},
+        {"hyperslave6.local", 9619, (int) map->size()},
     }, nullptr, 0.05);
 
     hyp->hub.setColumnName(columnIndex1, "Bulbs");

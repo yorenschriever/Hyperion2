@@ -490,7 +490,7 @@ void addOphanimPipe(Hyperion *hyp)
 
     hyp->addPipe(new ConvertPipe<Monochrome, Monochrome>(
             ring2SplitInput->getInput(0),
-            new UDPOutput(ophanimHost, 9621, 60),
+            new UDPOutput(ophanimHost, 9619, 60),
             ophanimLut
             ));
 

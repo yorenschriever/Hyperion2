@@ -207,7 +207,7 @@ private:
         if (strncmp((char *)&recvBuffer, ART_NET_ID, sizeof(ART_NET_ID)) != 0)
             return;
 
-        uint16_t opcode = opcode = recvBuffer[8] | recvBuffer[9] << 8;
+        uint16_t opcode = recvBuffer[8] | recvBuffer[9] << 8;
         auto ipAddress = Ethernet::getIp();
 
         if (opcode == ART_DMX)

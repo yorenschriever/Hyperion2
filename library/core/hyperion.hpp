@@ -329,7 +329,7 @@ private:
                 continue;
             }
 
-            // Log::info("HYP", "FPS: %d of %d (%d%% miss)\t interval: %dms \t freeHeap: %d \t avg length: %d \t channels: %d \t totalLights: %d", (int)outFps, (int)inFps, (int)misses, (int)elapsedTime, Utils::get_free_heap(), avgLength, activeChannels, totalLength);
+            Log::info("HYP", "FPS: %d of %d (%d%% miss)\t interval: %dms \t freeHeap: %d \t avg length: %d \t channels: %d \t totalLights: %d", (int)outFps, (int)inFps, (int)misses, (int)elapsedTime, Utils::get_free_heap(), avgLength, activeChannels, totalLength);
 
             // Debug.printf("IPAddress: %s\r\n", Ethernet::GetIp().toString().c_str());
             // Debug.printf("Tempo source: %s\r\n", Tempo::SourceName());
