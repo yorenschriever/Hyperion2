@@ -73,16 +73,16 @@ void setupWindows(Hyperion *hyp)
 
             
 
-            {.column = 2, .slot = 0, .pattern = new Window::GenericFallingPattern("Falling All /64", 0.5, 0, 64)},
-            {.column = 2, .slot = 1, .pattern = new Window::GenericFallingPattern("Falling 1,2,3,4 /32", 0.5, 1, 32)},
+            {.column = 2, .slot = 0, .pattern = new Window::GenericFallingPattern("Falling together", 0.5, 0, 64)},
+            {.column = 2, .slot = 1, .pattern = new Window::GenericFallingPattern("Falling one by one", 0.5, 1, 32)},
 
-            {.column = 2, .slot = 2, .pattern = new Window::GenericPositionLFOPattern<Cos>("Position All /64", 1, 0, 64)},
-            {.column = 2, .slot = 3, .pattern = new Window::GenericPositionLFOPattern<Cos>("Position 1,2,3,4 /64", 1, 1, 64)},
-            {.column = 2, .slot = 4, .pattern = new Window::GenericPositionLFOPattern<Cos>("Position 1+3,2+4 /64", 1, 4, 64)},
+            {.column = 2, .slot = 2, .pattern = new Window::GenericPositionLFOPattern<Cos>("Zig-zag together", 1, 0, 64)},
+            {.column = 2, .slot = 3, .pattern = new Window::GenericPositionLFOPattern<Cos>("Zig-zag one by one", 1, 1, 64)},
+            {.column = 2, .slot = 4, .pattern = new Window::GenericPositionLFOPattern<Cos>("Zig-zag pairs", 1, 4, 64)},
 
-            {.column = 2, .slot = 5, .pattern = new Window::GenericGapLFOPattern<NegativeCosFast>("Gap 1>2>3>4 /32", 1, 0.25, 32)},
-            {.column = 2, .slot = 6, .pattern = new Window::GenericGapLFOPattern<NegativeCosFast>("Gap 1,2,3,4 /32", 1, 1, 32)},
-            {.column = 2, .slot = 7, .pattern = new Window::GenericGapLFOPattern<NegativeCosFast>("Gap 1+3,2+4 /32", 1, 4, 32)},
+            {.column = 2, .slot = 5, .pattern = new Window::GenericGapLFOPattern<NegativeCosFast>("Gap snake", 1, 0.25, 32)},
+            {.column = 2, .slot = 6, .pattern = new Window::GenericGapLFOPattern<NegativeCosFast>("Gap one by one", 1, 1, 32)},
+            {.column = 2, .slot = 7, .pattern = new Window::GenericGapLFOPattern<NegativeCosFast>("Gap pair", 1, 4, 32)},
 
             // {.column = 2, .slot = 0, .pattern = new Window::SinPattern()},
             // {.column = 2, .slot = 1, .pattern = new Window::SinGapPattern()},
@@ -93,15 +93,26 @@ void setupWindows(Hyperion *hyp)
     int nbytes = 8 * sizeof(MotorPosition);
     auto split = new InputSlicer(input, {
                                             {0, nbytes, true},
+                                            {0, nbytes, true},
+                                            {0, nbytes, true},
+                                            {0, nbytes, true},
                                             {0, nbytes, false},
                                         });
 
-    hyp->addPipe(new ConvertPipe<MotorPosition, MotorPositionOut>(
-        split->getInput(0),
-        new ArtNetOutput("169.254.0.201", 0, 0, 1, 60)));
+    const char* hosts[4] = {
+        "window1.local",  // "169.254.0.201",
+        "window2.local",
+        "window3.local",
+        "window4.local",
+    };
+    for (int i=0;i<4;i++){
+        hyp->addPipe(new ConvertPipe<MotorPosition, MotorPositionOut>(
+            split->getInput(i),
+            new ArtNetOutput(hosts[i], 0, 0, 1, 60)));
+    }
 
     hyp->addPipe(new ConvertPipe<MotorPosition, MotorPositionOut>(
-        split->getInput(1),
+        split->getInput(split->size()-1),
         new WebsocketOutput(&hyp->webServer, "/ws/windows", 60)));
 
     hyp->hub.setForcedSelection(1, true);

@@ -159,7 +159,7 @@ public:
     }
 
     void send(const char *hostname, uint8_t net, uint8_t subnet, uint8_t universe, uint8_t *data_ptr, uint16_t size) override {
-        auto ip = IPAddress::fromHostname(hostname);
+        auto ip = HostnameCache::lookup(hostname);
 
         artnet_dmx_s packet;
 
@@ -186,7 +186,7 @@ public:
         packet.length = size;
         memcpy(packet.data, data_ptr, size);
 
-        sock.send(&ip, ART_NET_PORT, (uint8_t*) &packet, sizeof(artnet_dmx_s) - 512 + size);
+        sock.send(ip, ART_NET_PORT, (uint8_t*) &packet, sizeof(artnet_dmx_s) - 512 + size);
     }
 
 private:
