@@ -17,6 +17,7 @@ public:
         int HEIGHT;
         int FADER0_CONTROLLER_NUMBER;
         int MASTER_DIM_FADER_CONTROLLER_NUMBER;
+        int PHRASE_ALIGN_NOTE_NUMBER;
         int TAP_NOTE_NUMBER;
         int TAP_STOP_NOTE_NUMBER;
         int TAP_ALIGN_NOTE_NUMBER;
@@ -55,6 +56,8 @@ private:
             return TapTempo::getInstance()->Stop();
         if (note == make.TAP_ALIGN_NOTE_NUMBER && isOn)
             return TapTempo::getInstance()->Align();
+        if (note == make.PHRASE_ALIGN_NOTE_NUMBER && isOn)
+            return Tempo::AlignPhrase();
         
         if (note == make.TOGGLE_COLUMN_OFFSET_NOTE_NUMBER && isOn)
             return toggleColumnOffset();
@@ -178,6 +181,8 @@ ApcMiniController::Make ApcMiniController::MK1 = {
     .FADER0_CONTROLLER_NUMBER = 48,
     .MASTER_DIM_FADER_CONTROLLER_NUMBER = 56,
 
+    .PHRASE_ALIGN_NOTE_NUMBER = 86,
+
     .TAP_NOTE_NUMBER = 98,
     .TAP_STOP_NOTE_NUMBER = 89,
     .TAP_ALIGN_NOTE_NUMBER = 88,
@@ -195,6 +200,8 @@ ApcMiniController::Make ApcMiniController::MK2{
 
     .FADER0_CONTROLLER_NUMBER = 48,
     .MASTER_DIM_FADER_CONTROLLER_NUMBER = 56,
+
+    .PHRASE_ALIGN_NOTE_NUMBER = 74,
 
     .TAP_NOTE_NUMBER = 0x76,
     .TAP_STOP_NOTE_NUMBER = 0x77,
