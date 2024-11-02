@@ -22,6 +22,7 @@ if [ $TARGET = 'docker' ]; then
     docker run -it --name=hyperion --rm \
         --mount type=bind,source=${HYPERION_LIB_DIR},target=/hyperion_lib \
         --mount type=bind,source=$PWD,target=/project \
+        --mount type=bind,source=$projectDir/../common,target=/common \
         --workdir=/project hyperion \
         /hyperion_lib/scripts/build.sh linux
     exit;
