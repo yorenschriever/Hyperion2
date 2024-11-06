@@ -62,7 +62,7 @@ public:
         // Log::info("LFOTempo", "LFOTempo: phase: %f, phaseMs: %d, periodMs: %d, deltaPhase: %f, deltaPhaseMs: %d", phase, phaseMs, periodMs, deltaPhase, deltaPhaseMs);
 
         unsigned int dutyCycleMs = periodMs * dutyCycle;
-        if (phaseMs < dutyCycleMs)
+        if (phaseMs < dutyCycleMs && dutyCycleMs > 0)
             return float(phaseMs) / dutyCycleMs;
         else
             return 1;
