@@ -50,18 +50,18 @@ public:
             return 0;
 
         float phase = Tempo::GetProgress(period); 
-        int periodMs = Tempo::TimeBetweenBeats() * period;
+        unsigned  periodMs = Tempo::TimeBetweenBeats() * period;
 
-        int deltaPhaseMs = periodMs * deltaPhase;
+        unsigned int deltaPhaseMs = periodMs * deltaPhase;
         // Correction to make sure the phase never goes negative if deltaPhase > 1,
         // Not all plaforms handle modulus of negative numbers the same
-        long phaseMs = periodMs * phase;
-        long correctionMs = std::ceil(deltaPhase) * periodMs;
+        unsigned long phaseMs = periodMs * phase;
+        unsigned long correctionMs = std::ceil(deltaPhase) * periodMs;
         phaseMs = (phaseMs + deltaPhaseMs + correctionMs) % periodMs;
 
         // Log::info("LFOTempo", "LFOTempo: phase: %f, phaseMs: %d, periodMs: %d, deltaPhase: %f, deltaPhaseMs: %d", phase, phaseMs, periodMs, deltaPhase, deltaPhaseMs);
 
-        int dutyCycleMs = periodMs * dutyCycle;
+        unsigned int dutyCycleMs = periodMs * dutyCycle;
         if (phaseMs < dutyCycleMs)
             return float(phaseMs) / dutyCycleMs;
         else
