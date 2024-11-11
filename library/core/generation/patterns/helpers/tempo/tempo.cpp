@@ -68,11 +68,17 @@ const char *Tempo::SourceName()
 
 float Tempo::GetProgress(int intervalSize)
 {
+    if (intervalSize == 0)
+        return 0;
+
     AbstractTempo *source = getActive();
     if (!source)
         return 0;
 
     if (source->TimeBetweenBeats() == 0)
+        return 0;
+
+    if (source->GetBeatNumber() < 0)
         return 0;
 
     float coarse = float((source->GetBeatNumber() + phraseOffset) % intervalSize);
