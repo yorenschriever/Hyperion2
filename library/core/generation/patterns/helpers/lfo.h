@@ -1,11 +1,11 @@
 #pragma once
 
+#include "lfoShapes.h"
 #include "log.hpp"
 #include "utils.hpp"
 #include <cmath>
 #include <math.h>
 #include <stdint.h>
-#include "lfoShapes.h"
 
 template <class T>
 class LFO
@@ -103,6 +103,12 @@ public:
     {
         if (newPeriod == period)
             return;
+
+        if (this->period == 0 || newPeriod == 0)
+        {
+            this->period = newPeriod;
+            return;
+        }
 
         long ms = Utils::millis();
         long phaseMs = (ms - starting_point) % period;
