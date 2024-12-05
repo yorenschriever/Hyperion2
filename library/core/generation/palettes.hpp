@@ -65,67 +65,65 @@ Palette sunset4{
 
 // Some sunset color approximated from https://digitalsynopsis.com/design/sunrise-sunset-photos-sky-series-eric-cahan/
 
-
 Palette sunset2{
     .gradient = Gradient({
-  {.position  =  0, .color = RGB(   43,  0, 50)},  // Dark purple
-  {.position  =127, .color = RGB(  129,  0,140)},  // Lighter purple
-  {.position  =190, .color = RGB(  230,  0,255)},  // Bright purple
-  {.position  =255, .color = RGB(   25,111,213)} // Light blue
+        {.position = 0, .color = RGB(43, 0, 50)},     // Dark purple
+        {.position = 127, .color = RGB(129, 0, 140)}, // Lighter purple
+        {.position = 190, .color = RGB(230, 0, 255)}, // Bright purple
+        {.position = 255, .color = RGB(25, 111, 213)} // Light blue
     }),
-    .primary = RGB(  129,  0,140),
-    .secondary = RGB(   25,111,213),
+    .primary = RGB(129, 0, 140),
+    .secondary = RGB(25, 111, 213),
     .highlight = RGB(255, 255, 255),
     .name = "Sunset 2"};
 
 Palette sunset5{
     .gradient = Gradient({
-    {.position = 0, .color = RGB(40, 0, 50)},       // Dark purple
-    {.position = 150, .color = RGB(197, 70, 196)},  // Washed pink
-    {.position = 200, .color = RGB(247, 170, 200)}, // Light washed pink
-    {.position = 255, .color = RGB(237, 136, 80)}   // Orange
+        {.position = 0, .color = RGB(40, 0, 50)},       // Dark purple
+        {.position = 150, .color = RGB(197, 70, 196)},  // Washed pink
+        {.position = 200, .color = RGB(247, 170, 200)}, // Light washed pink
+        {.position = 255, .color = RGB(237, 136, 80)}   // Orange
     }),
     .primary = RGB(247, 170, 200),
     .secondary = RGB(237, 136, 80),
     .highlight = RGB(255, 255, 255),
     .name = "Sunset 5"};
 
-
 Palette sunset6{
     .gradient = Gradient({
-    {.position = 0, .color = RGB(40, 0, 50)},      // Dark purple
-    {.position = 150, .color = RGB(230, 0, 255)},  // Light purple
-    {.position = 210, .color = RGB(247, 170, 50)}, // Light Orange
-    {.position = 255, .color = RGB(120, 60, 0)}    // Dark Orange
+        {.position = 0, .color = RGB(40, 0, 50)},      // Dark purple
+        {.position = 150, .color = RGB(230, 0, 255)},  // Light purple
+        {.position = 210, .color = RGB(247, 170, 50)}, // Light Orange
+        {.position = 255, .color = RGB(120, 60, 0)}    // Dark Orange
     }),
     .primary = RGB(230, 0, 255),
-    .secondary =  RGB(120, 60, 0),
+    .secondary = RGB(120, 60, 0),
     .highlight = RGB(255, 255, 255),
     .name = "Sunset 6"};
 
 Palette sunset7{
     .gradient = Gradient({
-  {.position  =  0, .color = RGB(   76, 55, 98)},  // Dark purple
-  {.position  = 63, .color = RGB(   123, 66,123)}, // Light purple
-  {.position  =127, .color = RGB(  194, 61, 92)},  // Light purple / red
-  {.position  =191, .color = RGB(  216, 59, 62)},  // Light red
-  {.position  =255, .color = RGB(  203, 44, 33)} // Dark red
+        {.position = 0, .color = RGB(76, 55, 98)},    // Dark purple
+        {.position = 63, .color = RGB(123, 66, 123)}, // Light purple
+        {.position = 127, .color = RGB(194, 61, 92)}, // Light purple / red
+        {.position = 191, .color = RGB(216, 59, 62)}, // Light red
+        {.position = 255, .color = RGB(203, 44, 33)}  // Dark red
     }),
-    .primary = RGB(   76, 55, 98),
-    .secondary =  RGB(  216, 59, 62),
+    .primary = RGB(76, 55, 98),
+    .secondary = RGB(216, 59, 62),
     .highlight = RGB(255, 255, 255),
     .name = "Sunset 7"};
 
 Palette sunset8{
     .gradient = Gradient({
-    {.position = 0, .color = RGB(60, 20, 80)},    // Dark purple
-    {.position = 63, .color = RGB(100, 33, 123)}, // Light purple
-    {.position = 127, .color = RGB(160, 30, 70)}, // Light purple / red
-    {.position = 191, .color = RGB(216, 59, 62)}, // Light red
-    {.position = 255, .color = RGB(203, 22, 16)}  // Dark red
+        {.position = 0, .color = RGB(60, 20, 80)},    // Dark purple
+        {.position = 63, .color = RGB(100, 33, 123)}, // Light purple
+        {.position = 127, .color = RGB(160, 30, 70)}, // Light purple / red
+        {.position = 191, .color = RGB(216, 59, 62)}, // Light red
+        {.position = 255, .color = RGB(203, 22, 16)}  // Dark red
     }),
     .primary = RGB(100, 33, 123),
-    .secondary =   RGB(216, 59, 62),
+    .secondary = RGB(216, 59, 62),
     .highlight = RGB(255, 255, 255),
     .name = "Sunset 8"};
 
@@ -196,7 +194,7 @@ Palette retro{
 
 Palette coralTeal{
     .gradient = Gradient({
-        {.position = 0, .color = darken(RGB(0x3F7C85),255)},
+        {.position = 0, .color = darken(RGB(0x3F7C85), 255)},
         {.position = 63, .color = RGB(0x00CCBF)},
         {.position = 200, .color = RGB(0x72F2EB)},
         {.position = 255, .color = RGB(0x747E7E)},
@@ -334,13 +332,19 @@ Palette plumBath{
     .name = "Plum bath"};
 
 Palette matrix{
-    .gradient = Gradient({
-  {.position  =  0, .color = RGB(  0, 50,   43)},  
-  {.position  =127, .color = RGB(  0,140,  129)},  
-  {.position  =190, .color = RGB(  0,255,  230)},  
-  {.position  =255, .color = RGB(  111, 213,25)} 
-    }),
-    .primary =   RGB(  0,140,129),
-    .secondary = RGB(  111, 213,25),
+    .gradient = Gradient({{.position = 0, .color = RGB(0, 50, 43)},
+                          {.position = 127, .color = RGB(0, 140, 129)},
+                          {.position = 190, .color = RGB(0, 255, 230)},
+                          {.position = 255, .color = RGB(111, 213, 25)}}),
+    .primary = RGB(0, 140, 129),
+    .secondary = RGB(111, 213, 25),
     .highlight = RGB(255, 255, 255),
     .name = "Matrix"};
+
+Palette orangeWhite{
+    .gradient = Gradient({{.position = 0, .color = RGB(100, 100, 75)},
+                          {.position = 255, .color = RGB(255, 100, 0)}}),
+    .primary = RGB(255, 100, 0),
+    .secondary = RGB(100, 100, 75),
+    .highlight = RGB(255, 255, 255),
+    .name = "Orange white"};
