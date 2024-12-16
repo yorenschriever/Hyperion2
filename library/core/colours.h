@@ -365,8 +365,8 @@ public:
 
     inline void ApplyLut(LUT *lut)
     {
-        R = lut->luts[0 % lut->Dimension][R];
-        G = lut->luts[1 % lut->Dimension][G];
+        G = lut->luts[0 % lut->Dimension][G];
+        R = lut->luts[1 % lut->Dimension][R];
         B = lut->luts[2 % lut->Dimension][B];
         W = lut->luts[3 % lut->Dimension][W];
     }
@@ -583,6 +583,7 @@ public:
     operator RBG();
     operator GBR();
     operator RGBW();
+    operator GRBW();
     operator RGBWAmber();
     operator RGBWAmberUV();
 
@@ -959,7 +960,16 @@ inline RGBA::operator RGBW()
         (R - W)* A / 255, 
         (G - W)* A / 255, 
         (B - W)* A / 255, 
-        W* A / 255);
+        W * A / 255);
+}
+inline RGBA::operator GRBW()
+{
+    uint8_t W = std::min(std::min(R, G), B);
+    return GRBW(
+        (G - W)* A / 255, 
+        (R - W)* A / 255, 
+        (B - W)* A / 255, 
+        W * A / 255);
 }
 inline RGBA::operator RGBWAmber()
 {

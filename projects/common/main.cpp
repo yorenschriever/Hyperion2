@@ -7,6 +7,7 @@
 #include "mapHelpers.hpp"
 #include "patterns/patterns-led.hpp"
 #include "patterns/patterns-monochrome.hpp"
+#include "paletteColumn.hpp"
 
 /* TODOs
  * - distributeAndMonitor3d
@@ -104,6 +105,7 @@ int main()
 
     setupLed(hyp);
     setupMonochrome(hyp);
+    setupPaletteColumn();
 
     // addPaletteColumn(hyp);
     // addTrianglesPipe(hyp);
@@ -644,44 +646,4 @@ int main()
 
 // }
 
-// void addPaletteColumn(Hyperion *hyp)
-// {
-//     auto paletteColumn = new PaletteColumn(
-//         &hyp->hub,
-//         0,
-//         0,
-//         {
-            
-//             &pinkSunset,
-//             &sunset8,
-//             &campfire,
-//             &heatmap2,
-//             &sunset2,
-//             &sunset7,
-//             &tunnel,
-//             &redSalvation,
-//             &plumBath,
-            
-
-//             &sunset6,
-            
-//             &sunset1,
-//             &coralTeal,
-//             &deepBlueOcean,
-            
-//             &heatmap,
-//             &sunset4,
-//             &candy,
-//             &sunset3,
-//             &greatBarrierReef,
-//             &blueOrange,
-//             &peach,
-//             &denseWater,
-//             &purpleGreen,
-//             &sunset5,
-//             &salmonOnIce,
-//             &sunset2,
-//             &retro,
-//         });
-//     hyp->hub.subscribe(paletteColumn);
-// }
+// 
