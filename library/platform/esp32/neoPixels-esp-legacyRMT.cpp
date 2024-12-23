@@ -100,9 +100,9 @@ void IRAM_ATTR NeoPixelsEspLegacyRMT::fillNext(uint8_t channel)
 void IRAM_ATTR NeoPixelsEspLegacyRMT::begin_()
 {
     xSemaphoreTake(xMutex, portMAX_DELAY);
-    if (port == 0 || port > sizeof(pinMapping))
+    if (port == 0 || port > PinMapping::map.size())
     {
-        Log::error(TAG, "port must be between 1-%d (inclusive), but was %d", sizeof(pinMapping), port);
+        Log::error(TAG, "port must be between 1-%d (inclusive), but was %d", PinMapping::map.size(), port);
         return;
     }
 
@@ -115,7 +115,7 @@ void IRAM_ATTR NeoPixelsEspLegacyRMT::begin_()
 
     config.rmt_mode = RMT_MODE_TX;
     config.channel = rmtchannel;
-    config.gpio_num = static_cast<gpio_num_t>(pinMapping[port - 1]);
+    config.gpio_num = static_cast<gpio_num_t>(PinMapping::map[port - 1]);
     config.mem_block_num = 1;
     config.tx_config.loop_en = false;
 

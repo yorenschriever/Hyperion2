@@ -1,0 +1,11 @@
+#include "../esp32/log.cpp"
+#include "../esp32/neoPixels.cpp"
+#include "../esp32/network.cpp"
+#include "../esp32/spi.cpp"
+#include "../esp32/thread.cpp"
+#include "../esp32/utils.cpp"
+#include "../esp32/webserver.cpp"
+#include "../esp32/websocketServer.cpp"
+
+#include "../esp32/neoPixels-esp-legacyRMT.cpp"
+#include "../esp32/webServer-esp.cpp"

@@ -6,7 +6,7 @@
 #include <inttypes.h>
 #include "driver/spi_master.h"
 #include "esp_system.h"
-#include "misc/pinMapping.hpp"
+#include "pinMapping.hpp"
 #include <stdio.h>
 #include <string.h>
 
@@ -34,9 +34,9 @@ public:
 
         //Configuration for the SPI bus
         spi_bus_config_t buscfg={
-            .mosi_io_num=pinMapping[dataPin],
+            .mosi_io_num=PinMapping::map[dataPin],
             .miso_io_num=-1,
-            .sclk_io_num=pinMapping[clkPin],
+            .sclk_io_num=PinMapping::map[clkPin],
             .quadwp_io_num=-1,
             .quadhd_io_num=-1
         };

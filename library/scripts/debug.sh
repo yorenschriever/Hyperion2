@@ -28,9 +28,9 @@ if [ $TARGET = 'docker' ]; then
 
 elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ] || [ $TARGET = 'rpi' ]; then
     ${HYPERION_LIB_DIR}/scripts/certificate/generate.sh
-    PARAM="-DTARGET=${TARGET}"
+    PARAM="-DTARGET=${TARGET} -DSTARGET=${TARGET}"
 
-elif [ $TARGET = 'esp32' ] || [ $TARGET = 'esp32s3' ]; then
+elif [ $TARGET = 'esp32' ] || [ $TARGET = 'esp32s3' ] || [ $TARGET = 'hypernode' ]; then
     echo "Debug not supported (yet) on esp32"
     exit 1;
 else 

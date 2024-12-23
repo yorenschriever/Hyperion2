@@ -2,7 +2,7 @@
 #include "neoPixels.hpp"
 #include "log.hpp"
 #include "esp_attr.h"
-#include "misc/pinMapping.hpp"
+#include "pinMapping.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"

@@ -29,13 +29,18 @@ if [ $TARGET = 'docker' ]; then
 
 elif [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ] || [ $TARGET = 'rpi' ]; then
     ${HYPERION_LIB_DIR}/scripts/certificate/generate.sh
-    PARAM="-DTARGET=${TARGET}"
+    PARAM="-DTARGET=${TARGET} -DSTARGET=${TARGET}"
 
-elif [ $TARGET = 'esp32' ] || [ $TARGET = 'esp32s3' ]; then
+elif [ $TARGET = 'esp32' ]; then
     ${HYPERION_LIB_DIR}/scripts/certificate/generate.sh
     [ ! $IDF_PATH ] && . $IDF_DIR/export.sh; 
-    PARAM="-DCMAKE_TOOLCHAIN_FILE=$IDF_PATH/tools/cmake/toolchain-${TARGET}.cmake -DTARGET=${TARGET} -GNinja"
-    
+    PARAM="-DCMAKE_TOOLCHAIN_FILE=$IDF_PATH/tools/cmake/toolchain-${TARGET}.cmake -DTARGET=${TARGET} -DSTARGET=${TARGET} -GNinja"
+
+elif [ $TARGET = 'hypernode' ]; then
+    ${HYPERION_LIB_DIR}/scripts/certificate/generate.sh
+    [ ! $IDF_PATH ] && . $IDF_DIR/export.sh; 
+    PARAM="-DCMAKE_TOOLCHAIN_FILE=$IDF_PATH/tools/cmake/toolchain-esp32.cmake -DTARGET=esp32 -DSTARGET=${TARGET} -GNinja"
+
 else 
     echo "Invalid target: ${TARGET}"
     exit 1;

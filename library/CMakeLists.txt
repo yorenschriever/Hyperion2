@@ -22,9 +22,9 @@ if (${ESP_PLATFORM})
         PRIV_REQUIRES driver esp_eth esp_netif esp_phy esp_timer vfs spiffs esp_http_server esp_https_server mbedtls nvs_flash fatfs
         SRC_DIRS 
             ${CORE_SRC_DIR} 
-            "platform/${TARGET}" 
-            "platform/${TARGET}/misc"
-            "platform/${TARGET}/misc/mdns"
+            "platform/${STARGET}" 
+            "platform/${STARGET}/misc"
+            "platform/${STARGET}/misc/mdns"
             "platform/includes"
             "core/generation/patterns/helpers/tempo"
             "misc"
@@ -75,7 +75,7 @@ if (${ESP_PLATFORM})
 else ()
 
     file(GLOB PLATFORM_SRC CONFIGURE_DEPENDS
-        "${CMAKE_CURRENT_LIST_DIR}/platform/${TARGET}/*.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/platform/${STARGET}/*.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/platform/includes/*.cpp"
     )
 

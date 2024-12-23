@@ -118,6 +118,11 @@ public:
         pipes.push_back(pipe);
     }
 
+    virtual std::vector<Pipe*> getPipes()
+    {
+        return this->pipes;
+    }
+
     virtual void clearAll()
     {
         for (Pipe *pipe : pipes)
