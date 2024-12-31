@@ -51,7 +51,7 @@ void updateLed(Hyperion *hyp)
 {
   //If receiving data, flash fast
   for(auto pipe: hyp->getPipes()){
-    if(pipe->getNumPixels() > 0){
+    if(pipe->getNumPixels() > 0 && pipe->in->getUsedFrameCount() > 0){
       bool flashFast = Utils::millis() % 100 < 50;
       gpio_set_level(STATUS_LED_PIN, flashFast);
       return;
@@ -65,7 +65,7 @@ void updateLed(Hyperion *hyp)
     gpio_set_level(STATUS_LED_PIN, flashSlow);
     return;
   }
-
+  
   //If connected and on standby, turn on
   if (Ethernet::isConnected())
   {
