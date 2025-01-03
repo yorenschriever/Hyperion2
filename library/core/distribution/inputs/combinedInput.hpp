@@ -75,9 +75,6 @@ public:
     template <class T_SOURCE_COLOUR, class T_TARGET_COLOUR>
     static int convert(uint8_t *src, int length, uint8_t *dst, int dst_length, LUT *lut)
     {
-        // tell the output the new length so it can allocate enough space for the data
-        // we are going to send
-
         int numPixels = length / sizeof(T_SOURCE_COLOUR);
         if (numPixels * sizeof(T_TARGET_COLOUR) > dst_length)
         {
@@ -87,7 +84,7 @@ public:
 
         for (int i = 0; i < numPixels; i++)
         {
-            // store the i-th pixel in an object of type T (source datatype)
+            // store the i-th pixel in an object of type T_SOURCE_COLOUR
             T_SOURCE_COLOUR col = ((T_SOURCE_COLOUR *)src)[i];
 
             // this is where the actual conversion takes place. static cast will use
@@ -99,7 +96,7 @@ public:
             if (lut)
                 outCol.ApplyLut(lut);
 
-            // Pass the data to the output
+            // Place the data in the output buffer
             ((T_TARGET_COLOUR *)dst)[i] = outCol;
         }
         return numPixels * sizeof(T_TARGET_COLOUR);
