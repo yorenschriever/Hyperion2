@@ -28,7 +28,7 @@ This snippet downloads [Boost](https://www.boost.org/users/download/), unpacks t
 BOOST_INSTALL_DIR=$HOME"/repos/boost_1_82_0"
 
 mkdir -p $BOOST_INSTALL_DIR
-curl -L -o "$BOOST_INSTALL_DIR/boost.tar.gz" https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.tar.gz
+curl -L -o "$BOOST_INSTALL_DIR/boost.tar.gz" https://github.com/yorenschriever/boost_1_82_0/raw/refs/heads/main/boost_1_82_0.tar.gz
 tar xzvf $BOOST_INSTALL_DIR/boost.tar.gz --strip-components=1 -C $BOOST_INSTALL_DIR boost_1_82_0/boost
 echo "export BOOST_DIR=$BOOST_INSTALL_DIR" >> ~/.zprofile 
 ```
@@ -90,6 +90,8 @@ export OPENSSL_ROOT_DIR=$(brew --prefix openssl)
 ```
 
 In case the link to boost version 1.82 is no longer working, you can find a backup here
+https://github.com/yorenschriever/boost_1_82_0/raw/refs/heads/main/boost_1_82_0.tar.gz
+or here
 https://drive.google.com/file/d/1PrvEeoaydhL4MYVJdxWWK8Bm0sHBlHyo/view?usp=sharing.
 This is a google drive link. You need to download it manually. You can't replace the url in the curl script.
 

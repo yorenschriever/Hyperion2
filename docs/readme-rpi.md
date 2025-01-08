@@ -110,7 +110,7 @@ sudo apt-get install cmake make gcc g++ openssl openssl-dev git linux-headers ba
 Install boost
 ```
 cd ~
-curl -L -o boost.tar.gz https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.tar.gz 
+curl -L -o boost.tar.gz https://github.com/yorenschriever/boost_1_82_0/raw/refs/heads/main/boost_1_82_0.tar.gz 
 gunzip boost.tar.gz 
 tar -xvzf boost.tar.gz boost_1_82_0/
 rm boost.tar.gz
