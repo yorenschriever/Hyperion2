@@ -4,7 +4,7 @@ LABEL Description="Hyperion"
 RUN apk add cmake=3.24.4-r0 make=4.3-r1 gcc=12.2.1_git20220924-r4 g++=12.2.1_git20220924-r4 openssl openssl-dev git linux-headers bash
 
 WORKDIR /home
-RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.tar.gz
+RUN wget https://github.com/yorenschriever/boost_1_82_0/raw/refs/heads/main/boost_1_82_0.tar.gz 
 RUN tar xzvf boost_1_82_0.tar.gz 
 
 ENV HYPERION_LIB_DIR=/hyperion_lib
