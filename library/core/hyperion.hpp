@@ -1,11 +1,11 @@
 #pragma once
 #include "colours.h"
-#include "core/distribution/inputs/inputSlicer.hpp"
-#include "core/distribution/inputs/inputSplitter.hpp"
+// #include "core/distribution/inputs/inputSlicer.hpp"
+// #include "core/distribution/inputs/inputSplitter.hpp"
 #include "core/distribution/inputs/udpInput.hpp"
 #include "core/distribution/inputs/dmxInput.hpp"
 #include "core/distribution/inputs/patternInput.hpp"
-#include "core/distribution/inputs/combinedInput.hpp"
+#include "core/distribution/inputs/combinedInput2.hpp"
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 #include "core/distribution/luts/gammaLut.hpp"
 #include "core/distribution/luts/incandescentLut.hpp"
@@ -18,8 +18,6 @@
 #include "core/distribution/outputs/spiOutput.hpp"
 #include "core/distribution/outputs/udpOutput.hpp"
 #include "core/distribution/outputs/artnetOutput.hpp"
-#include "core/distribution/pipes/convertPipe.hpp"
-#include "core/distribution/pipes/pipe.hpp"
 #include "core/generation/controllers/dinMidiControllerFactory.hpp"
 #include "core/generation/controllers/midiBridge.hpp"
 #include "core/generation/controllers/midiController.hpp"
@@ -36,10 +34,11 @@
 #include "core/generation/patterns/helpers/tempo/websocketTempo.h"
 #include "core/generation/pixelMap.hpp"
 #include "core/generation/pixelMapSplitter3d.hpp"
-#include "distribution/inputs/controlHubInput.hpp"
-#include "distribution/inputs/patternCycleInput.hpp"
-#include "core/distribution/inputs/switchableInput.hpp"
-#include "distribution/outputs/neopixelOutput.hpp"
+#include "core/distribution/inputs/controlHubInput.hpp"
+#include "core/distribution/convertColor.hpp"
+// #include "distribution/inputs/patternCycleInput.hpp"
+// #include "core/distribution/inputs/switchableInput.hpp"
+// #include "distribution/outputs/neopixelOutput.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
 #include "generation/controllers/websocketController.hpp"
 #include "platform/includes/ethernet.hpp"
@@ -100,36 +99,67 @@ public:
             setup_tempo();
 
         Log::info(TAG, "starting outputs");
-        for (Pipe *pipe : pipes)
-            pipe->out->begin();
+        for (auto output : outputs)
+            output->begin();
 
         clearAll();
 
         Log::info(TAG, "starting inputs");
-        for (Pipe *pipe : pipes)
-            pipe->in->begin();
+        for (auto input : inputs)
+            input->begin();
 
         Log::info(TAG, "Initialization complete. Starting main loop");
         Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
         Thread::create(runTask, "run", Thread::Purpose::distribution, 30000, this, 1);
     }
 
-    virtual void addPipe(Pipe *pipe)
+    virtual void addInput(IInput *input)
     {
-        pipes.push_back(pipe);
+        inputs.push_back(input);
     }
 
-    virtual std::vector<Pipe*> getPipes()
+    virtual void addOutput(IOutput *output)
     {
-        return this->pipes;
+        outputs.push_back(output);
+    }
+
+    virtual void CreateChain(IInput *input, IOutput *output)
+    {
+        input->setReceiver(output);
+        addInput(input);
+        addOutput(output);
+    }
+
+    virtual void CreateChain(IInput *input, IConverter* converter, IOutput *output)
+    {
+        input->setReceiver(converter);
+        converter->setReceiver(output);
+        addInput(input);
+        addOutput(output);
+    }
+
+    virtual void CreateChain(IInput *input, std::vector<IConverter*> converters,IOutput *output)
+    {
+        IConverter *sender = nullptr;
+        for (auto converter : converters)
+        {
+            if (!sender)
+                input->setReceiver(converter);
+            else
+                sender->setReceiver(converter);
+            sender = converter;
+        }
+        sender->setReceiver(output);
+        addInput(input);
+        addOutput(output);
     }
 
     virtual void clearAll()
     {
-        for (Pipe *pipe : pipes)
+        for (auto output : outputs)
         {
-            pipe->out->clear();
-            pipe->out->show();
+            output->clear();
+            output->show();
         }
     }
 
@@ -290,6 +320,40 @@ private:
             this);
     }
 
+    template<class InputOutput>
+    void calcFps(const char* name,std::vector<InputOutput*> ioVec, unsigned long elapsedTime, bool firstRun)
+    {
+            int activeChannels = 0;
+            int totalUsedFrames = 0;
+            int totalMissedFrames = 0;
+            int totalTotalFrames = 0;
+            int totalLength = 0;
+            for (auto io : ioVec)
+            {
+                auto fps = io->getFpsCounter();
+                if (!fps || fps->getTotalFrameCount() == 0)
+                    continue;
+
+                activeChannels++;
+                totalUsedFrames += fps->getUsedFrameCount();
+                totalMissedFrames += fps->getMissedFrameCount();
+                totalTotalFrames += fps->getTotalFrameCount();
+                fps->resetFrameCount();
+
+                totalLength += 0; //input->getLength();
+            }
+
+            float outFps = activeChannels == 0 ? 0 : (float)1000. * totalUsedFrames / (elapsedTime) / activeChannels;
+            float inFps = activeChannels == 0 ? 0 : (float)1000. * totalTotalFrames / (elapsedTime) / activeChannels;
+            float misses = totalTotalFrames == 0 ? 0 : 100.0 * (totalMissedFrames) / totalTotalFrames;
+            int avgLength = activeChannels == 0 ? 0 : totalLength / activeChannels;
+
+            if (firstRun) return;
+
+            Log::info("HYP", "%s: FPS: %d of %d (%d%% miss)\t interval: %dms \t freeHeap: %d \t avg length: %d \t channels: %d \t totalLights: %d", name, (int)outFps, (int)inFps, (int)misses, (int)elapsedTime, Utils::get_free_heap(), avgLength, activeChannels, totalLength);
+
+    }
+
     static void UpdateDisplayTask(void *parameter)
     {
         Hyperion *instance = (Hyperion *)parameter;
@@ -301,29 +365,8 @@ private:
             unsigned long now = Utils::millis();
             unsigned long elapsedTime = now - lastFpsUpdate;
 
-            int activeChannels = 0;
-            int totalUsedFrames = 0;
-            int totalMissedFrames = 0;
-            int totalTotalFrames = 0;
-            int totalLength = 0;
-            for (Pipe *pipe : instance->pipes)
-            {
-                if (pipe->in->getTotalFrameCount() == 0)
-                    continue;
-
-                activeChannels++;
-                totalUsedFrames += pipe->in->getUsedFrameCount();
-                totalMissedFrames += pipe->in->getMissedFrameCount();
-                totalTotalFrames += pipe->in->getTotalFrameCount();
-                pipe->in->resetFrameCount();
-
-                totalLength += pipe->getNumPixels();
-            }
-
-            float outFps = activeChannels == 0 ? 0 : (float)1000. * totalUsedFrames / (elapsedTime) / activeChannels;
-            float inFps = activeChannels == 0 ? 0 : (float)1000. * totalTotalFrames / (elapsedTime) / activeChannels;
-            float misses = totalTotalFrames == 0 ? 0 : 100.0 * (totalMissedFrames) / totalTotalFrames;
-            int avgLength = activeChannels == 0 ? 0 : totalLength / activeChannels;
+            instance->calcFps("IN",instance->inputs, elapsedTime, firstRun);
+            instance->calcFps("OUT",instance->outputs, elapsedTime, firstRun);
 
             lastFpsUpdate = now;
 
@@ -335,7 +378,7 @@ private:
                 continue;
             }
 
-            Log::info("HYP", "FPS: %d of %d (%d%% miss)\t interval: %dms \t freeHeap: %d \t avg length: %d \t channels: %d \t totalLights: %d", (int)outFps, (int)inFps, (int)misses, (int)elapsedTime, Utils::get_free_heap(), avgLength, activeChannels, totalLength);
+            // Log::info("HYP", "FPS: %d of %d (%d%% miss)\t interval: %dms \t freeHeap: %d \t avg length: %d \t channels: %d \t totalLights: %d", (int)outFps, (int)inFps, (int)misses, (int)elapsedTime, Utils::get_free_heap(), avgLength, activeChannels, totalLength);
 
             // Debug.printf("IPAddress: %s\r\n", Ethernet::GetIp().toString().c_str());
             // Debug.printf("Tempo source: %s\r\n", Tempo::SourceName());
@@ -357,11 +400,8 @@ private:
     {
         // Log::info("Hyperion", "running");
 
-        for (Pipe *pipe : pipes)
-            pipe->process();
-
-        for (Pipe *pipe : pipes)
-            pipe->out->postProcess();
+        for (auto input: inputs)
+            input->process();
 
         Thread::sleep(1);
     }
@@ -374,7 +414,8 @@ private:
         Thread::destroy();
     }
 
-    std::vector<Pipe *> pipes;
+    std::vector<IInput *> inputs;
+    std::vector<IOutput *> outputs;
     std::map<MidiDevice *, std::unique_ptr<MidiController>> midiControllers;
     std::map<MidiDevice *, MidiClockTempo *> midiClockTempos;
     MidiControllerFactory *midiControllerFactory = nullptr;

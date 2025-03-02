@@ -4,7 +4,7 @@
 
 // Use bufferInput when you manually maintain a buffer with pixelData,
 // and want to feed it into a pipe
-class BufferInput : public Input
+class BufferInput final : public Input
 {
     using LoadDataCallback = void (*)(void *);
     using BeginCallback = void (*)(void *);

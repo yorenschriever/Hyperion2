@@ -1,12 +1,12 @@
 #pragma once
 
 #include "platform/includes/artNet.hpp"
-#include "output.hpp"
+#include "baseOutput.hpp"
+#include "utils.hpp"
 
-class ArtNetOutput : public Output
+class ArtNetOutput : public BaseOutput
 {
 public:
-    // start channel 1-512
     ArtNetOutput(const char* hostname, uint8_t net, uint8_t subnet, uint8_t universe, unsigned int fps=60)
     {
         this->hostname = hostname;
@@ -16,12 +16,12 @@ public:
         this->frameInterval = 1000 / fps;
     }
 
-    // index and size are in bytes
-    void setData(uint8_t *data, int size, int index) override
+    // size is in bytes
+    void setData(uint8_t *data, int size) override
     {
-        int copy_length = std::min(size, length - index);
+        int copy_length = std::min(size, length);
         if (copy_length > 0)
-            memcpy(this->buffer + index, data, copy_length);
+            memcpy(this->buffer, data, copy_length);
     }
 
     bool ready() override

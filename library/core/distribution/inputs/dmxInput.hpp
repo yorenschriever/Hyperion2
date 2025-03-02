@@ -2,11 +2,13 @@
 
 #include <algorithm>
 #include <cstring>
-#include "input.hpp"
+#include "baseInput.hpp"
 #include "dmx.hpp"
+#include "platform/includes/log.hpp"
+#include "platform/includes/utils.hpp"
 
 //DMXInput listens to input on the specified dmx port.
-class DMXInput : public Input
+class DMXInput final: public BaseInput
 {
 
 public:
@@ -19,26 +21,34 @@ public:
         this->dmxPort = dmxPort;
     }
 
-    virtual void begin() override
+    void begin() override
     {
         this->dmx = DMX::getInstance(dmxPort);
     }
 
-    virtual int loadData(uint8_t *dataPtr, unsigned int buffersize) override
+    Buffer *getData() override 
     {
         int frameNumber = dmx->getFrameNumber();
 
         //check if there is a new frame since last time
         if (frameNumber == lastFrameNumber)
-            return 0;
-
-        usedframecount++;
-        missedframecount += frameNumber - lastFrameNumber - 1;
+            return nullptr;
         lastFrameNumber = frameNumber;
 
-        memcpy(dataPtr, dmx->getDataPtr() + startChannel, std::min(length,(int) buffersize));
+        fpsCounter.increaseUsedFrameCount();
+        fpsCounter.increaseMissedFrameCount(frameNumber - lastFrameNumber - 1);
 
-        return length;
+        auto patternBuffer = BufferPool::getBuffer(length);
+        if (!patternBuffer)
+        {
+            Log::error("DMX_INPUT", "Unable to allocate memory for PatternInput, free heap = %d\n", Utils::get_free_heap());
+            Utils::exit();
+        }
+        auto dataPtr = patternBuffer->getData();
+
+        memcpy(dataPtr, dmx->getDataPtr() + startChannel, length);
+
+        return patternBuffer;
     }
 
 private:

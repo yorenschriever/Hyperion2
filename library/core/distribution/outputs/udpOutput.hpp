@@ -1,6 +1,6 @@
 #pragma once
 
-#include "output.hpp"
+#include "baseOutput.hpp"
 #include "core/distribution/utils/hostnameCache.hpp"
 #include "platform/includes/log.hpp"
 #include "platform/includes/socket.hpp"
@@ -10,7 +10,7 @@
 #include "log.hpp"
 
 // UDPoutput writes led data to another device over UDP.
-class UDPOutput : public Output
+class UDPOutput : public BaseOutput
 {
 public:
     UDPOutput(const char *hostname, int port, unsigned int fps)
@@ -23,12 +23,12 @@ public:
         buffer = (uint8_t *)malloc(12);
     }
 
-    // index and size are in bytes
-    void setData(uint8_t *data, int size, int index) override
+    // size is in bytes
+    void setData(uint8_t *data, int size) override
     {
-        int copy_length = std::min(size, length - index);
+        int copy_length = std::min(size, length);
         if (copy_length > 0)
-            memcpy(this->buffer + index, data, copy_length);
+            memcpy(this->buffer, data, copy_length);
     }
 
     bool ready() override
@@ -40,10 +40,6 @@ public:
     {
         lastFrame = Utils::millis();
         sock->send(HostnameCache::lookup(hostname), port, buffer, length);
-    }
-
-    void postProcess() override
-    {
     }
 
     void begin() override

@@ -6,7 +6,6 @@
 #include "input.hpp"
 #include "bufferInput.hpp"
 #include "utils.hpp"
-#include "core/distribution/pipes/pipe.hpp"
 
 // InputSlicer is a more advanced version of input splitter. 
 // With this class you can freely assign start and end positions
@@ -82,7 +81,8 @@ public:
         if (!instance->AllSyncedDestinationsAreReady())
             return;
 
-        auto len = instance->sourceInput->loadData(instance->buffer, Pipe::bufferSize);
+        // auto len = instance->sourceInput->loadData(instance->buffer, Pipe::bufferSize);
+        int len=0; //TODO
         if (len > Pipe::bufferSize) {
             Log::info("InputSlicer","pixel buffer to small, not all led data is processed, %d, %d", len, Pipe::bufferSize);
         }
@@ -109,6 +109,6 @@ protected:
     Input *sourceInput = NULL;
     std::vector<BufferInput *> destinationInputs;
     std::vector<Slice> slices;
-    uint8_t buffer[Pipe::bufferSize];
+    uint8_t buffer[0]; //TODO
     bool begun = false;
 };

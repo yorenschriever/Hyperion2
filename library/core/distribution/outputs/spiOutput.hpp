@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include "output.hpp"
+#include "baseOutput.hpp"
 #include "thread.hpp"
 #include "utils.hpp"
 #include "log.hpp"
@@ -9,7 +9,7 @@
 
 // SpiOutput sends the output over spi.
 // Can be used for pixel led strands.
-class SpiOutput : public Output
+class SpiOutput : public BaseOutput
 {
 public:
     SpiOutput(uint8_t clkPin, uint8_t dataPin, int frq = 500000)
@@ -24,11 +24,11 @@ public:
     }
 
     // index and size are in bytes
-    void setData(uint8_t *data, int size, int index) override
+    void setData(uint8_t *data, int size) override
     {
-        int copylength = std::min(size, length - index);
+        int copylength = std::min(size, length);
         if (copylength > 0)
-            memcpy(this->buffer + index, data, copylength);
+            memcpy(this->buffer, data, copylength);
     }
 
     bool ready() override

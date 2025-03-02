@@ -8,7 +8,7 @@
 
 //PatternCycleInput shows each pattern for a while.
 template <class T_COLOUR>
-class PatternCycleInput : public Input
+class PatternCycleInput final: public Input
 {
 
 public:

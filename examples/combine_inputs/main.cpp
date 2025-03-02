@@ -60,38 +60,40 @@ int main()
     // In this demo, we want to see all channels rendered as individual pixels.
     // The monitorOutput expects RGB values per pixel, so we convert from monochrome to RGB
 
-    auto combined = new CombinedInput();
-    //inputBulbs->setReceiver(combined->createOutput(0));
-    inputLeds->setReceiver(
-        (new ConvertColor<RGBA, RGB>())->setReceiver(
-            combined->createOutput(numMonochromePixels * sizeof(Monochrome) + 3)
-        )
-    );
-
-    combined->setReceiver(
-        (new ConvertColor<Monochrome, RGB>())->setReceiver(new MonitorOutput(&hyp->webServer, &map, 60, 0.03)));
-
-    //hyp->addInput(inputBulbs);
-    hyp->addInput(inputLeds);
-
-    // inputBulbs->setOutput(
-    //         new MonitorOutput(&hyp->webServer, &map, 60, 0.03));
-
-    // inputBulbs->setOutput(
-    //     (new ConvertColor<Monochrome,RGB>())->setOutput(
-    //         new MonitorOutput(&hyp->webServer, &map, 60, 0.03)
+    // auto combined = new CombinedInput();
+    // inputBulbs->setReceiver(combined->createOutput(0));
+    // inputLeds->setReceiver(
+    //     (new ConvertColor<RGBA, RGB>())->setReceiver(
+    //         combined->createOutput(numMonochromePixels * sizeof(Monochrome) + 3)
     //     )
     // );
+
+    // auto monitorOutput = new MonitorOutput(&hyp->webServer, &map, 60, 0.03);
+    // combined->setReceiver(
+    //     (new ConvertColor<Monochrome, RGB>())->setReceiver(monitorOutput));
+
     // hyp->addInput(inputBulbs);
-
-    //   auto pipe = new ConvertPipe<Monochrome, RGB>(
-    //       combined,
-    //       new MonitorOutput(&hyp->webServer, &map, 60, 0.03));
-
-    //   hyp->addPipe(pipe);
-
-    // inputLeds->setReceiver((new ConvertColor<RGBA, RGB>())->setReceiver(new MonitorOutput(&hyp->webServer, &map, 60, 0.03)));
     // hyp->addInput(inputLeds);
+    // hyp->addOutput(monitorOutput);
+
+
+
+    auto combined = new CombinedInput();
+    hyp->CreateChain(
+        inputBulbs,
+        combined->atOffset(0)
+    );
+    hyp->CreateChain(
+        inputLeds,
+        new ConvertColor<RGBA, RGB>(),
+        combined->atOffset(numMonochromePixels * sizeof(Monochrome) + 3)
+    );
+    hyp->CreateChain(
+        combined,
+        new ConvertColor<Monochrome, RGB>(),
+        new MonitorOutput(&hyp->webServer, &map, 60, 0.03)
+    );
+
 
     hyp->start();
 

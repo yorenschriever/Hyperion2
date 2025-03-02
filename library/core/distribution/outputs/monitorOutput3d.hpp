@@ -2,7 +2,6 @@
 
 #include "core/generation/pixelMap.hpp"
 #include "log.hpp"
-#include "output.hpp"
 #include "platform/includes/log.hpp"
 #include "platform/includes/webServer.hpp"
 #include "platform/includes/webServerResponseBuilder.hpp"
