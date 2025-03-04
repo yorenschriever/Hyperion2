@@ -21,7 +21,7 @@ public:
             return std::unique_ptr<MidiMixController>(new MidiMixController(hub,device));
         if (name.find("nanoKONTROL2 SLIDER/KNOB")==0)
             return std::unique_ptr<KorgNanoKontrol2controller>(new KorgNanoKontrol2controller(hub,device));
-        Log::info("MidiControllerFactory", "Midi device not recognized: %s", name);
+        Log::info("MidiControllerFactory", "Midi device not recognized: %s", name.c_str());
         return nullptr;
     }
 };
