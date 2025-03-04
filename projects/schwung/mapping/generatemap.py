@@ -10,7 +10,7 @@ from turtle import *
 ledsPerMeter = 60
 ledDistance = 1000 / ledsPerMeter #sizes are in mm
 
-scale = 1./5000 #scale to fit in the -1,1 canvas
+scale = 1./4100 #scale to fit in the -1,1 canvas
 
 turtle = Turtle()
 
@@ -74,6 +74,16 @@ complexFigure(0)
 complexFigure(-120)
 complexFigure(-240)
 
+
+turtle2 = Turtle()
+turtle2.setDirection(90)
+turtle2.setPosition(-4000,-4000)
+for i in range(8*ledsPerMeter):
+    turtle2.move(ledDistance)
+turtle2.setPosition(4000,-4000)
+for i in range(8*ledsPerMeter):
+    turtle2.move(ledDistance)
+
 def writePoints(name, points, scale=1.):
     f.write("PixelMap " + name + " = {\n")
     for point in points:
@@ -82,18 +92,9 @@ def writePoints(name, points, scale=1.):
     f.write("};\n\n")
 
 f = open(os.path.join(dir, "schwungMap.hpp"), "w")
-writePoints("schwungMap", turtle.trail, scale)
+writePoints("hexagonMap", turtle.trail, scale)
+writePoints("lineMap", turtle2.trail, scale)
 f.close()
-
-# points = list(map(lambda p: {'x': p['x'] ,'y': p['y'] }, ring1))
-# with open(os.path.join(dir, "ophanimRing1Map.json"), "w") as outfile:
-#     json.dump(points, outfile)
-
-# points = list(map(lambda p: {'x': p['x'] ,'y': p['y'] }, ring3))
-# with open(os.path.join(dir, "ophanimRing3Map.json"), "w") as outfile:
-#     json.dump(points, outfile)
-
-#export to image for video mask
 
 import cv2
 import numpy as np
@@ -121,8 +122,7 @@ def writePointsToImg(points):
         cv2.circle(img, coord, radius, white, -1)
 
 writePointsToImg(turtle.trail)
-# writePointsToImg(ring2)
-# writePointsToImg(ring3)
+writePointsToImg(turtle2.trail)
 
 cv2.imwrite(os.path.join(dir,"schwungMap.png"), img)
 cv2.imshow('img', img)

@@ -1,5 +1,6 @@
 #include "../common/distributeAndMonitor.hpp"
 #include "../common/mapHelpers.hpp"
+#include "../common/patterns/patterns-led.hpp"
 #include "core/hyperion.hpp"
 #include "mapping/hexagons.hpp"
 #include "mapping/schwungMap.hpp"
@@ -7,10 +8,9 @@
 
 LUT *NeopixelLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 255);
 
-const int channelCount = 8;
-
-// number of leds on each output
-const int sizes[channelCount] = {100, 100, 100, 50, 100, 50, 100, 150};
+void addPaletteColumn(Hyperion *hyp, const int col);
+void addHexagonPipe(Hyperion * hyp);
+void addlinePipe(Hyperion * hyp);
 
 void addPaletteColumn(Hyperion *hyp, const int col)
 {
@@ -55,15 +55,13 @@ void addPaletteColumn(Hyperion *hyp, const int col)
   hyp->hub.setForcedSelection(col);
 }
 
-int main()
+void addHexagonPipe(Hyperion * hyp)
 {
   generateHexagons();
 
-  auto hyp = new Hyperion();
-
   const int columnIndex = 1;
 
-  PixelMap *map = &schwungMap;
+  PixelMap *map = &hexagonMap;
 
   auto input = new ControlHubInput<RGBA>(
       map->size(),
@@ -72,23 +70,68 @@ int main()
       {
         new TestPatterns::OnPattern(RGB(255, 0, 0), "Red"),
         new TestPatterns::HexChaser(),
+
+        new LedPatterns::GradientChasePattern(),
+        new LedPatterns::GlowPulsePattern(),
+        new LedPatterns::FlashesPattern(),
+        new LedPatterns::StrobePattern(),
+        new LedPatterns::PalettePattern(0, "Primary"),
+        new LedPatterns::PalettePattern(1, "Secondary"),
+        new LedPatterns::GlowPattern(),
+        new LedPatterns::SegmentChasePattern(),
+        new LedPatterns::PixelGlitchPattern(),
+        new LedPatterns::FadingNoisePattern(),
+        new LedPatterns::SinPattern(),
+        new LedPatterns::GradientChasePattern(),
+        new LedPatterns::GlowPulsePattern(),
+
       });
   distributeAndMonitor<RGB, RGBA>(
       hyp, input, map,
       {
-          {"hyperslave4.local", 9611, 100},
-          {"hyperslave4.local", 9612, 100},
-          {"hyperslave4.local", 9613, 100},
-          {"hyperslave4.local", 9614, 50},
-          {"hyperslave4.local", 9615, 100},
-          {"hyperslave4.local", 9616, 50},
-          {"hyperslave4.local", 9617, 100},
-          {"hyperslave4.local", 9618, 150},
+          {"hypernode1.local", 9611, 8*60},
+          {"hypernode1.local", 9612, 8*60},
+          {"hypernode1.local", 9613, 8*60},
+          {"hypernode1.local", 9614, 8*60},
+          {"hypernode1.local", 9615, 8*60},
+          {"hypernode1.local", 9616, 8*60},
       });
 
-  hyp->hub.setColumnName(columnIndex, "Led");
+  hyp->hub.setColumnName(columnIndex, "Hexagons");
   hyp->hub.setFlashColumn(columnIndex, false, true);
+}
 
+void addLinePipe(Hyperion * hyp)
+{
+  const int columnIndex = 2;
+
+  PixelMap *map = &lineMap;
+
+  auto input = new ControlHubInput<RGBA>(
+      map->size(),
+      &hyp->hub,
+      columnIndex,
+      {
+        new TestPatterns::OnPattern(RGB(255, 0, 0), "Red"),
+        // new TestPatterns::HexChaser(),
+      });
+  distributeAndMonitor<RGB, RGBA>(
+      hyp, input, map,
+      {
+          {"hypernode1.local", 9617, 8*60},
+          {"hypernode1.local", 9618, 8*60},
+      });
+
+  hyp->hub.setColumnName(columnIndex, "Lines");
+  hyp->hub.setFlashColumn(columnIndex, false, true);
+}
+
+int main()
+{
+  auto hyp = new Hyperion();
+
+  addHexagonPipe(hyp);
+  addLinePipe(hyp);
   addPaletteColumn(hyp, 0);
 
   hyp->start();

@@ -11,6 +11,7 @@ class Turtle:
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.direction = direction
+        self.trail = []
 
     def turn(self,angle):
         self.direction += angle
