@@ -1,12 +1,5 @@
 
 #pragma once
-// #include "colours.h"
-// #include "core/generation/patterns/helpers/fade.h"
-// #include "core/generation/patterns/helpers/interval.h"
-// #include "core/generation/patterns/helpers/timeline.h"
-// #include "core/generation/patterns/pattern.hpp"
-// #include "core/generation/pixelMap.hpp"
-// #include "platform/includes/utils.hpp"
 #include "hyperion.hpp"
 #include <math.h>
 #include <vector>
@@ -387,4 +380,120 @@ class GlowPulsePattern : public Pattern<RGBA>
         }
     };
 
+
+    template <class T>
+    class RibbenClivePattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        const int segmentSize = 60;
+        int averagePeriod=10000;
+        float precision=1;
+        LFO<T> lfo = LFO<T>();
+        Permute perm;
+
+    public:
+        RibbenClivePattern(int averagePeriod = 10000, float precision = 1, float pulsewidth = 0.025)
+        {
+            this->averagePeriod = averagePeriod;
+            this->precision = precision;
+            this->lfo.setDutyCycle(pulsewidth);
+            this->name = "Ribben clive";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int segmentSize = 60;
+            int numSegments = width / segmentSize;
+
+            perm.setSize(numSegments);
+            lfo.setDutyCycle(params->getAmount(0.1, 0.5));
+
+            for (int segment = 0; segment < numSegments; segment++)
+            {
+                int interval = averagePeriod + perm.at[segment] * (averagePeriod * precision) / numSegments;
+                RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval) * transition.getValue();
+                for (int j = 0; j < segmentSize; j++)
+                    pixels[segment * segmentSize + j] = col;
+            }
+        }
+    };
+
+    class RibbenFlashPattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        Permute perm;
+        BeatWatcher watcher = BeatWatcher();
+        FadeDown fade = FadeDown(2400);
+
+    public:
+        RibbenFlashPattern() {
+            this->name = "Ribben flash";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int segmentSize =  60;
+            int numSegments = width / segmentSize;
+            perm.setSize(numSegments);
+
+            if (watcher.Triggered())
+            {
+
+                perm.permute();
+                fade.reset();
+            }
+
+            fade.duration = params->getVelocity(2500, 100);
+            int numVisible = params->getAmount(1, numSegments/3);
+
+            for (int ribbe = 0; ribbe < numVisible; ribbe++)
+            {
+                RGBA col = params->getPrimaryColour() * fade.getValue() * transition.getValue();
+                for (int j = 0; j < segmentSize; j++)
+                    pixels[perm.at[ribbe] * segmentSize + j] += col;
+            }
+        }
+    };
+
+    class SegmentGlitchPattern : public Pattern<RGBA>
+    {
+        // Timeline timeline = Timeline(50);
+        Permute perm = Permute(1);
+        Transition transition = Transition(
+            0, Transition::none, 0,
+            500, Transition::none, 0);
+
+    public:
+        SegmentGlitchPattern()
+        {
+            this->name = "Segment glitch";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int numSegmentsPerBar = 30 - params->getSize(29, 15);
+            int numSegments = (width / 60) * numSegmentsPerBar;
+            int threshold = params->getAmount(0, numSegments / 8);
+            perm.setSize(numSegments);
+            perm.permute();
+
+            for (int index = 0; index < width; index++)
+            {
+                int segmentIndex = index * numSegments / width;
+
+                if (perm.at[segmentIndex] > threshold)
+                    continue;
+                pixels[index] += params->getHighlightColour() * transition.getValue();
+            }
+        }
+    };
 }

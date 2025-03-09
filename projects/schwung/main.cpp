@@ -1,16 +1,20 @@
 #include "../common/distributeAndMonitor.hpp"
 #include "../common/mapHelpers.hpp"
 #include "../common/patterns/patterns-led.hpp"
+#include "../common/patterns/patterns-mapped-2d.hpp"
 #include "core/hyperion.hpp"
 #include "mapping/hexagons.hpp"
 #include "mapping/schwungMap.hpp"
 #include "patterns/testpatterns.hpp"
+#include "patterns/patterns.hpp"
 
 LUT *NeopixelLut = new ColourCorrectionLUT(1.5, 255, 255, 255, 255);
 
 void addPaletteColumn(Hyperion *hyp, const int col);
 void addHexagonPipe(Hyperion * hyp);
 void addlinePipe(Hyperion * hyp);
+
+auto pHexagonMap = hexagonMap.toPolarRotate90();
 
 void addPaletteColumn(Hyperion *hyp, const int col)
 {
@@ -84,6 +88,32 @@ void addHexagonPipe(Hyperion * hyp)
         new LedPatterns::SinPattern(),
         new LedPatterns::GradientChasePattern(),
         new LedPatterns::GlowPulsePattern(),
+        new LedPatterns::SegmentGlitchPattern(),
+
+        new LedPatterns::RibbenClivePattern<Glow>(10000, 1, 0.025),
+        new LedPatterns::RibbenFlashPattern(),  
+        new Mapped2dPatterns::Lighthouse(&pHexagonMap),
+        new Mapped2dPatterns::GrowingCirclesPattern(&hexagonMap),
+        new Mapped2dPatterns::LineLaunch(&hexagonMap),
+        new Mapped2dPatterns::SpiralPattern(&pHexagonMap),
+        new Mapped2dPatterns::DotBeatPattern(&pHexagonMap),
+        new Mapped2dPatterns::HorizontalSin(&pHexagonMap),
+        new Mapped2dPatterns::HorizontalSaw(&pHexagonMap),
+        new Mapped2dPatterns::RadialSaw(&pHexagonMap),
+        new Mapped2dPatterns::GrowShrink(&pHexagonMap),
+      
+
+        new SchwungPatterns::AngularFadePattern(&pHexagonMap),
+        new SchwungPatterns::GrowingStrobePattern(&pHexagonMap),
+        new SchwungPatterns::RadialFadePattern(&pHexagonMap),
+        new SchwungPatterns::StaticGradientPattern(&pHexagonMap),
+        new SchwungPatterns::RadialGlitterFadePattern(&pHexagonMap),
+        new SchwungPatterns::FadeFromCenter(),
+        new SchwungPatterns::FadeFromRandom(),
+        new SchwungPatterns::HexagonStrobePattern(),
+        new SchwungPatterns::FadeStarPattern(),
+        new SchwungPatterns::OnBeatHexagonFade(),
+        new SchwungPatterns::HexChaser(),
 
       });
   distributeAndMonitor<RGB, RGBA>(
