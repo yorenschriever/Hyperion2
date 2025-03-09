@@ -250,9 +250,9 @@ namespace SchwungPatterns
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                float h = map->th(index); // fromBottom(map->y(index))* height;
+                float h = map->r(index); // fromBottom(map->y(index))* height;
                 RGBA colour = params->getGradient(h * 255);
-                pixels[index] = colour * h * transition.getValue();
+                pixels[index] = colour  * transition.getValue();
             }
         }
     };
