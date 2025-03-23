@@ -178,7 +178,7 @@ namespace SchwungPatterns
 
             for (int i = 0; i < map->size(); i++)
             {
-                float conePos = 0.20 + map->r(i);
+                float conePos = 0.20 + map->r(i)/1.2;
                 if (directionUp && conePos < fade.getValue())
                     continue;
                 if (!directionUp && 1. - conePos < fade.getValue())
@@ -436,7 +436,7 @@ namespace SchwungPatterns
 
             for (int i = 0; i < 6*60; i++)
             {
-                pixels[hexagons[hex][i]] = params->getPrimaryColour();
+                pixels[hexagons[hex][i]] = params->getSecondaryColour();
             }
         }
     };
@@ -468,7 +468,7 @@ namespace SchwungPatterns
 
             for (int i = 0; i < 6*60; i++)
             {
-                pixels[hexagons[hex][i]] = params->getPrimaryColour() * fade.getValue() * transition.getValue();
+                pixels[hexagons[hex][i]] = params->getSecondaryColour() * fade.getValue() * transition.getValue();
             }
         }
     };
@@ -502,7 +502,8 @@ namespace SchwungPatterns
                 for (int i = 0; i < 6*60; i++)
                 {
                     int index = hex[i];
-                    RGBA value = RGBA(255, 0, 0,255) * lfo.getValue(float(i)/(6*60) + offset * hexi) * transition.getValue();
+                    float lfoValue = lfo.getValue(float(i)/(6*60) + offset * hexi);
+                    RGBA value = params->getGradient(lfoValue * 255) * lfoValue * transition.getValue();
                     pixels[index] += value;
                 }
                 hexi++;

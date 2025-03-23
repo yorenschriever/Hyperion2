@@ -206,7 +206,7 @@ class XY : public Pattern<RGBA>
                 return;
  
             auto col = RGBA(0,0,0,255);
-            float size = params->getSize(0.01,0.03);
+            float size = params->getSize(0.01,0.08);
             lfoX.setPeriod(params->getVelocity(4*20000,2000));
             lfoZ.setPeriod(params->getVelocity(4*14000,1400));
 

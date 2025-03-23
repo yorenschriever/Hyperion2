@@ -1,5 +1,6 @@
 #pragma once
 #include <math.h>
+#include "utils.hpp"
 
 float fromTop(float y){
     return (y - 0.1);
@@ -10,7 +11,7 @@ float fromBottom(float y){
 }
 
 float around(float th){
-    return (th + M_PI)/(2*M_PI);
+    return Utils::modulus_f((th + M_PI)/(2*M_PI));
 }
 
 inline float softEdge(float dist, float size, float edgeSize = 0.03)

@@ -32,6 +32,20 @@ public:
         return value;
     }
 
+    static float modulus_f(float value, float minimum=0, float maximum=1)
+    {
+        float range = maximum - minimum;
+        if (value < minimum){
+            int n = (minimum - value) / range;
+            return value + n * range;
+        }
+        if (value > maximum){
+            int n = (value - maximum) / range;
+            return value - n * range;
+        }
+        return value;
+    }
+
     static float rescale(float value, float minimum_out, float maximum_out, float minimum_in = 0, float maximum_in = 1)
     {
         float normalized = (value - minimum_in) / (maximum_in - minimum_in);

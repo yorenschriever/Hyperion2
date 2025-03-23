@@ -210,7 +210,7 @@ namespace Mapped2dPatterns
 
             for (int i = 0; i < map->size(); i++)
             {
-                float radius = fade.getValue()*1.2;
+                float radius = fade.getValue()*0.95;
                 if (map->r(i) > radius)
                     continue;
 
@@ -244,13 +244,12 @@ namespace Mapped2dPatterns
 
             lfo.setPeriod(params->getVelocity(11000,500));
             lfo.setDutyCycle(params->getSize(0.03,0.5));
+            int amount = params->getAmount(1,7.99);
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                // RGBA color = params->getPrimaryColour(); 
                 RGBA color = params->getGradient(fromTop(map->r(index))*255); 
-                pixels[index] = color * lfo.getValue(around(map->th(index))) * transition.getValue();
-                // pixels[index] = color * lfo.getValue(fromTop(map->z(index))) * transition.getValue();
+                pixels[index] = color * lfo.getValue(amount * around(map->th(index))) * transition.getValue();
             }
         }
 
@@ -341,21 +340,17 @@ namespace Mapped2dPatterns
                 return;
 
             lfo.setPeriod(params->getVelocity(5000,500));
-            //lfo.setPulseWidth(params->getSize(0.06,1));
-            float size = params->getSize(0.1,0.5);
-            float offset = params->getOffset(0,1);
+            float size = params->getSize(0.1,1.5);
+            int offset = params->getOffset(0,3.99);
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                //RGBA color = params->getPrimaryColour(); 
-                //float lfoArg = orientationHorizontal ? around(map->th(index)) : fromTop(map->z(index));
-                
-                float lfoSize = lfo.getValue(offset * around(map->th(index))) * size; 
+                float lfoSize = lfo.getValue(Utils::modulus_f(offset * around(map->th(index)))) * size; 
                 float distance = abs(map->r(index) + 0.07);
                 if (distance > lfoSize)
                     continue;
 
-                float distanceAsRatio = 1 - distance / lfoSize ;
+                float distanceAsRatio = 1 - distance / lfoSize;
 
                 pixels[index] = params->getGradient(distanceAsRatio * 255) * distanceAsRatio * transition.getValue();
             }

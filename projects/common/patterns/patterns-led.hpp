@@ -52,8 +52,10 @@ namespace LedPatterns
                 return; // the fade out is done. we can skip calculating pattern data
 
             RGBA col;
-            if (colorIndex==0) col = params->getPrimaryColour();
-            if (colorIndex==1) col = params->getSecondaryColour();
+            if (colorIndex == 0)
+                col = params->getPrimaryColour();
+            if (colorIndex == 1)
+                col = params->getSecondaryColour();
 
             RGBA value = col * transition.getValue();
 
@@ -65,7 +67,7 @@ namespace LedPatterns
     class GlowPattern : public Pattern<RGBA>
     {
         Permute perm;
-        LFO<Glow> lfo = LFO<Glow>(10000);
+        LFO<Glow> lfo;
         Transition transition;
 
     public:
@@ -106,7 +108,6 @@ namespace LedPatterns
             this->name = "Segment chase";
             this->segmentSize = segmentSize;
         }
-
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
@@ -205,11 +206,13 @@ namespace LedPatterns
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
+        int thresholdDiv;;
 
     public:
-        PixelGlitchPattern()
+        PixelGlitchPattern(int thresholdDiv = 2)
         {
             this->name = "Pixel glitch";
+            this->thresholdDiv = thresholdDiv;
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -223,7 +226,7 @@ namespace LedPatterns
             if (timeline.Happened(0))
                 perm.permute();
 
-            int threshold = params->getAmount(0, width);
+            int threshold = float(width)/params->getAmount(thresholdDiv, 1);
 
             for (int index = 0; index < threshold; index++)
                 pixels[perm.at[index]] = params->getSecondaryColour() * transition.getValue();
@@ -289,35 +292,35 @@ namespace LedPatterns
         }
     };
 
-class SinPattern : public Pattern<RGBA>
-{
-    LFO<NegativeCosFast> lfo;
-    Transition transition = Transition(
-        1000, Transition::none, 0,
-        1000, Transition::none, 0);
-
-public:
-    SinPattern()
+    class SinPattern : public Pattern<RGBA>
     {
-        this->name = "Sin";
-    }
+        LFO<NegativeCosFast> lfo;
+        Transition transition = Transition(
+            1000, Transition::none, 0,
+            1000, Transition::none, 0);
 
-    inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-    {
-        if (!transition.Calculate(active))
-            return; // the fade out is done. we can skip calculating pattern data
+    public:
+        SinPattern()
+        {
+            this->name = "Sin";
+        }
 
-        float velocity = params->getVelocity(20000, 2000);
-        int amount = params->getAmount(1, 3.99);
-        float size = params->getSize(0.05, 0.5);
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
 
-        lfo.setPeriod(velocity * size * amount);
-        lfo.setDutyCycle(size);
+            float velocity = params->getVelocity(20000, 2000);
+            int amount = params->getAmount(1, 3.99);
+            float size = params->getSize(0.05, 0.5);
 
-        for (int index = 0; index < width; index++)
-            pixels[index] = params->getSecondaryColour() * lfo.getValue(amount * float(index) / width) * transition.getValue(index, width);
-    }
-};
+            lfo.setPeriod(velocity * size * amount);
+            lfo.setDutyCycle(size);
+
+            for (int index = 0; index < width; index++)
+                pixels[index] = params->getSecondaryColour() * lfo.getValue(amount * float(index) / width) * transition.getValue(index, width);
+        }
+    };
 
     class GradientChasePattern : public Pattern<RGBA>
     {
@@ -329,7 +332,6 @@ public:
         {
             this->name = "Gradient chase";
         }
-
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
@@ -343,51 +345,53 @@ public:
             lfo.setPeriod(velocity / size * amount);
             lfo.setDutyCycle(size);
 
-            for (int i=0;i<width;i++)
+            for (int i = 0; i < width; i++)
             {
                 float lfoVal = lfo.getValue(amount * float(i) / width);
-                pixels[i] =  params->getGradient(lfoVal * 255) * lfoVal * transition.getValue();
+                pixels[i] = params->getGradient(lfoVal * 255) * lfoVal * transition.getValue();
             }
         }
     };
 
-class GlowPulsePattern : public Pattern<RGBA>
+    class GlowPulsePattern : public Pattern<RGBA>
     {
         Permute perm;
-        LFO<SinFast> lfo = LFO<SinFast>(10000);
+        LFO<Glow> lfo;
         Transition transition;
 
     public:
-        GlowPulsePattern(){
+        GlowPulsePattern()
+        {
             this->name = "Glow pulse";
         }
-        
+
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
-            lfo.setPeriod(500 + 10000* (1.0f - params->getVelocity()));
+            lfo.setPeriod(500 + 10000 * (1.0f - params->getVelocity()));
+            lfo.setDutyCycle(params->getAmount());
             perm.setSize(width);
 
             for (int index = 0; index < width; index++)
             {
-             float val = 1.025 * lfo.getValue(float(Transition::fromCenter(index,width,1000))/-1000);
-            if (val < 1.0)
-                pixels[perm.at[index]] = params->getPrimaryColour() * lfo.getValue(float(Transition::fromCenter(index,width,1000))/-1000);
-            else
-                pixels[perm.at[index]] = params->getPrimaryColour() + (params->getSecondaryColour() * (val-1)/0.025);            }
+                float val = 1.025 * lfo.getValue(float(Transition::fromCenter(index, width, 1000)) / -1000);
+                if (val < 1.0)
+                    pixels[perm.at[index]] = params->getPrimaryColour() * lfo.getValue(float(Transition::fromCenter(index, width, 1000)) / -1000);
+                else
+                    pixels[perm.at[index]] = params->getPrimaryColour() + (params->getSecondaryColour() * (val - 1) / 0.025);
+            }
         }
     };
-
 
     template <class T>
     class RibbenClivePattern : public Pattern<RGBA>
     {
         Transition transition;
         const int segmentSize = 60;
-        int averagePeriod=10000;
-        float precision=1;
+        int averagePeriod = 10000;
+        float precision = 1;
         LFO<T> lfo = LFO<T>();
         Permute perm;
 
@@ -429,7 +433,8 @@ class GlowPulsePattern : public Pattern<RGBA>
         FadeDown fade = FadeDown(2400);
 
     public:
-        RibbenFlashPattern() {
+        RibbenFlashPattern()
+        {
             this->name = "Ribben flash";
         }
 
@@ -438,7 +443,7 @@ class GlowPulsePattern : public Pattern<RGBA>
             if (!transition.Calculate(active))
                 return;
 
-            int segmentSize =  60;
+            int segmentSize = 60;
             int numSegments = width / segmentSize;
             perm.setSize(numSegments);
 
@@ -450,7 +455,7 @@ class GlowPulsePattern : public Pattern<RGBA>
             }
 
             fade.duration = params->getVelocity(2500, 100);
-            int numVisible = params->getAmount(1, numSegments/3);
+            int numVisible = params->getAmount(1, numSegments / 3);
 
             for (int ribbe = 0; ribbe < numVisible; ribbe++)
             {

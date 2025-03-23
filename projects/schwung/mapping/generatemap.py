@@ -94,6 +94,7 @@ def writePoints(name, points, scale=1.):
 f = open(os.path.join(dir, "schwungMap.hpp"), "w")
 writePoints("hexagonMap", turtle.trail, scale)
 writePoints("lineMap", turtle2.trail, scale)
+writePoints("schwungMap", turtle.trail + turtle2.trail, scale)
 f.close()
 
 import cv2
