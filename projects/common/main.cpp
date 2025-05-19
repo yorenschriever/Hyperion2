@@ -29,8 +29,8 @@ void setupLed(Hyperion * hyp) {
 
     // auto map = circleMap(100, 0.5);
     PixelMap *map = new PixelMap(combineMaps({
-        circleMap(50, 0.5),
-        circleMap(50, 0.7),
+        gridMap(50, 0.5),
+        gridMap(50, 0.7),
     }));
 
     // auto map = gridMap(5,5);
@@ -105,7 +105,7 @@ int main()
 
     setupLed(hyp);
     setupMonochrome(hyp);
-    setupPaletteColumn();
+    setupPaletteColumn(hyp);
 
     // addPaletteColumn(hyp);
     // addTrianglesPipe(hyp);
