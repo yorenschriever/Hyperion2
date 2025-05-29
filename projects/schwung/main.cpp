@@ -144,7 +144,7 @@ void addHexagonPipe(Hyperion * hyp)
         {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
         {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(10)}
       });
-  distributeAndMonitor<RGB, RGBA>(
+  distributeAndMonitor<BGR, RGBA>(
       hyp, input, map,
       {
           {"hypernode1.local", 9611, 8*60},
