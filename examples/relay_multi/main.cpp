@@ -9,7 +9,7 @@ int main()
 {
   auto hyp = new Hyperion();
 
-  Network::setHostName("hyperslave2");
+  Network::setHostName("hyperslave4");
 
   for (int i = 1; i <= 8; i++)
   {
@@ -25,6 +25,10 @@ int main()
   hyp->addPipe(new Pipe(
       new UDPInput(9619),
       new DMXOutput(1)));
+
+  hyp->addPipe(new Pipe(
+      new UDPInput(9620), 
+      new PWMOutput()));
 
   hyp->start(Hyperion::minimal);
 
