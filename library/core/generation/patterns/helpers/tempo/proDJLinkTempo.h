@@ -13,6 +13,7 @@
 
 #define PACKET_TYPE_BEAT 0x28
 #define PACKET_TYPE_STATUS 0x0a
+#define PACKET_TYPE_KEEP_ALIVE 0x06
 
 #define DEVICE_ID 0x21
 #define BEAT_NUMBER 0x5c
@@ -49,6 +50,8 @@ private:
     int lastbeat = -1;
     uint8_t buffer[1500];            // newer cdj versions tend to send longer and longer packets, allocate enough buffer for forward compatibility
     const char proDjLinkHeader[10] = {0x51, 0x73, 0x70, 0x74, 0x31, 0x57, 0x6d, 0x4a, 0x4f, 0x4c};
+    bool syncWithCdj3000 = false; // whether to sync with cdj3000 players, which send a different keep alive packet
+
 
     bool isProDjLink(uint8_t *message)
     {
@@ -117,7 +120,19 @@ private:
         while ((len = keepAliveSocket.receive(buffer, sizeof(buffer)) > 0))
         {
             // Log::info(TAG,"got keep alive %x, %x\r\n", len, buffer[0x0a]);
-            // Log::info(TAG,"received keepalive %d.%d.%d.%d", buffer[0x2c], buffer[0x2d],buffer[0x2e],buffer[0x2f]);
+            // Log::info(TAG,"received keepalive %d.%d.%d.%d", buffer[0x2c], buffer[0x2d],buffer[0x2e],buffer[0x2f])
+
+            if (!(isProDjLink(buffer) && buffer[PACKET_TYPE_INDICATOR] == PACKET_TYPE_KEEP_ALIVE))
+                continue;
+
+            int device = buffer[DEVICE_ID];
+            int deviceIsCdj3000 = buffer[0x35] > 0; // cdj3000 sends a different keep alive packet)
+
+            if (deviceIsCdj3000 && !this->syncWithCdj3000)
+            {
+                this->syncWithCdj3000 = true;
+                Log::info(TAG, "player %d detected as cdj3000. Changing keep alive packet structure", device);
+            }
         }
 
         // Log::info(TAG,"keep alive? %lu, %lu,   %d, %d", Utils::millis(), lastKeepAlive, Utils::millis() - lastKeepAlive > 300, Ethernet::isConnected());
@@ -135,7 +150,7 @@ private:
             0x51, 0x73, 0x70, 0x74, 0x31, 0x57, 0x6d, 0x4a, 0x4f, 0x4c,
 
             // keep alive packet type indicator
-            0x06, 0x00,
+            PACKET_TYPE_KEEP_ALIVE, 0x00,
 
             // device name
             0, 0, 0, 0, 
@@ -166,8 +181,12 @@ private:
         memcpy(buffer + 0x26, Ethernet::getMac().octets, 6);
         memcpy(buffer + 0x2c, &ip, 4);
 
-        const bool cdj3000=true;
-        if (cdj3000){
+        // https://djl-analysis.deepsymmetry.org/djl-analysis/startup.html#startup-3000
+        // cdj3000 sends a different keep alive packet
+        // I don't have these players here to test in depth, but when i detect a single cdj3000
+        // keep alive packet, i change over to the cdj3000 keep alive packet structure.
+        // (This structure seems not compatible with earlier devices like the cdj2000.)
+        if (syncWithCdj3000){
             buffer[0x30]=0x02;
             buffer[0x35]=0x64;
         }
