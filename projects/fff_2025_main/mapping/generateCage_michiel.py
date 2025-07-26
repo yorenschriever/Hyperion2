@@ -1,0 +1,45 @@
+import sys
+import os
+from math import pi, cos, sin
+import json
+
+dir = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(dir, "../../common/mapping/turtle"))
+from turtle3d import *
+
+ledsPerMeter = 60
+ledDistance = 1000 / ledsPerMeter #sizes are in mm
+
+scale = 1./4100 #scale to fit in the -1,1 canvas
+
+turtle = Turtle3d()
+
+def line(addPositionToTrail=True):
+    for i in range(ledsPerMeter):
+        turtle.move(ledDistance, addPositionToTrail)
+
+for a in range(8):
+    turtle.setPosition(0,0,3000)
+    turtle.setRotation(a * 360 / 8,0, 0)
+
+    line()
+    line()
+    turtle.pitch(-30)
+    line()
+    turtle.pitch(-30)
+    line()
+    turtle.pitch(-30)
+    line()
+    line()
+
+def writePoints(name, points, scale=1.):
+    f.write("PixelMap3d " + name + " = {\n")
+    for point in points:
+        f.write("    {.x = " + str(point['x'] * scale) +
+                ", .y = " + str(point['z'] * scale) +
+                ", .z = " + str(point['y'] * scale) + "},\n")
+    f.write("};\n\n")
+
+f = open(os.path.join(dir, "cageMap.hpp"), "w")
+writePoints("cageMap", turtle.trail, scale)
+f.close()
