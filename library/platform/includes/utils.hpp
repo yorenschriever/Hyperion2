@@ -11,6 +11,7 @@ public:
 
     static int random(int minimum, int maximum);
     static float random_f();
+    static void random_seed();
 
     static int get_free_heap();
 

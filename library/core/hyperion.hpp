@@ -81,6 +81,7 @@ public:
     virtual void start(Config config = normal)
     {
         Log::info(TAG, "Start");
+        Utils::random_seed();
 
         check_safe_mode();
 
