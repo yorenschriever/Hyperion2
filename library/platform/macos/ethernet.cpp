@@ -29,8 +29,8 @@ IPAddress Ethernet::getIp()
     struct ifaddrs *ifAddrStruct = NULL;
     struct ifaddrs *ifa = NULL;
     void *tmpAddrPtr = NULL;
-    sockaddr_in *ip4;
-    sockaddr_in6 *ip6;
+    sockaddr_in *ip4 = nullptr;
+    sockaddr_in6 *ip6 = nullptr;
 
     getifaddrs(&ifAddrStruct);
 
