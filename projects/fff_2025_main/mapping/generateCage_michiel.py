@@ -19,8 +19,8 @@ def line(addPositionToTrail=True):
         turtle.move(ledDistance, addPositionToTrail)
 
 for a in range(8):
-    turtle.setPosition(0,0,3000)
-    turtle.setRotation(a * 360 / 8,0, 0)
+    turtle.setPosition(0,0,2000)
+    turtle.setRotation(a * 360 / 8 + 22.5,0, 0)
 
     line()
     line()
@@ -31,6 +31,27 @@ for a in range(8):
     turtle.pitch(-30)
     line()
     line()
+
+turtle.setPosition(0,0,2000)
+turtle.setRotation(22.5,0, 0)
+turtle.move(2000,False) 
+turtle.yaw(90+22.5)
+for a in range(8):
+    turtle.move(530/2, False)  # Move to the center of the cage
+    line()
+    turtle.move(530/2, False)
+    turtle.yaw(45)
+ 
+turtle.setPosition(0,0,2000-1366)
+turtle.setRotation(22.5,0, 0)
+turtle.move(3366,False) 
+turtle.yaw(90+22.5)
+for a in range(8):
+    turtle.move(576/2, False)  # Move to the center of the cage
+    line()
+    line()
+    turtle.move(576/2, False)
+    turtle.yaw(45)
 
 def writePoints(name, points, scale=1.):
     f.write("PixelMap3d " + name + " = {\n")

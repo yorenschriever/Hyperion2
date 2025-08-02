@@ -19,7 +19,7 @@ def line(addPositionToTrail=True):
         turtle.move(ledDistance, addPositionToTrail)
 
 for a in range(6):
-    turtle.setPosition(0,0,3000)
+    turtle.setPosition(0,0,2000)
     turtle.setRotation(a * 360 / 6,0, 0)
 
     line() #radial
@@ -29,10 +29,18 @@ for a in range(6):
     line() #horizontal
     turtle.yaw(-60)
     turtle.pitch(-30)
-    line()
+    line() #45 degree
     turtle.pitch(-30)
-    line()
+    line() #45 degree
     turtle.pitch(-30)
+    turtle.yaw(90)
+    turtle.pitch(-30)
+    turtle.move(183,False)
+    line() #horizontal
+    line() #horizontal
+    line() #horizontal
+    turtle.move(183,False)
+    turtle.yaw(-90) 
     line()
     line()
 

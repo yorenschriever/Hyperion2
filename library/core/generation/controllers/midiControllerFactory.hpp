@@ -22,8 +22,6 @@ public:
             return std::unique_ptr<MidiMixController>(new MidiMixController(hub,device));
         if (name.find("nanoKONTROL2 SLIDER/KNOB")==0)
             return std::unique_ptr<KorgNanoKontrol2controller>(new KorgNanoKontrol2controller(hub,device));
-        if (name.find("ESP-NOW button")==0)
-            return std::unique_ptr<EspNowButtonController>(new EspNowButtonController(hub,device, {{.midiNotesOn={1}, .columnIndex=0 , .slotIndex= 0}}));
         Log::info("MidiControllerFactory", "Midi device not recognized: %s", name.c_str());
         return nullptr;
     }

@@ -101,6 +101,13 @@ public:
         float z;
     };
 
+    struct SphericalPixelPosition
+    {
+        float r;
+        float th; //angle from top
+        float phi; //angle from x-axis in xy-plane
+    };
+
     class Cylindrical: public vector<CylindricalPixelPosition>
     {
         public:
@@ -114,6 +121,22 @@ public:
 
         float z(unsigned int index){
             return this->operator[](index).z;
+        }
+    };
+
+    class Spherical: public vector<SphericalPixelPosition>
+    {
+        public:
+        float r(unsigned int index){
+            return this->operator[](index).r;
+        }
+
+        float th(unsigned int index){
+            return this->operator[](index).th;
+        }
+
+        float phi(unsigned int index){
+            return this->operator[](index).phi;
         }
     };
 
@@ -168,5 +191,31 @@ public:
                 };
             });
         return cylindricalXZ;
+    }
+
+    Spherical toSphericalXZ(float centerX=0, float centerY =0, float centerZ=0)
+    {
+        Spherical spherical;
+
+        transform(
+            this->begin(), 
+            this->end(), 
+            back_inserter(spherical), [centerX, centerY, centerZ](PixelPosition3d pos) -> SphericalPixelPosition{ 
+                float x = pos.x - centerX;
+                float y = pos.y - centerY;
+                float z = pos.z - centerZ;
+                float r = sqrt(x * x + y * y + z * z);
+                if (r == 0) // avoid division by zero
+                    return { .r = 0, .th = 0, .phi = 0 };
+
+                float th = acos(y / r); // angle from the top
+                float phi = atan2(z, x); // angle in the xy-plane from the x-axis
+                return {
+                    .r = r,
+                    .th = th,
+                    .phi = phi
+                };
+            });
+        return spherical;
     }
 };
