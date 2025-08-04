@@ -1,3 +1,4 @@
+#pragma once
 #include "core/hyperion.hpp"
 
 typedef struct
@@ -7,10 +8,12 @@ typedef struct
     const int size; // number of lights
 } Slave;
 
+typedef std::vector<Slave> Distribution;
+
 template <class T_INPUT_COLOUR = RGBA>
 std::vector<InputSlicer::Slice> createSlices(
     ControlHubInput<T_INPUT_COLOUR> *input,
-    std::vector<Slave> slaves
+    Distribution slaves
     )
 {
     std::vector<InputSlicer::Slice> slices;
@@ -36,7 +39,7 @@ std::vector<InputSlicer::Slice> createSlices(
 template <class T_OUTPUT_COLOUR = GRB, class T_INPUT_COLOUR = RGBA>
 void distribute(
     Hyperion *hyp,
-    std::vector<Slave> slaves,
+    Distribution slaves,
     InputSlicer *splitInput,
     LUT *lut = nullptr)
 {
@@ -55,7 +58,7 @@ void distributeAndMonitor(
     Hyperion *hyp,
     ControlHubInput<T_INPUT_COLOUR> *input,
     PixelMap *pixelMap,
-    std::vector<Slave> slaves,
+    Distribution slaves,
     LUT *lut = nullptr,
     float monitorDotSize=0.01)
 {
@@ -74,7 +77,7 @@ void distributeAndMonitor3d(
     Hyperion *hyp,
     ControlHubInput<T_INPUT_COLOUR> *input,
     PixelMap3d *pixelMap,
-    std::vector<Slave> slaves,
+    Distribution slaves,
     LUT *lut = nullptr,
     float monitorDotSize=0.01)
 {

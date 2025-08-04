@@ -1,6 +1,6 @@
 import sys
 import os
-from math import pi, cos, sin
+from math import pi, cos, sin, radians
 import json
 
 dir = os.path.dirname(os.path.realpath(__file__))
@@ -18,29 +18,49 @@ def line(addPositionToTrail=True):
     for i in range(ledsPerMeter):
         turtle.move(ledDistance, addPositionToTrail)
 
+# Inside
 for a in range(6):
     turtle.setPosition(0,0,2000)
     turtle.setRotation(a * 360 / 6,0, 0)
 
     line() #radial
-    line() #radial
+
     turtle.yaw(120)
     line() #horizontal
-    line() #horizontal
+
     turtle.yaw(-60)
     turtle.pitch(-30)
-    line() #45 degree
+    line() #30 degree
     turtle.pitch(-30)
-    line() #45 degree
+    line() #60 degree
     turtle.pitch(-30)
     turtle.yaw(90)
     turtle.pitch(-30)
-    turtle.move(183,False)
+
+    horizontalLength = 1000 * (1 + sin(radians(60)) + sin(radians(30)))
+    spacing = (horizontalLength - 2000)/2
+    turtle.move(spacing,False)
     line() #horizontal
     line() #horizontal
-    line() #horizontal
-    turtle.move(183,False)
+    turtle.move(spacing,False)
     turtle.yaw(-90) 
+
+    line()
+    line()
+
+# Outside
+for a in range(6):
+    turtle.setPosition(0,0,2000)
+    turtle.setRotation(a * 360 / 6,0, 0)
+
+    turtle.move(1100, False) #radial
+
+    turtle.pitch(-30)
+    line(False) #30 degree
+
+    turtle.pitch(-30)
+    line() #60 degree
+    turtle.pitch(-30)    
     line()
     line()
 

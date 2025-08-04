@@ -9,7 +9,7 @@ namespace Buttons
     private:
         std::vector<bool> pressed = {false, false, false, false, false, false};
         float alignmentStart = 0;
-        const int alignTo = 4; // Align to measure (4 beats)
+        const int alignTo = 16; // Align to measure (4 beats)
 
         RedButtonManager()  {
             Tempo::AddListener(this);
@@ -175,98 +175,79 @@ namespace Buttons
             if (redButtonManager.state != RedButtonManager::SyncToMeasure)
                 return;
 
-            //fade.setTail
-
             for (int i = 0; i < width; i++)
             {
-                float fadePos = Utils::rescale(map->th(i),0,1, 0.5*M_PI,0);
+                float fadePos = Utils::rescale(map->th(i),0,1, 0.45*M_PI,0);
                 float syncPos = redButtonManager.getSyncProgress();
-                float fadeValue = abs( syncPos - fadePos) < 0.05 ? 1 : 0;
+                float fadeValue = abs( syncPos - fadePos) < 0.025 ? 1 : 0;
                 
                 pixels[i] = params->getSecondaryColour() * fadeValue;
             }
         }
     };
 
+    class FadingNoisePattern : public Pattern<RGBA>
+    {
+        RedButtonManager &redButtonManager = RedButtonManager::getInstance();
+        Fade<Down, Cubic> fade = Fade<Down, Cubic>(600);
+        Permute perm;
+
+    public:
+        FadingNoisePattern()
+        {
+            this->name = "Fading noise";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active || redButtonManager.state != RedButtonManager::PlayAnimation)
+            {
+                fade.reset();
+                return;
+            }
+
+            perm.setSize(width);
+            perm.permute();
+
+            int noiseLevel = fade.getValue() * width / 3;
+            for (int index = 0; index < noiseLevel; index++)
+            {
+                pixels[perm.at[index]] = params->getHighlightColour();
+            }
+        }
+    };
 
 
-    // class GrowingCirclesPattern : public Pattern<RGBA>
-    // {
-    //     Transition transition = Transition(
-    //         200, Transition::none, 0,
-    //         1000, Transition::none, 0);
-    //     FadeDown fade[6] = {
-    //         FadeDown(200),
-    //         FadeDown(200),
-    //         FadeDown(200),
-    //         FadeDown(200),
-    //         FadeDown(200),
-    //         FadeDown(200)};
-    //     LFO<Glow> lfo = LFO<Glow>(500);
-    //     std::vector<float> radii[6];
-    //     // ControlHub *hub = nullptr;
-    //     BeatWatcher watcher = BeatWatcher();
-    //     // PixelMap3d::Cylindrical *map;
-    //     // Permute perm;
-    //     int pos = 0;
+    class StrobeFadePattern : public Pattern<RGBA>
+    {
+        RedButtonManager &redButtonManager = RedButtonManager::getInstance();
+        //Fade<Down, Cubic> fade = Fade<Down, Cubic>(600);
+        FadeDown fade = FadeDown(1500);
+        PixelMap3d::Spherical *map;
 
-    // public:
-    //     GrowingCirclesPattern(PixelMap3d *map)
-    //     {
-    //         // this->map = map.toCylindricalXZ();
-    //         for (int i = 0; i < 6; i++)
-    //         {
-    //             float r = 3360. / 4100;
-    //             float xc = r * cos(float(i) / 6 * 2 * M_PI);
-    //             float yc = 0.15;
-    //             float zc = r * sin(float(i) / 6 * 2 * M_PI);
-    //             std::transform(map->begin(), map->end(), std::back_inserter(radii[i]), [xc, yc, zc](PixelPosition3d pos) -> float
-    //                            { return sqrt(pow(pos.x - xc, 2) + pow(pos.y - yc, 2) + pow(pos.z - zc, 2)); });
-    //         }
-    //         // this->perm = Permute(map->size());
-    //         // this->controlHub = hub;
-    //         this->name = "Buttons circles";
-    //     }
+    public:
+        StrobeFadePattern(PixelMap3d::Spherical *map)
+        {
+            this->map = map;
+            this->name = "Strobe fade noise";
+        }
 
-    //     inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-    //     {
-    //         if (!transition.Calculate(active))
-    //             return;
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active || redButtonManager.state != RedButtonManager::PlayAnimation)
+            {
+                fade.reset();
+                return;
+            }
 
-    //         if (watcher.Triggered() && Tempo::GetBeatNumber() % 4 == 0)
-    //         {
-    //             pos = (pos + 1) % 6;
-    //             fade[pos].reset();
-    //         }
-
-    //         float velocity = params->getVelocity(1000, 100);
-    //         for (int i = 0; i < 6; i++)
-    //             fade[i].duration = params->getSize(400, 50) * velocity / 1000;
-
-    //         // float density = 481./width;
-
-    //         std::vector<bool> pressed = {true, false, true, true, false, false};
-    //         int amountPressed = std::count(pressed.begin(), pressed.end(), true);
-    //         float fadeFactors[7] = {0, 0.15, 0.3, 0.5, 0.5, 0.5, 0.5};
-    //         float fadeFactor = fadeFactors[amountPressed];
-
-    //         for (int i = 0; i < width; i++)
-    //         {
-    //             for (int column = 0; column < 6; column++)
-    //             {
-    //                 if (!pressed[column])
-    //                     continue;
-
-    //                 // float fadePosition = fade[column].getValue(radii[column][i] * velocity);
-    //                 RGBA color = params->getPrimaryColour();
-    //                 // pixels[i] += color * fadePosition * transition.getValue();
-    //                 float distanceFade = Utils::rescale_c(radii[column][i], 1, 0, 0, fadeFactor);
-
-    //                 float lfoValue = lfo.getValue(radii[column][i] * 20);
-    //                 pixels[i] += color * lfoValue * distanceFade;
-    //             }
-    //         }
-    //     }
-    // };
+            for (int index = 0; index < width; index++)
+            {
+                float fadePos = Utils::rescale(map->th(index), 0, 3000, 0, 2* M_PI);
+                float fadeValue = Utils::rescale_c(fade.getValue(fadePos),0,1, 0, 0.5);
+                RGBA col = Utils::millis() % 100 < 25 ? params->getHighlightColour() : RGBA(0,0,0,255);
+                pixels[index] = col * fadeValue;
+            }
+        }
+    };
 
 }

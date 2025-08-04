@@ -128,7 +128,7 @@ void setupLed(Hyperion *hyp)
     const int columnIndex2 = 4;
 
     PixelMap *map = new PixelMap(
-        resizeAndTranslateMap(gridMap(4, 1, 0.2),1,0,-0.8)
+        resizeAndTranslateMap(gridMap(4, 1, 0.2, 0.2),1,0,-0.8)
     );
 
     auto input = new ControlHubInput<RGBA>(
@@ -162,7 +162,7 @@ void setupBulbs(Hyperion *hyp)
     const int columnIndex2 = 6;
 
     PixelMap *map = new PixelMap(
-        resizeAndTranslateMap(gridMap(4, 6, 0.2),1,0,0)
+        resizeAndTranslateMap(gridMap(4, 6, 0.2, 0.2),1,0,0)
     );
 
     auto input = new ControlHubInput<Monochrome>(

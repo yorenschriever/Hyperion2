@@ -3,8 +3,10 @@
 #include "../common/patterns/patterns-test.hpp"
 #include "../common/setViewParams.hpp"
 #include "../common/paletteColumn.hpp"
+#include "../common/mapHelpers.hpp"
 #include "core/hyperion.hpp"
 #include "mapping/cageMap.hpp"
+#include "mapping/wingMap.old.hpp"
 
 #include "buttonMidiControllerFactory.hpp"
 
@@ -30,6 +32,23 @@ void addCagePipe(Hyperion *hyp)
   PixelMap3d::Cylindrical *cmap = &cCageMap;
   PixelMap3d::Spherical *smap = &sCageMap;
   
+  std::vector<Slave> distribution = {
+          {"hypernode1.local", 9611, 8 * 60},
+          {"hypernode1.local", 9612, 8 * 60},
+          {"hypernode1.local", 9613, 8 * 60},
+          {"hypernode1.local", 9614, 8 * 60},
+          {"hypernode1.local", 9615, 8 * 60},
+          {"hypernode1.local", 9616, 8 * 60},
+
+          {"hypernode2.local", 9611, 3 * 60},
+          {"hypernode2.local", 9612, 3 * 60},
+          {"hypernode2.local", 9613, 3 * 60},
+          {"hypernode2.local", 9614, 3 * 60},
+          {"hypernode2.local", 9615, 3 * 60},
+          {"hypernode2.local", 9616, 3 * 60},
+
+      };
+
   auto input = new ControlHubInput<RGBA>(
 
       map->size(),
@@ -93,7 +112,7 @@ void addCagePipe(Hyperion *hyp)
           // {.column = 1, .slot = 0, .pattern = new LedPatterns::PalettePattern(0, "Primary")},
           // {.column = 1, .slot = 1, .pattern = new LedPatterns::PalettePattern(1, "Secondary")},
 
-          {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(60, 11)},
+          {.column = 8, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution)},
           {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
           {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
           {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
@@ -109,25 +128,160 @@ void addCagePipe(Hyperion *hyp)
           {.column = 9, .slot = 4, .pattern = new Buttons::ButtonPressedPattern(map,4)},
           {.column = 9, .slot = 5, .pattern = new Buttons::ButtonPressedPattern(map,5)},
           {.column = 9, .slot = 6, .pattern = new Buttons::SyncToMeasurePattern(smap)},
+          {.column = 9, .slot = 7, .pattern = new Buttons::FadingNoisePattern()},
+          {.column = 9, .slot = 8, .pattern = new Buttons::StrobeFadePattern(smap)},
+
 
       });
 
   distributeAndMonitor3d<BGR, RGBA>(
-      hyp, input, map,
-      {
-          {"hypernode1.local", 9611, 6 * 60},
-          {"hypernode1.local", 9612, 6 * 60},
-          {"hypernode1.local", 9613, 6 * 60},
-          {"hypernode1.local", 9614, 6 * 60},
-          {"hypernode1.local", 9615, 6 * 60},
-          {"hypernode1.local", 9616, 6 * 60},
-          {"hypernode1.local", 9617, 6 * 60},
-          {"hypernode1.local", 9618, 6 * 60},
-      }, ledBarLut);
+      hyp, input, map, distribution, ledBarLut);
 
   hyp->hub.setColumnName(1, "Static");
-  hyp->hub.buttonPressed(9,0);
+  
+  hyp->hub.buttonPressed(8,0);
+  // hyp->hub.buttonPressed(9,0);
+  // hyp->hub.buttonPressed(9,1);
+  // hyp->hub.buttonPressed(9,2);
+  // hyp->hub.buttonPressed(9,3);
+  // hyp->hub.buttonPressed(9,4);
+
+  // hyp->hub.buttonPressed(9,6);
+  // // hyp->hub.buttonPressed(9,7);
+  // hyp->hub.buttonPressed(9,8);
 }
+
+
+void addWingsPipe(Hyperion *hyp)
+{
+  PixelMap *map = new PixelMap(resizeAndTranslateMap(wingMap, 0.9));
+
+  std::vector<Slave> distribution = {
+          {"hypernode2.local", 9611, 8 * 60},
+          {"hypernode2.local", 9612, 8 * 60},
+          {"hypernode2.local", 9613, 8 * 60},
+          {"hypernode2.local", 9614, 8 * 60},
+      };
+
+  auto input = new ControlHubInput<RGBA>(
+
+      map->size(),
+      &hyp->hub,
+      {
+
+          {.column = 10, .slot = 0, .pattern =             new LedPatterns::OnPattern({255,255,255},"White"),},
+          {.column = 10, .slot = 1, .pattern =             new LedPatterns::PalettePattern(0,"Primary"),},
+          {.column = 10, .slot = 2, .pattern =             new LedPatterns::PalettePattern(1,"Secondary"),},
+          {.column = 10, .slot = 3, .pattern =             new LedPatterns::GlowPulsePattern(),},
+          {.column = 10, .slot = 4, .pattern =             new LedPatterns::SegmentChasePattern(),},
+          {.column = 10, .slot = 5, .pattern =             new LedPatterns::FlashesPattern(),},
+          {.column = 10, .slot = 6, .pattern =             new LedPatterns::StrobePattern(),},
+          {.column = 10, .slot = 7, .pattern =             new LedPatterns::PixelGlitchPattern(),},
+          {.column = 10, .slot = 8, .pattern =             new LedPatterns::FadingNoisePattern(),},
+          {.column = 10, .slot = 9, .pattern =             new LedPatterns::StrobeHighlightPattern(),},
+          {.column = 10, .slot = 10, .pattern =            new LedPatterns::GradientChasePattern(), },
+
+          
+          {.column = 8, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution, 60)},
+          {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+          {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+          {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+          {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+          {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+          {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
+          {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
+
+      });
+
+  distributeAndMonitor<BGR, RGBA>(
+      hyp, input, map, distribution, ledBarLut);
+
+  hyp->hub.setColumnName(8, "Wings");
+}
+
+void addVulturePipe(Hyperion *hyp)
+{
+
+    const int wingSize = 50;
+
+    PixelMap *map = new PixelMap(combineMaps({
+        gridMap(wingSize, 3, -0.01, 0.07, -0.5, -0.5),
+        gridMap(wingSize, 3, 0.01, 0.07, 0.5, -0.5),
+        circleMap(100, 0.25, 0, -0.5),
+    }));
+
+  Distribution distribution = {
+          {"hypernode3.local", 9611, wingSize},
+          {"hypernode3.local", 9612, wingSize},
+          {"hypernode3.local", 9613, wingSize},
+          {"hypernode3.local", 9614, wingSize},
+          {"hypernode3.local", 9615, wingSize},
+          {"hypernode3.local", 9616, wingSize},
+          {"hypernode3.local", 9617, 100},
+      };
+
+  auto input = new ControlHubInput<RGBA>(
+
+      map->size(),
+      &hyp->hub,
+      {
+          {.column = 8, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution, 100)},
+          {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+          {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+          {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+          {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+          {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+          {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
+          {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
+
+      });
+
+  distributeAndMonitor<BGR, RGBA>(
+      hyp, input, map, distribution, ledBarLut);
+
+  hyp->hub.setColumnName(8, "Wings");
+}
+
+// void addDMXPipe(Hyperion *hyp)
+// {
+
+//     const int wingSize = 50;
+
+//     PixelMap *map = new PixelMap(combineMaps({
+//         gridMap(wingSize, 3, -0.01, 0.07, -0.5, -0.5),
+//         gridMap(wingSize, 3, 0.01, 0.07, 0.5, -0.5),
+//         circleMap(100, 0.25, 0, -0.5),
+//     }));
+
+//   // PixelMap *map = &wingMap;
+
+//   auto input = new ControlHubInput<RGBA>(
+
+//       map->size(),
+//       &hyp->hub,
+//       {
+//           {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(wingSize, 1)},
+//           {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+//           {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+//           {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+//           {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+//           {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+//           {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
+//           {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
+
+//       });
+
+//   distributeAndMonitor<BGR, RGBA>(
+//       hyp, input, map,
+//       {
+//           {"hypernode2.local", 9611, 8 * 60},
+//           {"hypernode2.local", 9612, 8 * 60},
+//           {"hypernode2.local", 9613, 8 * 60},
+//           {"hypernode2.local", 9614, 8 * 60},
+//       }, ledBarLut);
+
+//   hyp->hub.setColumnName(8, "Wings");
+// }
 
 int main()
 {
@@ -138,6 +292,9 @@ int main()
 
   setupPaletteColumn(hyp);
   addCagePipe(hyp);
+  addWingsPipe(hyp);
+  addVulturePipe(hyp);
+//   addDMXPipe(hyp);
 
   hyp->start();
   // setViewParams(hyp, viewParamsDefault);
@@ -145,10 +302,10 @@ int main()
   // setViewParams(hyp, viewParamsFront);
   // setViewParams(hyp, viewParamsSide);
   auto viewParams = new ViewParams(
-      40, 
+      35, 
       -0.45, 
       Vector{0, 0.1, -2.5}, 
-      Rotation{.4, 1, 0, 0},
+      Rotation{.5, 1, 0, 0},
       Rotation{0, 0, 1, 0});
   setViewParams(hyp, viewParams);
 
