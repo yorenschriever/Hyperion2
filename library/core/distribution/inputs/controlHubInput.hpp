@@ -2,6 +2,7 @@
 
 #include "core/generation/controlHub/controlHub.hpp"
 #include "core/generation/patterns/pattern.hpp"
+#include "core/distribution/utils/indexMap.hpp"
 #include "input.hpp"
 #include "log.hpp"
 #include "utils.hpp"
@@ -29,28 +30,29 @@ public:
     // which means that you not bound to output type when assigning columns in the control hub.
     // Also you can attach multiple patches to the same slot (also from multiple ControlHubInputs), 
     // so you can create scenes with for multiple outputs under 1 button
-    ControlHubInput(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns)
+    ControlHubInput(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns, IndexMap *indexMap = nullptr)
     {
-        ControlHubInput_(length, hub, slotPatterns);
+        ControlHubInput_(length, hub, slotPatterns, indexMap);
     }
 
     //simplified version of the constructor, where all patterns are added to a single column in the control hub
-    ControlHubInput(int length, ControlHub *hub, int column, std::vector<Pattern<T_COLOUR> *>patterns)
+    ControlHubInput(int length, ControlHub *hub, int column, std::vector<Pattern<T_COLOUR> *>patterns, IndexMap *indexMap = nullptr)
     {
         std::vector<SlotPattern> slotPatterns;
         int slotIndex=0;
         for (auto pattern: patterns){
             slotPatterns.push_back({.column = column, .slot = slotIndex++, .pattern = pattern});
         }
-        ControlHubInput_(length, hub, slotPatterns);
+        ControlHubInput_(length, hub, slotPatterns, indexMap);
     }
 
 private:
-    void ControlHubInput_(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns)
+    void ControlHubInput_(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns, IndexMap *indexMap = nullptr)
     {
         this->_length = length;
         this->slotPatterns = slotPatterns;
         this->hub = hub;
+        this->indexMap = indexMap;
         this->ledData = (T_COLOUR *)malloc(length * sizeof(T_COLOUR));
 
         if (!this->ledData)
@@ -125,7 +127,15 @@ public:
                     //if the colour space is not RGBA, apply dimming and sum with the existing value.
                     ledData[i].dim(dimValue);
                 }
-                ((T_COLOUR *)dataPtr)[i] += ledData[i];
+
+                int index = indexMap ? indexMap->map(i) : i;
+                if(index < 0 || index >= safeLength)
+                {
+                    Log::error("CONTROL_HUB_INPUT", "Mapped index out of bounds: %d, length: %d", index, safeLength);
+                    continue;
+                }
+                
+                ((T_COLOUR *)dataPtr)[index] += ledData[i];
             }
         }
 
@@ -136,6 +146,7 @@ public:
 private:
     int _length = 0;
     T_COLOUR *ledData;
+    IndexMap *indexMap = nullptr;
 
     std::vector<SlotPattern> slotPatterns;
     ControlHub *hub;
