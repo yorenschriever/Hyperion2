@@ -49,4 +49,14 @@ public:
             Changing
         )
     {}
+
+    bool Triggered(int div=0) 
+    {
+        if (div == 0)
+            return Watcher::Triggered();
+        
+        // Check if the current beat number is a multiple of div
+        return Watcher::Triggered() && Tempo::GetBeatNumber() % div == 0;
+    }
+
 };
