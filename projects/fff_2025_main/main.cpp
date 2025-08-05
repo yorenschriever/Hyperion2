@@ -1,6 +1,8 @@
 #include "../common/distributeAndMonitor.hpp"
 #include "../common/patterns/patterns-led.hpp"
 #include "../common/patterns/patterns-test.hpp"
+#include "../common/patterns/patterns-mapped-2d.hpp"
+#include "../common/patterns/patterns-mask.hpp"
 #include "../common/setViewParams.hpp"
 #include "../common/paletteColumn.hpp"
 #include "../common/mapHelpers.hpp"
@@ -17,13 +19,14 @@
 #include "patterns-max.hpp"
 #include "patterns-mid.hpp"
 #include "patterns-min.hpp"
-
+#include "patterns-wings.hpp"
 #include "patterns-button.hpp"
 
 LUT *ledBarLut = new ColourCorrectionLUT(1.8, 255, 200, 200, 200);
 
 PixelMap3d::Cylindrical cCageMap = cageMap.toCylindricalXZ();
 PixelMap3d::Spherical sCageMap = cageMap.toSphericalXZ();
+PixelMap::Polar pWingMap = wingMap.toPolarRotate90();
 
 void addCagePipe(Hyperion *hyp)
 {
@@ -139,7 +142,8 @@ void addCagePipe(Hyperion *hyp)
 
   hyp->hub.setColumnName(1, "Static");
   
-  hyp->hub.buttonPressed(8,0);
+//   hyp->hub.buttonPressed(8,0);
+
   // hyp->hub.buttonPressed(9,0);
   // hyp->hub.buttonPressed(9,1);
   // hyp->hub.buttonPressed(9,2);
@@ -154,8 +158,11 @@ void addCagePipe(Hyperion *hyp)
 
 void addWingsPipe(Hyperion *hyp)
 {
-  PixelMap *map = new PixelMap(resizeAndTranslateMap(wingMap, 0.9));
-
+  PixelMap *map = &wingMap;
+  PixelMap::Polar *pmap = &pWingMap;
+  PixelMap *displayMap = new PixelMap(resizeAndTranslateMap(wingMap, 0.9));
+  IndexMap *zigzag = new ZigZagMapper(60, true);
+  
   std::vector<Slave> distribution = {
           {"hypernode2.local", 9611, 8 * 60},
           {"hypernode2.local", 9612, 8 * 60},
@@ -169,19 +176,51 @@ void addWingsPipe(Hyperion *hyp)
       &hyp->hub,
       {
 
-          {.column = 10, .slot = 0, .pattern =             new LedPatterns::OnPattern({255,255,255},"White"),},
-          {.column = 10, .slot = 1, .pattern =             new LedPatterns::PalettePattern(0,"Primary"),},
-          {.column = 10, .slot = 2, .pattern =             new LedPatterns::PalettePattern(1,"Secondary"),},
-          {.column = 10, .slot = 3, .pattern =             new LedPatterns::GlowPulsePattern(),},
-          {.column = 10, .slot = 4, .pattern =             new LedPatterns::SegmentChasePattern(),},
-          {.column = 10, .slot = 5, .pattern =             new LedPatterns::FlashesPattern(),},
-          {.column = 10, .slot = 6, .pattern =             new LedPatterns::StrobePattern(),},
-          {.column = 10, .slot = 7, .pattern =             new LedPatterns::PixelGlitchPattern(),},
-          {.column = 10, .slot = 8, .pattern =             new LedPatterns::FadingNoisePattern(),},
-          {.column = 10, .slot = 9, .pattern =             new LedPatterns::StrobeHighlightPattern(),},
-          {.column = 10, .slot = 10, .pattern =            new LedPatterns::GradientChasePattern(), },
+          {.column = 10, .slot = 0, .pattern =  new LedPatterns::OnPattern({255,255,255},"White"),},
+          {.column = 10, .slot = 1, .pattern =  new LedPatterns::PalettePattern(0,"Primary"),},
+          {.column = 10, .slot = 2, .pattern =  new LedPatterns::PalettePattern(1,"Secondary"),},
+          {.column = 10, .slot = 3, .pattern =  new LedPatterns::GlowPulsePattern(),},
+          {.column = 10, .slot = 4, .pattern =  new LedPatterns::SegmentChasePattern(),},
+          {.column = 10, .slot = 5, .pattern =  new LedPatterns::FlashesPattern(),},
+          {.column = 10, .slot = 6, .pattern =  new LedPatterns::StrobePattern(),},
+          {.column = 10, .slot = 7, .pattern =  new LedPatterns::PixelGlitchPattern(),},
+          {.column = 10, .slot = 8, .pattern =  new LedPatterns::FadingNoisePattern(),},
+          {.column = 10, .slot = 9, .pattern =  new LedPatterns::StrobeHighlightPattern(),},
+          {.column = 10, .slot = 10, .pattern = new LedPatterns::GradientChasePattern(), },
+          {.column = 10, .slot = 11, .pattern = new LedPatterns::RibbenClivePattern<Glow>(10000, 1, 0.15)},
+          {.column = 10, .slot = 12, .pattern = new LedPatterns::ClivePattern<SawDown>(32, 1000, 1, 0.1)},
+          {.column = 10, .slot = 13, .pattern = new LedPatterns::ClivePattern<SoftPWM>(32, 1000, 1, 0.5)},
+          {.column = 10, .slot = 14, .pattern = new LedPatterns::ClivePattern<Glow>(32, 1000, 1, 0.5)},
+          {.column = 10, .slot = 15, .pattern = new LedPatterns::BarChase(60)},
+          {.column = 10, .slot = 16, .pattern = new Wings::FadeFromCenter()},
+          {.column = 10, .slot = 17, .pattern = new LedPatterns::FadeFromRandom()},
+          {.column = 10, .slot = 18, .pattern = new LedPatterns::SideWave(60)},
+          {.column = 10, .slot = 19, .pattern = new LedPatterns::SinChasePattern(60)},
+          {.column = 10, .slot = 20, .pattern = new LedPatterns::Fireworks()},
+          {.column = 10, .slot = 21, .pattern = new LedPatterns::SegmentGlitchPattern()},
 
-          
+
+
+
+          {.column = 11, .slot = 0, .pattern = new Mapped2dPatterns::Lighthouse(pmap)},
+          {.column = 11, .slot = 1, .pattern = new Mapped2dPatterns::GrowingCirclesPattern(map),},
+          {.column = 11, .slot = 2, .pattern = new Mapped2dPatterns::LineLaunch(map),},
+          {.column = 11, .slot = 3, .pattern = new Mapped2dPatterns::SpiralPattern(pmap),},
+          {.column = 11, .slot = 4, .pattern = new Mapped2dPatterns::DotBeatPattern(pmap),},
+          {.column = 11, .slot = 5, .pattern = new Mapped2dPatterns::HorizontalSin(pmap),},
+          {.column = 11, .slot = 6, .pattern = new Mapped2dPatterns::HorizontalSaw(pmap),},
+          {.column = 11, .slot = 7, .pattern = new Mapped2dPatterns::RadialSaw(pmap),},
+        //   {.column = 11, .slot = 8, .pattern = new Mapped2dPatterns::GrowShrink(pmap),},
+          {.column = 11, .slot = 10, .pattern = new Mapped2dPatterns::HorizontalGradientPattern(map)},
+          {.column = 11, .slot = 11, .pattern = new Mapped2dPatterns::RadialGlitterFadePattern(pmap)},
+          {.column = 11, .slot = 12, .pattern = new Mapped2dPatterns::RadialFadePattern(pmap)},
+          {.column = 11, .slot = 13, .pattern = new Mapped2dPatterns::AngularFadePattern(pmap)},
+          {.column = 11, .slot = 14, .pattern = new Wings::XY(map)},
+
+          {.column = 12, .slot = 0, .pattern = new MaskPatterns::SinChaseMaskPattern()},
+          {.column = 12, .slot = 1, .pattern = new MaskPatterns::GlowPulseMaskPattern()},
+          {.column = 12, .slot = 2, .pattern = new MaskPatterns::SegmentGradientMaskPattern(60, true)},
+
           {.column = 8, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution, 60)},
           {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
           {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
@@ -191,10 +230,10 @@ void addWingsPipe(Hyperion *hyp)
           {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
           {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
 
-      });
+      }, zigzag);
 
   distributeAndMonitor<BGR, RGBA>(
-      hyp, input, map, distribution, ledBarLut);
+      hyp, input, displayMap, distribution, ledBarLut);
 
   hyp->hub.setColumnName(8, "Wings");
 }
@@ -308,6 +347,14 @@ int main()
       Rotation{.5, 1, 0, 0},
       Rotation{0, 0, 1, 0});
   setViewParams(hyp, viewParams);
+
+//   auto viewParamsBottom = new ViewParams(
+//       100, 
+//       -0.45, 
+//       Vector{0, 0.0, -0.5}, 
+//       Rotation{-M_PI_2, 1, 0, 0},
+//       Rotation{0, 0, 1, 0});
+//   setViewParams(hyp, viewParamsBottom);
 
   while (1)
   {

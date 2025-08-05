@@ -1,6 +1,7 @@
 
 #pragma once
 #include "hyperion.hpp"
+#include "mappingHelpers.hpp"
 #include <math.h>
 #include <vector>
 
@@ -206,7 +207,8 @@ namespace LedPatterns
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        int thresholdDiv;;
+        int thresholdDiv;
+        ;
 
     public:
         PixelGlitchPattern(int thresholdDiv = 2)
@@ -226,7 +228,7 @@ namespace LedPatterns
             if (timeline.Happened(0))
                 perm.permute();
 
-            int threshold = float(width)/params->getAmount(thresholdDiv, 1);
+            int threshold = float(width) / params->getAmount(thresholdDiv, 1);
 
             for (int index = 0; index < threshold; index++)
                 pixels[perm.at[index]] = params->getSecondaryColour() * transition.getValue();
@@ -501,4 +503,252 @@ namespace LedPatterns
             }
         }
     };
+
+    template <class T>
+    class ClivePattern : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        int numSegments;
+        int averagePeriod;
+        float precision;
+        LFO<T> lfo;
+        Permute perm;
+
+    public:
+        ClivePattern(int numSegments = 10, int averagePeriod = 1000, float precision = 1, float pulsewidth = 1)
+        {
+            this->numSegments = std::max(numSegments, 1);
+            this->averagePeriod = averagePeriod;
+            this->precision = precision;
+            this->perm = Permute(numSegments);
+            this->lfo.setDutyCycle(pulsewidth);
+            this->name = "Clive pattern";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            for (int index = 0; index < width; index++)
+            {
+                int permutedQuantized = perm.at[index * numSegments / width] * width / numSegments;
+                int interval = averagePeriod + permutedQuantized * (averagePeriod * precision) / width;
+                pixels[index] += params->getSecondaryColour() * lfo.getValue(0, interval) * transition.getValue();
+            }
+        }
+    };
+
+    class BarChase : public Pattern<RGBA>
+    {
+        int segmentSize;
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        LFO<SawDown> lfo;
+
+    public:
+        BarChase(int segmentSize = 60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Bar chase";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            lfo.setPeriod(params->getVelocity(5000, 500));
+            int multiply = int(params->getAmount(1, 10));
+            lfo.setDutyCycle(params->getSize());
+            lfo.setSoftEdgeWidth(1. / width);
+
+            for (int i = 0; i < width; i++)
+            {
+                pixels[i] = params->getPrimaryColour() * lfo.getValue(float(i) / width * multiply) * transition.getValue();
+            }
+        }
+    };
+
+    class FadeFromRandom : public Pattern<RGBA>
+    {
+        int segmentSize;
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        FadeDown fade;
+        BeatWatcher watcher;
+        int beatDivs[6] = {16, 8, 4, 2, 1, 1};
+        int centers[48];
+        int delays[48];
+        FadeDown masterFade;
+
+    public:
+        FadeFromRandom(int segmentSize = 60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Fade from random";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            int beatDiv = beatDivs[int(params->getAmount(0, 5))];
+            if (this->watcher.Triggered() && Tempo::GetBeatNumber() % beatDiv == 0)
+            {
+                fade.reset();
+                masterFade.reset();
+                for (int i = 0; i < 48; i++)
+                {
+                    centers[i] = Utils::random(15, 45);
+                    delays[i] = Utils::random(0, 500);
+                }
+            }
+
+            if (!transition.Calculate(active))
+                return;
+
+            masterFade.duration = Tempo::TimeBetweenBeats() * beatDiv;
+
+            float trailSize = params->getVelocity(15, 5);
+            fade.setDuration(params->getSize(1200, 300));
+            float offset = params->getOffset();
+
+            for (int bar = 0; bar < width / segmentSize; bar++)
+            {
+                for (int i = 0; i < segmentSize; i++)
+                {
+                    int distance = abs(centers[bar] - i);
+                    float fadeValue = fade.getValue(distance * trailSize + delays[bar] * offset);
+                    pixels[bar * segmentSize + i] += params->getPrimaryColour() * fadeValue * masterFade.getValue() * transition.getValue();
+                }
+            }
+        }
+    };
+
+class SideWave : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        LFO<Glow> lfo;
+        int segmentSize = 60;
+
+    public:
+        SideWave(int segmentSize = 60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Side wave";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            float offset = params->getOffset(0, 3);
+            float duty = params->getAmount(0.1, 1);
+            lfo.setDutyCycle(duty);
+            lfo.setPeriod(params->getVelocity(3000, 500) / duty);
+            float size = params->getSize();
+            float baseSize = params->getIntensity(0, 10);
+
+            for (int bar = 0; bar < width / segmentSize; bar++)
+            {
+                for (int i = 0; i < segmentSize; i++)
+                {
+                    int index = bar * segmentSize + i;
+                    float fadeValue = softEdge(i - baseSize, size * lfo.getValue(2. * float(bar) / (width / segmentSize) * offset) * segmentSize);
+                    pixels[index] = params->getPrimaryColour() * fadeValue * transition.getValue();
+                }
+            }
+        }
+    };
+
+    class SinChasePattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        LFO<Glow> lfo;
+        int segmentSize = 60;
+
+    public:
+        SinChasePattern(int segmentSize = 60)
+        {
+            this->segmentSize = segmentSize;
+            this->name = "Sin chase";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            lfo.setDutyCycle(params->getSize(0.1, 1));
+            lfo.setPeriod(params->getVelocity(4000, 500));
+            int amount = params->getAmount(1, 5);
+
+            for (int i = 0; i < width; i++)
+            {
+                float phase = ((float)i / width) * amount;
+                pixels[i] = params->getSecondaryColour() * lfo.getValue(phase) * transition.getValue();
+            }
+        }
+    };
+
+
+    class Fireworks : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        static const int numFades = 8;
+
+        int currentFade = 0;
+        FadeDown fades[numFades];
+        int centers[numFades];
+        BeatWatcher watcher;
+        int beatDivs[5] = {16,8,4,2,2};
+
+    public:
+        Fireworks()
+        {
+            this->name = "Fireworks";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+
+            if (!transition.Calculate(active))
+                return;
+
+            if (watcher.Triggered())
+            {
+                for(int fade=0;fade<numFades;fade++)
+                {
+                    centers[fade] = Utils::random(0,width);
+                    fades[fade].reset();
+                }
+            }
+                
+            for(int fade=0;fade<numFades;fade++)
+            {
+                fades[fade].setDuration(params->getVelocity(1000,250));
+            }
+
+            for (int fade=0;fade < numFades; fade++)
+            {
+                int center = centers[fade];
+                int size=60;
+                for (int i=0; i<size; i++)
+                {
+                    float fadeValue = fades[fade].getValue(float(i)/size * 250);
+                    if (center+i < width) pixels[center + i] += params->getGradient(255 * fadeValue) * fadeValue;
+                    if (center-1 >= 0) pixels[center - i] += params->getGradient(255 * fadeValue) * fadeValue;
+                }
+            }
+        }
+    };
+
 }
