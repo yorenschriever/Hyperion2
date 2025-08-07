@@ -21,6 +21,7 @@ public:
         int slot;
         Pattern<T_COLOUR> *pattern;
         int paramsSlot {0};
+        IndexMap *indexMap {nullptr}; 
     };
 
     // length = the length in pixels
@@ -30,7 +31,7 @@ public:
     // which means that you not bound to output type when assigning columns in the control hub.
     // Also you can attach multiple patches to the same slot (also from multiple ControlHubInputs), 
     // so you can create scenes with for multiple outputs under 1 button
-    ControlHubInput(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns, IndexMap *indexMap = nullptr)
+    ControlHubInput(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns)
     {
         ControlHubInput_(length, hub, slotPatterns, indexMap);
     }
@@ -128,13 +129,12 @@ public:
                     ledData[i].dim(dimValue);
                 }
 
-                int index = indexMap ? indexMap->map(i) : i;
+                int index = (slotPattern.indexMap) ? slotPattern.indexMap->map(i) : i;
                 if(index < 0 || index >= safeLength)
                 {
                     Log::error("CONTROL_HUB_INPUT", "Mapped index out of bounds: %d, length: %d", index, safeLength);
                     continue;
                 }
-                
                 ((T_COLOUR *)dataPtr)[index] += ledData[i];
             }
         }
