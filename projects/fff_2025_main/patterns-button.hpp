@@ -9,7 +9,7 @@ namespace Buttons
     private:
         std::vector<bool> pressed = {false, false, false, false, false, false};
         float alignmentStart = 0;
-        const int alignTo = 16; // Align to measure (4 beats)
+        const int alignTo = 8; // Align to measure (4 beats)
 
         RedButtonManager()  {
             Tempo::AddListener(this);

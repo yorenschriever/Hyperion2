@@ -29,24 +29,28 @@ PixelMap3d::Cylindrical cCageMap = cageMap.toCylindricalXZ();
 PixelMap3d::Spherical sCageMap = cageMap.toSphericalXZ();
 PixelMap::Polar pWingMap = wingMap.toPolarRotate90();
 
-enum Columns {
+enum Columns
+{
     PALETTE,
     CAGE_1,
     CAGE_2,
     CAGE_3,
     CAGE_4,
-    CAGE_5,
     CAGE_MASK,
     CAGE_FLASH,
+    BUTTONS_EFFECT,
 
     WINGS_1,
     WINGS_2,
     WINGS_3,
+    WINGS_4,
     WINGS_MASK,
     WINGS_FLASH,
+    VULTURE,
     EFFECTS,
+
     BUTTONS,
-    BUTTONS_EFFECT,
+    DEBUG,
 };
 
 void addCagePipe(Hyperion *hyp)
@@ -73,88 +77,96 @@ void addCagePipe(Hyperion *hyp)
 
     };
 
-    auto input = new ControlHubInput<RGBA>(
+    std::vector<ControlHubInput<RGBA>::SlotPattern> patterns = {
+        {.column = Columns::CAGE_1, .slot = 0, .pattern = new Max::ChevronsConePattern(cmap)},
+        {.column = Columns::CAGE_1, .slot = 1, .pattern = new Low::VerticallyIsolated(cmap)},
+        {.column = Columns::CAGE_1, .slot = 2, .pattern = new Low::HorizontalSaw(cmap)},
+        {.column = Columns::CAGE_1, .slot = 3, .pattern = new Low::StaticGradientPattern(map)},
+        {.column = Columns::CAGE_1, .slot = 4, .pattern = new Min::RibbenClivePattern<Glow>(10000, 1, 0.15)},
+        {.column = Columns::CAGE_1, .slot = 5, .pattern = new Min::RibbenFlashPattern()},
+        {.column = Columns::CAGE_1, .slot = 6, .pattern = new Low::HorizontalSin(cmap)},
+        {.column = Columns::CAGE_1, .slot = 7, .pattern = new Mid::Halo(cmap)},
 
-        map->size(),
-        &hyp->hub,
-        {
-            {.column = 1, .slot = 0, .pattern = new Max::ChevronsPattern(map)},
-            {.column = 1, .slot = 1, .pattern = new Max::ChevronsConePattern(cmap)},
-            {.column = 1, .slot = 2, .pattern = new Max::RadialFadePattern(cmap)},
-            {.column = 1, .slot = 3, .pattern = new Max::RadialGlitterFadePattern(cmap)},
-            {.column = 1, .slot = 4, .pattern = new Max::AngularFadePattern(cmap)},
-            {.column = 1, .slot = 5, .pattern = new Max::GrowingStrobePattern(cmap)},
+        // {.column = Columns::CAGE_4, .slot = 1, .pattern = new Mid::SnowflakePatternColumn(cmap)},
 
-            {.column = 2, .slot = 0, .pattern = new Min::RibbenClivePattern<Glow>(10000, 1, 0.15)},
-            {.column = 2, .slot = 1, .pattern = new Min::RibbenFlashPattern()},
-            {.column = 2, .slot = 2, .pattern = new Min::GrowingCirclesPattern(map)},
-            {.column = 2, .slot = 3, .pattern = new Min::SpiralPattern(cmap)},
-            {.column = 2, .slot = 4, .pattern = new Min::SegmentChasePattern()},
-            {.column = 2, .slot = 5, .pattern = new Min::GlowPulsePattern()},
-            {.column = 2, .slot = 6, .pattern = new Min::LineLaunch(map)},
+        {.column = Columns::CAGE_2, .slot = 0, .pattern = new Max::RadialFadePattern(cmap)},
+        {.column = Columns::CAGE_2, .slot = 1, .pattern = new Max::RadialGlitterFadePattern(cmap)},
+        {.column = Columns::CAGE_2, .slot = 2, .pattern = new Mid::TakkenChase(cmap)},
+        {.column = Columns::CAGE_2, .slot = 3, .pattern = new Max::AngularFadePattern(cmap)},
+        {.column = Columns::CAGE_2, .slot = 4, .pattern = new Min::GrowingCirclesPattern(map)},
+        {.column = Columns::CAGE_2, .slot = 5, .pattern = new Min::SpiralPattern(cmap)},
+        {.column = Columns::CAGE_2, .slot = 6, .pattern = new Min::SegmentChasePattern()},
+        {.column = Columns::CAGE_2, .slot = 7, .pattern = new LedPatterns::FadeFromRandom()},
 
-            {.column = 3, .slot = 0, .pattern = new Low::HorizontalSin(cmap)},
-            {.column = 3, .slot = 1, .pattern = new Low::VerticallyIsolated(cmap)},
-            {.column = 3, .slot = 2, .pattern = new Low::HorizontalSaw(cmap)},
-            {.column = 3, .slot = 3, .pattern = new Low::StaticGradientPattern(map)},
-            {.column = 3, .slot = 4, .pattern = new Low::OnBeatColumnChaseUpPattern(map)},
-            {.column = 3, .slot = 5, .pattern = new Low::GrowShrink(cmap)},
-            {.column = 3, .slot = 6, .pattern = new Low::RotatingRingsPattern(cmap)},
-            {.column = 3, .slot = 7, .pattern = new Low::GlowPulsePattern(map)},
+        {.column = Columns::CAGE_3, .slot = 0, .pattern = new LedPatterns::Fireworks()},
+        {.column = Columns::CAGE_3, .slot = 1, .pattern = new Mid::Lighthouse(cmap)},
+        {.column = Columns::CAGE_3, .slot = 2, .pattern = new Max::GrowingStrobePattern(cmap)},
+        {.column = Columns::CAGE_3, .slot = 3, .pattern = new Hi::DotBeatPattern(cmap)},
+        {.column = Columns::CAGE_3, .slot = 4, .pattern = new Low::GrowShrink(cmap)},
+        {.column = Columns::CAGE_3, .slot = 5, .pattern = new Hi::XY(map)},
+        {.column = Columns::CAGE_3, .slot = 6, .pattern = new Low::RotatingRingsPattern(cmap)},
+        {.column = Columns::CAGE_3, .slot = 7, .pattern = new Low::OnBeatColumnChaseUpPattern(map)},
 
-            // {.column = 4, .slot = 0, .pattern = new Mid::HaloOnBeat(cmap)},
-            {.column = 4, .slot = 1, .pattern = new Mid::Halo(cmap)},
-            {.column = 4, .slot = 2, .pattern = new Mid::SnowflakePatternColumn(cmap)},
-            {.column = 4, .slot = 3, .pattern = new Mid::TakkenChase(cmap)},
-            {.column = 4, .slot = 5, .pattern = new Mid::Lighthouse(cmap)},
-            {.column = 4, .slot = 6, .pattern = new Mid::FireworksPattern(map)},
-            {.column = 4, .slot = 7, .pattern = new Mid::DoubleFlash(cmap)},
+        {.column = Columns::CAGE_4, .slot = 0, .pattern = new Max::AngularFadePattern(cmap)},
+        {.column = Columns::CAGE_4, .slot = 1, .pattern = new Low::GlowPulsePattern(map)},
+        {.column = Columns::CAGE_4, .slot = 2, .pattern = new Min::GlowPulsePattern()},
+        {.column = Columns::CAGE_4, .slot = 3, .pattern = new Mid::DoubleFlash(cmap)},
+        {.column = Columns::CAGE_4, .slot = 4, .pattern = new Min::LineLaunch(map)},
+        {.column = Columns::CAGE_4, .slot = 5, .pattern = new LedPatterns::SegmentGlitchPattern()},
+        {.column = Columns::CAGE_4, .slot = 6, .pattern = new Flash::FlashesPattern()},
+        {.column = Columns::CAGE_4, .slot = 7, .pattern = new Flash::StrobePattern()},
 
-            {.column = 5, .slot = 0, .pattern = new Hi::DotBeatPattern(cmap)},
-            {.column = 5, .slot = 5, .pattern = new Hi::XY(map)},
+        {.column = Columns::CAGE_MASK, .slot = 0, .pattern = new MaskPatterns::SinChaseMaskPattern()},
+        {.column = Columns::CAGE_MASK, .slot = 1, .pattern = new MaskPatterns::SinChaseMaskPattern()},
+        {.column = Columns::CAGE_MASK, .slot = 2, .pattern = new MaskPatterns::GlowPulseMaskPattern()},
+        {.column = Columns::CAGE_MASK, .slot = 3, .pattern = new MaskPatterns::SegmentGradientMaskPattern(60, true)},
 
-            {.column = 7, .slot = 0, .pattern = new Flash::FlashesPattern()},
-            {.column = 7, .slot = 1, .pattern = new Flash::SquareGlitchPattern(map)},
-            {.column = 7, .slot = 3, .pattern = new Flash::PixelGlitchPattern()},
-            {.column = 7, .slot = 4, .pattern = new Max::GrowingStrobePattern(cmap)},
-            {.column = 7, .slot = 5, .pattern = new Flash::StrobeHighlightPattern()},
-            {.column = 7, .slot = 6, .pattern = new Flash::StrobePattern()},
-            {.column = 7, .slot = 7, .pattern = new Flash::FadingNoisePattern()},
+        {.column = Columns::CAGE_FLASH, .slot = 0, .pattern = new Flash::FlashesPattern()},
+        {.column = Columns::CAGE_FLASH, .slot = 1, .pattern = new Flash::SquareGlitchPattern(map)},
+        {.column = Columns::CAGE_FLASH, .slot = 2, .pattern = new Flash::PixelGlitchPattern()},
+        {.column = Columns::CAGE_FLASH, .slot = 3, .pattern = new Max::GrowingStrobePattern(cmap)},
+        {.column = Columns::CAGE_FLASH, .slot = 4, .pattern = new Flash::StrobeHighlightPattern()},
+        {.column = Columns::CAGE_FLASH, .slot = 5, .pattern = new Flash::StrobePattern()},
+        {.column = Columns::CAGE_FLASH, .slot = 6, .pattern = new Flash::FadingNoisePattern()},
+        {.column = Columns::CAGE_FLASH, .slot = 7, .pattern = new LedPatterns::SegmentGlitchPattern()},
 
-            // {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
-            // {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
-            // {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
-            // {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
-            // {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
-            // {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-            // {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
-            // {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
-            // {.column = 8, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
+        {.column = Columns::BUTTONS, .slot = 0, .pattern = new Buttons::ButtonPressedPattern(map, 0)},
+        {.column = Columns::BUTTONS, .slot = 1, .pattern = new Buttons::ButtonPressedPattern(map, 1)},
+        {.column = Columns::BUTTONS, .slot = 2, .pattern = new Buttons::ButtonPressedPattern(map, 2)},
+        {.column = Columns::BUTTONS, .slot = 3, .pattern = new Buttons::ButtonPressedPattern(map, 3)},
+        {.column = Columns::BUTTONS, .slot = 4, .pattern = new Buttons::ButtonPressedPattern(map, 4)},
+        {.column = Columns::BUTTONS, .slot = 5, .pattern = new Buttons::ButtonPressedPattern(map, 5)},
 
-            // // Static
-            // {.column = 1, .slot = 0, .pattern = new LedPatterns::PalettePattern(0, "Primary")},
-            // {.column = 1, .slot = 1, .pattern = new LedPatterns::PalettePattern(1, "Secondary")},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 0, .pattern = new Buttons::SyncToMeasurePattern(smap)},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 1, .pattern = new Buttons::FadingNoisePattern()},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 2, .pattern = new Buttons::StrobeFadePattern(smap)},
 
-            {.column = 8, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution)},
-            {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
-            {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
-            {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
-            {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
-            {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-            {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
-            {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
+        // {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
+        // {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+        // {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+        // {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+        // {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+        // {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+        // {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(120, 20)},
+        // {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(60)},
+        // {.column = 8, .slot = 8, .pattern = new TestPatterns::BrightnessMatch()},
 
-            {.column = 9, .slot = 0, .pattern = new Buttons::ButtonPressedPattern(map, 0)},
-            {.column = 9, .slot = 1, .pattern = new Buttons::ButtonPressedPattern(map, 1)},
-            {.column = 9, .slot = 2, .pattern = new Buttons::ButtonPressedPattern(map, 2)},
-            {.column = 9, .slot = 3, .pattern = new Buttons::ButtonPressedPattern(map, 3)},
-            {.column = 9, .slot = 4, .pattern = new Buttons::ButtonPressedPattern(map, 4)},
-            {.column = 9, .slot = 5, .pattern = new Buttons::ButtonPressedPattern(map, 5)},
-            {.column = 9, .slot = 6, .pattern = new Buttons::SyncToMeasurePattern(smap)},
-            {.column = 9, .slot = 7, .pattern = new Buttons::FadingNoisePattern()},
-            {.column = 9, .slot = 8, .pattern = new Buttons::StrobeFadePattern(smap)},
+        // // Static
+        // {.column = 1, .slot = 0, .pattern = new LedPatterns::PalettePattern(0, "Primary")},
+        // {.column = 1, .slot = 1, .pattern = new LedPatterns::PalettePattern(1, "Secondary")},
 
-        });
+        {.column = Columns::DEBUG, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution)},
+        {.column = Columns::DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+        {.column = Columns::DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+        {.column = Columns::DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+        {.column = Columns::DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+        {.column = Columns::DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+        {.column = Columns::DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
+        {.column = Columns::DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
+
+    };
+
+    auto input = new ControlHubInput<RGBA>(map->size(), &hyp->hub, patterns);
 
     distributeAndMonitor3d<BGR, RGBA>(
         hyp, input, map, distribution, ledBarLut);
@@ -188,138 +200,140 @@ void addWingsPipe(Hyperion *hyp)
         {"hypernode2.local", 9614, 8 * 60},
     };
 
-    auto input = new ControlHubInput<RGBA>(
-
-        map->size(),
-        &hyp->hub,
+    std::vector<ControlHubInput<RGBA>::SlotPattern> patterns = {
         {
+            .column = WINGS_1,
+            .slot = 0,
+            .pattern = new LedPatterns::PalettePattern(0, "Primary"),
+        },
+        {
+            .column = WINGS_1,
+            .slot = 1,
+            .pattern = new LedPatterns::PalettePattern(1, "Secondary"),
+        },
+        {.column = Columns::WINGS_1, .slot = 2, .pattern = new Wings::FadeFromCenter()},
+        {.column = Columns::WINGS_1, .slot = 3, .pattern = new LedPatterns::FadeFromRandom()},
+        {
+            .column = Columns::WINGS_1,
+            .slot = 4,
+            .pattern = new Mapped2dPatterns::RadialSaw(pmap),
+        },
+        {.column = Columns::WINGS_1, .slot = 5, .pattern = new Mapped2dPatterns::HorizontalGradientPattern(map)},
+        {.column = Columns::WINGS_1, .slot = 6, .pattern = new Mapped2dPatterns::RadialGlitterFadePattern(pmap)},
+        {.column = Columns::WINGS_1, .slot = 7, .pattern = new Mapped2dPatterns::RadialFadePattern(pmap)},
 
-            {
-                .column = 10,
-                .slot = 0,
-                .pattern = new LedPatterns::OnPattern({255, 255, 255}, "White"),
-            },
-            {
-                .column = 10,
-                .slot = 1,
-                .pattern = new LedPatterns::PalettePattern(0, "Primary"),
-            },
-            {
-                .column = 10,
-                .slot = 2,
-                .pattern = new LedPatterns::PalettePattern(1, "Secondary"),
-            },
-            {
-                .column = 10,
-                .slot = 3,
-                .pattern = new LedPatterns::GlowPulsePattern(),
-            },
-            {
-                .column = 10,
-                .slot = 4,
-                .pattern = new LedPatterns::SegmentChasePattern(),
-            },
-            {
-                .column = 10,
-                .slot = 5,
-                .pattern = new LedPatterns::FlashesPattern(),
-            },
-            {
-                .column = 10,
-                .slot = 6,
-                .pattern = new LedPatterns::StrobePattern(),
-            },
-            {
-                .column = 10,
-                .slot = 7,
-                .pattern = new LedPatterns::PixelGlitchPattern(),
-            },
-            {
-                .column = 10,
-                .slot = 8,
-                .pattern = new LedPatterns::FadingNoisePattern(),
-            },
-            {
-                .column = 10,
-                .slot = 9,
-                .pattern = new LedPatterns::StrobeHighlightPattern(),
-            },
-            {
-                .column = 10,
-                .slot = 10,
-                .pattern = new LedPatterns::GradientChasePattern(),
-                .indexMap = zigzag
-            },
-            {.column = 10, .slot = 11, .pattern = new LedPatterns::RibbenClivePattern<Glow>(10000, 1, 0.15)},
-            {.column = 10, .slot = 12, .pattern = new LedPatterns::ClivePattern<SawDown>(32, 1000, 1, 0.1)},
-            {.column = 10, .slot = 13, .pattern = new LedPatterns::ClivePattern<SoftPWM>(32, 1000, 1, 0.5)},
-            {.column = 10, .slot = 14, .pattern = new LedPatterns::ClivePattern<Glow>(32, 1000, 1, 0.5)},
-            {.column = 10, .slot = 15, .pattern = new LedPatterns::BarChase(60), .indexMap = zigzag},
-            {.column = 10, .slot = 16, .pattern = new Wings::FadeFromCenter()},
-            {.column = 10, .slot = 17, .pattern = new LedPatterns::FadeFromRandom()},
-            {.column = 10, .slot = 18, .pattern = new LedPatterns::SideWave(60), .indexMap = zigzag},
-            {.column = 10, .slot = 19, .pattern = new LedPatterns::SinChasePattern(60), .indexMap = zigzag},
-            {.column = 10, .slot = 20, .pattern = new LedPatterns::Fireworks()},
-            {.column = 10, .slot = 21, .pattern = new LedPatterns::SegmentGlitchPattern()},
+        {.column = Columns::WINGS_2, .slot = 0, .pattern = new LedPatterns::SinChasePattern(60), .indexMap = zigzag},
+        {.column = Columns::WINGS_2, .slot = 1, .pattern = new LedPatterns::Fireworks()},
+        {.column = Columns::WINGS_2, .slot = 2, .pattern = new LedPatterns::RibbenClivePattern<Glow>(10000, 1, 0.15)},
+        {.column = Columns::WINGS_2, .slot = 3, .pattern = new LedPatterns::ClivePattern<SawDown>(32, 1000, 1, 0.1)},
+        {.column = Columns::WINGS_2, .slot = 4, .pattern = new LedPatterns::ClivePattern<SoftPWM>(32, 1000, 1, 0.5)},
+        {.column = Columns::WINGS_2, .slot = 5, .pattern = new LedPatterns::ClivePattern<Glow>(32, 1000, 1, 0.5)},
+        {.column = Columns::WINGS_2, .slot = 6, .pattern = new LedPatterns::BarChase(60), .indexMap = zigzag},
+        {.column = Columns::WINGS_2, .slot = 7, .pattern = new LedPatterns::GradientChasePattern(), .indexMap = zigzag},
 
-            {.column = 11, .slot = 0, .pattern = new Mapped2dPatterns::Lighthouse(pmap)},
-            {
-                .column = 11,
-                .slot = 1,
-                .pattern = new Mapped2dPatterns::GrowingCirclesPattern(map),
-            },
-            {
-                .column = 11,
-                .slot = 2,
-                .pattern = new Mapped2dPatterns::LineLaunch(map),
-            },
-            {
-                .column = 11,
-                .slot = 3,
-                .pattern = new Mapped2dPatterns::SpiralPattern(pmap),
-            },
-            {
-                .column = 11,
-                .slot = 4,
-                .pattern = new Mapped2dPatterns::DotBeatPattern(pmap),
-            },
-            {
-                .column = 11,
-                .slot = 5,
-                .pattern = new Mapped2dPatterns::HorizontalSin(pmap),
-            },
-            {
-                .column = 11,
-                .slot = 6,
-                .pattern = new Mapped2dPatterns::HorizontalSaw(pmap),
-            },
-            {
-                .column = 11,
-                .slot = 7,
-                .pattern = new Mapped2dPatterns::RadialSaw(pmap),
-            },
-            //   {.column = 11, .slot = 8, .pattern = new Mapped2dPatterns::GrowShrink(pmap),},
-            {.column = 11, .slot = 10, .pattern = new Mapped2dPatterns::HorizontalGradientPattern(map)},
-            {.column = 11, .slot = 11, .pattern = new Mapped2dPatterns::RadialGlitterFadePattern(pmap)},
-            {.column = 11, .slot = 12, .pattern = new Mapped2dPatterns::RadialFadePattern(pmap)},
-            {.column = 11, .slot = 13, .pattern = new Mapped2dPatterns::AngularFadePattern(pmap)},
-            {.column = 11, .slot = 14, .pattern = new Wings::XY(map)},
+        {
+            .column = Columns::WINGS_3,
+            .slot = 0,
+            .pattern = new Mapped2dPatterns::SpiralPattern(pmap),
+        },
+        {.column = Columns::WINGS_3, .slot = 1, .pattern = new LedPatterns::SideWave(60), .indexMap = zigzag},
+        {.column = Columns::WINGS_3, .slot = 2, .pattern = new Mapped2dPatterns::Lighthouse(pmap)},
+        {
+            .column = Columns::WINGS_3,
+            .slot = 3,
+            .pattern = new Mapped2dPatterns::GrowingCirclesPattern(map),
+        },
+        {
+            .column = Columns::WINGS_3,
+            .slot = 4,
+            .pattern = new Mapped2dPatterns::HorizontalSin(pmap),
+        },
+        {
+            .column = Columns::WINGS_3,
+            .slot = 5,
+            .pattern = new Mapped2dPatterns::HorizontalSaw(pmap),
+        },
+        {
+            .column = Columns::WINGS_3,
+            .slot = 6,
+            .pattern = new Mapped2dPatterns::DotBeatPattern(pmap),
+        },
+        {.column = Columns::WINGS_3, .slot = 7, .pattern = new Mapped2dPatterns::AngularFadePattern(pmap)},
 
-            {.column = 12, .slot = 0, .pattern = new MaskPatterns::SinChaseMaskPattern()},
-            {.column = 12, .slot = 1, .pattern = new MaskPatterns::SinChaseMaskPattern(), .indexMap = zigzag},
-            {.column = 12, .slot = 2, .pattern = new MaskPatterns::GlowPulseMaskPattern()},
-            {.column = 12, .slot = 3, .pattern = new MaskPatterns::SegmentGradientMaskPattern(60, true), .indexMap = zigzag},
+        {.column = Columns::WINGS_4, .slot = 0, .pattern = new Wings::XY(map)},
+        {
+            .column = Columns::WINGS_4,
+            .slot = 1,
+            .pattern = new LedPatterns::FlashesPattern(),
+        },
 
-            {.column = 8, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution, 60)},
-            {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
-            {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
-            {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
-            {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
-            {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-            {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
-            {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
+        {
+            .column = Columns::WINGS_4,
+            .slot = 2,
+            .pattern = new LedPatterns::SegmentChasePattern(),
+        },
+        {
+            .column = Columns::WINGS_4,
+            .slot = 3,
+            .pattern = new LedPatterns::GlowPulsePattern(),
+        },
+        {
+            .column = Columns::WINGS_4,
+            .slot = 4,
+            .pattern = new LedPatterns::StrobePattern(),
+        },
+        {
+            .column = Columns::WINGS_4,
+            .slot = 5,
+            .pattern = new LedPatterns::PixelGlitchPattern(),
+        },
+        {.column = Columns::WINGS_4, .slot = 6, .pattern = new LedPatterns::SegmentGlitchPattern()},
+        {
+            .column = Columns::WINGS_4,
+            .slot = 7,
+            .pattern = new Mapped2dPatterns::LineLaunch(map),
+        },
 
-        });
+        {.column = Columns::WINGS_MASK, .slot = 0, .pattern = new MaskPatterns::SinChaseMaskPattern()},
+        {.column = Columns::WINGS_MASK, .slot = 1, .pattern = new MaskPatterns::SinChaseMaskPattern(), .indexMap = zigzag},
+        {.column = Columns::WINGS_MASK, .slot = 2, .pattern = new MaskPatterns::GlowPulseMaskPattern()},
+        {.column = Columns::WINGS_MASK, .slot = 3, .pattern = new MaskPatterns::SegmentGradientMaskPattern(60, true), .indexMap = zigzag},
+
+        {
+            .column = Columns::WINGS_FLASH,
+            .slot = 0,
+            .pattern = new LedPatterns::FadingNoisePattern(),
+        },
+        {
+            .column = Columns::WINGS_FLASH,
+            .slot = 1,
+            .pattern = new LedPatterns::FlashesPattern(),
+        },
+        {
+            .column = Columns::WINGS_FLASH,
+            .slot = 2,
+            .pattern = new LedPatterns::StrobePattern(),
+        },
+        {
+            .column = Columns::WINGS_FLASH,
+            .slot = 3,
+            .pattern = new LedPatterns::StrobeHighlightPattern(),
+        },
+        {.column = Columns::WINGS_FLASH, .slot = 4, .pattern = new LedPatterns::SegmentGlitchPattern()},
+        
+
+        {.column = Columns::DEBUG, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution, 60)},
+        {.column = Columns::DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+        {.column = Columns::DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+        {.column = Columns::DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+        {.column = Columns::DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+        {.column = Columns::DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+        {.column = Columns::DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
+        {.column = Columns::DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
+
+    };
+
+    auto input = new ControlHubInput<RGBA>(map->size(), &hyp->hub, patterns);
 
     distributeAndMonitor<BGR, RGBA>(
         hyp, input, displayMap, distribution, ledBarLut);
@@ -353,14 +367,14 @@ void addVulturePipe(Hyperion *hyp)
         map->size(),
         &hyp->hub,
         {
-            {.column = 8, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution, 100)},
-            {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
-            {.column = 8, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
-            {.column = 8, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
-            {.column = 8, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
-            {.column = 8, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
-            {.column = 8, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
-            {.column = 8, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
+            {.column = Columns::DEBUG, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution, 100)},
+            {.column = Columns::DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
+            {.column = Columns::DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
+            {.column = Columns::DEBUG, .slot = 3, .pattern = new TestPatterns::OneColor(RGB(0, 0, 255), "Blue")},
+            {.column = Columns::DEBUG, .slot = 4, .pattern = new TestPatterns::OneColor(RGB(255, 255, 255), "White")},
+            {.column = Columns::DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
+            {.column = Columns::DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
+            {.column = Columns::DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
 
         });
 
@@ -377,15 +391,36 @@ void addDMXPipe(Hyperion *hyp)
 
     Distribution distribution = {{"hypernode3.local", 9611, (int)map->size()}};
 
-    auto input = new ControlHubInput<Monochrome>(
-        map->size(),
+    auto inputEyes = new ControlHubInput<Monochrome>(
+        2,
         &hyp->hub,
         {
-            {.column = 8, .slot = 4, .pattern = new MonochromePatterns::OnPattern()},
+            {.column = Columns::EFFECTS, .slot = 3, .pattern = new MonochromePatterns::OnPattern(255, "eyes")},
         });
 
-    distributeAndMonitor<Monochrome, Monochrome>(
-        hyp, input, map, distribution);
+    auto inputPinspots = new ControlHubInput<Monochrome>(
+        4,
+        &hyp->hub,
+        {
+            {.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::OnPattern(255, "Pinspots")},
+        });
+
+    auto combined = new CombinedInput({
+        {.input = inputEyes, .offset=0},
+        {.input = inputPinspots, .offset=2},
+    }, 100);
+
+    std::vector<InputSlicer::Slice> slices = {
+        {.start=0, .length=(int)map->size(), .sync=true},
+        {.start=0, .length=(int)map->size(), .sync=false}
+    };
+    auto splitInput = new InputSlicer(combined,slices);
+    distribute<Monochrome, Monochrome>(hyp, distribution, splitInput);
+
+    hyp->addPipe(
+        new ConvertPipe<Monochrome, RGB>(
+            splitInput->getInput(slices.size()-1),
+            new MonitorOutput(&hyp->webServer, map, 60)));
 }
 
 void addFogPipe(Hyperion *hyp)
@@ -398,7 +433,7 @@ void addFogPipe(Hyperion *hyp)
         map->size(),
         &hyp->hub,
         {
-            //{.column = 8, .slot = 4, .pattern = new MonochromePatterns::OnPattern()},
+            //{.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::OnPattern()},
         });
 
     distributeAndMonitor<Effect, Effect>(
@@ -415,7 +450,9 @@ void addLightningPipe(Hyperion *hyp)
         map->size(),
         &hyp->hub,
         {
-            {.column = 8, .slot = 4, .pattern = new MonochromePatterns::OnPattern()},
+            {.column = Columns::EFFECTS, .slot = 0, .pattern = new MonochromePatterns::FastStrobePattern2()},
+            {.column = Columns::EFFECTS, .slot = 1, .pattern = new MonochromePatterns::GlitchPattern()},
+            {.column = Columns::EFFECTS, .slot = 2, .pattern = new MonochromePatterns::BeatShakePattern()},
         });
 
     distributeAndMonitor<Monochrome, Monochrome>(
@@ -429,13 +466,32 @@ int main()
 
     Tempo::AddSource(new ConstantTempo(120));
 
-    setupPaletteColumn(hyp);
+    setupPaletteColumn(hyp, Columns::PALETTE);
     addCagePipe(hyp);
     addWingsPipe(hyp);
     addVulturePipe(hyp);
     addFogPipe(hyp);
     addDMXPipe(hyp);
     addLightningPipe(hyp);
+
+    hyp->hub.setColumnName(Columns::PALETTE, "Palette");
+    hyp->hub.setColumnName(Columns::CAGE_1, "Cage");
+    hyp->hub.setColumnName(Columns::CAGE_2, "Cage");
+    hyp->hub.setColumnName(Columns::CAGE_3, "Cage");
+    hyp->hub.setColumnName(Columns::CAGE_4, "Cage");
+    hyp->hub.setColumnName(Columns::CAGE_MASK, "Mask");
+    hyp->hub.setColumnName(Columns::CAGE_FLASH, "Flash");
+    hyp->hub.setColumnName(Columns::BUTTONS_EFFECT, "Cage FX");
+    hyp->hub.setColumnName(Columns::WINGS_1, "Wings");
+    hyp->hub.setColumnName(Columns::WINGS_2, "Wings");
+    hyp->hub.setColumnName(Columns::WINGS_3, "Wings");
+    hyp->hub.setColumnName(Columns::WINGS_4, "Wings");
+    hyp->hub.setColumnName(Columns::WINGS_MASK, "Mask");
+    hyp->hub.setColumnName(Columns::WINGS_FLASH, "Flash");
+    hyp->hub.setColumnName(Columns::VULTURE, "Vulture");
+    hyp->hub.setColumnName(Columns::EFFECTS, "FX");
+    hyp->hub.setColumnName(Columns::BUTTONS, "Buttons");
+    hyp->hub.setColumnName(Columns::DEBUG, "Debug");
 
     hyp->start();
     // setViewParams(hyp, viewParamsDefault);
