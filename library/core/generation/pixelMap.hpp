@@ -122,6 +122,23 @@ public:
         float z(unsigned int index){
             return this->operator[](index).z;
         }
+
+        Cylindrical rotate(float angle)
+        {
+            Cylindrical rotated;
+
+            transform(
+                this->begin(), 
+                this->end(), 
+                back_inserter(rotated), [angle](CylindricalPixelPosition pos) -> CylindricalPixelPosition{ 
+                    return {
+                        .r = pos.r,
+                        .th = pos.th + angle, 
+                        .z = pos.z
+                    };
+                });
+            return rotated;
+        }
     };
 
     class Spherical: public vector<SphericalPixelPosition>

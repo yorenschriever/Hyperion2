@@ -329,7 +329,7 @@ namespace MonochromePatterns
     class OnPattern : public Pattern<Monochrome>
     {
         uint8_t intensity;
-
+        
         Transition transition = Transition(
             400, Transition::none, 0,
             400, Transition::none, 0);
@@ -352,6 +352,34 @@ namespace MonochromePatterns
 
             for (int index = 0; index < width; index++)
                 pixels[index] = value;
+        }
+    };
+
+    class StaticPattern : public Pattern<Monochrome>
+    {
+        struct Channel {
+            int channel;
+            uint8_t intensity;
+        };
+
+        std::vector<Channel> channels;
+        Transition transition;
+
+    public:
+        StaticPattern(std::vector<Channel> channels, const char *name)
+        {
+            this->channels = channels;
+            this->name = name;
+        }
+        inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
+
+            for (auto &channel : channels){
+                if (channel.channel >= width) continue;
+                pixels[channel.channel] = Monochrome(channel.intensity) * transition.getValue();
+            }
         }
     };
 

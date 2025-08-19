@@ -26,6 +26,7 @@
 LUT *ledBarLut = new ColourCorrectionLUT(1.8, 255, 200, 200, 200);
 
 PixelMap3d::Cylindrical cCageMap = cageMap.toCylindricalXZ();
+PixelMap3d::Cylindrical cCageMap90 = cCageMap.rotate(M_PI * 35. /180.);
 PixelMap3d::Spherical sCageMap = cageMap.toSphericalXZ();
 PixelMap::Polar pWingMap = wingMap.toPolarRotate90();
 
@@ -58,6 +59,7 @@ void addCagePipe(Hyperion *hyp)
 
     PixelMap3d *map = &cageMap;
     PixelMap3d::Cylindrical *cmap = &cCageMap;
+    PixelMap3d::Cylindrical *cmap90 = &cCageMap90;
     PixelMap3d::Spherical *smap = &sCageMap;
 
     std::vector<Slave> distribution = {
@@ -79,20 +81,20 @@ void addCagePipe(Hyperion *hyp)
 
     std::vector<ControlHubInput<RGBA>::SlotPattern> patterns = {
         {.column = Columns::CAGE_1, .slot = 0, .pattern = new Max::ChevronsConePattern(cmap)},
-        {.column = Columns::CAGE_1, .slot = 1, .pattern = new Low::VerticallyIsolated(cmap)},
+        {.column = Columns::CAGE_1, .slot = 1, .pattern = new Low::VerticallyIsolated(cmap)}, 
         {.column = Columns::CAGE_1, .slot = 2, .pattern = new Low::HorizontalSaw(cmap)},
         {.column = Columns::CAGE_1, .slot = 3, .pattern = new Low::StaticGradientPattern(map)},
         {.column = Columns::CAGE_1, .slot = 4, .pattern = new Min::RibbenClivePattern<Glow>(10000, 1, 0.15)},
         {.column = Columns::CAGE_1, .slot = 5, .pattern = new Min::RibbenFlashPattern()},
-        {.column = Columns::CAGE_1, .slot = 6, .pattern = new Low::HorizontalSin(cmap)},
-        {.column = Columns::CAGE_1, .slot = 7, .pattern = new Mid::Halo(cmap)},
+        {.column = Columns::CAGE_1, .slot = 6, .pattern = new Low::HorizontalSin(cmap90)}, 
+        {.column = Columns::CAGE_1, .slot = 7, .pattern = new Mid::Halo(cmap)}, 
 
         // {.column = Columns::CAGE_4, .slot = 1, .pattern = new Mid::SnowflakePatternColumn(cmap)},
 
         {.column = Columns::CAGE_2, .slot = 0, .pattern = new Max::RadialFadePattern(cmap)},
         {.column = Columns::CAGE_2, .slot = 1, .pattern = new Max::RadialGlitterFadePattern(cmap)},
         {.column = Columns::CAGE_2, .slot = 2, .pattern = new Mid::TakkenChase(cmap)},
-        {.column = Columns::CAGE_2, .slot = 3, .pattern = new Max::AngularFadePattern(cmap)},
+        {.column = Columns::CAGE_2, .slot = 3, .pattern = new Max::AngularFadePattern(cmap)}, 
         {.column = Columns::CAGE_2, .slot = 4, .pattern = new Min::GrowingCirclesPattern(map)},
         {.column = Columns::CAGE_2, .slot = 5, .pattern = new Min::SpiralPattern(cmap)},
         {.column = Columns::CAGE_2, .slot = 6, .pattern = new Min::SegmentChasePattern()},
@@ -100,17 +102,17 @@ void addCagePipe(Hyperion *hyp)
 
         {.column = Columns::CAGE_3, .slot = 0, .pattern = new LedPatterns::Fireworks()},
         {.column = Columns::CAGE_3, .slot = 1, .pattern = new Mid::Lighthouse(cmap)},
-        {.column = Columns::CAGE_3, .slot = 2, .pattern = new Max::GrowingStrobePattern(cmap)},
-        {.column = Columns::CAGE_3, .slot = 3, .pattern = new Hi::DotBeatPattern(cmap)},
+        {.column = Columns::CAGE_3, .slot = 2, .pattern = new Max::GrowingStrobePattern(cmap)}, 
+        {.column = Columns::CAGE_3, .slot = 3, .pattern = new Hi::DotBeatPattern(smap)}, 
         {.column = Columns::CAGE_3, .slot = 4, .pattern = new Low::GrowShrink(cmap)},
-        {.column = Columns::CAGE_3, .slot = 5, .pattern = new Hi::XY(map)},
-        {.column = Columns::CAGE_3, .slot = 6, .pattern = new Low::RotatingRingsPattern(cmap)},
-        {.column = Columns::CAGE_3, .slot = 7, .pattern = new Low::OnBeatColumnChaseUpPattern(map)},
+        {.column = Columns::CAGE_3, .slot = 5, .pattern = new Hi::XY(map)}, 
+        {.column = Columns::CAGE_3, .slot = 6, .pattern = new Low::RotatingRingsPattern(cmap)}, 
+        {.column = Columns::CAGE_3, .slot = 7, .pattern = new Low::OnBeatColumnChaseUpPattern(smap)}, 
 
-        {.column = Columns::CAGE_4, .slot = 0, .pattern = new Max::AngularFadePattern(cmap)},
+        {.column = Columns::CAGE_4, .slot = 0, .pattern = new Max::AngularFadePattern(cmap)}, //duplicate van cage 2
         {.column = Columns::CAGE_4, .slot = 1, .pattern = new Low::GlowPulsePattern(map)},
         {.column = Columns::CAGE_4, .slot = 2, .pattern = new Min::GlowPulsePattern()},
-        {.column = Columns::CAGE_4, .slot = 3, .pattern = new Mid::DoubleFlash(cmap)},
+        {.column = Columns::CAGE_4, .slot = 3, .pattern = new Mid::DoubleFlash(cmap)}, 
         {.column = Columns::CAGE_4, .slot = 4, .pattern = new Min::LineLaunch(map)},
         {.column = Columns::CAGE_4, .slot = 5, .pattern = new LedPatterns::SegmentGlitchPattern()},
         {.column = Columns::CAGE_4, .slot = 6, .pattern = new Flash::FlashesPattern()},
@@ -320,7 +322,6 @@ void addWingsPipe(Hyperion *hyp)
             .pattern = new LedPatterns::StrobeHighlightPattern(),
         },
         {.column = Columns::WINGS_FLASH, .slot = 4, .pattern = new LedPatterns::SegmentGlitchPattern()},
-        
 
         {.column = Columns::DEBUG, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution, 60)},
         {.column = Columns::DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
@@ -351,6 +352,7 @@ void addVulturePipe(Hyperion *hyp)
         gridMap(wingSize, 3, 0.01, 0.07, 0.5, -0.5),
         circleMap(100, 0.25, 0, -0.5),
     }));
+    PixelMap::Polar *pmap = new PixelMap::Polar(map->toPolarRotate90());
 
     Distribution distribution = {
         {"hypernode3.local", 9611, wingSize},
@@ -367,6 +369,31 @@ void addVulturePipe(Hyperion *hyp)
         map->size(),
         &hyp->hub,
         {
+            {
+                .column = VULTURE,
+                .slot = 0,
+                .pattern = new LedPatterns::PalettePattern(0, "Primary"),
+            },
+            {.column = Columns::VULTURE, .slot = 1, .pattern = new Mapped2dPatterns::HorizontalGradientPattern(map)},
+            {.column = Columns::VULTURE, .slot = 2, .pattern = new Mapped2dPatterns::Lighthouse(pmap)},
+            {.column = Columns::VULTURE, .slot = 3, .pattern = new Mapped2dPatterns::RadialGlitterFadePattern(pmap)},
+            {.column = Columns::VULTURE, .slot = 4, .pattern = new Mapped2dPatterns::RadialFadePattern(pmap)},
+            {
+                .column = Columns::VULTURE,
+                .slot = 5,
+                .pattern = new LedPatterns::GlowPulsePattern(),
+            },
+            {
+                .column = Columns::VULTURE,
+                .slot = 6,
+                .pattern = new LedPatterns::StrobePattern(),
+            },
+            {
+                .column = Columns::VULTURE,
+                .slot = 7,
+                .pattern = new LedPatterns::PixelGlitchPattern(),
+            },
+
             {.column = Columns::DEBUG, .slot = 0, .pattern = new TestPatterns::DistributionPattern(distribution, 100)},
             {.column = Columns::DEBUG, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
             {.column = Columns::DEBUG, .slot = 2, .pattern = new TestPatterns::OneColor(RGB(0, 255, 0), "Green")},
@@ -375,7 +402,6 @@ void addVulturePipe(Hyperion *hyp)
             {.column = Columns::DEBUG, .slot = 5, .pattern = new TestPatterns::OneColor(RGB(127, 127, 127), "White 50%")},
             {.column = Columns::DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
             {.column = Columns::DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
-
         });
 
     distributeAndMonitor<BGR, RGBA>(
@@ -386,40 +412,76 @@ void addVulturePipe(Hyperion *hyp)
 
 void addDMXPipe(Hyperion *hyp)
 {
-    PixelMap *map = new PixelMap(combineMaps({PixelMap({{.x = -0.02, .y = 0}, {.x = 0.02, .y = 0}}), // eyes
-                                              gridMap(4, 1, 0.1, 0.1, 0, 0.85)}));                   // pinspots
+    PixelMap *map = new PixelMap(combineMaps({
+        PixelMap({{.x = -0.02, .y = 0}, {.x = 0.02, .y = 0}}), // eyes
+
+        PixelMap({{.x = 0, .y = 0.85}}),     // motor wings
+        gridMap(4, 1, 0.1, 0.1, -0.4, 0.85), // fire
+        gridMap(4, 1, 0.1, 0.1, 0.4, 0.85),  // pinspots
+
+    }));
+
+    // channel mapping:
+    //  0-1: eyes
+    //  2: wings motor
+    //  3-4, 5-6: fire
+    //  7-10: pinspots
 
     Distribution distribution = {{"hypernode3.local", 9611, (int)map->size()}};
 
-    auto inputEyes = new ControlHubInput<Monochrome>(
-        2,
+    auto inputBase = new ControlHubInput<Monochrome>(
+        map->size(),
         &hyp->hub,
         {
-            {.column = Columns::EFFECTS, .slot = 3, .pattern = new MonochromePatterns::OnPattern(255, "eyes")},
+            {.column = Columns::EFFECTS, .slot = 3, .pattern = new MonochromePatterns::StaticPattern({{.channel = 0, .intensity = 255}, {.channel = 1, .intensity = 255}}, "Eyes")},
+            {.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::StaticPattern({{.channel = 2, .intensity = 255}}, "Wings motor")},
+            {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::StaticPattern({{.channel = 3, .intensity = 255}, {.channel = 5, .intensity = 255}}, "Fire")},
+            {.column = Columns::EFFECTS, .slot = 6, .pattern = new MonochromePatterns::StaticPattern({{.channel = 4, .intensity = 255}, {.channel = 6, .intensity = 255}}, "Fire pulse")},
         });
+
+    // auto inputEyes = new ControlHubInput<Monochrome>(
+    //     2,
+    //     &hyp->hub,
+    //     {
+    //         {.column = Columns::EFFECTS, .slot = 3, .pattern = new MonochromePatterns::OnPattern(255, "Eyes")},
+    //     });
 
     auto inputPinspots = new ControlHubInput<Monochrome>(
         4,
         &hyp->hub,
         {
-            {.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::OnPattern(255, "Pinspots")},
+            {.column = Columns::EFFECTS, .slot = 7, .pattern = new MonochromePatterns::OnPattern(255, "Pinspots on")},
+            {.column = Columns::EFFECTS, .slot = 8, .pattern = new MonochromePatterns::GlowPattern()},
         });
 
+    // auto inputMotor = new ControlHubInput<Monochrome>(
+    //     1,
+    //     &hyp->hub,
+    //     {
+    //         {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::OnPattern(255, "Wings motor")},
+    //     });
+
+    // auto combined = new CombinedInput({
+    //     {.input = inputEyes, .offset=0},
+    //     {.input = inputPinspots, .offset=2},
+    //     {.input = inputMotor, .offset=6},
+    // }, 100);
+
     auto combined = new CombinedInput({
-        {.input = inputEyes, .offset=0},
-        {.input = inputPinspots, .offset=2},
-    }, 100);
+                                          {.input = inputBase, .offset = 0},
+                                          {.input = inputPinspots, .offset = 7},
+                                      },
+                                      100);
 
     std::vector<InputSlicer::Slice> slices = {
-        {.start=0, .length=(int)map->size(), .sync=true},
-        {.start=0, .length=(int)map->size(), .sync=false}
-    };
-    auto splitInput = new InputSlicer(combined,slices);
+        {.start = 0, .length = (int)map->size(), .sync = true},
+        {.start = 0, .length = (int)map->size(), .sync = false}};
+    auto splitInput = new InputSlicer(combined, slices);
     distribute<Monochrome, Monochrome>(hyp, distribution, splitInput);
 
     hyp->addPipe(
         new ConvertPipe<Monochrome, RGB>(
-            splitInput->getInput(slices.size()-1),
+            splitInput->getInput(slices.size() - 1),
             new MonitorOutput(&hyp->webServer, map, 60)));
 }
 
@@ -464,7 +526,7 @@ int main()
     auto hyp = new Hyperion();
     hyp->setMidiControllerFactory(new ButtonMidiControllerFactory());
 
-    Tempo::AddSource(new ConstantTempo(120));
+    
 
     setupPaletteColumn(hyp, Columns::PALETTE);
     addCagePipe(hyp);
@@ -493,7 +555,13 @@ int main()
     hyp->hub.setColumnName(Columns::BUTTONS, "Buttons");
     hyp->hub.setColumnName(Columns::DEBUG, "Debug");
 
+    hyp->hub.setFlashColumn(Columns::CAGE_FLASH);
+    hyp->hub.setFlashColumn(Columns::WINGS_FLASH);
+    hyp->hub.setFlashColumn(Columns::EFFECTS);
+
     hyp->start();
+
+    Tempo::AddSource(new ConstantTempo(120));
     // setViewParams(hyp, viewParamsDefault);
     // setViewParams(hyp, viewParamsTop);
     // setViewParams(hyp, viewParamsFront);

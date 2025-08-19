@@ -1,13 +1,13 @@
 #pragma once
-// #include "core/generation/patterns/pattern.hpp"
-// #include "generation/patterns/helpers/fade.h"
-// #include "generation/patterns/helpers/interval.h"
-// #include "generation/patterns/helpers/timeline.h"
-// #include "generation/pixelMap.hpp"
-// #include <math.h>
-// #include <vector>
-// #include "mappingHelpers.hpp"
-// #include "log.hpp"
+
+float fromTop2(float y){
+
+    return Utils::rescale(y,0,1,-0.5,.5);
+}
+
+float fromBottom2(float y){
+    return 1.0 - fromTop2(y);
+}
 
 
 namespace Low
@@ -45,9 +45,7 @@ namespace Low
 
     class OnBeatColumnChaseUpPattern : public Pattern<RGBA>
     {
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
+        Transition transition;
         FadeDown fade[6] = {
             FadeDown(200),
             FadeDown(200),
@@ -56,15 +54,13 @@ namespace Low
             FadeDown(200),
             FadeDown(200)};
         BeatWatcher watcher = BeatWatcher();
-        PixelMap3d *map;
-        Permute perm;
+        PixelMap3d::Spherical *map;
         int pos = 0;
 
     public:
-        OnBeatColumnChaseUpPattern(PixelMap3d *map)
+        OnBeatColumnChaseUpPattern(PixelMap3d::Spherical *map)
         {
             this->map = map;
-            this->perm = Permute(map->size());
             this->name = "On beat column chase up";
         }
 
@@ -82,21 +78,48 @@ namespace Low
             float velocity = params->getVelocity(2000, 100);
             float tailSize = params->getSize(300,50);
 
-            for (int column = 0; column < 6; column++)
+            for (int c=0;c<6; c++)
             {
-                int columnStart = column * width / 6;
-                int columnEnd = columnStart + width / 6;
-
-                fade[column].duration = tailSize;
-
-                for (int i = columnStart; i < columnEnd; i++)
-                {
-                    float y = fromTop(map->y(i));
-                    float fadePosition = fade[column].getValue(y * velocity);
-                    RGBA color = params->getPrimaryColour(); 
-                    pixels[i] = color * fadePosition * (1 - y) * transition.getValue();
-                }
+                fade[c].setDuration(tailSize);
             }
+
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
+            {
+                int column = map->phi(index) * 6 / (2. * M_PI);
+                float columnCenter = (float)column * 2 * M_PI / 6;
+
+                if (abs(map->phi(index) - columnCenter) > 0.01)
+                    continue; 
+
+                column = (column + 6) % 6;
+
+                float normalized_angle = Utils::rescale_c(map->th(index), 1, 0, 0, 0.6 * M_PI);
+                float fadePosition = fade[column].getValue(normalized_angle * velocity);
+
+                RGBA color = params->getPrimaryColour(); 
+                pixels[index] = color * fadePosition * transition.getValue();
+                
+                // float y = fromTop2(map->y(index));
+                // float fadePosition = fade[column].getValue(y * velocity);
+                // RGBA color = params->getPrimaryColour(); 
+                // pixels[index] = color * fadePosition * (1 - y) * transition.getValue();
+            }
+
+            // for (int column = 0; column < 6; column++)
+            // {
+            //     int columnStart = column * width / 6;
+            //     int columnEnd = columnStart + width / 6;
+
+            //     fade[column].duration = tailSize;
+
+            //     for (int i = columnStart; i < columnEnd; i++)
+            //     {
+            //         float y = fromTop(map->y(i));
+            //         float fadePosition = fade[column].getValue(y * velocity);
+            //         RGBA color = params->getPrimaryColour(); 
+            //         pixels[i] = color * fadePosition * (1 - y) * transition.getValue();
+            //     }
+            // }
         }
     };
 
@@ -105,7 +128,7 @@ namespace Low
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        LFO<Glow> lfo;
+        LFOTempo<Glow> lfo;
         PixelMap3d::Cylindrical *map;
 
     public:
@@ -120,7 +143,13 @@ namespace Low
             if (!transition.Calculate(active))
                 return;
 
-            lfo.setPeriod(params->getVelocity(11000,500));
+            // lfo.setPeriodExponential(params->getVelocity(3, 1.01));
+            float velo = params->getVelocity();
+            int period = 4;
+            if (velo<0.33) period = 8;
+            if ( velo > 0.66 ) period = 1;
+
+            lfo.setPeriod(6*period);
             lfo.setDutyCycle(params->getSize(0.03,0.5));
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
@@ -269,7 +298,7 @@ namespace Low
                 if ((angle+300) % 600 > 0)
                     continue;
 
-                int z255 = fromBottom(map->z(index)) * 255;
+                int z255 = fromBottom2(map->z(index)) * 255;
                 pixels[index] = params->getGradient(z255)* transition.getValue(z255,255);
             }
         }
@@ -303,7 +332,7 @@ namespace Low
 
             for (int index = 0; index < width; index++)
             {
-                float z_norm = zoffset+2*fromTop(map->z(index));
+                float z_norm = zoffset+2*fromTop2(map->z(index));
                 float offset = around(map->th(index)) * params->getOffset();
 
                 pixels[index] = col1 * softEdge(abs(z_norm - ring1.getValue(offset)), size);

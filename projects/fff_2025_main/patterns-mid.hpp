@@ -2,10 +2,10 @@
 
 float fromMid(PixelMap3d::CylindricalPixelPosition pos)
 {
-    if (pos.z >= 0.44)
-        //ledster, bovenin
-        return Utils::rescale(pos.r,0,1,0.4,1);    
-    else
+    // if (pos.z >= 0.44)
+    //     //ledster, bovenin
+    //     return Utils::rescale(pos.r,0,1,0.4,1);    
+    // else
         //staand
         return Utils::rescale(pos.z,0,1,0,.45);
 }
@@ -67,13 +67,19 @@ namespace Mid
 
             auto col = params->getSecondaryColour() * transition.getValue();
 
-            for (int index = 0; index < std::min(width, (int)map->size()); index++)
-            {
-                if (map->z(index) < 0.44)
-                    continue;
+            for(int h = 0; h<6; h++){
+                int start = h * 60 * 8;
+                int offset1 = 1 * 60;
+                int offset2 = 4 * 60;
+                int offset3 = 5 * 60;
 
-                pixels[index] = col;
+                for (int i=0;i<60;i++){
+                    pixels[start + offset1 + i] = col;
+                    pixels[start + offset2 + i] = col;
+                    pixels[start + offset3 + i] = col;
+                }
             }
+
         }
     };
 
@@ -245,11 +251,17 @@ namespace Mid
             if (!timeline.Happened(0) && !timeline.Happened(100))
                 return;
 
-            for (int i = 0; i < width; i++)
-            {
-                if (map->z(i) < 0.44)
-                    continue;
-                pixels[i] = params->getHighlightColour();
+            for(int h = 0; h<6; h++){
+                int start = h * 60 * 8;
+                int offset1 = 1 * 60;
+                int offset2 = 4 * 60;
+                int offset3 = 5 * 60;
+
+                for (int i=0;i<60;i++){
+                    if (timeline.Happened(0)) pixels[start + offset1 + i] =  params->getHighlightColour();
+                    if (timeline.Happened(100)) pixels[start + offset2 + i] =  params->getHighlightColour();
+                    if (timeline.Happened(100)) pixels[start + offset3 + i] =  params->getHighlightColour();
+                }
             }
         }
     };

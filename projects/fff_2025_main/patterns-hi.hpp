@@ -40,11 +40,8 @@ namespace Hi
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                if (map->y(index) < 0.44)
-                    continue;
-
-                float x_norm = (map->x(index)+1)/2;
-                float z_norm = (map->z(index)+1)/2;
+                float x_norm = (map->x(index)+1)/2.5;
+                float z_norm = (map->z(index)+1)/2.5;
 
                 float dim = std::max(
                     softEdge(abs(x_norm - lfoX.getValue()), size),
@@ -61,16 +58,14 @@ class DotBeatPattern : public Pattern<RGBA>
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap3d::Cylindrical *map;
+        PixelMap3d::Spherical *map;
         FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
-        //Permute perm;
 
     public:
-        DotBeatPattern(PixelMap3d::Cylindrical *map)
+        DotBeatPattern(PixelMap3d::Spherical *map)
         {
             this->map = map;
-            //this->perm = Permute(map->size());
             this->name = "Dot beat";
         }
 
@@ -84,17 +79,17 @@ class DotBeatPattern : public Pattern<RGBA>
             if (watcher.Triggered())
                 fade.reset();
 
+            float size = params->getSize();
+
             for (int i = 0; i < map->size(); i++)
             {
-                if (map->z(i)<0.44)
-                    continue;;
-
-                float radius = fade.getValue()*1.2;
-                if (map->r(i) > radius)
+                float radius = fade.getValue() * size;
+                float normalized_angle = Utils::rescale_c(map->th(i), 0,1, 0, 0.8*M_PI);
+                if (normalized_angle > radius)
                     continue;
 
                 RGBA color = params->getGradient(radius * 255);
-                float dim = map->r(i) / radius;
+                float dim = normalized_angle / radius;
                 pixels[i] = color * dim * transition.getValue();   
             }
         }
