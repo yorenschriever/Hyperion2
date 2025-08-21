@@ -22,6 +22,7 @@
 #include "patterns-mid.hpp"
 #include "patterns-min.hpp"
 #include "patterns-wings.hpp"
+#include "patterns-mask.hpp"
 
 LUT *ledBarLut = new ColourCorrectionLUT(1.8, 255, 200, 200, 200);
 
@@ -100,7 +101,7 @@ void addCagePipe(Hyperion *hyp)
         {.column = Columns::CAGE_2, .slot = 6, .pattern = new Min::SegmentChasePattern()},
         {.column = Columns::CAGE_2, .slot = 7, .pattern = new LedPatterns::FadeFromRandom()},
 
-        {.column = Columns::CAGE_3, .slot = 0, .pattern = new LedPatterns::Fireworks()},
+
         {.column = Columns::CAGE_3, .slot = 1, .pattern = new Mid::Lighthouse(cmap)},
         {.column = Columns::CAGE_3, .slot = 2, .pattern = new Max::GrowingStrobePattern(cmap)}, 
         {.column = Columns::CAGE_3, .slot = 3, .pattern = new Hi::DotBeatPattern(smap)}, 
@@ -121,7 +122,8 @@ void addCagePipe(Hyperion *hyp)
         {.column = Columns::CAGE_MASK, .slot = 0, .pattern = new MaskPatterns::SinChaseMaskPattern()},
         {.column = Columns::CAGE_MASK, .slot = 1, .pattern = new MaskPatterns::SinChaseMaskPattern()},
         {.column = Columns::CAGE_MASK, .slot = 2, .pattern = new MaskPatterns::GlowPulseMaskPattern()},
-        {.column = Columns::CAGE_MASK, .slot = 3, .pattern = new MaskPatterns::SegmentGradientMaskPattern(60, true)},
+        {.column = Columns::CAGE_MASK, .slot = 3, .pattern = new CageMaskPatterns::GradientMaskPattern(map, true)},
+        {.column = Columns::CAGE_MASK, .slot = 4, .pattern = new CageMaskPatterns::GradientMaskPattern(map, false)},
 
         {.column = Columns::CAGE_FLASH, .slot = 0, .pattern = new Flash::FlashesPattern()},
         {.column = Columns::CAGE_FLASH, .slot = 1, .pattern = new Flash::SquareGlitchPattern(map)},
@@ -225,7 +227,7 @@ void addWingsPipe(Hyperion *hyp)
         {.column = Columns::WINGS_1, .slot = 7, .pattern = new Mapped2dPatterns::RadialFadePattern(pmap)},
 
         {.column = Columns::WINGS_2, .slot = 0, .pattern = new LedPatterns::SinChasePattern(60), .indexMap = zigzag},
-        {.column = Columns::WINGS_2, .slot = 1, .pattern = new LedPatterns::Fireworks()},
+        // {.column = Columns::WINGS_2, .slot = 1, .pattern = new LedPatterns::Fireworks()},
         {.column = Columns::WINGS_2, .slot = 2, .pattern = new LedPatterns::RibbenClivePattern<Glow>(10000, 1, 0.15)},
         {.column = Columns::WINGS_2, .slot = 3, .pattern = new LedPatterns::ClivePattern<SawDown>(32, 1000, 1, 0.1)},
         {.column = Columns::WINGS_2, .slot = 4, .pattern = new LedPatterns::ClivePattern<SoftPWM>(32, 1000, 1, 0.5)},
@@ -416,7 +418,8 @@ void addDMXPipe(Hyperion *hyp)
         PixelMap({{.x = -0.02, .y = 0}, {.x = 0.02, .y = 0}}), // eyes
 
         PixelMap({{.x = 0, .y = 0.85}}),     // motor wings
-        gridMap(4, 1, 0.1, 0.1, -0.4, 0.85), // fire
+        gridMap(4, 1, 0.1, 0.1, -0.4, 0.85), // fire 1, marten
+        PixelMap({{.x = -0.4, .y = 0.9}}),   // fire 2, joel
         gridMap(4, 1, 0.1, 0.1, 0.4, 0.85),  // pinspots
 
     }));
@@ -435,8 +438,8 @@ void addDMXPipe(Hyperion *hyp)
         {
             {.column = Columns::EFFECTS, .slot = 3, .pattern = new MonochromePatterns::StaticPattern({{.channel = 0, .intensity = 255}, {.channel = 1, .intensity = 255}}, "Eyes")},
             {.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::StaticPattern({{.channel = 2, .intensity = 255}}, "Wings motor")},
-            {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::StaticPattern({{.channel = 3, .intensity = 255}, {.channel = 5, .intensity = 255}}, "Fire")},
-            {.column = Columns::EFFECTS, .slot = 6, .pattern = new MonochromePatterns::StaticPattern({{.channel = 4, .intensity = 255}, {.channel = 6, .intensity = 255}}, "Fire pulse")},
+            {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::StaticPattern({{.channel = 3, .intensity = 255}, {.channel = 4, .intensity = 255}, {.channel = 5, .intensity = 255}, {.channel = 6, .intensity = 255}}, "Fire")},
+            {.column = Columns::EFFECTS, .slot = 6, .pattern = new MonochromePatterns::StaticPattern({{.channel = 7, .intensity = 255}}, "Fire big")},
         });
 
     // auto inputEyes = new ControlHubInput<Monochrome>(
@@ -469,7 +472,7 @@ void addDMXPipe(Hyperion *hyp)
 
     auto combined = new CombinedInput({
                                           {.input = inputBase, .offset = 0},
-                                          {.input = inputPinspots, .offset = 7},
+                                          {.input = inputPinspots, .offset = 8},
                                       },
                                       100);
 
@@ -491,14 +494,14 @@ void addFogPipe(Hyperion *hyp)
 
     Distribution distribution = {{"hypernode4.local", 9611, (int)map->size()}};
 
-    auto input = new ControlHubInput<Effect>(
+    auto input = new ControlHubInput<Monochrome>(
         map->size(),
         &hyp->hub,
         {
             //{.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::OnPattern()},
         });
 
-    distributeAndMonitor<Effect, Effect>(
+    distributeAndMonitor<Monochrome, Monochrome>(
         hyp, input, map, distribution, nullptr, 0.03);
 }
 

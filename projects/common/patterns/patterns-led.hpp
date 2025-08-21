@@ -698,57 +698,5 @@ class SideWave : public Pattern<RGBA>
     };
 
 
-    class Fireworks : public Pattern<RGBA>
-    {
-        Transition transition = Transition(
-            200, Transition::none, 0,
-            1000, Transition::none, 0);
-        static const int numFades = 8;
-
-        int currentFade = 0;
-        FadeDown fades[numFades];
-        int centers[numFades];
-        BeatWatcher watcher;
-        int beatDivs[5] = {16,8,4,2,2};
-
-    public:
-        Fireworks()
-        {
-            this->name = "Fireworks";
-        }
-
-        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-        {
-
-            if (!transition.Calculate(active))
-                return;
-
-            if (watcher.Triggered())
-            {
-                for(int fade=0;fade<numFades;fade++)
-                {
-                    centers[fade] = Utils::random(0,width);
-                    fades[fade].reset();
-                }
-            }
-                
-            for(int fade=0;fade<numFades;fade++)
-            {
-                fades[fade].setDuration(params->getVelocity(1000,250));
-            }
-
-            for (int fade=0;fade < numFades; fade++)
-            {
-                int center = centers[fade];
-                int size=60;
-                for (int i=0; i<size; i++)
-                {
-                    float fadeValue = fades[fade].getValue(float(i)/size * 250);
-                    if (center+i < width) pixels[center + i] += params->getGradient(255 * fadeValue) * fadeValue;
-                    if (center-1 >= 0) pixels[center - i] += params->getGradient(255 * fadeValue) * fadeValue;
-                }
-            }
-        }
-    };
-
+   
 }
