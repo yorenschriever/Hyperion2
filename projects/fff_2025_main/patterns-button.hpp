@@ -9,7 +9,7 @@ namespace Buttons
     private:
         std::vector<bool> pressed = {false, false, false, false, false, false};
         float alignmentStart = 0;
-        const int alignTo = 8; // Align to measure (4 beats)
+        const int alignTo = 4; // Align to measure (4 beats)
 
         RedButtonManager()  {
             Tempo::AddListener(this);
@@ -46,6 +46,7 @@ namespace Buttons
             }
 
             if (amountPressed() == 0 && state == PlayAnimation)
+            // if (amountPressed() < 6 && state == PlayAnimation)
             {
                 state = WaitForPresses;
             }
@@ -94,14 +95,15 @@ namespace Buttons
         std::vector<float> radii;
         int buttonIndex;
         RedButtonManager &redButtonManager = RedButtonManager::getInstance();
-        char nameBuf[18] = "Button circles  ";
+        char nameBuf[50];
+        float fadeFactors[7] = {0, 0.15, 0.3, 0.5, 0.5, 0.5, 0.5};
 
         // BeatWatcher watcher = BeatWatcher();
 
     public:
         ButtonPressedPattern(PixelMap3d *map, int buttonIndex)
         {
-            float r = 3360. / 4100;
+            float r = 2360. / 4100;
             float xc = r * cos(float(buttonIndex) / 6 * 2 * M_PI);
             float yc = 0.15;
             float zc = r * sin(float(buttonIndex) / 6 * 2 * M_PI);
@@ -110,7 +112,7 @@ namespace Buttons
 
             this->buttonIndex = buttonIndex;
 
-            snprintf(nameBuf, sizeof(nameBuf), "Button circles %d", buttonIndex + 1);
+            snprintf(nameBuf, sizeof(nameBuf), "Button feedback %d", buttonIndex + 1);
             this->name = nameBuf;
         }
 
@@ -123,28 +125,13 @@ namespace Buttons
             if (redButtonManager.state != RedButtonManager::WaitForPresses)
                 return;
 
-            // if (watcher.Triggered() && Tempo::GetBeatNumber() % 4 == 0)
-            // {
-            //     pos = (pos + 1) % 6;
-            //     fade[pos].reset();
-            // }
-
-            // float velocity = params->getVelocity(1000, 100);
-            // for (int i = 0; i < 6; i++)
-            //     fade[i].duration = params->getSize(400, 50) * velocity / 1000;
-
-            // float density = 481./width;
-
-            // std::vector<bool> pressed = {true, false, true, true, false, false};
             int amountPressed = redButtonManager.amountPressed();
-            float fadeFactors[7] = {0, 0.15, 0.3, 0.5, 0.5, 0.5, 0.5};
+
             float fadeFactor = fadeFactors[amountPressed];
 
             for (int i = 0; i < width; i++)
             {
-                // float fadePosition = fade[column].getValue(radii[column][i] * velocity);
                 RGBA color = params->getPrimaryColour();
-                // pixels[i] += color * fadePosition * transition.getValue();
                 float distanceFade = Utils::rescale_c(radii[i], 1, 0, 0, fadeFactor);
 
                 float lfoValue = lfo.getValue(radii[i] * 20);
@@ -186,67 +173,41 @@ namespace Buttons
         }
     };
 
-    class FadingNoisePattern : public Pattern<RGBA>
+    template <class T_COLOUR>
+    class TimedAnimate : public Pattern<T_COLOUR>
     {
+        Timeline timeline;
+        int onDuration;
+        int onStart;
         RedButtonManager &redButtonManager = RedButtonManager::getInstance();
-        Fade<Down, Cubic> fade = Fade<Down, Cubic>(600);
-        Permute perm;
+        Pattern<T_COLOUR> *innerpattern;
 
     public:
-        FadingNoisePattern()
+        TimedAnimate(Pattern<T_COLOUR> *innerpattern, int onDuration, int onstart=0)
         {
-            this->name = "Fading noise";
+            this->innerpattern = innerpattern;
+            this->onDuration = onDuration;
+            this->onStart = onstart;
+
+            this->name = innerpattern->name;
         }
 
-        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+
+        inline void Calculate(T_COLOUR *pixels, int width, bool active, Params *params) override
         {
-            if (!active || redButtonManager.state != RedButtonManager::PlayAnimation)
-            {
-                fade.reset();
-                return;
+            if (redButtonManager.state == RedButtonManager::SyncToMeasure){
+                timeline.reset();
             }
 
-            perm.setSize(width);
-            perm.permute();
+            timeline.FrameStart();
 
-            int noiseLevel = fade.getValue() * width / 3;
-            for (int index = 0; index < noiseLevel; index++)
-            {
-                pixels[perm.at[index]] = params->getHighlightColour();
-            }
-        }
-    };
+            bool active2 = 
+                active && 
+                timeline.GetTimelinePosition() > 0 &&
+                timeline.GetTimelinePosition() >= onStart &&
+                timeline.GetTimelinePosition() < onStart + onDuration;
 
-
-    class StrobeFadePattern : public Pattern<RGBA>
-    {
-        RedButtonManager &redButtonManager = RedButtonManager::getInstance();
-        //Fade<Down, Cubic> fade = Fade<Down, Cubic>(600);
-        FadeDown fade = FadeDown(1500);
-        PixelMap3d::Spherical *map;
-
-    public:
-        StrobeFadePattern(PixelMap3d::Spherical *map)
-        {
-            this->map = map;
-            this->name = "Strobe fade noise";
-        }
-
-        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
-        {
-            if (!active || redButtonManager.state != RedButtonManager::PlayAnimation)
-            {
-                fade.reset();
-                return;
-            }
-
-            for (int index = 0; index < width; index++)
-            {
-                float fadePos = Utils::rescale(map->th(index), 0, 3000, 0, 2* M_PI);
-                float fadeValue = Utils::rescale_c(fade.getValue(fadePos),0,1, 0, 0.5);
-                RGBA col = Utils::millis() % 100 < 25 ? params->getHighlightColour() : RGBA(0,0,0,255);
-                pixels[index] = col * fadeValue;
-            }
+            innerpattern->Calculate(pixels, width, active2, params);
         }
     };
 

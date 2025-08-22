@@ -141,9 +141,19 @@ void addCagePipe(Hyperion *hyp)
         {.column = Columns::BUTTONS, .slot = 4, .pattern = new Buttons::ButtonPressedPattern(map, 4)},
         {.column = Columns::BUTTONS, .slot = 5, .pattern = new Buttons::ButtonPressedPattern(map, 5)},
 
+        //button sync patterns
         {.column = Columns::BUTTONS_EFFECT, .slot = 0, .pattern = new Buttons::SyncToMeasurePattern(smap)},
-        {.column = Columns::BUTTONS_EFFECT, .slot = 1, .pattern = new Buttons::FadingNoisePattern()},
-        {.column = Columns::BUTTONS_EFFECT, .slot = 2, .pattern = new Buttons::StrobeFadePattern(smap)},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 1, .pattern = new Buttons::SyncToMeasurePattern(smap)},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 2, .pattern = new Buttons::SyncToMeasurePattern(smap)},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 3, .pattern = new Buttons::SyncToMeasurePattern(smap)},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 4, .pattern = new Buttons::SyncToMeasurePattern(smap)},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 5, .pattern = new Buttons::SyncToMeasurePattern(smap)},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 6, .pattern = new Buttons::SyncToMeasurePattern(smap)},
+
+        //button effect patterns
+        {.column = Columns::BUTTONS_EFFECT, .slot = 0, .pattern = new Buttons::TimedAnimate(new Flash::FadingNoisePattern(),1000)},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 1, .pattern = new Buttons::TimedAnimate(new Flash::StrobeFadePattern(smap),2000)},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 6, .pattern = new Buttons::TimedAnimate(new Low::VerticallyIsolated(cmap),5000)},
 
         // {.column = 8, .slot = 0, .pattern = new TestPatterns::ShowStarts(60)},
         // {.column = 8, .slot = 1, .pattern = new TestPatterns::OneColor(RGB(255, 0, 0), "Red")},
@@ -334,6 +344,10 @@ void addWingsPipe(Hyperion *hyp)
         {.column = Columns::DEBUG, .slot = 6, .pattern = new TestPatterns::Palette(10, 1)},
         {.column = Columns::DEBUG, .slot = 7, .pattern = new TestPatterns::Gamma(10)},
 
+        {.column = Columns::BUTTONS_EFFECT, .slot = 4, .pattern = new Buttons::TimedAnimate(new Mapped2dPatterns::HorizontalGradientPattern(map), 5000)},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 4, .pattern = new Buttons::TimedAnimate(new MaskPatterns::SinChaseMaskPattern(), 5000+1000), .indexMap = zigzag},
+        {.column = Columns::BUTTONS_EFFECT, .slot = 4, .pattern = new Buttons::TimedAnimate(new MaskPatterns::SegmentGradientMaskPattern(60, true), 5000+1000), .indexMap = zigzag},
+            
     };
 
     auto input = new ControlHubInput<RGBA>(map->size(), &hyp->hub, patterns);
@@ -436,10 +450,14 @@ void addDMXPipe(Hyperion *hyp)
         map->size(),
         &hyp->hub,
         {
-            {.column = Columns::EFFECTS, .slot = 3, .pattern = new MonochromePatterns::StaticPattern({{.channel = 0, .intensity = 255}, {.channel = 1, .intensity = 255}}, "Eyes")},
-            {.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::StaticPattern({{.channel = 2, .intensity = 255}}, "Wings motor")},
-            {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::StaticPattern({{.channel = 3, .intensity = 255}, {.channel = 4, .intensity = 255}, {.channel = 5, .intensity = 255}, {.channel = 6, .intensity = 255}}, "Fire")},
-            {.column = Columns::EFFECTS, .slot = 6, .pattern = new MonochromePatterns::StaticPattern({{.channel = 7, .intensity = 255}}, "Fire big")},
+            {.column = Columns::EFFECTS, .slot = 3, .pattern = new MonochromePatterns::StaticPattern("Eyes", {{.channel = 0}, {.channel = 1}})},
+            {.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::StaticPattern("Wings motor", {{.channel = 2}})},
+            {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::StaticPattern( "Fire", {{.channel = 3}, {.channel = 4}, {.channel = 5}, {.channel = 6}})},
+            {.column = Columns::EFFECTS, .slot = 6, .pattern = new MonochromePatterns::StaticPattern("Fire big", {{.channel = 7}} )},
+
+            {.column = Columns::BUTTONS_EFFECT, .slot = 2, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Fire ",  {{.channel = 3}, {.channel = 4}, {.channel = 5}, {.channel = 6}}),1000)},
+            {.column = Columns::BUTTONS_EFFECT, .slot = 3, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Fire big", {{.channel = 7}}),1000)},
+            {.column = Columns::BUTTONS_EFFECT, .slot = 5, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Eyes", {{.channel = 0},{.channel = 1}}),10000)},
         });
 
     // auto inputEyes = new ControlHubInput<Monochrome>(
@@ -455,6 +473,9 @@ void addDMXPipe(Hyperion *hyp)
         {
             {.column = Columns::EFFECTS, .slot = 7, .pattern = new MonochromePatterns::OnPattern(255, "Pinspots on")},
             {.column = Columns::EFFECTS, .slot = 8, .pattern = new MonochromePatterns::GlowPattern()},
+
+            {.column = Columns::BUTTONS_EFFECT, .slot = 4, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::OnPattern(255, "Pinspots on"),1000)},
+            
         });
 
     // auto inputMotor = new ControlHubInput<Monochrome>(
@@ -561,6 +582,10 @@ int main()
     hyp->hub.setFlashColumn(Columns::CAGE_FLASH);
     hyp->hub.setFlashColumn(Columns::WINGS_FLASH);
     hyp->hub.setFlashColumn(Columns::EFFECTS);
+
+    hyp->hub.setForcedSelection(Columns::BUTTONS_EFFECT);
+    hyp->hub.buttonPressed(Columns::BUTTONS_EFFECT, 0);
+
 
     hyp->start();
 

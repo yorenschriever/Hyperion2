@@ -359,14 +359,14 @@ namespace MonochromePatterns
     {
         struct Channel {
             int channel;
-            uint8_t intensity;
+            uint8_t intensity = 255;
         };
 
         std::vector<Channel> channels;
         Transition transition;
 
     public:
-        StaticPattern(std::vector<Channel> channels, const char *name)
+        StaticPattern(const char *name, std::vector<Channel> channels)
         {
             this->channels = channels;
             this->name = name;
@@ -382,6 +382,43 @@ namespace MonochromePatterns
             }
         }
     };
+
+    class TimelinePattern : public Pattern<Monochrome>
+    {
+        struct Channel {
+            int channel;
+            uint8_t intensity = 255;
+            int on = 0;
+            int off = 1000;
+        };
+
+        std::vector<Channel> channels;
+        Timeline timeline;
+
+    public:
+        TimelinePattern(const char *name, std::vector<Channel> channels)
+        {
+            this->channels = channels;
+            this->name = name;
+        }
+        inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
+        {
+            if (!active){
+                timeline.reset();
+                return; 
+            }
+
+            timeline.FrameStart();
+
+            for (auto &channel : channels){
+                if (channel.channel >= width) continue;
+                if (!(timeline.Happened(channel.on) && !timeline.Happened(channel.off))) continue;
+    
+                pixels[channel.channel] = Monochrome(channel.intensity);
+            }
+        }
+    };
+
 
     template <class T>
     class LFOPattern : public Pattern<Monochrome>

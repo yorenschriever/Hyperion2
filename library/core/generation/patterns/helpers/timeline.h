@@ -24,6 +24,9 @@ public:
         return Happened(event.Moment);
     }
 
+    // Returns true if the moment happened within the frame.
+    // So this is just a single frame spike
+    // use GetTimelinePosition() < moment for a level that stays on
     bool Happened(int moment)
     {
         if (startInterval == endInterval)
@@ -32,7 +35,8 @@ public:
         if (startInterval < endInterval)
             return moment >= startInterval && moment < endInterval;
 
-        //if (startInterval > endInterval) this is always true
+        //case (startInterval > endInterval)
+        //used in case the interval looped back to the start
         return moment >= startInterval || moment < endInterval;
     }
 

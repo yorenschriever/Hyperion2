@@ -239,4 +239,35 @@ namespace Flash
     //             pixels[LedsterShapes::petals[petal][j]] += col;
     //     }
     // };
+
+    class StrobeFadePattern : public Pattern<RGBA>
+    {
+        FadeDown fade = FadeDown(1500);
+        PixelMap3d::Spherical *map;
+
+    public:
+        StrobeFadePattern(PixelMap3d::Spherical *map)
+        {
+            this->map = map;
+            this->name = "Strobe fade noise";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+            {
+                fade.reset();
+                return;
+            }
+
+            for (int index = 0; index < width; index++)
+            {
+                float fadePos = Utils::rescale(map->th(index), 0, 3000, 0, 2* M_PI);
+                float fadeValue = Utils::rescale_c(fade.getValue(fadePos),0,1, 0, 0.5);
+                RGBA col = Utils::millis() % 100 < 25 ? params->getHighlightColour() : RGBA(0,0,0,255);
+                pixels[index] = col * fadeValue;
+            }
+        }
+    };
+
 }
