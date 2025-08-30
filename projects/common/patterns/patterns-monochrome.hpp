@@ -366,10 +366,11 @@ namespace MonochromePatterns
         Transition transition;
 
     public:
-        StaticPattern(const char *name, std::vector<Channel> channels)
+        StaticPattern(const char *name, std::vector<Channel> channels, int fadein = 0, int fadeout = 0)
         {
             this->channels = channels;
             this->name = name;
+            this->transition = Transition(fadein, fadeout);
         }
         inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
         {

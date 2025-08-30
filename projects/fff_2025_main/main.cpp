@@ -64,19 +64,19 @@ void addCagePipe(Hyperion *hyp)
     PixelMap3d::Spherical *smap = &sCageMap;
 
     std::vector<Slave> distribution = {
-        {"hypernode1.local", 9611, 8 * 60},
-        {"hypernode1.local", 9612, 8 * 60},
-        {"hypernode1.local", 9613, 8 * 60},
-        {"hypernode1.local", 9614, 8 * 60},
-        {"hypernode1.local", 9615, 8 * 60},
-        {"hypernode1.local", 9616, 8 * 60},
+        {"hyperslave1.local", 9611, 8 * 60},
+        {"hyperslave1.local", 9612, 8 * 60},
+        {"hyperslave1.local", 9613, 8 * 60},
+        {"hyperslave1.local", 9614, 8 * 60},
+        {"hyperslave1.local", 9615, 8 * 60},
+        {"hyperslave1.local", 9616, 8 * 60},
 
-        {"hypernode2.local", 9611, 3 * 60},
-        {"hypernode2.local", 9612, 3 * 60},
-        {"hypernode2.local", 9613, 3 * 60},
-        {"hypernode2.local", 9614, 3 * 60},
-        {"hypernode2.local", 9615, 3 * 60},
-        {"hypernode2.local", 9616, 3 * 60},
+        {"hyperslave2.local", 9611, 3 * 60},
+        {"hyperslave2.local", 9612, 3 * 60},
+        {"hyperslave2.local", 9613, 3 * 60},
+        {"hyperslave2.local", 9614, 3 * 60},
+        {"hyperslave2.local", 9615, 3 * 60},
+        {"hyperslave2.local", 9616, 3 * 60},
 
     };
 
@@ -182,7 +182,7 @@ void addCagePipe(Hyperion *hyp)
 
     auto input = new ControlHubInput<RGBA>(map->size(), &hyp->hub, patterns);
 
-    distributeAndMonitor3d<BGR, RGBA>(
+    distributeAndMonitor3d<GBR, RGBA>(
         hyp, input, map, distribution, ledBarLut);
 
     hyp->hub.setColumnName(1, "Static");
@@ -208,10 +208,10 @@ void addWingsPipe(Hyperion *hyp)
     IndexMap *zigzag = new ZigZagMapper(60, true);
 
     std::vector<Slave> distribution = {
-        {"hypernode2.local", 9611, 8 * 60},
-        {"hypernode2.local", 9612, 8 * 60},
-        {"hypernode2.local", 9613, 8 * 60},
-        {"hypernode2.local", 9614, 8 * 60},
+        {"hypernode3.local", 9611, 8 * 60},
+        {"hypernode3.local", 9612, 8 * 60},
+        {"hypernode3.local", 9613, 8 * 60},
+        {"hypernode3.local", 9614, 8 * 60},
     };
 
     std::vector<ControlHubInput<RGBA>::SlotPattern> patterns = {
@@ -457,7 +457,7 @@ void addDMXPipe(Hyperion *hyp)
 
             {.column = Columns::BUTTONS_EFFECT, .slot = 2, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Fire ",  {{.channel = 3}, {.channel = 4}, {.channel = 5}, {.channel = 6}}),1000)},
             {.column = Columns::BUTTONS_EFFECT, .slot = 3, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Fire big", {{.channel = 7}}),1000)},
-            {.column = Columns::BUTTONS_EFFECT, .slot = 5, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Eyes", {{.channel = 0},{.channel = 1}}),10000)},
+            {.column = Columns::BUTTONS_EFFECT, .slot = 5, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Eyes", {{.channel = 0},{.channel = 1}}, 200, 1000),10000)},
         });
 
     // auto inputEyes = new ControlHubInput<Monochrome>(
