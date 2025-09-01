@@ -6,14 +6,14 @@
 #include "../common/patterns/patterns-mask.hpp"
 #include "../common/patterns/patterns-monochrome.hpp"
 #include "../common/patterns/patterns-test.hpp"
+#include "../common/patterns/patterns-effect.hpp"
 #include "../common/setViewParams.hpp"
 #include "core/hyperion.hpp"
 #include "mapping/cageMap.hpp"
 #include "mapping/wingMap.old.hpp"
-
+#include "columns.hpp"
 #include "buttonMidiControllerFactory.hpp"
 
-// TODO write own pattern for this project
 #include "patterns-button.hpp"
 #include "patterns-flash.hpp"
 #include "patterns-hi.hpp"
@@ -31,29 +31,6 @@ PixelMap3d::Cylindrical cCageMap90 = cCageMap.rotate(M_PI * 35. /180.);
 PixelMap3d::Spherical sCageMap = cageMap.toSphericalXZ();
 PixelMap::Polar pWingMap = wingMap.toPolarRotate90();
 
-enum Columns
-{
-    PALETTE,
-    CAGE_1,
-    CAGE_2,
-    CAGE_3,
-    CAGE_4,
-    CAGE_MASK,
-    CAGE_FLASH,
-    BUTTONS_EFFECT,
-
-    WINGS_1,
-    WINGS_2,
-    WINGS_3,
-    WINGS_4,
-    WINGS_MASK,
-    WINGS_FLASH,
-    VULTURE,
-    EFFECTS,
-
-    BUTTONS,
-    DEBUG,
-};
 
 void addCagePipe(Hyperion *hyp)
 {
@@ -69,14 +46,14 @@ void addCagePipe(Hyperion *hyp)
         {"hyperslave1.local", 9613, 8 * 60},
         {"hyperslave1.local", 9614, 8 * 60},
         {"hyperslave1.local", 9615, 8 * 60},
-        {"hyperslave1.local", 9616, 8 * 60},
+        {"hyperslave1.local", 9616, 5 * 60},
+        {"hyperslave2.local", 9617, 5 * 60},
+        {"hyperslave2.local", 9618, 5 * 60},
 
-        {"hyperslave2.local", 9611, 3 * 60},
-        {"hyperslave2.local", 9612, 3 * 60},
-        {"hyperslave2.local", 9613, 3 * 60},
-        {"hyperslave2.local", 9614, 3 * 60},
-        {"hyperslave2.local", 9615, 3 * 60},
-        {"hyperslave2.local", 9616, 3 * 60},
+        {"hyperslave2.local", 9611, 5 * 60},
+        {"hyperslave2.local", 9612, 5 * 60},
+        {"hyperslave2.local", 9613, 5 * 60},
+        {"hyperslave2.local", 9614, 5 * 60},
 
     };
 
@@ -110,7 +87,7 @@ void addCagePipe(Hyperion *hyp)
         {.column = Columns::CAGE_3, .slot = 6, .pattern = new Low::RotatingRingsPattern(cmap)}, 
         {.column = Columns::CAGE_3, .slot = 7, .pattern = new Low::OnBeatColumnChaseUpPattern(smap)}, 
 
-        {.column = Columns::CAGE_4, .slot = 0, .pattern = new Max::AngularFadePattern(cmap)}, //duplicate van cage 2
+        // {.column = Columns::CAGE_4, .slot = 0, .pattern = new Max::AngularFadePattern(cmap)}, //duplicate van cage 2
         {.column = Columns::CAGE_4, .slot = 1, .pattern = new Low::GlowPulsePattern(map)},
         {.column = Columns::CAGE_4, .slot = 2, .pattern = new Min::GlowPulsePattern()},
         {.column = Columns::CAGE_4, .slot = 3, .pattern = new Mid::DoubleFlash(cmap)}, 
@@ -208,10 +185,10 @@ void addWingsPipe(Hyperion *hyp)
     IndexMap *zigzag = new ZigZagMapper(60, true);
 
     std::vector<Slave> distribution = {
-        {"hypernode3.local", 9611, 8 * 60},
-        {"hypernode3.local", 9612, 8 * 60},
-        {"hypernode3.local", 9613, 8 * 60},
-        {"hypernode3.local", 9614, 8 * 60},
+        {"hyperslave4.local", 9611, 8 * 60},
+        {"hyperslave4.local", 9612, 8 * 60},
+        {"hyperslave4.local", 9613, 8 * 60},
+        {"hyperslave4.local", 9614, 8 * 60},
     };
 
     std::vector<ControlHubInput<RGBA>::SlotPattern> patterns = {
@@ -371,13 +348,13 @@ void addVulturePipe(Hyperion *hyp)
     PixelMap::Polar *pmap = new PixelMap::Polar(map->toPolarRotate90());
 
     Distribution distribution = {
-        {"hypernode3.local", 9611, wingSize},
-        {"hypernode3.local", 9612, wingSize},
-        {"hypernode3.local", 9613, wingSize},
-        {"hypernode3.local", 9614, wingSize},
-        {"hypernode3.local", 9615, wingSize},
-        {"hypernode3.local", 9616, wingSize},
-        {"hypernode3.local", 9617, 100},
+        {"hyperslave3.local", 9611, wingSize},
+        {"hyperslave3.local", 9612, wingSize},
+        {"hyperslave3.local", 9613, wingSize},
+        {"hyperslave3.local", 9614, wingSize},
+        {"hyperslave3.local", 9615, wingSize},
+        {"hyperslave3.local", 9616, wingSize},
+        {"hyperslave3.local", 9617, 100},
     };
 
     auto input = new ControlHubInput<RGBA>(
@@ -435,37 +412,31 @@ void addDMXPipe(Hyperion *hyp)
         gridMap(4, 1, 0.1, 0.1, -0.4, 0.85), // fire 1, marten
         PixelMap({{.x = -0.4, .y = 0.9}}),   // fire 2, joel
         gridMap(4, 1, 0.1, 0.1, 0.4, 0.85),  // pinspots
-
+        {{.x = -0, .y = 0.5}},               //fog
     }));
 
     // channel mapping:
-    //  0-1: eyes
-    //  2: wings motor
-    //  3-4, 5-6: fire
-    //  7-10: pinspots
+    //  1-2: eyes
+    //  3: wings motor
+    //  4-5, 6-7: fire
+    //  8-11: pinspots
+    //  12: fog
 
-    Distribution distribution = {{"hypernode3.local", 9611, (int)map->size()}};
+    Distribution distribution = {{"hyperslave4.local", 9619, (int)map->size()}};
 
     auto inputBase = new ControlHubInput<Monochrome>(
-        map->size(),
+        map->size()-1,
         &hyp->hub,
         {
             {.column = Columns::EFFECTS, .slot = 3, .pattern = new MonochromePatterns::StaticPattern("Eyes", {{.channel = 0}, {.channel = 1}})},
             {.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::StaticPattern("Wings motor", {{.channel = 2}})},
-            {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::StaticPattern( "Fire", {{.channel = 3}, {.channel = 4}, {.channel = 5}, {.channel = 6}})},
+            {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::StaticPattern("Fire", {{.channel = 3}, {.channel = 4}, {.channel = 5}, {.channel = 6}})},
             {.column = Columns::EFFECTS, .slot = 6, .pattern = new MonochromePatterns::StaticPattern("Fire big", {{.channel = 7}} )},
 
             {.column = Columns::BUTTONS_EFFECT, .slot = 2, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Fire ",  {{.channel = 3}, {.channel = 4}, {.channel = 5}, {.channel = 6}}),1000)},
             {.column = Columns::BUTTONS_EFFECT, .slot = 3, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Fire big", {{.channel = 7}}),1000)},
             {.column = Columns::BUTTONS_EFFECT, .slot = 5, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Eyes", {{.channel = 0},{.channel = 1}}, 200, 1000),10000)},
         });
-
-    // auto inputEyes = new ControlHubInput<Monochrome>(
-    //     2,
-    //     &hyp->hub,
-    //     {
-    //         {.column = Columns::EFFECTS, .slot = 3, .pattern = new MonochromePatterns::OnPattern(255, "Eyes")},
-    //     });
 
     auto inputPinspots = new ControlHubInput<Monochrome>(
         4,
@@ -491,9 +462,24 @@ void addDMXPipe(Hyperion *hyp)
     //     {.input = inputMotor, .offset=6},
     // }, 100);
 
+    auto inputFog = new ControlHubInput<Monochrome>(
+        1,
+        &hyp->hub,
+        {
+            {.column = Columns::FOG, .slot = 0, .pattern = new MonochromePatterns::OnPattern(255, "Fog"), .noMasterDim=true},
+        
+            {.column = Columns::FOG, .slot = 1, .pattern = new MonochromePatterns::IntervalPattern(4, 64, "Interval 4/64 beats (minst)"), .noMasterDim=true},
+            {.column = Columns::FOG, .slot = 4, .pattern = new MonochromePatterns::IntervalPattern(8, 64, "Interval 8/64 beats"), .noMasterDim=true},
+            {.column = Columns::FOG, .slot = 2, .pattern = new MonochromePatterns::IntervalPattern(4, 32, "Interval 4/32 beats"), .noMasterDim=true},
+            {.column = Columns::FOG, .slot = 3, .pattern = new MonochromePatterns::IntervalPattern(4, 16, "Interval 4/16 beats"), .noMasterDim=true},
+            {.column = Columns::FOG, .slot = 5, .pattern = new MonochromePatterns::IntervalPattern(8, 16, "Interval 8/16 beats (meest)"), .noMasterDim=true},  
+        }
+    );
+
     auto combined = new CombinedInput({
                                           {.input = inputBase, .offset = 0},
                                           {.input = inputPinspots, .offset = 8},
+                                          {.input = inputFog, .offset = 11},
                                       },
                                       100);
 
@@ -509,28 +495,11 @@ void addDMXPipe(Hyperion *hyp)
             new MonitorOutput(&hyp->webServer, map, 60)));
 }
 
-void addFogPipe(Hyperion *hyp)
-{
-    PixelMap *map = new PixelMap({{.x = -0, .y = 0.5}});
-
-    Distribution distribution = {{"hypernode4.local", 9611, (int)map->size()}};
-
-    auto input = new ControlHubInput<Monochrome>(
-        map->size(),
-        &hyp->hub,
-        {
-            //{.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::OnPattern()},
-        });
-
-    distributeAndMonitor<Monochrome, Monochrome>(
-        hyp, input, map, distribution, nullptr, 0.03);
-}
-
 void addLightningPipe(Hyperion *hyp)
 {
     PixelMap *map = new PixelMap(gridMap(8, 1, 0.1, 0.1, 0, 0.7));
 
-    Distribution distribution = {{"hypernode4.local", 9621, (int)map->size()}};
+    Distribution distribution = {{"hyperslave4.local", 9620, (int)map->size()}};
 
     auto input = new ControlHubInput<Monochrome>(
         map->size(),
@@ -541,7 +510,7 @@ void addLightningPipe(Hyperion *hyp)
             {.column = Columns::EFFECTS, .slot = 2, .pattern = new MonochromePatterns::BeatShakePattern()},
         });
 
-    distributeAndMonitor<Monochrome, Monochrome>(
+    distributeAndMonitor<Monochrome12, Monochrome>(
         hyp, input, map, distribution);
 }
 
@@ -550,13 +519,10 @@ int main()
     auto hyp = new Hyperion();
     hyp->setMidiControllerFactory(new ButtonMidiControllerFactory());
 
-    
-
     setupPaletteColumn(hyp, Columns::PALETTE);
     addCagePipe(hyp);
     addWingsPipe(hyp);
     addVulturePipe(hyp);
-    addFogPipe(hyp);
     addDMXPipe(hyp);
     addLightningPipe(hyp);
 
@@ -567,7 +533,7 @@ int main()
     hyp->hub.setColumnName(Columns::CAGE_4, "Cage");
     hyp->hub.setColumnName(Columns::CAGE_MASK, "Mask");
     hyp->hub.setColumnName(Columns::CAGE_FLASH, "Flash");
-    hyp->hub.setColumnName(Columns::BUTTONS_EFFECT, "Cage FX");
+    hyp->hub.setColumnName(Columns::EFFECTS, "FX");
     hyp->hub.setColumnName(Columns::WINGS_1, "Wings");
     hyp->hub.setColumnName(Columns::WINGS_2, "Wings");
     hyp->hub.setColumnName(Columns::WINGS_3, "Wings");
@@ -575,8 +541,9 @@ int main()
     hyp->hub.setColumnName(Columns::WINGS_MASK, "Mask");
     hyp->hub.setColumnName(Columns::WINGS_FLASH, "Flash");
     hyp->hub.setColumnName(Columns::VULTURE, "Vulture");
-    hyp->hub.setColumnName(Columns::EFFECTS, "FX");
+    hyp->hub.setColumnName(Columns::FOG, "Fog");
     hyp->hub.setColumnName(Columns::BUTTONS, "Buttons");
+    hyp->hub.setColumnName(Columns::BUTTONS_EFFECT, "Buttons FX");
     hyp->hub.setColumnName(Columns::DEBUG, "Debug");
 
     hyp->hub.setFlashColumn(Columns::CAGE_FLASH);
@@ -586,7 +553,10 @@ int main()
     hyp->hub.setForcedSelection(Columns::BUTTONS_EFFECT);
     hyp->hub.buttonPressed(Columns::BUTTONS_EFFECT, 0);
 
-
+    hyp->hub.setFlashColumn(Columns::FOG, false, true);
+    hyp->hub.findSlot(Columns::FOG, 0)->releaseColumn = true;
+    hyp->hub.findSlot(Columns::FOG, 0)->flash = true;
+    
     hyp->start();
 
     Tempo::AddSource(new ConstantTempo(120));

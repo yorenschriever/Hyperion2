@@ -61,6 +61,17 @@ for a in range(6):
     turtle.pitch(-30)
     line() #60 degree
     turtle.pitch(-30)    
+    turtle.yaw(90)
+    turtle.pitch(-30)
+
+    horizontalLength = 1000 * (1.1 + sin(radians(60)) + sin(radians(30)))
+    spacing = (horizontalLength - 2000)/2
+    turtle.move(spacing,False)
+    line() #horizontal
+    line() #horizontal
+    turtle.move(spacing,False)
+    turtle.yaw(-90) 
+
     line()
     line()
 

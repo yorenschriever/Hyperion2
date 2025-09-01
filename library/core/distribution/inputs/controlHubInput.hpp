@@ -20,6 +20,7 @@ public:
         int column;
         int slot;
         Pattern<T_COLOUR> *pattern;
+        bool noMasterDim {false};
         int paramsSlot {0};
         IndexMap *indexMap {nullptr}; 
     };
@@ -33,27 +34,26 @@ public:
     // so you can create scenes with for multiple outputs under 1 button
     ControlHubInput(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns)
     {
-        ControlHubInput_(length, hub, slotPatterns, indexMap);
+        ControlHubInput_(length, hub, slotPatterns);
     }
 
     //simplified version of the constructor, where all patterns are added to a single column in the control hub
-    ControlHubInput(int length, ControlHub *hub, int column, std::vector<Pattern<T_COLOUR> *>patterns, IndexMap *indexMap = nullptr)
+    ControlHubInput(int length, ControlHub *hub, int column, std::vector<Pattern<T_COLOUR> *>patterns)
     {
         std::vector<SlotPattern> slotPatterns;
         int slotIndex=0;
         for (auto pattern: patterns){
             slotPatterns.push_back({.column = column, .slot = slotIndex++, .pattern = pattern});
         }
-        ControlHubInput_(length, hub, slotPatterns, indexMap);
+        ControlHubInput_(length, hub, slotPatterns);
     }
 
 private:
-    void ControlHubInput_(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns, IndexMap *indexMap = nullptr)
+    void ControlHubInput_(int length, ControlHub *hub, std::vector<SlotPattern> slotPatterns)
     {
         this->_length = length;
         this->slotPatterns = slotPatterns;
         this->hub = hub;
-        this->indexMap = indexMap;
         this->ledData = (T_COLOUR *)malloc(length * sizeof(T_COLOUR));
 
         if (!this->ledData)
@@ -106,7 +106,9 @@ public:
 
             auto column = hub->findColumn(slotPattern.column);
             auto slot = hub->findSlot(column, slotPattern.slot);
-            uint8_t dimValue = (int) column->dim * hub->masterDim >> 8;
+            uint8_t dimValue = column->dim;
+            if (!slotPattern.noMasterDim)
+                dimValue = (int) dimValue * hub->masterDim >> 8;
 
             //Log::info("CONTROL_HUB_INPUT", "calculating pattern active = %d, dim = %d ,masterDim = %d", slot->activated, column->dim, hub->masterDim);
 
@@ -146,7 +148,6 @@ public:
 private:
     int _length = 0;
     T_COLOUR *ledData;
-    IndexMap *indexMap = nullptr;
 
     std::vector<SlotPattern> slotPatterns;
     ControlHub *hub;

@@ -482,4 +482,26 @@ namespace MonochromePatterns
         }
     };
 
+    class IntervalPattern : public Pattern<Monochrome>
+    {
+        LFOTempo<PWM> lfo;
+        
+    public:
+        IntervalPattern(int duty, int period, const char *name = "on")
+        {
+            this->name = name;
+            lfo.setDutyCycle((float)duty / period);
+            lfo.setPeriod(period);
+        }
+
+        inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            for (int index = 0; index < width; index++)
+                pixels[index] = 255 * lfo.getValue();
+        }
+    };
+
 }
