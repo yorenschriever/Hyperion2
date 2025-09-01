@@ -20,14 +20,14 @@ function initBuffers(gl, scene) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(
       gl.ELEMENT_ARRAY_BUFFER,
-      new Uint16Array(sphere.indices),
+      new Uint32Array(sphere.indices),
       gl.STATIC_DRAW
     );
 
     const colorBuffer = gl.createBuffer();
     const colors = Array(sphere.vertices.length).fill([0, 0, 255]).flat();
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(colors), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(colors), gl.DYNAMIC_DRAW);
 
     ledBuffers.push({
       position: positionBuffer,

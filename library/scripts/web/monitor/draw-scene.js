@@ -81,7 +81,7 @@ function drawScene(gl, programInfo, buffers, time) {
           modelViewMatrix
         );
 
-        gl.drawElements(gl.TRIANGLES, buf.indicesCount, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, buf.indicesCount, gl.UNSIGNED_INT, 0);
     })
     
 
