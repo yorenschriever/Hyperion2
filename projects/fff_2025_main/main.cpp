@@ -11,6 +11,7 @@
 #include "core/hyperion.hpp"
 #include "mapping/cageMap.hpp"
 #include "mapping/wingMap.old.hpp"
+#include "mapping/flippedWingMap.hpp"
 #include "columns.hpp"
 #include "buttonMidiControllerFactory.hpp"
 
@@ -29,8 +30,9 @@ LUT *ledBarLut = new ColourCorrectionLUT(1.8, 255, 200, 200, 200);
 PixelMap3d::Cylindrical cCageMap = cageMap.toCylindricalXZ();
 PixelMap3d::Cylindrical cCageMap90 = cCageMap.rotate(M_PI * 35. /180.);
 PixelMap3d::Spherical sCageMap = cageMap.toSphericalXZ();
-PixelMap::Polar pWingMap = wingMap.toPolarRotate90();
 
+PixelMap flippedWingMap = flipWingMap(wingMap);
+PixelMap::Polar pWingMap = flippedWingMap.toPolarRotate90();
 
 void addCagePipe(Hyperion *hyp)
 {
@@ -179,10 +181,10 @@ void addCagePipe(Hyperion *hyp)
 
 void addWingsPipe(Hyperion *hyp)
 {
-    PixelMap *map = &wingMap;
+    PixelMap *map = &flippedWingMap;
     PixelMap::Polar *pmap = &pWingMap;
-    PixelMap *displayMap = new PixelMap(resizeAndTranslateMap(wingMap, 0.9));
-    IndexMap *zigzag = new ZigZagMapper(60, true);
+    PixelMap *displayMap = new PixelMap(resizeAndTranslateMap(flippedWingMap, 0.9));
+    IndexMap *zigzag = new ZigZagMapper(60, false);
 
     std::vector<Slave> distribution = {
         {"hyperslave4.local", 9611, 8 * 60},
@@ -407,20 +409,30 @@ void addDMXPipe(Hyperion *hyp)
 {
     PixelMap *map = new PixelMap(combineMaps({
         PixelMap({{.x = -0.02, .y = 0}, {.x = 0.02, .y = 0}}), // eyes
-
         PixelMap({{.x = 0, .y = 0.85}}),     // motor wings
+        PixelMap({{.x = 0.4, .y = 0.95}}),     // spiegelbol
+
         gridMap(4, 1, 0.1, 0.1, -0.4, 0.85), // fire 1, marten
-        PixelMap({{.x = -0.4, .y = 0.9}}),   // fire 2, joel
+
         gridMap(4, 1, 0.1, 0.1, 0.4, 0.85),  // pinspots
+
         {{.x = -0, .y = 0.5}},               //fog
+
+        gridMap(1, 179 - 13 -1 , 0, 0, -0.9, -2),  // reserve
+
+        gridMap(2, 1, 0.1, 0.1, -0.4, 0.95),  // fire 2, joel  
+        
+        gridMap(1, 1  , 0, 0, -0.9, -2),  // reserve
     }));
 
     // channel mapping:
     //  1-2: eyes
     //  3: wings motor
-    //  4-5, 6-7: fire
-    //  8-11: pinspots
-    //  12: fog
+    //  4: spiegelbol
+    //  5-8: fire marten
+    //  9-12: pinspots
+    //  13: fog
+    //  197-198: fire joel
 
     Distribution distribution = {{"hyperslave4.local", 9619, (int)map->size()}};
 
@@ -430,11 +442,12 @@ void addDMXPipe(Hyperion *hyp)
         {
             {.column = Columns::EFFECTS, .slot = 3, .pattern = new MonochromePatterns::StaticPattern("Eyes", {{.channel = 0}, {.channel = 1}})},
             {.column = Columns::EFFECTS, .slot = 4, .pattern = new MonochromePatterns::StaticPattern("Wings motor", {{.channel = 2}})},
-            {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::StaticPattern("Fire", {{.channel = 3}, {.channel = 4}, {.channel = 5}, {.channel = 6}})},
-            {.column = Columns::EFFECTS, .slot = 6, .pattern = new MonochromePatterns::StaticPattern("Fire big", {{.channel = 7}} )},
+            {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::StaticPattern("Fire", {{.channel = 4}, {.channel = 5}, {.channel = 6}, {.channel = 7}})},
+            {.column = Columns::EFFECTS, .slot = 6, .pattern = new MonochromePatterns::StaticPattern("Fire big", {{.channel = 178}, {.channel=179}} )},
+            {.column = Columns::EFFECTS, .slot = 9, .pattern = new MonochromePatterns::StaticPattern("Mirror ball", {{.channel = 3}})},
 
-            {.column = Columns::BUTTONS_EFFECT, .slot = 2, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Fire ",  {{.channel = 3}, {.channel = 4}, {.channel = 5}, {.channel = 6}}),1000)},
-            {.column = Columns::BUTTONS_EFFECT, .slot = 3, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Fire big", {{.channel = 7}}),1000)},
+            {.column = Columns::BUTTONS_EFFECT, .slot = 2, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Fire ",  {{.channel = 4}, {.channel = 5}, {.channel = 6}, {.channel = 7}}),1000)},
+            {.column = Columns::BUTTONS_EFFECT, .slot = 3, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Fire big", {{.channel = 178}, {.channel=179}}),1000)},
             {.column = Columns::BUTTONS_EFFECT, .slot = 5, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::StaticPattern("Eyes", {{.channel = 0},{.channel = 1}}, 200, 1000),10000)},
         });
 
@@ -448,19 +461,6 @@ void addDMXPipe(Hyperion *hyp)
             {.column = Columns::BUTTONS_EFFECT, .slot = 4, .pattern = new Buttons::TimedAnimate(new MonochromePatterns::OnPattern(255, "Pinspots on"),1000)},
             
         });
-
-    // auto inputMotor = new ControlHubInput<Monochrome>(
-    //     1,
-    //     &hyp->hub,
-    //     {
-    //         {.column = Columns::EFFECTS, .slot = 5, .pattern = new MonochromePatterns::OnPattern(255, "Wings motor")},
-    //     });
-
-    // auto combined = new CombinedInput({
-    //     {.input = inputEyes, .offset=0},
-    //     {.input = inputPinspots, .offset=2},
-    //     {.input = inputMotor, .offset=6},
-    // }, 100);
 
     auto inputFog = new ControlHubInput<Monochrome>(
         1,
@@ -479,9 +479,9 @@ void addDMXPipe(Hyperion *hyp)
     auto combined = new CombinedInput({
                                           {.input = inputBase, .offset = 0},
                                           {.input = inputPinspots, .offset = 8},
-                                          {.input = inputFog, .offset = 11},
+                                          {.input = inputFog, .offset = 12},
                                       },
-                                      100);
+                                      512);
 
     std::vector<InputSlicer::Slice> slices = {
         {.start = 0, .length = (int)map->size(), .sync = true},
@@ -497,7 +497,7 @@ void addDMXPipe(Hyperion *hyp)
 
 void addLightningPipe(Hyperion *hyp)
 {
-    PixelMap *map = new PixelMap(gridMap(8, 1, 0.1, 0.1, 0, 0.7));
+    PixelMap *map = new PixelMap(gridMap(6, 1, 0.1, 0.1, 0, 0.7));
 
     Distribution distribution = {{"hyperslave4.local", 9620, (int)map->size()}};
 
@@ -506,7 +506,7 @@ void addLightningPipe(Hyperion *hyp)
         &hyp->hub,
         {
             {.column = Columns::EFFECTS, .slot = 0, .pattern = new MonochromePatterns::FastStrobePattern2()},
-            {.column = Columns::EFFECTS, .slot = 1, .pattern = new MonochromePatterns::GlitchPattern()},
+            {.column = Columns::EFFECTS, .slot = 1, .pattern = new MonochromePatterns::SingleGlitchPattern()},
             {.column = Columns::EFFECTS, .slot = 2, .pattern = new MonochromePatterns::BeatShakePattern()},
         });
 

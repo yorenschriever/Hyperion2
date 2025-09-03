@@ -213,7 +213,7 @@ namespace MonochromePatterns
             }
 
             perm.setSize(width);
-            fader.setDuration(params->getSize(100, 1000));
+            fader.setDuration(params->getSize(100, 400));
 
             if (active && watcher.Triggered())
             {
@@ -501,6 +501,27 @@ namespace MonochromePatterns
 
             for (int index = 0; index < width; index++)
                 pixels[index] = 255 * lfo.getValue();
+        }
+    };
+
+    class SingleGlitchPattern : public Pattern<Monochrome>
+    {
+        int last = 0;
+
+    public:
+        SingleGlitchPattern()
+        {
+            this->name = "Single glitch";
+        }
+
+        inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            int index = (last + Utils::random(1, width-1)) % width;
+            pixels[last] = 255;
+            last=index;
         }
     };
 

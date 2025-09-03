@@ -1,13 +1,9 @@
 # TODO
 - controle mapping rode knoppen/vapes op patterns -> rookmachine
-- dmx kanaal 179 voor vuureffect joel
-- test of dmx output klopt op 30ch, channel mapping opschrijven
-- tweaken bliksem patches, beatshake korter, single glitch ipv glitch
-- motors op switchpack
 
-- inprogrammeren rook, vuur, discobol & spotjes, vleugels, bliksem, ogen checken, flashmode goed zetten
-- testen hyperslaves, nummer goedzetten, diagram maken
 - wings inverten, beginnen aan de houtkant
+- testop op laptop
+- goed zetten desktop shortcuts
 
 # op locatie
 
@@ -15,7 +11,6 @@
 - palettes uitkiezen die mooi werken
 - default effects aanzetten bij startup
 - prodjlink testen
-- 
 
 # done
 - inprogrammeren gier
@@ -27,3 +22,9 @@
 - column index flash en cage effects omdraaien? of cage effects ook > 16 maken, hoeft niet op controller
 - daarna fog een eigen kolom geven met interval elke 8 16 32 beats, wel op fader, niet op masterdim
 - rookmachine inprogrammeren
+- dmx kanaal 179 voor vuureffect joel
+- test of dmx output klopt op 30ch, channel mapping opschrijven
+- tweaken bliksem patches, beatshake korter, single glitch ipv glitch
+- motors op switchpack
+- inprogrammeren rook, vuur, discobol & spotjes, vleugels, bliksem, ogen checken, flashmode goed zetten
+- testen hyperslaves, nummer goedzetten, diagram maken
