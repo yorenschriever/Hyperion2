@@ -27,7 +27,7 @@ int main()
       new DMXOutput(1)));
 
   hyp->addPipe(new Pipe(
-      new UDPInput(9620), 
+      new UDPInput(9620),
       new PWMOutput()));
 
   hyp->start(Hyperion::minimal);
