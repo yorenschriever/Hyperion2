@@ -211,7 +211,7 @@ namespace LedPatterns
         ;
 
     public:
-        PixelGlitchPattern(int thresholdDiv = 2)
+        PixelGlitchPattern(int thresholdDiv = 100)
         {
             this->name = "Pixel glitch";
             this->thresholdDiv = thresholdDiv;
@@ -228,7 +228,7 @@ namespace LedPatterns
             if (timeline.Happened(0))
                 perm.permute();
 
-            int threshold = float(width) / params->getAmount(thresholdDiv, 1);
+            int threshold = float(width) / params->getAmount(thresholdDiv, 2);
 
             for (int index = 0; index < threshold; index++)
                 pixels[perm.at[index]] = params->getSecondaryColour() * transition.getValue();

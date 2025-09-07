@@ -71,7 +71,7 @@ namespace Flash
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
                 int xquantized = Utils::rescale(map->x(index),0,numCubes,-1,1);
-                int yquantized = fromBottom(map->y(index)) * numCubes;
+                int yquantized = Utils::rescale(map->y(index),0,numCubes,-0.5,.5);
                 int zquantized = Utils::rescale(map->z(index),0,numCubes,-1,1);
 
                 int cubeIndex = 

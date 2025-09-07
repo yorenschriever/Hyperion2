@@ -254,12 +254,12 @@ namespace Max
                 return;
             }
 
-            RGBA col = Utils::millis() % 100 < 25 ? params->getPrimaryColour() : RGBA();
+            RGBA col = Utils::millis() % 100 < 25 ? params->getPrimaryColour() : RGBA(0,0,0,255);
             int directionUp = params->getVariant() > 0.5;
 
             for (int i = 0; i < map->size(); i++)
             {
-                float conePos = 0.20 + (map->r(i) - map->z(i)) / 2;
+                float conePos = 0.35 + (map->r(i) - map->z(i)) / 1.4;
                 if (directionUp && conePos < fade.getValue())
                     continue;
                 if (!directionUp && 1. - conePos < fade.getValue())

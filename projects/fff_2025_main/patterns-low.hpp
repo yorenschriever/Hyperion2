@@ -226,6 +226,10 @@ namespace Low
                 //RGBA color = params->getPrimaryColour(); 
                 //float lfoArg = orientationHorizontal ? around(map->th(index)) : fromTop(map->z(index));
                 
+                int angle = around(map->th(index)) * 3600;
+                if ((angle+300) % 600 > 0)
+                    continue;
+
                 float lfoSize = lfo.getValue(offset * around(map->th(index))) * size; 
                 float distance = abs(map->z(index) + 0.07);
                 if (distance > lfoSize)

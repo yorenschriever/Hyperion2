@@ -163,20 +163,6 @@ void addCagePipe(Hyperion *hyp)
 
     distributeAndMonitor3d<GBR, RGBA>(
         hyp, input, map, distribution, ledBarLut);
-
-    hyp->hub.setColumnName(1, "Static");
-
-    //   hyp->hub.buttonPressed(8,0);
-
-    // hyp->hub.buttonPressed(9,0);
-    // hyp->hub.buttonPressed(9,1);
-    // hyp->hub.buttonPressed(9,2);
-    // hyp->hub.buttonPressed(9,3);
-    // hyp->hub.buttonPressed(9,4);
-
-    // hyp->hub.buttonPressed(9,6);
-    // // hyp->hub.buttonPressed(9,7);
-    // hyp->hub.buttonPressed(9,8);
 }
 
 void addWingsPipe(Hyperion *hyp)
@@ -557,6 +543,10 @@ int main()
     hyp->hub.findSlot(Columns::FOG, 0)->releaseColumn = true;
     hyp->hub.findSlot(Columns::FOG, 0)->flash = true;
     
+    hyp->hub.findSlot(Columns::EFFECTS, 8)->flash = false; //Glow
+    hyp->hub.findSlot(Columns::EFFECTS, 9)->flash = false; //mirror ball
+
+
     hyp->start();
 
     Tempo::AddSource(new ConstantTempo(120));
