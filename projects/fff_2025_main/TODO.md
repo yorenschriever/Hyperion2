@@ -1,9 +1,4 @@
 # TODO
-- controle mapping rode knoppen/vapes op patterns -> rookmachine
-
-- wings inverten, beginnen aan de houtkant
-- testop op laptop
-- goed zetten desktop shortcuts
 
 # op locatie
 
@@ -28,3 +23,7 @@
 - motors op switchpack
 - inprogrammeren rook, vuur, discobol & spotjes, vleugels, bliksem, ogen checken, flashmode goed zetten
 - testen hyperslaves, nummer goedzetten, diagram maken
+- wings inverten, beginnen aan de houtkant
+- test op op laptop
+- goed zetten desktop shortcuts
+- controle mapping rode knoppen/vapes op patterns -> rookmachine
