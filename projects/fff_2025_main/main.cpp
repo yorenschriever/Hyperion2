@@ -48,9 +48,9 @@ void addCagePipe(Hyperion *hyp)
         {"hyperslave1.local", 9613, 8 * 60},
         {"hyperslave1.local", 9614, 8 * 60},
         {"hyperslave1.local", 9615, 8 * 60},
-        {"hyperslave1.local", 9616, 5 * 60},
-        {"hyperslave2.local", 9617, 5 * 60},
-        {"hyperslave2.local", 9618, 5 * 60},
+        {"hyperslave1.local", 9616, 8 * 60},
+        {"hyperslave1.local", 9617, 5 * 60},
+        {"hyperslave1.local", 9618, 5 * 60},
 
         {"hyperslave2.local", 9611, 5 * 60},
         {"hyperslave2.local", 9612, 5 * 60},
