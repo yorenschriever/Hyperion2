@@ -2,6 +2,7 @@
 
 # op locatie
 
+- laatste versie pullen
 - wingsize instellen vulture
 - palettes uitkiezen die mooi werken
 - default effects aanzetten bij startup
