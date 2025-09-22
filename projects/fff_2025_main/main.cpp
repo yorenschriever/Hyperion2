@@ -549,7 +549,7 @@ int main()
 
     hyp->start();
 
-    Tempo::AddSource(new ConstantTempo(120));
+    // Tempo::AddSource(new ConstantTempo(120));
     // setViewParams(hyp, viewParamsDefault);
     // setViewParams(hyp, viewParamsTop);
     // setViewParams(hyp, viewParamsFront);
