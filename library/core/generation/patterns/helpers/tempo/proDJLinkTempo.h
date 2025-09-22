@@ -71,14 +71,14 @@ private:
 
             // if no master is set yet, make the cdj that sends the first beat the master
             // (except if beatNumber has value 16, which is a message all devices send on startup)
-            if (master == -1 && beatNumber != 16)
+            if (master == -1 && beatNumberCdj != 16)
                 master = device;
 
-            if (device == master && lastbeat != beatNumber)
+            if (device == master && lastbeat != beatNumberCdj)
             {
                 beat();
                 lastbeat = beatNumber;
-                Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
+                Log::info(TAG,"BEAT len=%d, id=%d, beat=%d, device=%d, master=%d", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
 
                 // adjust the beat counter if it is not in sync with the beat counter of the cdj anymore.
                 int beatMod4cdj = beatNumberCdj - 1;   // beat number 0-3 from the cdj
@@ -95,6 +95,8 @@ private:
 
                     beatNumber += diff;
                 }
+            } else {
+                // Log::info(TAG, "deviceis not master %d %d, %d %d", device, master, lastbeat, beatNumberCdj);
             }
             validSignal = true;
             // Log::info(TAG,"len=%d, id=%d, beat=%d, device=%d, master=%d", len, buffer[0x21], buffer[0x5c], buffer[0x5f], master);
@@ -119,14 +121,14 @@ private:
 
         while ((len = keepAliveSocket.receive(buffer, sizeof(buffer)) > 0))
         {
-            // Log::info(TAG,"got keep alive %x, %x\r\n", len, buffer[0x0a]);
+            // Log::info(TAG,"got keep alive %x, %x", len, buffer[0x0a]);
             // Log::info(TAG,"received keepalive %d.%d.%d.%d", buffer[0x2c], buffer[0x2d],buffer[0x2e],buffer[0x2f])
 
             if (!(isProDjLink(buffer) && buffer[PACKET_TYPE_INDICATOR] == PACKET_TYPE_KEEP_ALIVE))
                 continue;
 
             int device = buffer[DEVICE_ID];
-            int deviceIsCdj3000 = buffer[0x35] > 0; // cdj3000 sends a different keep alive packet)
+            int deviceIsCdj3000 = buffer[0x35] > 0 ; // cdj3000 sends a different keep alive packet)
 
             if (deviceIsCdj3000 && !this->syncWithCdj3000)
             {
@@ -144,7 +146,7 @@ private:
 
     void SendKeepAlive()
     {
-        uint8_t device_id = 5;
+        uint8_t device_id = 6;
         uint8_t buffer[] = {
             // proDJLink header
             0x51, 0x73, 0x70, 0x74, 0x31, 0x57, 0x6d, 0x4a, 0x4f, 0x4c,
