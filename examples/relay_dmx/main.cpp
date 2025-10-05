@@ -8,7 +8,7 @@ int main()
 
   hyp->createChain(
       new UDPInput(9619),
-      new DMXOutput(1));
+      new DMXOutput());
 
   hyp->start(Hyperion::minimal);
 

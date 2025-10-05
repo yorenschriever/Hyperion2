@@ -124,6 +124,14 @@ public:
         outputs.push_back(output);
     }
 
+    virtual std::vector<IInput*> getInputs(){
+        return inputs;
+    }
+
+    virtual std::vector<IOutput*> getOutputs(){
+        return outputs;
+    }
+
     virtual void createChain(IInput *input, IOutput *output)
     {
         input->setReceiver(output);
