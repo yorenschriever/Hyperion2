@@ -1,1 +1,0 @@
-for f in ~/Downloads/Renders_Kapel/*; do python3 convert.py "$f" ; done
