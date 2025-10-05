@@ -7,9 +7,9 @@ int main()
 
   Network::setHostName("hyperslave7");
 
-  hyp->addPipe(new Pipe(
+  hyp->createChain(
       new UDPInput(9620),
-      new PWMOutput()));
+      new PWMOutput());
 
   hyp->start(Hyperion::minimal);
 

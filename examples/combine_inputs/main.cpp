@@ -79,16 +79,16 @@ int main()
 
 
     auto combined = new CombinedInput();
-    hyp->CreateChain(
+    hyp->createChain(
         inputBulbs,
         combined->atOffset(0)
     );
-    hyp->CreateChain(
+    hyp->createChain(
         inputLeds,
         new ConvertColor<RGBA, RGB>(),
         combined->atOffset(numMonochromePixels * sizeof(Monochrome) + 3)
     );
-    hyp->CreateChain(
+    hyp->createChain(
         combined,
         new ConvertColor<Monochrome, RGB>(),
         new MonitorOutput(&hyp->webServer, &map, 60, 0.03)

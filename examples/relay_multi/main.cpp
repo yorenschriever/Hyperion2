@@ -1,4 +1,4 @@
-#include "core/hyperion.hpp"
+#include "hyperion.hpp"
 
 // This example creates a node that listens to UDP ports 9611 - 9618,
 // and puts their data on the neopixel outputs 1-8
@@ -16,19 +16,19 @@ int main()
     // neopixelOutput 6 has a shared pin with DMX. 
     // DMX is given priority, so we skip it here
     if (i==6) continue;
-    auto pipe = new Pipe(
+
+    hyp->createChain(
         new UDPInput(9610 + i),
         new NeopixelOutput(i));
-    hyp->addPipe(pipe);
   }
 
-  hyp->addPipe(new Pipe(
+  hyp->createChain(
       new UDPInput(9619),
-      new DMXOutput(1)));
+      new DMXOutput(1));
 
-  hyp->addPipe(new Pipe(
+  hyp->createChain(
       new UDPInput(9620),
-      new PWMOutput()));
+      new PWMOutput());
 
   hyp->start(Hyperion::minimal);
 

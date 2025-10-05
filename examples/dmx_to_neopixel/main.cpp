@@ -30,9 +30,10 @@ int main()
 
   for (int i = 0; i < 8; i++)
   {
-    hyp->addPipe(new ConvertPipe<RGB,GBR>(
+    hyp->createChain(
         new DMXInput(1 + i * 64),
-        new NeopixelOutput(i + 1)));
+        new ConvertColor<RGB,GBR>(),
+        new NeopixelOutput(i + 1));
   }
 
   hyp->start(Hyperion::minimal);

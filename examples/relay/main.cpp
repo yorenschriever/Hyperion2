@@ -1,4 +1,4 @@
-#include "core/hyperion.hpp"
+#include "hyperion.hpp"
 
 // This example creates a node that listens to UDP ports 9611 - 9618,
 // and puts their data on the neopixel outputs 1-8
@@ -13,10 +13,9 @@ int main()
 
   for (int i = 1; i <= 8; i++)
   {
-    auto pipe = new Pipe(
+    hyp->createChain(
         new UDPInput(9610 + i),
         new NeopixelOutput(i));
-    hyp->addPipe(pipe);
   }
 
   hyp->start(Hyperion::minimal);

@@ -1,9 +1,5 @@
-#include "colours.h"
-#include "distribution/inputs/controlHubInput.hpp"
-#include "distribution/outputs/monitorOutput.hpp"
-#include "distribution/pipes/convertPipe.hpp"
-#include "generation/patterns/mappedPatterns.h"
 #include "hyperion.hpp"
+#include "generation/patterns/mappedPatterns.h"
 #include "ledsterMap.hpp"
 /*
 
@@ -53,7 +49,7 @@ int main()
   hyp->setMidiControllerFactory(new DinMidiControllerFactory<ApcMiniController>());
 
   // the rest of the code is a simple controller, so you can see that you device actually connects to something.
-  auto pipe = new ConvertPipe<RGBA, RGB>(
+  hyp->createChain(
       new ControlHubInput<RGBA>(
           ledsterMap.size(),
           &hyp->hub,
@@ -62,9 +58,9 @@ int main()
               new Mapped::ConcentricWavePattern<SinFast>(&ledsterMap),
               new Mapped::HorizontalGradientPattern(&ledsterMap),
           }),
-      new MonitorOutput(&hyp->webServer, &ledsterMap));
-
-  hyp->addPipe(pipe);
+      new ConvertColor<RGBA, RGB>(),
+      new MonitorOutput(&hyp->webServer, &ledsterMap)
+  );
 
   hyp->start();
 

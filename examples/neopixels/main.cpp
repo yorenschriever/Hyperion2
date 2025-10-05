@@ -1,11 +1,4 @@
-#include "core/hyperion.hpp"
-
-#include "colours.h"
-#include "distribution/inputs/patternInput.hpp"
-#include "distribution/outputs/neopixelOutput.hpp"
-#include "distribution/pipes/convertPipe.hpp"
-#include "generation/patterns/pattern.hpp"
-#include "utils.hpp"
+#include "hyperion.hpp"
 
 //This reaches 48fps for 500 leds on 8 channels (= 4000 leds)
 class RainbowPattern : public Pattern<RGB>
@@ -31,10 +24,10 @@ int main()
 
   for (int i = 1; i <= 8; i++)
   {
-    auto pipe = new ConvertPipe<RGB, GRB>(
+    hyp->createChain(
         new PatternInput<RGB>(500, new RainbowPattern()),
+        new ConvertColor<RGB, GRB>(),
         new NeopixelOutput(i));
-    hyp->addPipe(pipe);
   }
 
   hyp->start();

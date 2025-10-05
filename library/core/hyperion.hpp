@@ -5,7 +5,7 @@
 #include "core/distribution/inputs/udpInput.hpp"
 #include "core/distribution/inputs/dmxInput.hpp"
 #include "core/distribution/inputs/patternInput.hpp"
-#include "core/distribution/inputs/combinedInput2.hpp"
+#include "core/distribution/inputs/combinedInput.hpp"
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 #include "core/distribution/luts/gammaLut.hpp"
 #include "core/distribution/luts/incandescentLut.hpp"
@@ -124,14 +124,14 @@ public:
         outputs.push_back(output);
     }
 
-    virtual void CreateChain(IInput *input, IOutput *output)
+    virtual void createChain(IInput *input, IOutput *output)
     {
         input->setReceiver(output);
         addInput(input);
         addOutput(output);
     }
 
-    virtual void CreateChain(IInput *input, IConverter* converter, IOutput *output)
+    virtual void createChain(IInput *input, IConverter* converter, IOutput *output)
     {
         input->setReceiver(converter);
         converter->setReceiver(output);
@@ -139,7 +139,7 @@ public:
         addOutput(output);
     }
 
-    virtual void CreateChain(IInput *input, std::vector<IConverter*> converters,IOutput *output)
+    virtual void createChain(IInput *input, std::vector<IConverter*> converters,IOutput *output)
     {
         IConverter *sender = nullptr;
         for (auto converter : converters)

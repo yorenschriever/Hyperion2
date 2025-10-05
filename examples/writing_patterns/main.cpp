@@ -1,9 +1,9 @@
-#include "core/hyperion.hpp"
+#include "hyperion.hpp"
 #include "mapping/haloMap.hpp"
 #include "patterns.hpp"
 
 // forward declarations. This lets us call the functions before we defined them.
-void addHaloPipe(Hyperion *hyp);
+void addHaloChain(Hyperion *hyp);
 void addPaletteColumn(Hyperion *hyp);
 
 int main()
@@ -11,8 +11,8 @@ int main()
     // create an hyperion object
     auto hyp = new Hyperion();
 
-    // add a pipe
-    addHaloPipe(hyp);
+    // add a chain
+    addHaloChain(hyp);
 
     // add a column to the controller that lets you select a palette
     addPaletteColumn(hyp);
@@ -49,7 +49,7 @@ int main()
         Thread::sleep(1000);
 }
 
-void addHaloPipe(Hyperion *hyp)
+void addHaloChain(Hyperion *hyp)
 {
     // In Hyperion, all pixel data comes from an input and in transferred to an
     // output by a pipe. 
@@ -93,9 +93,10 @@ void addHaloPipe(Hyperion *hyp)
             {.column = 7, .slot = 2, .pattern = new ExamplePatterns::MappedSpatialTransitionPattern(&haloMap)},
         });
 
-    hyp->addPipe(new ConvertPipe<RGBA, RGB>(
+    hyp->createChain(
         input,
-        new MonitorOutput(&hyp->webServer,&haloMap)));
+        new ConvertColor<RGBA, RGB>(),
+        new MonitorOutput(&hyp->webServer, &haloMap));
 }
 
 void addPaletteColumn(Hyperion *hyp)

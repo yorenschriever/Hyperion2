@@ -1,5 +1,4 @@
-#include "core/distribution/outputs/dmxOutput.hpp"
-#include "core/hyperion.hpp"
+#include "hyperion.hpp"
 
 int main()
 {
@@ -7,9 +6,9 @@ int main()
 
   Network::setHostName("hyperslave6");
 
-  hyp->addPipe(new Pipe(
+  hyp->createChain(
       new UDPInput(9619),
-      new DMXOutput(1)));
+      new DMXOutput(1));
 
   hyp->start(Hyperion::minimal);
 
