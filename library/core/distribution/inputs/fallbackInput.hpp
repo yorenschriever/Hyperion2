@@ -6,7 +6,7 @@
 #include "platform/includes/utils.hpp"
 
 //FallbackInput gets its input from one of the available sources
-class FallbackInput : public Input
+class FallbackInput final: public Input
 {
 
 public:

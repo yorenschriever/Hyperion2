@@ -3,16 +3,17 @@
 #include "core/generation/controlHub/controlHub.hpp"
 #include "core/generation/patterns/pattern.hpp"
 #include "core/distribution/utils/indexMap.hpp"
-#include "input.hpp"
+#include "baseInput.hpp"
 #include "log.hpp"
 #include "utils.hpp"
+#include "../bufferPool.hpp"
 #include <algorithm>
 #include <vector>
 
 // this class attaches a provided set of patterns to a control hub.
 // Patterns should all be the same 'Colour'. You have to provide this colour as template here
 template <class T_COLOUR>
-class ControlHubInput : public Input
+class ControlHubInput final : public BaseInput
 {
 public:
     struct SlotPattern 
@@ -54,13 +55,13 @@ private:
         this->_length = length;
         this->slotPatterns = slotPatterns;
         this->hub = hub;
-        this->ledData = (T_COLOUR *)malloc(length * sizeof(T_COLOUR));
+        // this->renderBufferPtr = (uint8_t*)calloc(length, sizeof(T_COLOUR));
 
-        if (!this->ledData)
-        {
-            Log::error("CONTROL_HUB_INPUT", "Unable to allocate memory for ControlHubInput, free heap = %d\n", Utils::get_free_heap());
-            Utils::exit();
-        }
+        // if (!this->renderBufferPtr)
+        // {
+        //     Log::error("CONTROL_HUB_INPUT", "Unable to allocate memory for ControlHubInput, free heap = %d\n", Utils::get_free_heap());
+        //     Utils::exit();
+        // }
 
         //make sure the control hub is large enough to fit all the patterns.
         //do this in reverse, because it is likely that the largest slot/column is passed last,
@@ -81,28 +82,39 @@ public:
 
     void begin() override
     {
-        for (int i = 0; i < _length; i++)
-            this->ledData[i] = T_COLOUR();
-
         for (auto slotPattern : slotPatterns)
             slotPattern.pattern->Initialize();
     }
 
-    int loadData(uint8_t *dataPtr, unsigned int buffersize) override
+    // InputBuffer getData() override
+    // {
+    //     auto patternBuffer = BufferPool::getBuffer(_length * sizeof(T_COLOUR));
+    //     if (!patternBuffer)
+    //     {
+    //         Log::error("CONTROL_HUB_INPUT", "Unable to allocate memory for ControlHubInput, free heap = %d\n", Utils::get_free_heap());
+    //         Utils::exit();
+    //     }
+
+    Buffer *getData() override
     {
-        int safeLength = std::min(_length, (int)(buffersize / sizeof(T_COLOUR)));
-        if (safeLength != _length)
+        auto patternBuffer = BufferPool::getBuffer(_length * sizeof(T_COLOUR));
+        auto renderBuffer = BufferPool::getBuffer(_length * sizeof(T_COLOUR));
+        if (!patternBuffer || !renderBuffer)
         {
-            Log::error("CONTROL_HUB_INPUT", "loadData buffer size not large enough");
+            Log::error("CONTROL_HUB_INPUT", "Unable to allocate memory for ControlHubInput, free heap = %d\n", Utils::get_free_heap());
+            Utils::exit();
         }
 
-        for (int i = 0; i < safeLength; i++)
-            ((T_COLOUR *)dataPtr)[i] = T_COLOUR();
+        T_COLOUR * patternBufferPtr = ( T_COLOUR *) patternBuffer->getData();
+        T_COLOUR * renderBufferPtr = ( T_COLOUR *) renderBuffer->getData();
+
+        for (int i = 0; i < _length; i++)
+            ((T_COLOUR *)renderBufferPtr)[i] = T_COLOUR();
 
         for (auto slotPattern : slotPatterns)
         {
-            for (int i = 0; i < safeLength; i++)
-                ledData[i] = T_COLOUR();
+            for (int i = 0; i < _length; i++)
+                patternBufferPtr[i] = T_COLOUR();
 
             auto column = hub->findColumn(slotPattern.column);
             auto slot = hub->findSlot(column, slotPattern.slot);
@@ -112,42 +124,43 @@ public:
 
             //Log::info("CONTROL_HUB_INPUT", "calculating pattern active = %d, dim = %d ,masterDim = %d", slot->activated, column->dim, hub->masterDim);
 
-            slotPattern.pattern->Calculate(ledData, safeLength, slot->activated, hub->getParams(slotPattern.paramsSlot));
+            slotPattern.pattern->Calculate(patternBufferPtr, _length, slot->activated, hub->getParams(slotPattern.paramsSlot));
 
             // apply dimming and copy to output buffer
-            for (int i = 0; i < safeLength; i++)
+            for (int i = 0; i < _length; i++)
             {
                 // TODO give a good thought about when we want dimming and when we want to make things transparent.
                 // how to support this in general?
                 if (std::is_same<T_COLOUR, RGBA>::value)
                 {
                     //if the colour space is RGBA, apply colour mixing based on the alpha channel
-                    RGBA *l = (RGBA*) &ledData[i];
+                    RGBA *l = (RGBA*) &patternBufferPtr[i];
                     l->A = (l->A * dimValue) >> 8;
                 }
                 else
                 {
                     //if the colour space is not RGBA, apply dimming and sum with the existing value.
-                    ledData[i].dim(dimValue);
+                    patternBufferPtr[i].dim(dimValue);
                 }
-
                 int index = (slotPattern.indexMap) ? slotPattern.indexMap->map(i) : i;
+                int safeLength = renderBuffer->getLength() / (int)sizeof(T_COLOUR);
                 if(index < 0 || index >= safeLength)
                 {
                     Log::error("CONTROL_HUB_INPUT", "Mapped index out of bounds: %d, length: %d", index, safeLength);
                     continue;
                 }
-                ((T_COLOUR *)dataPtr)[index] += ledData[i];
+                ((T_COLOUR *)renderBufferPtr)[index] += patternBufferPtr[i];
             }
-        }
+        }   
 
-        usedframecount++;
-        return safeLength * sizeof(T_COLOUR);
+        fpsCounter.increaseUsedFrameCount();
+        //return {renderBufferPtr, _length * (int)sizeof(T_COLOUR)};
+        return renderBuffer;
     }
 
 private:
     int _length = 0;
-    T_COLOUR *ledData;
+    // uint8_t * renderBufferPtr;
 
     std::vector<SlotPattern> slotPatterns;
     ControlHub *hub;

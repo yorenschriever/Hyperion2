@@ -1,3 +1,5 @@
+#include "core/generation/pixelMap.hpp"
+
 PixelMap gridMap(int amount_hor, int amount_ver, float distance=0, float center_x=0, float center_y=0)
 {
     PixelMap map;

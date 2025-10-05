@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/distribution/utils/hostnameCache.hpp"
-#include "output.hpp"
+#include "baseOutput.hpp"
 #include "platform/includes/log.hpp"
 #include "platform/includes/thread.hpp"
 #include "platform/includes/utils.hpp"
@@ -11,7 +11,7 @@
 #include <algorithm>
 
 // WebsocketOutput sends data to websocket clients.
-class WebsocketOutput : public Output
+class WebsocketOutput : public BaseOutput
 {
 public:
     WebsocketOutput(WebServer **webserver, const char *path, unsigned int fps)
@@ -25,11 +25,11 @@ public:
     }
 
     // index and size are in bytes
-    void setData(uint8_t *data, int size, int index) override
+    void setData(uint8_t *data, int size) override
     {
-        int copy_length = std::min(size, length - index);
+        int copy_length = std::min(size, length);
         if (copy_length > 0)
-            memcpy(this->buffer + index, data, copy_length);
+            memcpy(this->buffer, data, copy_length);
     }
 
     bool ready() override
@@ -41,11 +41,12 @@ public:
     {
         lastFrame = Utils::millis();
         server->sendAll(buffer, length);
+        fpsCounter.increaseUsedFrameCount();
     }
 
-    void postProcess() override
-    {
-    }
+    // void postProcess() override
+    // {
+    // }
 
     void begin() override
     {

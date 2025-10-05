@@ -2,14 +2,14 @@
 
 #include "log.hpp"
 #include "neoPixels.hpp"
-#include "output.hpp"
+#include "baseOutput.hpp"
 #include "thread.hpp"
 #include "utils.hpp"
 #include <algorithm>
 
 // Writes the led data to the octows2811 style connector on the front panel.
 // It use esp32's RMT peripheral to do this.
-class NeopixelOutput : public Output
+class NeopixelOutput : public BaseOutput
 {
 public:
     // port goes from 1-8
@@ -31,11 +31,11 @@ public:
     }
 
     // index and size are in bytes
-    void setData(uint8_t *data, int size, int index) override
+    void setData(uint8_t *data, int size) override
     {
-        int copy_length = std::min(size, length - index);
+        int copy_length = std::min(size, length);
         if (copy_length > 0)
-            memcpy(this->buffer + index, data, copy_length);
+            memcpy(this->buffer, data, copy_length);
     }
 
     bool ready() override
