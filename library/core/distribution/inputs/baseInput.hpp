@@ -40,7 +40,7 @@ public:
         receiver->setData(inputBuffer->getData(), inputBuffer->getLength());
 
         //TODO it would be nicer if the buffer is requested in the same method where it is released
-        inputBuffer->release();
+        BufferPool::release(inputBuffer);
 
         receiver->show();
     }

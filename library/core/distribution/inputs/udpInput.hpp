@@ -35,19 +35,20 @@ public:
         }
         auto dataPtr = patternBuffer->getData();
 
-        int cb, cbr;
         bool gotFrame = false;
         int missedFrameCount = -1;
         // read all packets, throw them away, but keep the last one.
-        while ((cbr = sock->receive(dataPtr, bufferSize)) > 0)
+        while ((sock->receive(dataPtr, bufferSize)) > 0)
         {
             gotFrame = true;
-            cb = cbr;
             missedFrameCount++;
         }
 
         if (!gotFrame)
+        {
+            BufferPool::release(patternBuffer);
             return nullptr;
+        }
 
         fpsCounter.increaseUsedFrameCount();
 

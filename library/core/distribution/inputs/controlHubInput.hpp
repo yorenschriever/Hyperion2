@@ -86,15 +86,6 @@ public:
             slotPattern.pattern->Initialize();
     }
 
-    // InputBuffer getData() override
-    // {
-    //     auto patternBuffer = BufferPool::getBuffer(_length * sizeof(T_COLOUR));
-    //     if (!patternBuffer)
-    //     {
-    //         Log::error("CONTROL_HUB_INPUT", "Unable to allocate memory for ControlHubInput, free heap = %d\n", Utils::get_free_heap());
-    //         Utils::exit();
-    //     }
-
     Buffer *getData() override
     {
         auto patternBuffer = BufferPool::getBuffer(_length * sizeof(T_COLOUR));

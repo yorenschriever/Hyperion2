@@ -13,16 +13,14 @@ class RainbowPattern : public Pattern<RGB>
   }
 };
 
-const char* hostname = "hypernode2.local";
-
 int main()
 {
   auto hyp = new Hyperion();
 
-  for(int i=0;i<8;i++){
+  for(int i=1;i<=8;i++){
     hyp->createChain(
       new PatternInput(100,new RainbowPattern()),
-      new UDPOutput("localhost",9610+i,60)
+      new UDPOutput("hypernode1.local",9610+i,60)
     );
   }
 

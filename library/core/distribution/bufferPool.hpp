@@ -1,21 +1,19 @@
-
 #pragma once
+#include "log.hpp"
 #include <cstdlib>
 #include <inttypes.h>
+#include <mutex>
 #include <vector>
 
-//This is written for use in the distribution module only.
-//If this is going to be called from outside the distribution module, it should be rewritten to be thread safe.
+// This is written for use in the distribution module only.
+// If this is going to be called from outside the distribution module, it should be rewritten to be thread safe.
 class BufferPool;
 
 class Buffer
 {
-friend BufferPool;
+    friend BufferPool;
+
 public:
-    void release()
-    {
-        inUse = false;
-    }
     uint8_t *getData()
     {
         return data;
@@ -27,93 +25,105 @@ public:
 
 private:
     uint8_t *data;
-    int length;
+    int length;   // Length is the length as requested by the user. This is also publicly available
+    int capacity; // Capacity is only used internally to determine if the buffer is big enough when reusing it
     bool inUse = false;
 };
 
 class BufferPool
 {
 private:
-    // static uint8_t * buffer;
-    // static int bufferSize;
-    static std::vector<Buffer*> buffers;
+    static std::vector<Buffer *> buffers;
+    static std::mutex mutex;
 
 public:
     static Buffer *getBuffer(int size)
     {
-        // if (size > bufferSize)
+        // Log::info("BUFFER_POOL", "Requested buffer of size %d. (%d buffers available)", size, buffers.size());
+        // for (int i = 0; i < buffers.size(); i++)
         // {
-        //     buffer = (uint8_t *)realloc(buffer, size);
-        //     bufferSize = size;
+        //     Log::info("BUFFER_POOL", "Buffer %d: capacity %d, inUse=%d", i, buffers[i]->capacity, buffers[i]->inUse);
         // }
-        // return buffer;
 
-        Buffer * largestFreeBuffer = nullptr;
+        mutex.lock();
+        Buffer *largestFreeBuffer = nullptr;
+        Buffer *smallestSuitableBuffer = nullptr;
 
-        //see if a free buffer is available
+        // see if a free buffer is available
         for (auto buffer : buffers)
         {
             if (buffer->inUse)
                 continue;
 
-            if (buffer->length >= size)
+            if (
+                smallestSuitableBuffer == nullptr ||
+                (buffer->capacity >= size && buffer->capacity < smallestSuitableBuffer->capacity))
             {
-                buffer->inUse = true;
-                return buffer;
+                smallestSuitableBuffer = buffer;
             }
 
-            if (largestFreeBuffer == nullptr || buffer->length > largestFreeBuffer->length)
+            if (largestFreeBuffer == nullptr || buffer->capacity > largestFreeBuffer->capacity)
+            {
                 largestFreeBuffer = buffer;
+            }
         }
 
-        //make the largest buffer a bit bigger to the data
+        if (smallestSuitableBuffer != nullptr)
+        {
+            // Log::info("BUFFER_POOL", "Found suitable buffer of capacity %d", smallestSuitableBuffer->capacity);
+            smallestSuitableBuffer->inUse = true;
+            smallestSuitableBuffer->length = size;
+            mutex.unlock();
+            return smallestSuitableBuffer;
+        }
+
+        // make the largest buffer a bit bigger to the data
         if (largestFreeBuffer != nullptr)
         {
+            // Log::info("BUFFER_POOL", "No suitable buffer found in %d buffers. Resizing the largest one from %d to %d", largestFreeBuffer->capacity, size);
+
             largestFreeBuffer->data = (uint8_t *)realloc(largestFreeBuffer->data, size);
             if (!largestFreeBuffer->data)
             {
-                //realloc failed, return nullptr
+                // realloc failed, return nullptr
+                mutex.unlock();
                 return nullptr;
             }
+            largestFreeBuffer->capacity = size;
             largestFreeBuffer->length = size;
             largestFreeBuffer->inUse = true;
+            mutex.unlock();
             return largestFreeBuffer;
         }
 
-        //no free buffer available, create a new one
+        // Log::info("BUFFER_POOL", "No free buffer found in %d buffers. Allowcating new one", buffers.size());
+
+        // no free buffer available, create a new one
         auto buffer = new Buffer();
         buffer->data = (uint8_t *)malloc(size);
         if (!buffer->data)
         {
-            //malloc failed, return nullptr
+            // malloc failed, return nullptr
+            mutex.unlock();
             return nullptr;
         }
+        buffer->capacity = size;
         buffer->length = size;
         buffer->inUse = true;
         buffers.push_back(buffer);
+        mutex.unlock();
         return buffer;
+    }
+
+    static void release(Buffer *buffer)
+    {
+        // Log::info("BUFFER_POOL", "Releasing buffer of capacity %d", buffer->capacity);
+        mutex.lock();
+        buffer->length = 0;
+        buffer->inUse = false;
+        mutex.unlock();
     }
 };
 
-std::vector<Buffer*> BufferPool::buffers;
-
-// class BufferPool
-// {
-// private:
-//     static uint8_t * buffer;
-//     static int bufferSize;
-
-// public:
-//     static uint8_t *getBuffer(int size)
-//     {
-//         if (size > bufferSize)
-//         {
-//             buffer = (uint8_t *)realloc(buffer, size);
-//             bufferSize = size;
-//         }
-//         return buffer;
-//     }
-// };
-
-// uint8_t* BufferPool::buffer = nullptr;
-// int BufferPool::bufferSize = 0;
+std::vector<Buffer *> BufferPool::buffers;
+std::mutex BufferPool::mutex;

@@ -24,33 +24,10 @@ public:
 
     void begin() override
     {
-        this->ledData = (T_COLOUR *)malloc(length * sizeof(T_COLOUR));
-
-        if (!this->ledData)
-        {
-            Log::error("PATTERN_INPUT", "Unable to allocate memory for PatternInput, free heap = %d\n", Utils::get_free_heap());
-            Utils::exit();
-        }
-
-        for (int i = 0; i < length; i++)
-            ledData[i] = T_COLOUR();
-
         pattern->Initialize();
     }
 
-    // InputBuffer getData() override
-    // {
-    //     for (int i = 0; i < length; i++)
-    //         ledData[i] = T_COLOUR();
-
-    //     pattern->Calculate(ledData, length, true, &params);
-
-    //     fpsCounter.increaseUsedFrameCount();
-
-    //     return { (uint8_t *)ledData, length * sizeof(T_COLOUR) };
-    // }
-
-    Buffer *getData()
+    Buffer *getData() override
     {
         auto patternBuffer = BufferPool::getBuffer(length * sizeof(T_COLOUR));
         if (!patternBuffer)
@@ -68,7 +45,6 @@ public:
         fpsCounter.increaseUsedFrameCount();
 
         return patternBuffer;
-        //return { (uint8_t *)ledData, length * sizeof(T_COLOUR) };
     }
 
 private:

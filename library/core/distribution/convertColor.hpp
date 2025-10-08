@@ -75,7 +75,7 @@ public:
             ((T_TARGET_COLOUR *)outputBufferPtr)[i] = outCol;
         }
         receiver->setData(outputBufferPtr, outputLength);
-        outputBuffer->release();
+        BufferPool::release(outputBuffer);
     }
     
 };
