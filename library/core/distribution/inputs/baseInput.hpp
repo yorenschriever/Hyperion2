@@ -5,13 +5,7 @@
 #include "../interfaces.hpp"
 #include <inttypes.h>
 
-// struct InputBuffer
-// {
-//     uint8_t *data;
-//     int length;
-// };
-
-// Derive form this class when you are going to write new inputs. You should at least implement
+// Derive from this class when you are going to write new inputs. You should at least implement
 // getData(), and you can implement begin(), if there is some setup to do. Putting the
 // initialization code in begin() instead of the constructor makes you code easier to debug,
 // because at that point the logging system is guaranteed to be initialized.

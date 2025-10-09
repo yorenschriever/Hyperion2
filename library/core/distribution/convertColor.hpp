@@ -15,6 +15,11 @@ private:
     LUT *lut = nullptr;
 
 public: 
+    ConvertColor(LUT *lut = nullptr)
+    {
+        this->lut = lut;
+    }
+
     IConverter *setReceiver(IReceiver *receiver) override
     {
         this->receiver = receiver;
