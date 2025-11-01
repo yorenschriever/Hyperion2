@@ -1,3 +1,5 @@
+import './gl-matrix-min.js';
+import {WebGLDebugUtils} from './webgl-debug.js';
 import { initBuffers } from "./init-buffers.js";
 import { drawScene } from "./draw-scene.js";
 import { Websockets } from "./websockets.js";
