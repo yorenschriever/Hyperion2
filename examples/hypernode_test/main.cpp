@@ -13,6 +13,8 @@ class RainbowPattern : public Pattern<RGB>
   }
 };
 
+const char *target = "hypernode1.local";
+
 int main()
 {
   auto hyp = new Hyperion();
@@ -20,9 +22,16 @@ int main()
   for(int i=1;i<=8;i++){
     hyp->createChain(
       new PatternInput(100,new RainbowPattern()),
-      new UDPOutput("hypernode1.local",9610+i,60)
+      new UDPOutput(target,9610+i,60)
     );
   }
+
+
+  hyp->createChain(
+    new PatternInput(512,new RainbowPattern()),
+    new UDPOutput(target,9619,30)
+  );
+
 
   hyp->start(Hyperion::minimal);
 
