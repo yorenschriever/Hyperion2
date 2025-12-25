@@ -3,7 +3,7 @@
 #include "generation/patterns/helpers/fade.h"
 #include "generation/patterns/helpers/interval.h"
 #include "generation/patterns/helpers/timeline.h"
-#include "generation/pixelMap.hpp"
+#include "generation/pixelMap/pixelMap.hpp"
 #include <math.h>
 #include <vector>
 

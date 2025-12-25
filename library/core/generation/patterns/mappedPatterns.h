@@ -1,7 +1,7 @@
 #pragma once
 #include "pattern.hpp"
 #include "utils.hpp"
-#include "core/generation/pixelMap.hpp"
+#include "core/generation/pixelMap/pixelMap.hpp"
 #include "helpers/fade.h"
 #include <vector>
 #include <math.h>

@@ -1,5 +1,5 @@
-#include "generation/patterns/mappedPatterns.h"
 #include "hyperion.hpp"
+#include "generation/patterns/mappedPatterns.h"
 #include "ledsterMap.hpp"
 
 int main()

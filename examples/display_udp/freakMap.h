@@ -1,5 +1,5 @@
 #pragma once
-#include "core/generation/pixelMap.hpp"
+#include "core/generation/pixelMap/pixelMap.hpp"
 
 PixelMap freakMap = {
     {.x = -0.9208333333333334, .y = -0.17958333333333337}, 
