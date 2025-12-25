@@ -168,8 +168,11 @@ public:
     {
         for (auto output : outputs)
         {
-            output->clear();
-            output->show();
+            if (output->ready())
+            {
+                output->clear();
+                output->show();
+            }
         }
     }
 

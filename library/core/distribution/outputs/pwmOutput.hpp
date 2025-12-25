@@ -66,5 +66,5 @@ public:
     }
 
 private:
-    PWMDriver *pwm;
+    PWMDriver *pwm = nullptr;
 };
