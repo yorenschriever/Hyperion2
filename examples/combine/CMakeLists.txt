@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # The name of your project
-set(PROJECT combine_inputs)
+set(PROJECT combine)
 
 include($ENV{HYPERION_LIB_DIR}/build-utils/utils.cmake)
 

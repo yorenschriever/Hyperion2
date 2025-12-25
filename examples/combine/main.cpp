@@ -2,7 +2,7 @@
 #include "hyperion.hpp"
 #include "patterns.hpp"
 
-// This example will show you how to combine multiple inputs.
+// This example will show you how to combine multiple chains.
 // This is useful if you want to send data to multiple fixture types
 // on a single DMX port on a hypernode.
 
