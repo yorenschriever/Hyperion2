@@ -6,7 +6,7 @@
 #include <algorithm>
 
 //This class controls the 12 pwm outputs on the back of the device
-class PWMOutput : public BaseOutput
+class PWMOutput final: public BaseOutput
 {
     const char* TAG = "PWM";
 public:
@@ -47,7 +47,7 @@ public:
         pwm->show();
     }
 
-    void begin() override
+    void initialize() override
     {
         this->pwm = PWMDriver::getInstance();
     }

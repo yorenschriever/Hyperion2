@@ -80,12 +80,6 @@ public:
         return _length;
     }
 
-    void begin() override
-    {
-        for (auto slotPattern : slotPatterns)
-            slotPattern.pattern->Initialize();
-    }
-
     Buffer *getData() override
     {
         auto patternBuffer = BufferPool::getBuffer(_length * sizeof(T_COLOUR));
@@ -143,6 +137,8 @@ public:
                 ((T_COLOUR *)renderBufferPtr)[index] += patternBufferPtr[i];
             }
         }   
+
+        BufferPool::release(patternBuffer);
 
         fpsCounter.increaseUsedFrameCount();
         //return {renderBufferPtr, _length * (int)sizeof(T_COLOUR)};

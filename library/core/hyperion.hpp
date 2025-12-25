@@ -1,11 +1,16 @@
 #pragma once
 #include "colours.h"
-// #include "core/distribution/inputs/inputSlicer.hpp"
-// #include "core/distribution/inputs/inputSplitter.hpp"
+#include "core/distribution/processors/convertColor.hpp"
 #include "core/distribution/inputs/udpInput.hpp"
 #include "core/distribution/inputs/dmxInput.hpp"
 #include "core/distribution/inputs/patternInput.hpp"
-#include "core/distribution/inputs/combinedInput.hpp"
+#include "core/distribution/inputs/controlHubInput.hpp"
+#include "distribution/inputs/patternCycleInput.hpp"
+#include "core/distribution/routing/slicer.hpp"
+#include "core/distribution/routing/splitter.hpp"
+#include "core/distribution/routing/combine.hpp"
+#include "core/distribution/routing/fallback.hpp"
+#include "core/distribution/routing/switch.hpp"
 #include "core/distribution/luts/colourCorrectionLut.hpp"
 #include "core/distribution/luts/gammaLut.hpp"
 #include "core/distribution/luts/incandescentLut.hpp"
@@ -34,11 +39,7 @@
 #include "core/generation/patterns/helpers/tempo/websocketTempo.h"
 #include "core/generation/pixelMap.hpp"
 #include "core/generation/pixelMapSplitter3d.hpp"
-#include "core/distribution/inputs/controlHubInput.hpp"
-#include "core/distribution/convertColor.hpp"
-// #include "distribution/inputs/patternCycleInput.hpp"
-// #include "core/distribution/inputs/switchableInput.hpp"
-// #include "distribution/outputs/neopixelOutput.hpp"
+
 #include "generation/controlHub/paletteColumn.hpp"
 #include "generation/controllers/websocketController.hpp"
 #include "platform/includes/ethernet.hpp"
@@ -54,7 +55,7 @@
 #include <memory>
 #include <vector>
 
-class Hyperion
+class Hyperion final: public IRegistrant
 {
     const char *TAG = "Hyperion";
 
@@ -99,15 +100,10 @@ public:
         if (config.tempo)
             setup_tempo();
 
-        Log::info(TAG, "starting outputs");
-        for (auto output : outputs)
-            output->begin();
+        for (auto initializer : initializers)
+            initializer->initialize();
 
         clearAll();
-
-        Log::info(TAG, "starting inputs");
-        for (auto input : inputs)
-            input->begin();
 
         Log::info(TAG, "Initialization complete. Starting main loop");
         Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
@@ -124,6 +120,11 @@ public:
         outputs.push_back(output);
     }
 
+    virtual void addInitializer(IRegisterable *initializer)
+    {
+        initializers.push_back(initializer);
+    }
+
     virtual std::vector<IInput*> getInputs(){
         return inputs;
     }
@@ -132,22 +133,22 @@ public:
         return outputs;
     }
 
-    virtual void createChain(IInput *input, IOutput *output)
+    virtual void createChain(ISender *input, IReceiver *output)
     {
         input->setReceiver(output);
-        addInput(input);
-        addOutput(output);
+        input->registerToHyperion(this);
+        output->registerToHyperion(this);
     }
 
-    virtual void createChain(IInput *input, IConverter* converter, IOutput *output)
+    virtual void createChain(ISender *input, IConverter* converter, IReceiver *output)
     {
         input->setReceiver(converter);
         converter->setReceiver(output);
-        addInput(input);
-        addOutput(output);
+        input->registerToHyperion(this);
+        output->registerToHyperion(this);
     }
 
-    virtual void createChain(IInput *input, std::vector<IConverter*> converters,IOutput *output)
+    virtual void createChain(ISender *input, std::vector<IConverter*> converters,IReceiver *output)
     {
         IConverter *sender = nullptr;
         for (auto converter : converters)
@@ -159,8 +160,8 @@ public:
             sender = converter;
         }
         sender->setReceiver(output);
-        addInput(input);
-        addOutput(output);
+        input->registerToHyperion(this);
+        output->registerToHyperion(this);
     }
 
     virtual void clearAll()
@@ -425,6 +426,7 @@ private:
 
     std::vector<IInput *> inputs;
     std::vector<IOutput *> outputs;
+    std::vector<IRegisterable*> initializers;
     std::map<MidiDevice *, std::unique_ptr<MidiController>> midiControllers;
     std::map<MidiDevice *, MidiClockTempo *> midiClockTempos;
     MidiControllerFactory *midiControllerFactory = nullptr;

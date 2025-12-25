@@ -1,34 +1,17 @@
 #pragma once
 
-#include "output.hpp"
+#include "baseOutput.hpp"
 
 // nullOutput does not use the output.
 // you can use this for performance testing or debugging
-class NullOutput : public Output
+class NullOutput final: public BaseOutput
 {
 public:
-    NullOutput()
-    {
-    }
+    NullOutput() {}
 
-    // index and size are in bytes
-    void setData(uint8_t *data, int size, int index) override {}
-
-    bool ready() override
-    {
-        return true;
-    }
-
-    void show() override {}
-
-    void postProcess() override {}
-
-    void begin() override {}
-
-    void clear() override {}
-
-    // length is in bytes
-    void setLength(int len) override {}
-
-private:
+    void clear() override {};
+    bool ready() override {return true;};
+    void setLength(int length) override {};
+    void setData(uint8_t *data, int size) override {};
+    void show() override {};
 };

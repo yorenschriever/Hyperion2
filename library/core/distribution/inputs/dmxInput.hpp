@@ -21,7 +21,7 @@ public:
         this->dmxPort = dmxPort;
     }
 
-    void begin() override
+    void initialize() override
     {
         this->dmx = DMX::getInstance(dmxPort);
     }

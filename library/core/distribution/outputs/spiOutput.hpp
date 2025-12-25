@@ -9,7 +9,7 @@
 
 // SpiOutput sends the output over spi.
 // Can be used for pixel led strands.
-class SpiOutput : public BaseOutput
+class SpiOutput final: public BaseOutput
 {
 public:
     SpiOutput(uint8_t clkPin, uint8_t dataPin, int frq = 500000)
@@ -43,7 +43,7 @@ public:
         spi->send(buffer, length);
     }
 
-    void begin() override
+    void initialize() override
     {
         if (spi)
             spi->begin(clkPin, dataPin, frq );

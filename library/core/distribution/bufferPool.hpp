@@ -39,13 +39,13 @@ private:
 public:
     static Buffer *getBuffer(int size)
     {
+        mutex.lock();
         // Log::info("BUFFER_POOL", "Requested buffer of size %d. (%d buffers available)", size, buffers.size());
         // for (int i = 0; i < buffers.size(); i++)
         // {
         //     Log::info("BUFFER_POOL", "Buffer %d: capacity %d, inUse=%d", i, buffers[i]->capacity, buffers[i]->inUse);
         // }
 
-        mutex.lock();
         Buffer *largestFreeBuffer = nullptr;
         Buffer *smallestSuitableBuffer = nullptr;
 
@@ -56,8 +56,8 @@ public:
                 continue;
 
             if (
-                smallestSuitableBuffer == nullptr ||
-                (buffer->capacity >= size && buffer->capacity < smallestSuitableBuffer->capacity))
+                buffer->capacity >= size && 
+                (smallestSuitableBuffer == nullptr || buffer->capacity < smallestSuitableBuffer->capacity))
             {
                 smallestSuitableBuffer = buffer;
             }

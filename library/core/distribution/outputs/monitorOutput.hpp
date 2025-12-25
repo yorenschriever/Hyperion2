@@ -65,7 +65,7 @@ private:
 };
 
 // MonitorOutput displays the led data in your browser
-class MonitorOutput : public WebsocketOutput
+class MonitorOutput final: public WebsocketOutput
 {
 public:
     MonitorOutput(WebServer **webServer, PixelMap *map, unsigned int fps = 60, float size = 0.01) : WebsocketOutput(webServer, pathBuf, fps)
@@ -74,10 +74,10 @@ public:
         snprintf(pathBuf, 20, "/ws/monitor%d", pixelMapJson.addOutput(map, size));
     }
 
-    void begin() override
+    void initialize() override 
     {
-        // Log::info(TAG,"beginning MonitorOutput on port %d",port);
-        WebsocketOutput::begin();
+        // Log::info(TAG,"beginning MonitorOutput");
+        WebsocketOutput::initialize();
         (*webServer)->addPath("/monitor2d/mapping.json", &pixelMapJson);
     }
 

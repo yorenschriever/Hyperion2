@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "interfaces.hpp"
-#include "bufferPool.hpp"
+#include "../interfaces.hpp"
+#include "../bufferPool.hpp"
 
 // ConvertPipe<SourceColour,TargetColour> will convert the data from source colour format
 // to target format. eg. from RGB to RGBW or from RGB to Monochrome.
@@ -20,21 +20,15 @@ public:
         this->lut = lut;
     }
 
-    IConverter *setReceiver(IReceiver *receiver) override
+    void setReceiver(IReceiver *receiver) override
     {
         this->receiver = receiver;
-        return this;
     }
 
     bool ready() override
     {
         return receiver && receiver->ready();   
     }
-
-    // void begin() override
-    // {
-    //     receiver->begin();
-    // }
 
     void show() override
     {
@@ -76,7 +70,6 @@ public:
                 outCol.ApplyLut(lut);
 
             // Pass the data to the output
-            // receiver->setData((uint8_t *)&outCol, sizeof(T_TARGET_COLOUR), i * sizeof(T_TARGET_COLOUR));
             ((T_TARGET_COLOUR *)outputBufferPtr)[i] = outCol;
         }
         receiver->setData(outputBufferPtr, outputLength);

@@ -49,6 +49,12 @@ public:
         return &fpsCounter;
     }
 
+    void initialize() override {}
+
+    void registerToHyperion(IRegistrant *hyp) override {
+        hyp->addInput(this);
+        hyp->addInitializer(this);
+    }
 protected:
     IReceiver *receiver = nullptr;
     FPSCounter fpsCounter;

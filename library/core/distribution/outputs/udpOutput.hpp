@@ -10,7 +10,7 @@
 #include "log.hpp"
 
 // UDPoutput writes led data to another device over UDP.
-class UDPOutput : public BaseOutput
+class UDPOutput final: public BaseOutput
 {
 public:
     UDPOutput(const char *hostname, int port, unsigned int fps)
@@ -42,7 +42,7 @@ public:
         sock->send(HostnameCache::lookup(hostname), port, buffer, length);
     }
 
-    void begin() override
+    void initialize() override
     {
         lastFrame = Utils::millis();
         if (sock == NULL)
@@ -81,8 +81,9 @@ public:
 
     ~UDPOutput()
     {
-        if (sock != NULL)
-            delete sock;
+        // this wont work if the sock is shared with all instances..
+        // if (sock != NULL)
+        //     delete sock;
     }
 protected:
     const char *hostname;

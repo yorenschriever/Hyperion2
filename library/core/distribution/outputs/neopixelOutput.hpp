@@ -9,7 +9,7 @@
 
 // Writes the led data to the octows2811 style connector on the front panel.
 // It use esp32's RMT peripheral to do this.
-class NeopixelOutput : public BaseOutput
+class NeopixelOutput final: public BaseOutput
 {
 public:
     // port goes from 1-8
@@ -51,7 +51,7 @@ public:
         rmt->send(buffer, length);
     }
 
-    void begin() override
+    void initialize() override
     {
         if (!rmt)
             return;

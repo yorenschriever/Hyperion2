@@ -4,7 +4,7 @@
 #include "baseOutput.hpp"
 #include "utils.hpp"
 
-class ArtNetOutput : public BaseOutput
+class ArtNetOutput final: public BaseOutput
 {
 public:
     ArtNetOutput(const char* hostname, uint8_t net, uint8_t subnet, uint8_t universe, unsigned int fps=60)
@@ -39,7 +39,7 @@ public:
         artNet->send(hostname, net, subnet, universe, buffer, length);
     }
 
-    void begin() override
+    void initialize() override
     {
         lastFrame = Utils::millis();
         this->artNet = ArtNet::getInstance();

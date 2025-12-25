@@ -152,7 +152,7 @@ namespace LedPatterns
 
             for (int index = 0; index < width; index++)
             {
-                pixels[perm.at[index]] = params->getSecondaryColour() * lfo.getValue(float(index) / width) * transition.getValue(index, width);
+                pixels[perm.at[index]] = RGBA(255,255,255,255) * lfo.getValue(float(index) / width) * transition.getValue(index, width);
             }
         }
     };

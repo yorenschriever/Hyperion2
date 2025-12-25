@@ -17,10 +17,6 @@ class Pattern
 {
 
 public:
-    // override this method if you want to complex initialization behaviour.
-    // do not put such behaviour in the constructor
-    virtual void Initialize() {}
-
     // frameBuffer = the buffer to fill. 
     //    contains data underlying layers that you have to mix this pattern into
     //    (only if active is true)

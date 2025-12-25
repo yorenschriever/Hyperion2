@@ -22,14 +22,7 @@ public:
         this->length = length;
         this->patterns = patterns;
         this->duration = duration;
-    }
-
-    virtual void begin() override
-    {
-        for (auto pattern:patterns)
-            pattern->Initialize();
-
-        start = Utils::millis();
+        this->start = Utils::millis();
     }
 
     Buffer *getData() override 

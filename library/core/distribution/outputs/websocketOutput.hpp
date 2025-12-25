@@ -11,7 +11,7 @@
 #include <algorithm>
 
 // WebsocketOutput sends data to websocket clients.
-class WebsocketOutput : public BaseOutput
+class WebsocketOutput: public BaseOutput
 {
 public:
     WebsocketOutput(WebServer **webserver, const char *path, unsigned int fps)
@@ -44,11 +44,8 @@ public:
         fpsCounter.increaseUsedFrameCount();
     }
 
-    // void postProcess() override
-    // {
-    // }
 
-    void begin() override
+    void initialize() override 
     {
         lastFrame = Utils::millis();
         if (server.get() == nullptr)

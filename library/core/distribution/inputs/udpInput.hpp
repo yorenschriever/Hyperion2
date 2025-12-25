@@ -19,7 +19,7 @@ public:
         this->port = port;
     }
 
-    virtual void begin() override
+    virtual void initialize() override
     {
         sock = new Socket(this->port);
     }

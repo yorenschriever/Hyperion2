@@ -1,13 +1,15 @@
 #pragma once
-#include "input.hpp"
+#include "baseInput.hpp"
+#include "log.hpp"
+#include "utils.hpp"
 #include <algorithm>
 
 // Use bufferInput when you manually maintain a buffer with pixelData,
 // and want to feed it into a pipe
-class BufferInput final : public Input
+class BufferInput final : public BaseInput
 {
     using LoadDataCallback = void (*)(void *);
-    using BeginCallback = void (*)(void *);
+    using InitializeCallback = void (*)(void *);
 
 public:
     BufferInput(uint8_t *buffer, unsigned int length)
@@ -25,7 +27,7 @@ public:
     void setFrameReady()
     {
         frameReady = true;
-        missedframecount++;
+        fpsCounter.increaseMissedFrameCount();
     }
 
     bool getFrameReady()
@@ -33,34 +35,41 @@ public:
         return frameReady;
     }
 
-    virtual void begin()
-    {
-        if (beginCallback)
-            beginCallback(callbackParam);
+    void initialize() override {
+        if (initializeCallback)
+            initializeCallback(callbackParam);
     }
 
-    virtual int loadData(uint8_t *dataPtr, unsigned int buffersize)
+    Buffer *getData() override
     {
+        auto patternBuffer = BufferPool::getBuffer(length);
+        if (!patternBuffer)
+        {
+            Log::error("PATTERN_INPUT", "Unable to allocate memory for PatternInput, free heap = %d\n", Utils::get_free_heap());
+            Utils::exit();
+        }
+        auto dataPtr = patternBuffer->getData();
+
         if (loadDataCallback)
             loadDataCallback(callbackParam);
 
         if (!frameReady)
-            return 0;
+            return nullptr;
 
         frameReady = false;
 
-        memcpy(dataPtr, buffer, std::min(length, buffersize));
+        memcpy(dataPtr, buffer, length);
 
-        usedframecount++;
-        missedframecount--;
+        fpsCounter.increaseUsedFrameCount();
+        fpsCounter.increaseUsedFrameCount(-1);
 
-        return length;
+        return patternBuffer;
     }
 
-    void setCallbacks(LoadDataCallback loadDataCallback, BeginCallback beginCallback, void *callbackParam)
+    void setCallbacks(LoadDataCallback loadDataCallback, InitializeCallback initializeCallback, void *callbackParam)
     {
         this->loadDataCallback = loadDataCallback;
-        this->beginCallback = beginCallback;
+        this->initializeCallback = initializeCallback;
         this->callbackParam = callbackParam;
     }
 
@@ -69,6 +78,6 @@ private:
     unsigned int length = 0;
     bool frameReady = false;
     LoadDataCallback loadDataCallback = NULL;
-    BeginCallback beginCallback = NULL;
+    InitializeCallback initializeCallback = NULL;
     void *callbackParam = NULL;
 };

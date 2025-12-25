@@ -22,11 +22,6 @@ public:
         this->pattern = pattern;
     }
 
-    void begin() override
-    {
-        pattern->Initialize();
-    }
-
     Buffer *getData() override
     {
         auto patternBuffer = BufferPool::getBuffer(length * sizeof(T_COLOUR));
