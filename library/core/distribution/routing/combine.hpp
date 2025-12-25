@@ -70,6 +70,11 @@ public:
         return part;
     }
 
+    CombinedInputPart *atDmxChannel(int offset, bool sync = true)
+    {
+        return atOffset(offset-1, sync);
+    }
+
     void setReceiver(IReceiver *receiver) override
     {
         this->receiver = receiver;
