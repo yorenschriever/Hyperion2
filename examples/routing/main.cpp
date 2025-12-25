@@ -19,42 +19,26 @@ int main()
 {
   auto hyp = new Hyperion();
 
-  auto inputRed = new PatternInput(10, new ColorPattern(RGB(255, 0, 0)));
+  auto inputRed =   new PatternInput(10, new ColorPattern(RGB(255, 0, 0)));
   auto inputGreen = new PatternInput(10, new ColorPattern(RGB(0, 255, 0)));
-  auto inputBlue = new PatternInput(10, new ColorPattern(RGB(0, 0, 255)));
+  auto inputBlue =  new PatternInput(10, new ColorPattern(RGB(0, 0, 255)));
 
   auto combine = new Combine();
 
-  hyp->createChain(inputRed, combine->atOffset(0));
-  hyp->createChain(inputRed, combine->atOffset(30));
-  hyp->createChain(inputRed, combine->atOffset(60 + 10));
+  hyp->createChain(inputRed,   combine->atOffset(0));
+  hyp->createChain(inputGreen, combine->atOffset(30));
+  hyp->createChain(inputBlue,  combine->atOffset(60 + 30));
 
-  auto map = gridMap(100,1);
-  hyp->createChain(combine, new MonitorOutput(hyp->webServer, map)));
+  auto slicer = new Slicer({
+    {0, 120, true},
+    {0, 120}
+  });
 
-  // auto sw = new Switch(2);
+  hyp->createChain(combine,slicer);
 
-  // hyp->createPartialChain(
-  //   new PatternInput(100,new RainbowPattern()),
-  //   sw->getReceiver(0)
-  // );
-
-  // hyp->createPartialChain(
-  //   new PatternInput(100,new RainbowPattern()),
-  //   sw->getReceiver(0)
-  // );
-
-  // hyp->createPartialChain(
-  //   sw,
-  //   new UDPOutput(target,9619,30)
-  // );
-
-  // ISender input =
-  //       new Switch(
-  //           input1,
-  //           input2,
-  //           [](){return hyp->hub.findSlot(autoColumn,0)->activated;}
-  //       );
+  auto map = gridMap(40,1);
+  hyp->createChain(slicer->getSlice(0), new UDPOutput("hypernode1.local",9611));
+  hyp->createChain(slicer->getSlice(1), new MonitorOutput(&hyp->webServer, &map));
 
   hyp->start();
 

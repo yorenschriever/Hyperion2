@@ -45,7 +45,7 @@ public:
         auto patternBuffer = BufferPool::getBuffer(length);
         if (!patternBuffer)
         {
-            Log::error("PATTERN_INPUT", "Unable to allocate memory for PatternInput, free heap = %d\n", Utils::get_free_heap());
+            Log::error("BUFFER_INPUT", "Unable to allocate memory for BufferInput, free heap = %d\n", Utils::get_free_heap());
             Utils::exit();
         }
         auto dataPtr = patternBuffer->getData();

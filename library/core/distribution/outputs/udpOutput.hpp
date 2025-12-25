@@ -13,7 +13,7 @@
 class UDPOutput final: public BaseOutput
 {
 public:
-    UDPOutput(const char *hostname, int port, unsigned int fps)
+    UDPOutput(const char *hostname, int port, unsigned int fps = 60)
     {
         this->hostname = hostname;
         this->port = port;

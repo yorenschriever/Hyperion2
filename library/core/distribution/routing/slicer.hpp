@@ -11,7 +11,7 @@
 // With this class you can freely assign start and end positions
 // of each slice. This means you can also skip parts of the buffer,
 // or use parts twice.
-class Slicer : IReceiver
+class Slicer : public IReceiver
 {
 
 public:
@@ -40,16 +40,19 @@ public:
 
         for (Slice slice : slices)
         {
-            auto bi = new BufferInput(this->buffer + slice.start, slice.length);
-            this->destinationInputs.push_back(bi);
-
             bufferSize = std::max(bufferSize, slice.start + slice.length);
         }
 
         buffer = (uint8_t *)malloc(bufferSize);
         if (!buffer)
         {
-            Log::error("", "Unable to allocate buffer for slicer.");
+            Log::error("SLICER", "Unable to allocate buffer for slicer.");
+        }
+
+        for (Slice slice : slices)
+        {
+            auto bi = new BufferInput(this->buffer + slice.start, slice.length);
+            this->destinationInputs.push_back(bi); 
         }
     }
 

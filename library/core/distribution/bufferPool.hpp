@@ -80,7 +80,7 @@ public:
         // make the largest buffer a bit bigger to the data
         if (largestFreeBuffer != nullptr)
         {
-            // Log::info("BUFFER_POOL", "No suitable buffer found in %d buffers. Resizing the largest one from %d to %d", largestFreeBuffer->capacity, size);
+            // Log::info("BUFFER_POOL", "No suitable buffer found in %d buffers. Resizing the largest one from %d to %d", buffers.size(), largestFreeBuffer->capacity, size);
 
             largestFreeBuffer->data = (uint8_t *)realloc(largestFreeBuffer->data, size);
             if (!largestFreeBuffer->data)

@@ -5,7 +5,6 @@
 // TODO separate files
 
 class IReceiver;
-class Hyperion;
 class IInput;
 class IOutput;
 class IRegisterable;
