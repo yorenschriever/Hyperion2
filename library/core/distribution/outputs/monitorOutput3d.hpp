@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/generation/pixelMap.hpp"
+#include "core/generation/pixelMap/pixelMap.hpp"
 #include "log.hpp"
 #include "platform/includes/log.hpp"
 #include "platform/includes/webServer.hpp"

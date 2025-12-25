@@ -37,9 +37,9 @@
 #include "core/generation/patterns/helpers/tempo/tapTempo.h"
 #include "core/generation/patterns/helpers/tempo/tempo.h"
 #include "core/generation/patterns/helpers/tempo/websocketTempo.h"
-#include "core/generation/pixelMap.hpp"
-#include "core/generation/pixelMapSplitter3d.hpp"
-
+#include "core/generation/pixelMap/pixelMap.hpp"
+#include "core/generation/pixelMap/pixelMapSplitter3d.hpp"
+#include "core/generation/pixelMap/mapHelpers.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
 #include "generation/controllers/websocketController.hpp"
 #include "platform/includes/ethernet.hpp"

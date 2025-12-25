@@ -1,4 +1,3 @@
-#include "gridmap.hpp"
 #include "hyperion.hpp"
 #include "patterns.hpp"
 
