@@ -63,9 +63,10 @@ void distributeAndMonitor(
     float monitorDotSize=0.01)
 {
     auto slices = createSlices<T_INPUT_COLOUR>(input, slaves);
-    auto splitInput = new Slicer(input,slices);
+    auto splitInput = new Slicer(slices);
     distribute<T_OUTPUT_COLOUR, T_INPUT_COLOUR>(hyp, slaves, splitInput, lut);
 
+    hyp->createChain(input,splitInput);
     hyp->createChain(
         splitInput->getSlice(slices.size()-1),
         new ConvertColor<T_INPUT_COLOUR, RGB>(),
@@ -83,9 +84,10 @@ void distributeAndMonitor3d(
     float monitorDotSize=0.01)
 {
     auto slices = createSlices<T_INPUT_COLOUR>(input, slaves);
-    auto splitInput = new Slicer(input,slices);
+    auto splitInput = new Slicer(slices);
     distribute<T_OUTPUT_COLOUR, T_INPUT_COLOUR>(hyp, slaves, splitInput, lut);
 
+    hyp->createChain(input,splitInput);
     hyp->createChain(
         splitInput->getSlice(slices.size()-1),
         new ConvertColor<T_INPUT_COLOUR, RGB>(),

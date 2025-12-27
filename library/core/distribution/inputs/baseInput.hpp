@@ -13,22 +13,17 @@ class BaseInput : public IInput
 {
 
 public:
-    // Implement this function to provide data to the pipe
-    // When this function is called you should put copy the
-    // most recent pixel data into the dataPtr and return
-    // the number of byte you have written. Ideally you should
-    // have a buffer ready to be copied, as every execution in
-    // this function slows down the main loop.
-    virtual Buffer *getData() = 0;
-
     virtual void process() override
     {
         if (!receiver || !receiver->ready())
             return;
 
         auto inputBuffer = getData();
-        if (!inputBuffer || inputBuffer->getLength() == 0)
+        if (!inputBuffer) return;
+        if (inputBuffer->getLength() == 0){
+            BufferPool::release(inputBuffer);
             return;
+        }
 
         receiver->setLength(inputBuffer->getLength());
         receiver->setData(inputBuffer->getData(), inputBuffer->getLength());
@@ -58,4 +53,6 @@ public:
 protected:
     IReceiver *receiver = nullptr;
     FPSCounter fpsCounter;
+
+    virtual Buffer *getData() = 0;
 };

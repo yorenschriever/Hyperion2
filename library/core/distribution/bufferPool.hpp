@@ -46,6 +46,10 @@ public:
         //     Log::info("BUFFER_POOL", "Buffer %d: capacity %d, inUse=%d", i, buffers[i]->capacity, buffers[i]->inUse);
         // }
 
+        if (buffers.size() > 20){
+            Log::error("BUFFERPOOL","Bufferpool > 20, sus");
+        }
+
         Buffer *largestFreeBuffer = nullptr;
         Buffer *smallestSuitableBuffer = nullptr;
 
@@ -87,6 +91,7 @@ public:
             {
                 // realloc failed, return nullptr
                 mutex.unlock();
+                buffers.erase(std::remove(buffers.begin(), buffers.end(), largestFreeBuffer), buffers.end());
                 return nullptr;
             }
             largestFreeBuffer->capacity = size;

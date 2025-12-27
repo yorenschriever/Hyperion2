@@ -42,6 +42,10 @@ public:
 
     Buffer *getData() override
     {
+        if (!frameReady){
+            return nullptr;
+        }
+
         auto patternBuffer = BufferPool::getBuffer(length);
         if (!patternBuffer)
         {
@@ -52,9 +56,6 @@ public:
 
         if (loadDataCallback)
             loadDataCallback(callbackParam);
-
-        if (!frameReady)
-            return nullptr;
 
         frameReady = false;
 
