@@ -53,7 +53,7 @@ export class Websockets {
     writeBuffer() {
         this.bytesbuffer.forEach((buf, index) => {
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffers.ledBuffers[index].color);
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, buf, this.gl.STATIC_DRAW);
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, buf, this.gl.DYNAMIC_DRAW);
         })
         window.requestAnimationFrame(() => this.writeBuffer());
     }
