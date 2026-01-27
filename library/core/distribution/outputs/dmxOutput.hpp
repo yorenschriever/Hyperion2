@@ -14,22 +14,12 @@ public:
         this->dmxPort = dmxPort;
     }
 
-    // size is in bytes
-    void setData(uint8_t *data, int size) override
-    {
-        if (dmx)
-            dmx->write(data, size, 1);
-    }
 
     bool ready() override
     {
         return dmx && dmx->ready();
     }
 
-    void show() override
-    {
-        dmx->show();
-    }
 
     void initialize() override
     {
@@ -42,10 +32,15 @@ public:
             dmx->clearTxBuffer();
     }
 
-    // length is in bytes
-    void setLength(int len) override
+    void process(Buffer inputBuffer) override
     {
-        // do nothing. DMX automatically detects the length based on the last byte written
+        if (!ready())
+            return;
+
+        dmx->write(inputBuffer.data(), inputBuffer.size(), 1);
+        dmx->show();
+
+        fpsCounter.increaseUsedFrameCount();
     }
 
 private:

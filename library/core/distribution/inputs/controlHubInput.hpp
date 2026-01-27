@@ -6,7 +6,6 @@
 #include "baseInput.hpp"
 #include "log.hpp"
 #include "utils.hpp"
-#include "../bufferPool.hpp"
 #include <algorithm>
 #include <vector>
 
@@ -55,13 +54,6 @@ private:
         this->_length = length;
         this->slotPatterns = slotPatterns;
         this->hub = hub;
-        // this->renderBufferPtr = (uint8_t*)calloc(length, sizeof(T_COLOUR));
-
-        // if (!this->renderBufferPtr)
-        // {
-        //     Log::error("CONTROL_HUB_INPUT", "Unable to allocate memory for ControlHubInput, free heap = %d\n", Utils::get_free_heap());
-        //     Utils::exit();
-        // }
 
         //make sure the control hub is large enough to fit all the patterns.
         //do this in reverse, because it is likely that the largest slot/column is passed last,
@@ -80,26 +72,20 @@ public:
         return _length;
     }
 
-    Buffer *getData() override
+    virtual bool ready() override
     {
-        auto patternBuffer = BufferPool::getBuffer(_length * sizeof(T_COLOUR));
-        auto renderBuffer = BufferPool::getBuffer(_length * sizeof(T_COLOUR));
-        if (!patternBuffer || !renderBuffer)
-        {
-            Log::error("CONTROL_HUB_INPUT", "Unable to allocate memory for ControlHubInput, free heap = %d\n", Utils::get_free_heap());
-            Utils::exit();
-        }
+        return true;
+    }
 
-        T_COLOUR * patternBufferPtr = ( T_COLOUR *) patternBuffer->getData();
-        T_COLOUR * renderBufferPtr = ( T_COLOUR *) renderBuffer->getData();
-
-        for (int i = 0; i < _length; i++)
-            ((T_COLOUR *)renderBufferPtr)[i] = T_COLOUR();
+    Buffer process() override
+    {
+        auto patternBuffer = Buffer(_length * sizeof(T_COLOUR));
+        auto renderBuffer  = Buffer(_length * sizeof(T_COLOUR));
+        renderBuffer.clear<T_COLOUR>();
 
         for (auto slotPattern : slotPatterns)
         {
-            for (int i = 0; i < _length; i++)
-                patternBufferPtr[i] = T_COLOUR();
+            patternBuffer.clear<T_COLOUR>();
 
             auto column = hub->findColumn(slotPattern.column);
             auto slot = hub->findSlot(column, slotPattern.slot);
@@ -109,7 +95,7 @@ public:
 
             //Log::info("CONTROL_HUB_INPUT", "calculating pattern active = %d, dim = %d ,masterDim = %d", slot->activated, column->dim, hub->masterDim);
 
-            slotPattern.pattern->Calculate(patternBufferPtr, _length, slot->activated, hub->getParams(slotPattern.paramsSlot));
+            slotPattern.pattern->Calculate(patternBuffer.as<T_COLOUR>(), _length, slot->activated, hub->getParams(slotPattern.paramsSlot));
 
             // apply dimming and copy to output buffer
             for (int i = 0; i < _length; i++)
@@ -119,35 +105,32 @@ public:
                 if (std::is_same<T_COLOUR, RGBA>::value)
                 {
                     //if the colour space is RGBA, apply colour mixing based on the alpha channel
-                    RGBA *l = (RGBA*) &patternBufferPtr[i];
-                    l->A = (l->A * dimValue) >> 8;
+                    RGBA l = patternBuffer.as<RGBA>()[i];
+                    l.A = (l.A * dimValue) >> 8;
                 }
                 else
                 {
                     //if the colour space is not RGBA, apply dimming and sum with the existing value.
-                    patternBufferPtr[i].dim(dimValue);
+                    patternBuffer.as<T_COLOUR>()[i].dim(dimValue);
                 }
                 int index = (slotPattern.indexMap) ? slotPattern.indexMap->map(i) : i;
-                int safeLength = renderBuffer->getLength() / (int)sizeof(T_COLOUR);
+                int safeLength = renderBuffer.size() / sizeof(T_COLOUR);
                 if(index < 0 || index >= safeLength)
                 {
                     Log::error("CONTROL_HUB_INPUT", "Mapped index out of bounds: %d, length: %d", index, safeLength);
                     continue;
                 }
-                ((T_COLOUR *)renderBufferPtr)[index] += patternBufferPtr[i];
+                renderBuffer.as<T_COLOUR>()[index] += patternBuffer.as<T_COLOUR>()[i];
             }
         }   
 
-        BufferPool::release(patternBuffer);
-
         fpsCounter.increaseUsedFrameCount();
-        //return {renderBufferPtr, _length * (int)sizeof(T_COLOUR)};
+        
         return renderBuffer;
     }
 
 private:
     int _length = 0;
-    // uint8_t * renderBufferPtr;
 
     std::vector<SlotPattern> slotPatterns;
     ControlHub *hub;

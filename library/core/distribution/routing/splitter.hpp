@@ -31,7 +31,7 @@ public:
         buffer = (uint8_t *)malloc(bufferSize);
         if (!buffer)
         {
-            Log::error("", "Unable to allocate buffer for slicer.");
+            Log::error("Splitter", "Unable to allocate buffer for splitter.");
         }
     }
 };

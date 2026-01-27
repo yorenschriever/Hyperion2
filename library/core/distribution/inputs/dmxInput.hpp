@@ -26,27 +26,29 @@ public:
         this->dmx = DMX::getInstance(dmxPort);
     }
 
-    Buffer *getData() override 
+    virtual bool ready() override
     {
-        int frameNumber = dmx->getFrameNumber();
+        if(!dmx || !dmx->isHealthy()) 
+            return false;
 
-        //check if there is a new frame since last time
-        if (frameNumber == lastFrameNumber)
-            return nullptr;
+        int frameNumber = dmx->getFrameNumber();
+        return (frameNumber != lastFrameNumber);
+    }
+
+    Buffer process() override 
+    {
+        if (!ready())
+            return Buffer(0);
+
+        int frameNumber = dmx->getFrameNumber();
         lastFrameNumber = frameNumber;
 
         fpsCounter.increaseUsedFrameCount();
         fpsCounter.increaseMissedFrameCount(frameNumber - lastFrameNumber - 1);
 
-        auto patternBuffer = BufferPool::getBuffer(length);
-        if (!patternBuffer)
-        {
-            Log::error("DMX_INPUT", "Unable to allocate memory for PatternInput, free heap = %d\n", Utils::get_free_heap());
-            Utils::exit();
-        }
-        auto dataPtr = patternBuffer->getData();
+        auto patternBuffer = Buffer(length);
 
-        memcpy(dataPtr, dmx->getDataPtr() + startChannel, length);
+        memcpy(patternBuffer.data(), dmx->getDataPtr() + startChannel, length);
 
         return patternBuffer;
     }

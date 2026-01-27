@@ -3,6 +3,7 @@
 #include "platform/includes/artNet.hpp"
 #include "baseOutput.hpp"
 #include "utils.hpp"
+#include <algorithm>
 
 class ArtNetOutput final: public BaseOutput
 {
@@ -16,27 +17,20 @@ public:
         this->frameInterval = 1000 / fps;
     }
 
-    // size is in bytes
-    void setData(uint8_t *data, int size) override
-    {
-        int copy_length = std::min(size, length);
-        if (copy_length > 0)
-            memcpy(this->buffer, data, copy_length);
-    }
-
     bool ready() override
     {
         if (!artNet) return false;
         return (Utils::millis() - lastFrame >= frameInterval);
     }
 
-    void show() override
-    {
+    void process(Buffer inputBuffer) override {
         if (!ready())
             return;
 
         lastFrame = Utils::millis();
-        artNet->send(hostname, net, subnet, universe, buffer, length);
+
+        int length = std::min((int)inputBuffer.size(), 512);
+        artNet->send(hostname, net, subnet, universe, inputBuffer.data(), length);
     }
 
     void initialize() override
@@ -47,18 +41,9 @@ public:
 
     void clear() override
     {
-        memset(buffer, 0, length);
-    }
-
-    // length is in bytes
-    void setLength(int len) override
-    {
-        if (len == this->length)
-            return;
-        if (len > 512)
-            return;
-        
-        this->length = len;
+        auto blankBuffer = Buffer(512);
+        blankBuffer.clear<Monochrome>();
+        process(blankBuffer);
     }
 
 private:
@@ -67,9 +52,6 @@ private:
     uint8_t subnet;
     uint8_t universe;
     ArtNet *artNet = nullptr;
-
-    uint8_t buffer[512];
-    int length = 512;
 
     int frameInterval;
     unsigned long lastFrame = 0;

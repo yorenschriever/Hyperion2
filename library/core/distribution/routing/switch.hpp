@@ -11,10 +11,10 @@ class Fallback;
 
 // TODO docs
 // you can either provide a switchfunc or use setReceiver.
-class Switch : public ISender
+class Switch : public ISource
 {
 
-    class SwitchReceiver : public IReceiver
+    class SwitchReceiver : public ISink
     {
     public:
         SwitchReceiver(Switch *parent)
@@ -22,42 +22,20 @@ class Switch : public ISender
             this->parent = parent;
         }
 
+        void initialize() override {}
+
         bool ready() override
         {
             lastSignal = Utils::millis();
-            parent->checkSwitchFunc();
-            if (!active)
-                return false;
-            if (!parent->outReceiver)
-                return false;
-            return parent->outReceiver->ready();
+            return !parent->dirty;
         }
 
-        void setLength(int length) override
+        void process(const Buffer inputBuffer) override
         {
             if (!active)
                 return;
-            if (!parent->outReceiver)
-                return;
-            parent->outReceiver->setLength(length);
-        }
-
-        void setData(uint8_t *data, int size) override
-        {
-            if (!active)
-                return;
-            if (!parent->outReceiver)
-                return;
-            parent->outReceiver->setData(data, size);
-        }
-
-        void show() override
-        {
-            if (!active)
-                return;
-            if (!parent->outReceiver)
-                return;
-            parent->outReceiver->show();
+            parent->buffer = inputBuffer;
+            parent->dirty = true;
         }
 
     private:
@@ -81,27 +59,22 @@ public:
         this->switchFunc = switchFunc;
     }
 
-    IReceiver *getReceiver(int i)
+    ISink *getReceiver(int i)
     {
         if (i >= inReceivers.size())
         {
-            Log::error("", "Switch.getReceiver(%d) out of bounds (%d)", i, inReceivers.size());
+            Log::error("SWITCH", "Switch.getReceiver(%d) out of bounds (%d)", i, inReceivers.size());
             return nullptr;
         }
 
         return inReceivers[i];
     }
 
-    void setReceiver(IReceiver *receiver) override
-    {
-        this->outReceiver = receiver;
-    }
-
     void setReceiver(int receiverIndex)
     {
         if (receiverIndex >= inReceivers.size())
         {
-            Log::error("", "Switch.setReceiver(%d) out of bounds (%d)", receiverIndex, inReceivers.size());
+            Log::error("SWITCH", "Switch.setReceiver(%d) out of bounds (%d)", receiverIndex, inReceivers.size());
         }
 
         int i = 0;
@@ -112,10 +85,27 @@ public:
         }
     }
 
+    void initialize() override
+    {
+    } 
+
+    bool ready() override
+    {
+        return dirty;
+    }
+
+    Buffer process() override
+    {
+        checkSwitchFunc();
+        dirty = false;
+        return buffer;
+    }
+
 protected:
-    IReceiver *outReceiver;
     std::vector<SwitchReceiver *> inReceivers;
     SwitchFunc switchFunc;
+    bool dirty = false;
+    Buffer buffer = Buffer(0);
 
     void checkSwitchFunc()
     {

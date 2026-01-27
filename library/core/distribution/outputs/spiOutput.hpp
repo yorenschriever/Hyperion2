@@ -23,13 +23,6 @@ public:
         buffer = (uint8_t *)Utils::malloc_dma(length);
     }
 
-    // index and size are in bytes
-    void setData(uint8_t *data, int size) override
-    {
-        int copylength = std::min(size, length);
-        if (copylength > 0)
-            memcpy(this->buffer, data, copylength);
-    }
 
     bool ready() override
     {
@@ -38,10 +31,6 @@ public:
         return spi && spi->ready();
     }
 
-    void show() override
-    {
-        spi->send(buffer, length);
-    }
 
     void initialize() override
     {
@@ -54,27 +43,32 @@ public:
         memset(buffer, 0, length);
     }
 
-    // length is in bytes
-    void setLength(int len) override
+    void process(Buffer inputBuffer) override
     {
-        if (len != this->length)
-        {
-            // wait for the buffer to be sent before we are going to change its size
-            while (!ready())
-                Thread::sleep(1);
+        if (!ready())
+            return;
 
-            buffer = (uint8_t *)Utils::realloc_dma(buffer, len);
+        if (!inputBuffer.size())
+            return;
 
+        if (inputBuffer.size() != length){
+            buffer = (uint8_t *)Utils::realloc_dma(buffer, inputBuffer.size());
             if (!buffer)
             {
-                Log::error("SPI","Unable to allocate memory for SPIOutput, free heap = %d",Utils::get_free_heap());
+                Log::error("SPI_OUTPUT", "Unable to allocate memory for SPIOutput, free heap = %d", Utils::get_free_heap());
                 Utils::exit();
             }
-
-            memset(buffer, 0, len);
-            this->length = len;
+            length = inputBuffer.size();
+            memset(buffer, 0, length);
         }
+
+        memcpy(this->buffer, inputBuffer.data(), length);
+
+        spi->send(buffer, length);
+
+        fpsCounter.increaseUsedFrameCount();
     }
+
 
     ~SpiOutput()
     {

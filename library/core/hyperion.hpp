@@ -1,11 +1,11 @@
 #pragma once
 #include "colours.h"
-#include "core/distribution/processors/convertColor.hpp"
+#include "core/distribution/chain.hpp"
 #include "core/distribution/inputs/udpInput.hpp"
 #include "core/distribution/inputs/dmxInput.hpp"
 #include "core/distribution/inputs/patternInput.hpp"
 #include "core/distribution/inputs/controlHubInput.hpp"
-#include "distribution/inputs/patternCycleInput.hpp"
+#include "core/distribution/inputs/patternCycleInput.hpp"
 #include "core/distribution/routing/slicer.hpp"
 #include "core/distribution/routing/splitter.hpp"
 #include "core/distribution/routing/combine.hpp"
@@ -23,6 +23,8 @@
 #include "core/distribution/outputs/spiOutput.hpp"
 #include "core/distribution/outputs/udpOutput.hpp"
 #include "core/distribution/outputs/artnetOutput.hpp"
+#include "core/distribution/outputs/nullOutput.hpp"
+#include "core/distribution/processors/convertColor.hpp"
 #include "core/generation/controllers/dinMidiControllerFactory.hpp"
 #include "core/generation/controllers/midiBridge.hpp"
 #include "core/generation/controllers/midiController.hpp"
@@ -55,7 +57,7 @@
 #include <memory>
 #include <vector>
 
-class Hyperion final: public IRegistrant
+class Hyperion
 {
     const char *TAG = "Hyperion";
 
@@ -100,8 +102,9 @@ public:
         if (config.tempo)
             setup_tempo();
 
-        for (auto initializer : initializers)
-            initializer->initialize();
+        Log::info(TAG, "Initializing chains");
+        for (auto chain: chains)
+            chain->initialize();
 
         clearAll();
 
@@ -110,70 +113,25 @@ public:
         Thread::create(runTask, "run", Thread::Purpose::distribution, 30000, this, 1);
     }
 
-    virtual void addInput(IInput *input)
+    virtual void createChain(ISource *input, ISink *output)
     {
-        inputs.push_back(input);
+        chains.push_back(new Chain(input, output));
     }
 
-    virtual void addOutput(IOutput *output)
+    virtual void createChain(ISource *input, IConverter* converter, ISink *output)
     {
-        outputs.push_back(output);
+        chains.push_back(new Chain(input, converter, output));
     }
 
-    virtual void addInitializer(IRegisterable *initializer)
+    virtual void createChain(ISource *input, std::vector<IConverter*> converters,ISink *output)
     {
-        initializers.push_back(initializer);
-    }
-
-    virtual std::vector<IInput*> getInputs(){
-        return inputs;
-    }
-
-    virtual std::vector<IOutput*> getOutputs(){
-        return outputs;
-    }
-
-    virtual void createChain(ISender *input, IReceiver *output)
-    {
-        input->setReceiver(output);
-        input->registerToHyperion(this);
-        output->registerToHyperion(this);
-    }
-
-    virtual void createChain(ISender *input, IConverter* converter, IReceiver *output)
-    {
-        input->setReceiver(converter);
-        converter->setReceiver(output);
-        input->registerToHyperion(this);
-        output->registerToHyperion(this);
-    }
-
-    virtual void createChain(ISender *input, std::vector<IConverter*> converters,IReceiver *output)
-    {
-        IConverter *sender = nullptr;
-        for (auto converter : converters)
-        {
-            if (!sender)
-                input->setReceiver(converter);
-            else
-                sender->setReceiver(converter);
-            sender = converter;
-        }
-        sender->setReceiver(output);
-        input->registerToHyperion(this);
-        output->registerToHyperion(this);
+        chains.push_back(new Chain(input, converters, output));
     }
 
     virtual void clearAll()
     {
-        for (auto output : outputs)
-        {
-            if (output->ready())
-            {
-                output->clear();
-                output->show();
-            }
-        }
+        // for (auto chain : chains)
+        //     chain->output->clear();
     }
 
     virtual void setMidiControllerFactory(MidiControllerFactory * midiControllerFactory)
@@ -378,8 +336,8 @@ private:
             unsigned long now = Utils::millis();
             unsigned long elapsedTime = now - lastFpsUpdate;
 
-            instance->calcFps("IN",instance->inputs, elapsedTime, firstRun);
-            instance->calcFps("OUT",instance->outputs, elapsedTime, firstRun);
+            // instance->calcFps("IN",instance->inputs, elapsedTime, firstRun);
+            // instance->calcFps("OUT",instance->outputs, elapsedTime, firstRun);
 
             lastFpsUpdate = now;
 
@@ -394,7 +352,7 @@ private:
             // Log::info("HYP", "FPS: %d of %d (%d%% miss)\t interval: %dms \t freeHeap: %d \t avg length: %d \t channels: %d \t totalLights: %d", (int)outFps, (int)inFps, (int)misses, (int)elapsedTime, Utils::get_free_heap(), avgLength, activeChannels, totalLength);
 
             // Debug.printf("IPAddress: %s\r\n", Ethernet::GetIp().toString().c_str());
-            // Debug.printf("Tempo source: %s\r\n", Tempo::SourceName());
+            // Log::info("Hyperion","Tempo source: %s\r\n", Tempo::SourceName());
 
             // Display::setFPS(infps,outfps,misses);
             // Display::setLeds(totalLength);
@@ -413,8 +371,8 @@ private:
     {
         // Log::info("Hyperion", "running");
 
-        for (auto input: inputs)
-            input->process();
+        for (auto chain: chains)
+            chain->process();
 
         Thread::sleep(1);
     }
@@ -427,9 +385,7 @@ private:
         Thread::destroy();
     }
 
-    std::vector<IInput *> inputs;
-    std::vector<IOutput *> outputs;
-    std::vector<IRegisterable*> initializers;
+    std::vector<Chain*> chains;
     std::map<MidiDevice *, std::unique_ptr<MidiController>> midiControllers;
     std::map<MidiDevice *, MidiClockTempo *> midiClockTempos;
     MidiControllerFactory *midiControllerFactory = nullptr;

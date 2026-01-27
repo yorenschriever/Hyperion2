@@ -36,9 +36,9 @@ int main()
 
   hyp->createChain(combine,slicer);
 
-  auto map = gridMap(40,1);
+  auto map = new PixelMap(gridMap(40,1));
   hyp->createChain(slicer->getSlice(0), new UDPOutput("hypernode1.local",9611));
-  hyp->createChain(slicer->getSlice(1), new MonitorOutput(&hyp->webServer, &map));
+  hyp->createChain(slicer->getSlice(1), new MonitorOutput(&hyp->webServer, map));
 
   hyp->start();
 

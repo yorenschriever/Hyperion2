@@ -30,7 +30,7 @@ public:
         fpsCounter.increaseMissedFrameCount();
     }
 
-    bool getFrameReady()
+    virtual bool ready() override
     {
         return frameReady;
     }
@@ -40,25 +40,17 @@ public:
             initializeCallback(callbackParam);
     }
 
-    Buffer *getData() override
+    Buffer process() override
     {
-        if (!frameReady){
-            return nullptr;
-        }
 
-        auto patternBuffer = BufferPool::getBuffer(length);
-        if (!patternBuffer)
-        {
-            Log::error("BUFFER_INPUT", "Unable to allocate memory for BufferInput, free heap = %d\n", Utils::get_free_heap());
-            Utils::exit();
-        }
-        auto dataPtr = patternBuffer->getData();
+        auto patternBuffer = Buffer(length);
 
         if (loadDataCallback)
             loadDataCallback(callbackParam);
 
         frameReady = false;
 
+        auto dataPtr = patternBuffer.data();
         memcpy(dataPtr, buffer, length);
 
         fpsCounter.increaseUsedFrameCount();

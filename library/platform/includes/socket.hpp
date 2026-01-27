@@ -172,6 +172,25 @@ public:
         return len;
     }
 
+    int peek(void *rx_buffer, unsigned int buffer_length)
+    {
+        if (sock <= 0)
+        {
+            Log::error(TAG, "cannot recv. socket not open");
+            return 0;
+        }
+
+        int len = recv(sock, rx_buffer, buffer_length, MSG_DONTWAIT | MSG_PEEK);
+
+        if (len < 0 && errno != EWOULDBLOCK)
+        {
+            Log::error(TAG, "error during recvfrom: errno: %d", errno);
+            return 0;
+        }
+
+        return len;
+    }
+
     int set_recv_timeout(int ms)
     {
         if (ms == 0)

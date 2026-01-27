@@ -18,17 +18,6 @@ public:
         this->hostname = hostname;
         this->port = port;
         this->frameInterval = 1000 / fps;
-
-        this->length = 12;
-        buffer = (uint8_t *)malloc(12);
-    }
-
-    // size is in bytes
-    void setData(uint8_t *data, int size) override
-    {
-        int copy_length = std::min(size, length);
-        if (copy_length > 0)
-            memcpy(this->buffer, data, copy_length);
     }
 
     bool ready() override
@@ -36,10 +25,14 @@ public:
         return (Utils::millis() - lastFrame >= frameInterval);
     }
 
-    void show() override
+    void process(Buffer inputBuffer) override
     {
+        if (!ready())
+            return;
+
         lastFrame = Utils::millis();
-        sock->send(HostnameCache::lookup(hostname), port, buffer, length);
+
+        sock->send(HostnameCache::lookup(hostname), port, (uint8_t *)inputBuffer.data(), inputBuffer.size());
     }
 
     void initialize() override
@@ -51,33 +44,9 @@ public:
 
     void clear() override
     {
-        memset(this->buffer, 0, this->length);
+        
     }
 
-    // length is in bytes
-    void setLength(int len) override
-    {
-        if (len != this->length)
-        {
-            if (len > 1500){
-                Log::info("UPD_OUTPUT","Warning! udp output length is > 1500, which is the maximum transfer length on some systems. Data might not be sent.");
-            }
-
-            // wait for the front buffer to be sent before we are going to change its size
-            while (!ready())
-                Thread::sleep(1);
-
-            buffer = (uint8_t *)realloc(buffer, len);
-
-            if (!buffer)
-            {
-                Log::error("UPD_OUTPUT", "Unable to allocate memory for UdpOutput, free heap = %d\n", Utils::get_free_heap());
-                Utils::exit();
-            }
-
-            this->length = len;
-        }
-    }
 
     ~UDPOutput()
     {
@@ -91,8 +60,6 @@ protected:
     int frameInterval;
     unsigned long lastFrame = 0;
 
-    int length;
-    uint8_t *buffer;
 
     // share 1 socket instance with all UdpOutputs, because the number of sockets is limited on esp platforms
     static Socket *sock;

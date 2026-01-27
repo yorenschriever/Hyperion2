@@ -11,7 +11,7 @@
 // With this class you can freely assign start and end positions
 // of each slice. This means you can also skip parts of the buffer,
 // or use parts twice.
-class Slicer : public IReceiver
+class Slicer : public ISink
 {
 
 public:
@@ -56,6 +56,10 @@ public:
         }
     }
 
+    void initialize() override
+    {
+    }
+
     bool ready() override
     {
         int index = 0;
@@ -67,31 +71,24 @@ public:
 
             // the output is marked as sync. If the bufferOutput still has a frame ready to be
             // sent out (or is in the process of sending it out), we are not ready to load new data yet.
-            if (di->getFrameReady())
+            if (di->ready())
                 return false;
         }
         return true;
     }
 
-    void setLength(int length) override
+    void process(const Buffer inputBuffer) override
     {
-        // do nothing
-    }
+        auto copyLength = std::min((int)inputBuffer.size(), bufferSize);
+        memcpy(buffer, inputBuffer.data(), copyLength);
 
-    void setData(uint8_t *data, int size) override
-    {
-        memcpy(buffer, data, std::min(size, bufferSize));
-    }
-
-    void show() override
-    {
         for (auto di : destinationInputs)
         {
             di->setFrameReady();
         }
     }
 
-    ISender *getSlice(int index)
+    ISource *getSlice(int index)
     {
         return destinationInputs[index];
     }

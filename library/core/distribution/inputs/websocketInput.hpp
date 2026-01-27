@@ -46,26 +46,24 @@ public:
         instance->fpsCounter.increaseMissedFrameCount();
     }
 
-    Buffer *getData() override
+    virtual bool ready() override
+    {
+        return frameReady;
+    }
+
+    Buffer process() override
     {
         if (!frameReady)
-            return nullptr;
+            return Buffer(0);
 
         if (ack)
             socket->sendAll("OK");
 
         frameReady = false;
 
-        const unsigned int bufferSize = 2 * MTU;
-        auto patternBuffer = BufferPool::getBuffer(bufferSize);
-        if (!patternBuffer)
-        {
-            Log::error("PATTERN_INPUT", "Unable to allocate memory for PatternInput, free heap = %d\n", Utils::get_free_heap());
-            Utils::exit();
-        }
-        auto dataPtr = patternBuffer->getData();
+        auto patternBuffer = Buffer(dataSize);
 
-        memcpy(dataPtr, buffer, std::min(dataSize, bufferSize));
+        memcpy(patternBuffer.data(), buffer, dataSize);
 
         fpsCounter.getUsedFrameCount();
         fpsCounter.increaseMissedFrameCount(-1);

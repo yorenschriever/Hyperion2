@@ -22,20 +22,17 @@ public:
         this->pattern = pattern;
     }
 
-    Buffer *getData() override
+    virtual bool ready() override
     {
-        auto patternBuffer = BufferPool::getBuffer(length * sizeof(T_COLOUR));
-        if (!patternBuffer)
-        {
-            Log::error("PATTERN_INPUT", "Unable to allocate memory for PatternInput, free heap = %d\n", Utils::get_free_heap());
-            Utils::exit();
-        }
-        auto ledData = (T_COLOUR *)patternBuffer->getData();
+        return true;
+    }
 
-        for (int i = 0; i < length; i++)
-            ledData[i] = T_COLOUR();
+    Buffer process() override
+    {
+        auto patternBuffer = Buffer(length * sizeof(T_COLOUR));
+        patternBuffer.clear<T_COLOUR>();
 
-        pattern->Calculate(ledData, length, true, &params);
+        pattern->Calculate(patternBuffer.as<T_COLOUR>(), length, true, &params);
 
         fpsCounter.increaseUsedFrameCount();
 

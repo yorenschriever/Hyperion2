@@ -8,13 +8,11 @@ class Combine;
 class ICombine
 {
 public:
-    virtual void setLengthCombined() = 0;
-    virtual void showCombined() = 0;
-    virtual bool readyCombined() = 0;
-    virtual void setDataCombined(uint8_t *data, int size, int index) = 0;
+    virtual void processCombined(Buffer inputBuffer, int offset) = 0;
+    virtual void resizeBuffer() = 0;
 };
 
-class CombinedInputPart final : public IReceiver
+class CombinedInputPart final : public ISink
 {
     friend Combine;
 
@@ -26,39 +24,34 @@ public:
         this->sync = sync;
     }
 
-    void setData(uint8_t *data, int size) override
-    {
-        parent->setDataCombined(data, size, offset);
-    }
+    void initialize() override { }
 
-    void setLength(int len) override
+    void process(const Buffer inputBuffer) override
     {
-        length = len;
-        parent->setLengthCombined();
-    }
-
-    void show() override
-    {
+        if (inputBuffer.size() != length)
+        {
+            length = inputBuffer.size();
+            parent->resizeBuffer();
+        }
+        parent->processCombined(inputBuffer, offset);
         dirty = true;
-        parent->showCombined();
     }
 
     bool ready() override
     {
-        if (dirty) return false;
-        return parent->readyCombined();
+        return !dirty;
     }
 
 private:
     ICombine *parent;
-    int offset;
+    int offset = 0;
     int length = 0;
     bool dirty = false;
     bool sync;
 };
 
 // CombinedInput reads the input from multiple sources and glues them together
-class Combine final : public ISender, ICombine
+class Combine final : public ISource, ICombine
 {
     friend CombinedInputPart;
 
@@ -75,52 +68,41 @@ public:
         return atOffset(offset-1, sync);
     }
 
-    void setReceiver(IReceiver *receiver) override
-    {
-        this->receiver = receiver;
-    }
-
 private:
-    IReceiver *receiver = nullptr;
     std::vector<CombinedInputPart *> parts;
-    uint8_t *buffer = nullptr;
-    int bufferSize = 0;
+    Buffer buffer = Buffer(0);
 
-    bool readyCombined() override
-    {
-        return receiver && receiver->ready();
-    }
-
-    void setLengthCombined() override
+    void resizeBuffer() override
     {
         int maxLength = 0;
         for (auto part : parts)
             maxLength = std::max(maxLength, part->offset + part->length);
 
-        buffer = (uint8_t *)realloc(buffer, maxLength);
-        bufferSize = maxLength;
+        buffer = Buffer(maxLength);
     }
 
-    void showCombined() override
+    void processCombined(Buffer inputBuffer, int offset) override
     {
-        for (auto part : parts)
-            if (part->sync && !part->dirty)
-                return;
-
-        if (!receiver)
-            return;
-
-        receiver->setLength(bufferSize);
-        receiver->setData(buffer, bufferSize);
-        receiver->show();
+        memcpy((uint8_t*)buffer.data() + offset, inputBuffer.data(), inputBuffer.size());
 
         for (auto part : parts)
             part->dirty = false;
     }
 
-    void setDataCombined(uint8_t *data, int size, int index) override
+    void initialize() override
     {
-        int safeSize = std::min(size, bufferSize - index);
-        memcpy(buffer + index, data, safeSize);
+    }
+
+    bool ready() override
+    {
+        for (auto part : parts)
+            if (part->dirty)
+                return true;
+        return false;
+    }
+
+    Buffer process() override
+    {
+        return buffer;
     }
 };

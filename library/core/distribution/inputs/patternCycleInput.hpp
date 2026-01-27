@@ -24,24 +24,20 @@ public:
         this->duration = duration;
         this->start = Utils::millis();
     }
-
-    Buffer *getData() override 
+    
+    virtual bool ready() override
     {
-        const int bufferSize = length * sizeof(T_COLOUR);
-        auto patternBuffer = BufferPool::getBuffer(bufferSize);
-        if (!patternBuffer)
-        {
-            Log::error("PATTERN_CYCLE_INPUT", "Unable to allocate memory for PatternCycleInput, free heap = %d\n", Utils::get_free_heap());
-            Utils::exit();
-        }
-        auto dataPtr = patternBuffer->getData();
+        return true;
+    }
 
-        for (int i = 0; i < length; i++)
-            dataPtr[i] = T_COLOUR();
+    Buffer process() override 
+    {
+        auto patternBuffer = Buffer(length * sizeof(T_COLOUR));
+        patternBuffer.clear<T_COLOUR>();
 
         for (int i=0; i < patterns.size(); i++) {
             bool active = ((Utils::millis() - start) / duration) % patterns.size() == i;
-            patterns[i]->Calculate(dataPtr, length, active, &params);
+            patterns[i]->Calculate(patternBuffer.as<T_COLOUR>(), length, active, &params);
         }
 
         fpsCounter.increaseUsedFrameCount();

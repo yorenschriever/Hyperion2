@@ -24,31 +24,28 @@ public:
         sock = new Socket(this->port);
     }
 
-    Buffer *getData() override 
+    virtual bool ready() override
+    {
+        char buffer[1];
+        return sock->peek(buffer, 1) > 0;
+    }
+
+    Buffer process() override 
     {
         const int bufferSize = 2 * MTU;
-        auto patternBuffer = BufferPool::getBuffer(bufferSize);
-        if (!patternBuffer)
-        {
-            Log::error("PATTERN_INPUT", "Unable to allocate memory for PatternInput, free heap = %d\n", Utils::get_free_heap());
-            Utils::exit();
-        }
-        auto dataPtr = patternBuffer->getData();
+        auto patternBuffer = Buffer(bufferSize);
 
         bool gotFrame = false;
         int missedFrameCount = -1;
         // read all packets, throw them away, but keep the last one.
-        while ((sock->receive(dataPtr, bufferSize)) > 0)
+        while ((sock->receive(patternBuffer.data(), bufferSize)) > 0)
         {
             gotFrame = true;
             missedFrameCount++;
         }
 
         if (!gotFrame)
-        {
-            BufferPool::release(patternBuffer);
-            return nullptr;
-        }
+            return Buffer(0);
 
         fpsCounter.increaseUsedFrameCount();
 

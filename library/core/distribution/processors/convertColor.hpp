@@ -2,16 +2,14 @@
 #pragma once
 
 #include "../interfaces.hpp"
-#include "../bufferPool.hpp"
 
-// ConvertPipe<SourceColour,TargetColour> will convert the data from source colour format
+// ConvertColor<SourceColour,TargetColour> will convert the data from source colour format
 // to target format. eg. from RGB to RGBW or from RGB to Monochrome.
-// ConvertPipe can also apply a look up table (LUT) to adjust the colour
+// ConvertColor can also apply a look up table (LUT) to adjust the colour
 template <class T_SOURCE_COLOUR, class T_TARGET_COLOUR>
-class ConvertColor: public IConverter
+class ConvertColor final:  public IConverter
 {
 private:
-    IReceiver *receiver = nullptr;
     LUT *lut = nullptr;
 
 public: 
@@ -20,45 +18,24 @@ public:
         this->lut = lut;
     }
 
-    void setReceiver(IReceiver *receiver) override
-    {
-        this->receiver = receiver;
-    }
+    void initialize() override {}
 
     bool ready() override
     {
-        return receiver && receiver->ready();   
+        return true;   
     }
 
-    void show() override
+    Buffer process(Buffer inputBuffer) override
     {
-        receiver->show();
-    }
-
-    void setLength(int length) override
-    {
-        // tell the output the new length so it can allocate enough space for the data
-        // we are going to send
-        receiver->setLength(length / sizeof(T_SOURCE_COLOUR) * sizeof(T_TARGET_COLOUR));
-    }
-
-    void setData(uint8_t *data, int length) override
-    {
-        int numPixels = length / sizeof(T_SOURCE_COLOUR);
-
-        int outputLength = numPixels * sizeof(T_TARGET_COLOUR);
-        auto outputBuffer = BufferPool::getBuffer(outputLength);
-        if (!outputBuffer)
-        {
-            Log::error("CONVERT_COLOR", "Unable to allocate memory for ConvertColor, free heap = %d\n", Utils::get_free_heap());
-            Utils::exit();
-        }
-        uint8_t *outputBufferPtr = outputBuffer->getData();
+        int numPixels = inputBuffer.size() / sizeof(T_SOURCE_COLOUR);
+        auto outputBuffer = Buffer(numPixels * sizeof(T_TARGET_COLOUR));
+        
+        // Log::info("ConvertColor", "Converting %d pixels from %d to %d", numPixels, sizeof(T_SOURCE_COLOUR), sizeof(T_TARGET_COLOUR));
 
         for (int i = 0; i < numPixels; i++)
         {
-            // store the i-th pixel in an object of type T (source datatype)
-            T_SOURCE_COLOUR col = ((T_SOURCE_COLOUR *)data)[i];
+            // store the i-th pixel in an object of type T_SOURCE_COLOUR
+            T_SOURCE_COLOUR col = inputBuffer.as<T_SOURCE_COLOUR>()[i];
 
             // this is where the actual conversion takes place. static cast will use
             // the cast operators in the Colour classes to convert between the
@@ -70,10 +47,9 @@ public:
                 outCol.ApplyLut(lut);
 
             // Pass the data to the output
-            ((T_TARGET_COLOUR *)outputBufferPtr)[i] = outCol;
+            outputBuffer.as<T_TARGET_COLOUR>()[i] = outCol;
         }
-        receiver->setData(outputBufferPtr, outputLength);
-        BufferPool::release(outputBuffer);
+        return outputBuffer;
     }
     
 };

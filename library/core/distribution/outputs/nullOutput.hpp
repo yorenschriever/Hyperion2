@@ -9,9 +9,11 @@ class NullOutput final: public BaseOutput
 public:
     NullOutput() {}
 
-    void clear() override {};
     bool ready() override {return true;};
-    void setLength(int length) override {};
-    void setData(uint8_t *data, int size) override {};
-    void show() override {};
+    void initialize() override {};
+    void clear() override {};
+
+    void process(Buffer) override {
+        fpsCounter.increaseUsedFrameCount();
+    };
 };

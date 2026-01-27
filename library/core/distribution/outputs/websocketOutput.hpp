@@ -24,26 +24,10 @@ public:
         buffer = (uint8_t *)malloc(12);
     }
 
-    // index and size are in bytes
-    void setData(uint8_t *data, int size) override
-    {
-        int copy_length = std::min(size, length);
-        if (copy_length > 0)
-            memcpy(this->buffer, data, copy_length);
-    }
-
     bool ready() override
     {
         return (Utils::millis() - lastFrame >= frameInterval);
     }
-
-    void show() override
-    {
-        lastFrame = Utils::millis();
-        server->sendAll(buffer, length);
-        fpsCounter.increaseUsedFrameCount();
-    }
-
 
     void initialize() override 
     {
@@ -65,25 +49,32 @@ public:
         memset(this->buffer, 0, this->length);
     }
 
-    // length is in bytes
-    void setLength(int len) override
+    void process(Buffer inputBuffer) override
     {
-        if (len != this->length)
-        {
-            // wait for the front buffer to be sent before we are going to change its size
-            while (!ready())
-                Thread::sleep(1);
+        if (!ready())
+            return;
 
-            buffer = (uint8_t *)realloc(buffer, len);
+        if (!inputBuffer.size())
+            return;
 
+        if (inputBuffer.size() != length){
+            buffer = (uint8_t *)Utils::realloc_dma(buffer, inputBuffer.size());
             if (!buffer)
             {
-                Log::error(TAG, "Unable to allocate memory for WebsocketOutput, free heap = %d\n", Utils::get_free_heap());
+                Log::error("WEBSOCKET_OUTPUT", "Unable to allocate memory for WebsocketOutput, free heap = %d", Utils::get_free_heap());
                 Utils::exit();
             }
-
-            this->length = len;
+            length = inputBuffer.size();
+            memset(buffer, 0, length);
         }
+
+        lastFrame = Utils::millis();
+
+        memcpy(this->buffer, inputBuffer.data(), length);
+
+        server->sendAll(buffer, length);
+
+        fpsCounter.increaseUsedFrameCount();
     }
 
 protected:
