@@ -107,6 +107,7 @@ public:
                     //if the colour space is RGBA, apply colour mixing based on the alpha channel
                     RGBA l = patternBuffer.as<RGBA>()[i];
                     l.A = (l.A * dimValue) >> 8;
+                    patternBuffer.as<RGBA>()[i] = l;
                 }
                 else
                 {
