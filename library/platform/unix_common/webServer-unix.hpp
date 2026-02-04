@@ -250,7 +250,7 @@ handle_request(
             }
             catch (const std::exception &e)
             {
-                Log::error("WEB", "Error in custom content: %s", e.what());
+                Log::error("WEBSERVER", "Error in custom content: %s", e.what());
                 return server_error("Error in custom content");
             }
         }
@@ -339,7 +339,7 @@ void fail(beast::error_code ec, char const *what) //;
     if (ec == net::ssl::error::stream_truncated)
         return;
 
-    std::cerr << what << ": " << ec.message() << "\n";
+    Log::error("WEBSERVER", "%s: %s", what, ec.message().c_str());
 }
 
 //------------------------------------------------------------------------------
@@ -992,6 +992,7 @@ class listener : public std::enable_shared_from_this<listener>
     std::shared_ptr<DocRoots_t> doc_root_;
     PathMap *paths_;
     PathMapWs *wsPaths_;
+    bool initialized_ = false;
 
 public:
     listener(
@@ -1025,6 +1026,7 @@ public:
         acceptor_.bind(endpoint, ec);
         if (ec)
         {
+            Log::error("WEBSERVER", "Another instance of the app might still be running");
             fail(ec, "bind");
             return;
         }
@@ -1037,6 +1039,8 @@ public:
             fail(ec, "listen");
             return;
         }
+
+        initialized_ = true;
     }
 
     // Start accepting incoming connections
@@ -1044,6 +1048,11 @@ public:
     run()
     {
         do_accept();
+    }
+
+    bool is_initialized()
+    {
+        return initialized_;
     }
 
 private:
@@ -1147,14 +1156,22 @@ private:
             load_server_certificate(ctx);
 
             // Create and launch a listening port
-            std::make_shared<listener>(
+            auto listener_ptr = std::make_shared<listener>(
                 ioc,
                 ctx,
                 tcp::endpoint{address, port},
                 doc_root,
                 paths,
-                wsPaths)
-                ->run();
+                wsPaths);
+            
+            if (listener_ptr->is_initialized()){
+                Log::info(TAG, "Web server started on port %d", port);
+            } else {
+                Log::error(TAG, "Failed to start web server on port %d", port);
+                return;
+            }
+
+            listener_ptr->run();
 
             // Capture SIGINT and SIGTERM to perform a clean shutdown
             // net::signal_set signals(ioc, SIGINT, SIGTERM);
