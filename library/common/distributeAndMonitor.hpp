@@ -12,7 +12,7 @@ typedef std::vector<Slave> Distribution;
 
 template <class T_INPUT_COLOUR = RGBA>
 std::vector<Slicer::Slice> createSlices(
-    ControlHubInput<T_INPUT_COLOUR> *input,
+    int inputLength,
     Distribution slaves
     )
 {
@@ -27,10 +27,10 @@ std::vector<Slicer::Slice> createSlices(
         start += slave.size;
     }
 
-    slices.push_back({0, int( input->length() * sizeof(T_INPUT_COLOUR)), false});
+    slices.push_back({0, int( inputLength * sizeof(T_INPUT_COLOUR)), false});
  
-    if (start != input->length()){
-        Log::error("DistributeAndMonitor","createSliceAndMonitorPipes: Total length of slaves (%d) does not equal number of lights in the input (%d).",start,input->length());
+    if (start != inputLength){
+        Log::error("DistributeAndMonitor","createSliceAndMonitorPipes: Total length of slaves (%d) does not equal number of lights in the input (%d).",start,inputLength);
     }
 
     return slices;
@@ -62,7 +62,7 @@ void distributeAndMonitor(
     LUT *lut = nullptr,
     float monitorDotSize=0.01)
 {
-    auto slices = createSlices<T_INPUT_COLOUR>(input, slaves);
+    auto slices = createSlices<T_INPUT_COLOUR>(input->length(), slaves);
     auto splitInput = new Slicer(slices);
     distribute<T_OUTPUT_COLOUR, T_INPUT_COLOUR>(hyp, slaves, splitInput, lut);
 
@@ -83,7 +83,7 @@ void distributeAndMonitor3d(
     LUT *lut = nullptr,
     float monitorDotSize=0.01)
 {
-    auto slices = createSlices<T_INPUT_COLOUR>(input, slaves);
+    auto slices = createSlices<T_INPUT_COLOUR>(input->length(), slaves);
     auto splitInput = new Slicer(slices);
     distribute<T_OUTPUT_COLOUR, T_INPUT_COLOUR>(hyp, slaves, splitInput, lut);
 
