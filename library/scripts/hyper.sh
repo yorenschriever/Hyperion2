@@ -66,11 +66,10 @@ if [ $TARGET = 'docker' ]; then
     docker run -it --name=hyperion --rm \
         --mount type=bind,source=${HYPERION_LIB_DIR},target=/hyperion_lib \
         --mount type=bind,source=$PWD,target=/project \
-        --mount type=bind,source=$PWD/../common,target=/common \
         --workdir=/project\
         -p 80:80 \
         hyperion \
-        sh -c "cd /proiject && ./hyper.sh --target=linux $COMMANDS"
+        sh -c "cd /project && /hyperion_lib/scripts/hyper.sh --target=linux $COMMANDS"
     exit
 fi
 
