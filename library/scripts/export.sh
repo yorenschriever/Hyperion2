@@ -12,4 +12,6 @@ alias run='$HYPERION_LIB_DIR/scripts/run.sh'
 alias interactive='$HYPERION_LIB_DIR/platform/docker/run-interactive.sh'
 alias debug='$HYPERION_LIB_DIR/scripts/debug.sh'
 
+alias hyper='$HYPERION_LIB_DIR/scripts/hyper.sh'
+
 # echo "HYPERION_LIB_DIR = "$HYPERION_LIB_DIR
