@@ -128,6 +128,11 @@ public:
         chains.push_back(new Chain(input, converters, output));
     }
 
+    virtual std::vector<Chain*> getChains()
+    {
+        return chains;
+    }
+
     virtual void clearAll()
     {
         // for (auto chain : chains)
@@ -325,6 +330,40 @@ private:
 
     }
 
+
+    void calcFps(unsigned long elapsedTime, bool firstRun)
+    {
+            int activeChannels = 0;
+            int totalUsedFrames = 0;
+            int totalMissedFrames = 0;
+            int totalTotalFrames = 0;
+            int totalLength = 0;
+            for (auto io : chains)
+            {
+                auto fps = io->getSource()->getFpsCounter();
+                if (!fps || fps->getTotalFrameCount() == 0)
+                    continue;
+
+                activeChannels++;
+                totalUsedFrames += fps->getUsedFrameCount();
+                totalMissedFrames += fps->getMissedFrameCount();
+                totalTotalFrames += fps->getTotalFrameCount();
+                fps->resetFrameCount();
+
+                totalLength += 0; //input->getLength();
+            }
+
+            float outFps = activeChannels == 0 ? 0 : (float)1000. * totalUsedFrames / (elapsedTime) / activeChannels;
+            float inFps  = activeChannels == 0 ? 0 : (float)1000. * totalTotalFrames / (elapsedTime) / activeChannels;
+            float misses = totalTotalFrames == 0 ? 0 : 100.0 * (totalMissedFrames) / totalTotalFrames;
+            int avgLength = activeChannels == 0 ? 0 : totalLength / activeChannels;
+
+            if (firstRun) return;
+
+            Log::info("HYP", "FPS: %d of %d (%d%% miss)", (int)outFps, (int)inFps, (int)misses);
+
+    }
+
     static void UpdateDisplayTask(void *parameter)
     {
         Hyperion *instance = (Hyperion *)parameter;
@@ -336,7 +375,9 @@ private:
             unsigned long now = Utils::millis();
             unsigned long elapsedTime = now - lastFpsUpdate;
 
-            // instance->calcFps("IN",instance->inputs, elapsedTime, firstRun);
+            instance->calcFps( elapsedTime, firstRun);
+            // instance->calcFps("OUT",instance->outputs, elapsedTime, firstRun);
+
             // instance->calcFps("OUT",instance->outputs, elapsedTime, firstRun);
 
             lastFpsUpdate = now;

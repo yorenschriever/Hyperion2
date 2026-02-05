@@ -33,6 +33,7 @@ int main()
   while (1)
   {
     updateLed(hyp);
+    Thread::sleep(5);
   }
 }
 
@@ -46,8 +47,8 @@ void initLed()
 void updateLed(Hyperion *hyp)
 {
   //If receiving data, flash fast
-  for(auto output: hyp->getInputs()){
-    if(output->getFpsCounter()->getUsedFrameCount() > 0){
+  for(auto chain: hyp->getChains()){
+    if(chain->getSource()->getFpsCounter()->getUsedFrameCount() > 0){
       bool flashFast = Utils::millis() % 100 < 50;
       gpio_set_level(STATUS_LED_PIN, flashFast);
       return;
@@ -71,6 +72,4 @@ void updateLed(Hyperion *hyp)
 
   //Status led is off by default
   gpio_set_level(STATUS_LED_PIN, 0);
-
-  Thread::sleep(100);
 }
