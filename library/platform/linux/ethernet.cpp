@@ -28,8 +28,8 @@ IPAddress Ethernet::getIp()
     struct ifaddrs * ifAddrStruct=NULL;
     struct ifaddrs * ifa=NULL;
     void * tmpAddrPtr=NULL;
-    sockaddr_in *ip4;
-    sockaddr_in6 *ip6;
+    sockaddr_in *ip4=nullptr;
+    sockaddr_in6 *ip6=nullptr;
 
     getifaddrs(&ifAddrStruct);
 
@@ -37,7 +37,7 @@ IPAddress Ethernet::getIp()
         if (!ifa->ifa_addr) {
             continue;
         }
-        if (strncmp(ifa->ifa_name, "en", 2))
+        if (strncmp(ifa->ifa_name, "eth", 3))
         {
             //on macos the wifi and eth interface names begin with 'en'
             //so skip if we got another name
@@ -48,14 +48,14 @@ IPAddress Ethernet::getIp()
             // tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
             // char addressBuffer[INET_ADDRSTRLEN];
             // inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
-            // printf("%s IP Address %s\n", ifa->ifa_name, addressBuffer); 
+            // Log::info(TAG, "%s IP4 Address %s", ifa->ifa_name, addressBuffer);
             ip4 = (struct sockaddr_in *) ifa->ifa_addr;
         } else if (ifa->ifa_addr->sa_family == AF_INET6) { // check it is IP6
             // is a valid IP6 Address
             // tmpAddrPtr=&((struct sockaddr_in6 *)ifa->ifa_addr)->sin6_addr;
             // char addressBuffer[INET6_ADDRSTRLEN];
             // inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
-            // printf("%s IP Address %s\n", ifa->ifa_name, addressBuffer); 
+            // Log::info(TAG, "%s IP6 Address %s", ifa->ifa_name, addressBuffer);
             ip6 = (struct sockaddr_in6 *)ifa->ifa_addr;
         } 
     //     else if (ifa->ifa_addr->sa_family == AF_LINK) {
@@ -70,6 +70,7 @@ IPAddress Ethernet::getIp()
     //   }
     }
     auto result = IPAddress(ip4, ip6);
+    // auto result = IPAddress(ip4, nullptr);
 
     if (ifAddrStruct != NULL)
         freeifaddrs(ifAddrStruct);
