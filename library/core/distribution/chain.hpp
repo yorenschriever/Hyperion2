@@ -57,4 +57,7 @@ public:
             
         sink->initialize();
     }
+
+    ISource* getSource(){ return source; }
+    ISink* getSink(){ return sink; }
 };

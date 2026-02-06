@@ -17,26 +17,28 @@ public:
     virtual bool ready() = 0;
 
     virtual Buffer process() = 0;
+
+    virtual FPSCounter *getFpsCounter() = 0;
 };
 
 class ISink
 {
 public:
     virtual void initialize() =0;
-    
+
     // Indicates whether the sink is ready to receive data.
     virtual bool ready() = 0;
 
     virtual void process(const Buffer) = 0;
+
+    virtual FPSCounter *getFpsCounter() = 0;
 };
 
 // An IInput is an input to the entire system. It is a source where
 // pixel data is generated or comes in externally
 
 class IInput : public ISource
-{
-public:
-    virtual FPSCounter *getFpsCounter() = 0;
+{ 
 };
 
 // An IOutput is an output to the entire system. It is a sink where
@@ -44,7 +46,6 @@ public:
 class IOutput : public ISink
 {
 public:
-    virtual FPSCounter *getFpsCounter() { return nullptr; }
     virtual void clear() = 0;
 };
 
