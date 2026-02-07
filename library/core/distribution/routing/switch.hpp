@@ -30,7 +30,7 @@ class Switch : public ISource
             return !parent->dirty;
         }
 
-        void process(const Buffer inputBuffer) override
+        void process(const Buffer& inputBuffer) override
         {
             if (!active)
                 return;

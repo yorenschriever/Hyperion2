@@ -26,7 +26,7 @@ public:
 
     void initialize() override { }
 
-    void process(const Buffer inputBuffer) override
+    void process(const Buffer& inputBuffer) override
     {
         if (inputBuffer.size() != length)
         {

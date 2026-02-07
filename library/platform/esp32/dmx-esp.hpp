@@ -166,7 +166,7 @@ public:
 
     //================= sending
 
-    void write(uint8_t *data, int size, int startChannel) override
+    void write(const uint8_t *data, int size, int startChannel) override
     {
         if (startChannel < 1)
         {

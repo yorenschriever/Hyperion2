@@ -8,7 +8,7 @@
 // process(), and you can implement initialize(), if there is some setup to do. Putting the
 // initialization code in initialize() instead of the constructor makes you code easier to debug,
 // because at that point the logging system is guaranteed to be initialized.
-class BaseInput : public IInput
+class BaseInput : public ISource
 {
 
 public:

@@ -77,7 +77,7 @@ public:
         return true;
     }
 
-    void process(const Buffer inputBuffer) override
+    void process(const Buffer& inputBuffer) override
     {
         auto copyLength = std::min((int)inputBuffer.size(), bufferSize);
         memcpy(buffer, inputBuffer.data(), copyLength);

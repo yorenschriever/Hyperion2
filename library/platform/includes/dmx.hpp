@@ -12,7 +12,7 @@ public:
     virtual int getFrameNumber() = 0;           // get the number of frames received
     virtual uint8_t *getDataPtr() = 0;          // get a pointer to the incoming data buffer
 
-    virtual void write(uint8_t *data, int len, int startChannel) = 0; // write to the dmx output buffer. After all data is written, use show() to send out the frame. startChannel >= 1
+    virtual void write(const uint8_t *data, int len, int startChannel) = 0; // write to the dmx output buffer. After all data is written, use show() to send out the frame. startChannel >= 1
     virtual void show() = 0;                                   // sends the dmx frame
     virtual bool ready() = 0;
     virtual void clearTxBuffer() = 0;

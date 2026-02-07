@@ -45,12 +45,8 @@ public:
         rmt->begin(port, timing);
     }
 
-    void clear() override
-    {
-        memset(buffer, 0, length);
-    }
 
-    void process(Buffer inputBuffer) override
+    void process(const Buffer& inputBuffer) override
     {
         if (!ready())
             return;

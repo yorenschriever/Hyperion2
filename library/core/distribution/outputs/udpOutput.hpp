@@ -25,7 +25,7 @@ public:
         return (Utils::millis() - lastFrame >= frameInterval);
     }
 
-    void process(Buffer inputBuffer) override
+    void process(const Buffer& inputBuffer) override
     {
         if (!ready())
             return;
@@ -41,12 +41,6 @@ public:
         if (sock == NULL)
             sock = new Socket();
     }
-
-    void clear() override
-    {
-        
-    }
-
 
     ~UDPOutput()
     {

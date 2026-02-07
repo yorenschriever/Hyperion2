@@ -42,7 +42,6 @@ public:
 
     Buffer process() override
     {
-
         auto patternBuffer = Buffer(length);
 
         if (loadDataCallback)

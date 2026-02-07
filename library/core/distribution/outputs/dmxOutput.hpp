@@ -26,13 +26,8 @@ public:
         this->dmx = DMX::getInstance(dmxPort);
     }
 
-    void clear() override
-    {
-        if (dmx)
-            dmx->clearTxBuffer();
-    }
 
-    void process(Buffer inputBuffer) override
+    void process(const Buffer& inputBuffer) override
     {
         if (!ready())
             return;

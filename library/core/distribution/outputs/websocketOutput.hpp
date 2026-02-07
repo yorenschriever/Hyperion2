@@ -44,12 +44,7 @@ public:
         }
     }
 
-    void clear() override
-    {
-        memset(this->buffer, 0, this->length);
-    }
-
-    void process(Buffer inputBuffer) override
+    void process(const Buffer& inputBuffer) override
     {
         if (!ready())
             return;

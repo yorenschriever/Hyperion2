@@ -27,7 +27,7 @@ public:
         this->pwm = PWMDriver::getInstance();
     }
 
-    void process(Buffer inputBuffer) override
+    void process(const Buffer& inputBuffer) override
     {
         if (!ready())
             return;
@@ -53,13 +53,7 @@ public:
         fpsCounter.increaseUsedFrameCount();
     }
 
-    void clear() override
-    {
-        if (!pwm) return;
 
-        for (int i = 0; i < 12; i++)
-            pwm->write(i,0);
-    }
 
 
 private:

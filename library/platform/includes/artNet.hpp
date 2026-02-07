@@ -42,7 +42,7 @@ public:
     }
 
     virtual ArtNetUniverse *addUniverse(uint16_t port)=0;
-    virtual void send(const char *hostname, uint8_t net, uint8_t subnet, uint8_t universe, uint8_t *data_ptr, uint16_t size)=0;
+    virtual void send(const char *hostname, uint8_t net, uint8_t subnet, uint8_t universe, const uint8_t *data_ptr, uint16_t size)=0;
 
     virtual ~ArtNet() = default;
 
@@ -158,7 +158,7 @@ public:
         return &(universes.find(port)->second);
     }
 
-    void send(const char *hostname, uint8_t net, uint8_t subnet, uint8_t universe, uint8_t *data_ptr, uint16_t size) override {
+    void send(const char *hostname, uint8_t net, uint8_t subnet, uint8_t universe, const uint8_t *data_ptr, uint16_t size) override {
         auto ip = HostnameCache::lookup(hostname);
 
         artnet_dmx_s packet;

@@ -23,7 +23,7 @@ public:
         return (Utils::millis() - lastFrame >= frameInterval);
     }
 
-    void process(Buffer inputBuffer) override {
+    void process(const Buffer& inputBuffer) override {
         if (!ready())
             return;
 
@@ -39,12 +39,6 @@ public:
         this->artNet = ArtNet::getInstance();
     }
 
-    void clear() override
-    {
-        auto blankBuffer = Buffer(512);
-        blankBuffer.clear<Monochrome>();
-        process(blankBuffer);
-    }
 
 private:
     const char *hostname;

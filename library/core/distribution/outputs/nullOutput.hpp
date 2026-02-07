@@ -11,9 +11,8 @@ public:
 
     bool ready() override {return true;};
     void initialize() override {};
-    void clear() override {};
 
-    void process(Buffer) override {
+    void process(const Buffer&) override {
         fpsCounter.increaseUsedFrameCount();
     };
 };
