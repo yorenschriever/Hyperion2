@@ -3,15 +3,15 @@ from numpy import matrix, array
 
 class Turtle3d:
 
-    position = array([0,0,0])
-    # https://en.wikipedia.org/wiki/Rotation_matrix
-    rotation = matrix([
-        [1., 0,  0 ],
-        [0,  1., 0 ],
-        [0,  0,  1.]
-    ])
-
-    trail=[]
+    def __init__(self):
+        self.position = array([0,0,0])
+        # https://en.wikipedia.org/wiki/Rotation_matrix
+        self.rotation = matrix([
+            [1., 0,  0 ],
+            [0,  1., 0 ],
+            [0,  0,  1.]
+        ])
+        self.trail = []
     
     def yaw(self,angle):
         alpha = angle * 2. * pi / 360

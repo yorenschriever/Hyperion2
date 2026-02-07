@@ -1,11 +1,6 @@
 from math import pi, cos, sin
 
 class Turtle:
-
-    pos_x=0
-    pos_y=0
-    direction=0
-    trail=[]
     
     def __init__(self, pos_x=0, pos_y=0, direction=0):
         self.pos_x = pos_x
