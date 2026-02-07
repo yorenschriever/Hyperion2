@@ -85,8 +85,6 @@ public:
         Log::info(TAG, "Start");
         Utils::random_seed();
 
-        check_safe_mode();
-
         if (config.network)
             setup_network();
         if (config.rotary)
@@ -105,8 +103,6 @@ public:
         Log::info(TAG, "Initializing chains");
         for (auto chain: chains)
             chain->initialize();
-
-        clearAll();
 
         Log::info(TAG, "Initialization complete. Starting main loop");
         Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control, 3000, this, 4);
@@ -131,12 +127,6 @@ public:
     virtual std::vector<Chain*> getChains()
     {
         return chains;
-    }
-
-    virtual void clearAll()
-    {
-        // for (auto chain : chains)
-        //     chain->output->clear();
     }
 
     virtual void setMidiControllerFactory(MidiControllerFactory * midiControllerFactory)
@@ -164,18 +154,6 @@ public:
     
 
 private:
-    virtual void check_safe_mode()
-    {
-        // if ()
-        // {
-        //     setup_network();
-        //     setup_display();
-        // }
-    }
-
-    virtual void setup_safe_mode()
-    {
-    }
 
     virtual void setup_network()
     {
@@ -204,14 +182,6 @@ private:
         // Tempo::AddSource(MidiClockTempo::getInstance());
         Tempo::AddSource(TapTempo::getInstance());
         // Tempo::AddSource(UdpTempo::getInstance());
-
-        // Midi::Initialize();
-        // Midi::onNoteOn([](uint8_t ch, uint8_t note, uint8_t velocity) {
-        //     if (note == Configuration.tapMidiNote) TapTempo::getInstance()->Tap();
-        //     if (note == Configuration.tapStopMidiNote) TapTempo::getInstance()->Stop();
-        //     if (note == Configuration.tapAlignMidiNote) TapTempo::getInstance()->Align();
-        //     if (note == Configuration.tapBarAlignMidiNote) Tempo::AlignPhrase();
-        // });
 
         // Rotary::onPress([]() { TapTempo::getInstance()->Tap(); });
         // Rotary::onLongPress([]() { TapTempo::getInstance()->Stop(); });
@@ -376,9 +346,6 @@ private:
             unsigned long elapsedTime = now - lastFpsUpdate;
 
             instance->calcFps( elapsedTime, firstRun);
-            // instance->calcFps("OUT",instance->outputs, elapsedTime, firstRun);
-
-            // instance->calcFps("OUT",instance->outputs, elapsedTime, firstRun);
 
             lastFpsUpdate = now;
 
