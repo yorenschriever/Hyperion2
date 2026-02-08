@@ -1,12 +1,12 @@
 #pragma once
 #include "hyperion.hpp"
 
-typedef struct
+typedef struct Slave
 {
     const char *host;
-    const unsigned short port;
-    const int size; // number of lights
-    const IConverter* converter = nullptr;
+    unsigned short port;
+    int size; // number of lights
+    IConverter* converter = nullptr;
 } Slave;
 
 typedef std::vector<Slave> Distribution;
