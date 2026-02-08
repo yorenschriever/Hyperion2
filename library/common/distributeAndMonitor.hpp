@@ -6,6 +6,7 @@ typedef struct
     const char *host;
     const unsigned short port;
     const int size; // number of lights
+    const IConverter* converter = nullptr;
 } Slave;
 
 typedef std::vector<Slave> Distribution;
@@ -43,11 +44,13 @@ void distribute(
     Slicer *splitInput,
     LUT *lut = nullptr)
 {
+    auto defaultConverter = new ConvertColor<T_INPUT_COLOUR, T_OUTPUT_COLOUR>(lut);
+
     for (int i = 0; i < splitInput->size() - 1; i++)
     {
         hyp->createChain(
             splitInput->getSlice(i),
-            new ConvertColor<T_INPUT_COLOUR, T_OUTPUT_COLOUR>(lut),
+            slaves[i].converter ? slaves[i].converter : defaultConverter,
             new UDPOutput(slaves[i].host, slaves[i].port, 60)
         );
     }
