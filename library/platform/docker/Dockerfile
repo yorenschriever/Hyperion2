@@ -12,7 +12,7 @@ ENV BOOST_DIR=/home/boost_1_82_0
 ENV CMAKE_C_COMPILER=/usr/bin/gcc
 ENV CMAKE_CXX_COMPILER=/usr/bin/g++
 
-RUN echo "source /hyperion_lib/scripts/export.sh" >> ~/.bashrc
+RUN echo "source /hyperion_lib/build-utils/shell/export.sh" >> ~/.bashrc
 
 EXPOSE 80
 EXPOSE 443

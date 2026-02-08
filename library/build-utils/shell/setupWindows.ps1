@@ -1,4 +1,4 @@
-$library = ([IO.DirectoryInfo] $PSScriptRoot).Parent.FullName
+$library = ([IO.DirectoryInfo] $PSScriptRoot).Parent.Parent.FullName
 
 # create a profile if it does not yet exist
 if (! (Test-Path $profile)) {

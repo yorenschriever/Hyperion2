@@ -39,8 +39,7 @@ git pull
 Now test if everything works by building and running the hello world example. 
 ```
 cd ~/Hyperion2/examples/hello_world
-build rpi
-run rpi
+hyper --target=rpi build run
 ```
 
 ## Running and accessing the web interface
@@ -52,8 +51,7 @@ ssh hyperion@raspberrypi.local
 Then build the writing_patterns example
 ```
 cd ~/Hyperion2/examples/writing_patterns
-build rpi
-run rpi
+hyper --target=rpi build run
 ```
 
 Now, open https://raspberrypi.local/ to view the web interface.
@@ -123,13 +121,13 @@ pico ~/.bashrc
 And add these lines in the file somewhere. type ctrl+o to save and ctrl+x to close after editing. Change the home path if you chose a different username when flashing the sd card.
 ```
 export BOOST_DIR=/home/hyperion/boost_1_81_0
-source /home/hyperion/Hyperion2/library/scripts/export.sh
+source /home/hyperion/Hyperion2/library/build-utils/shell/export.sh
 export HYPERION_LIB_DIR=/home/hyperion/Hyperion2/library/
 ```
 
 Generate a certificate
 ```
-cd ~/Hyperion2/library/scripts/certificate/
+cd ~/Hyperion2/library/build-utils/shell/certificate/
 ./generate.sh
 ```
 

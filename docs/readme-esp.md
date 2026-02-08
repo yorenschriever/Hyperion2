@@ -40,8 +40,7 @@ That's it. If these steps didn't work for you, you can try this:
 
 ```
 cd examples/hello_world
-build esp32
-run esp32
+hyper --target=esp32 build run monitor
 ```
 
 ## Change sdkconfig

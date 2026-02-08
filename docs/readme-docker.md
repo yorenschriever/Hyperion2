@@ -10,7 +10,7 @@ And, if you dan't have it already, [install Git](https://git-scm.com/book/en/v2/
 Clone the repository and run a script to configure some environment variables.
 ```sh
 git clone https://github.com/yorenschriever/Hyperion2.git
-./Hyperion2/library/scripts/export.sh
+./Hyperion2/library/build-utils/shell/export.sh
 ```
 
 NB: you need to run the export script every time you open a new terminal. You can also add the script to your zprofile, so it runs automatically each time. See installation step 1 of the [MacOs readme](readme-macos.md) for instructions.
@@ -20,8 +20,7 @@ Open a terminal on your host machine, go to a project folder and build and run:
 
 ```sh
 cd Hyperion2/examples/hello_world
-build docker
-run docker
+hyper --target=docker build run
 ```
 
 
@@ -35,13 +34,13 @@ Clone the repository and run a script to configure some environment variables.
 ```ps
 git clone https://github.com/yorenschriever/Hyperion2.git
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-. .\Hyperion2\library\scripts\export.ps1
+. .\Hyperion2\library\build-utils\shell\export.ps1
 ```
 
 NB: you need to run the export script every time you open a new terminal. You can also add the script to your profile, so it runs automatically each time. In order to do that, run this script:
 
 ```ps
-. .\Hyperion2\library\scripts\setupWindows.ps1
+. .\Hyperion2\library\build-utils\shell\setupWindows.ps1
 ```
 
 #### 3. Run
@@ -49,6 +48,5 @@ Open a terminal on your host machine, go to a project folder and build and run:
 
 ```ps
 cd Hyperion2\examples\hello_world
-build docker
-run docker
+hyper --target=docker build run
 ```

@@ -69,7 +69,7 @@ if [ $TARGET = 'docker' ]; then
         --workdir=/project\
         -p 80:80 \
         hyperion \
-        sh -c "cd /project && /hyperion_lib/scripts/hyper.sh --target=linux $COMMANDS"
+        sh -c "cd /project && /hyperion_lib/build-utils/shell/hyper.sh --target=linux $COMMANDS"
     exit
 fi
 

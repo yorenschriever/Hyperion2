@@ -11,7 +11,7 @@ SOURCE_INSTALL_DIR=$HOME"/repos/Hyperion2"
 
 mkdir -p $SOURCE_INSTALL_DIR
 git clone https://github.com/yorenschriever/Hyperion2.git $SOURCE_INSTALL_DIR
-echo "source $SOURCE_INSTALL_DIR/library/scripts/export.sh" >> ~/.zprofile 
+echo "source $SOURCE_INSTALL_DIR/library/build-utils/shell/export.sh" >> ~/.zprofile 
 ```
 
 ### 2. OpenSSL
@@ -65,8 +65,7 @@ Test if your installation is working by running the hello world example.
 
 ```sh
 cd examples/hello_world
-build macos
-run macos
+hyper build run
 ```
 
 You should see the text 'initializing' followed by 'running'
@@ -97,9 +96,8 @@ This is a google drive link. You need to download it manually. You can't replace
 
 If your project used to build before, but suddenly it doesn't anymore: You can try removing all build files and start from scratch. In your project folder, run:
 ```sh
-rm -r build
-build macos
-run macos
+hyper clean
+hyper build run
 ```
 
 The error `Target "Hyperion" links to: OpenSSL::SSL but the target was not found.` can also be solved by removing the build dir
