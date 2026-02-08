@@ -5,7 +5,7 @@
 
 # extract the library dir name from the location of this script
 if [[ -z "${HYPERION_LIB_DIR}" ]]; then
-    export HYPERION_LIB_DIR="$(cd "$(dirname "$0")/../../"; pwd)"
+    export HYPERION_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../"; pwd)"
 fi
 
 alias hyper-interactive='$HYPERION_LIB_DIR/platform/docker/run-interactive.sh'
