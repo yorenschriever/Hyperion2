@@ -1,5 +1,5 @@
 #pragma once
-#include "colours.h"
+#include "colors.h"
 #include "core/generation/gradient.hpp"
 #include "core/generation/palette.hpp"
 #include <string>
@@ -27,9 +27,9 @@ public:
     }
     std::string name;
 
-    RGBA getPrimaryColour() { return palette->primary; }
-    RGBA getSecondaryColour() { return palette->secondary; }
-    RGBA getHighlightColour() { return palette->highlight; }
+    RGBA getPrimaryColor() { return palette->primary; }
+    RGBA getSecondaryColor() { return palette->secondary; }
+    RGBA getHighlightColor() { return palette->highlight; }
     RGBA getGradient(int pos) { return palette->gradient.get(pos); }
     RGBA getGradientf(float pos) { return palette->gradient.getf(pos); }
 

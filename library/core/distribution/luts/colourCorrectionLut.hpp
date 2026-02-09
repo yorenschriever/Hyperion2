@@ -1,22 +1,22 @@
 #pragma once
 #include "lut.hpp"
 
-//ColourCorrectionLut applies the same gamma correction to all channels, and also
+//ColorCorrectionLut applies the same gamma correction to all channels, and also
 //gives you the option to scale the output of the 3 channels. You can use this if
 //get a better white balance.
-//This colour correction luts follows the colour order of the output. I.e.: If You use GRB as output colour,
-//then colour1 will be G. 
-class ColourCorrectionLUT  : public LUT
+//This color correction luts follows the color order of the output. I.e.: If You use GRB as output color,
+//then color1 will be G. 
+class ColorCorrectionLUT  : public LUT
 {
     public:
-        ColourCorrectionLUT(float gammaCorrection, int maxValue, uint8_t Colour1, uint8_t Colour2, uint8_t Colour3) 
+        ColorCorrectionLUT(float gammaCorrection, int maxValue, uint8_t Color1, uint8_t Color2, uint8_t Color3) 
         {
             Dimension = 3;
             luts = new uint16_t*[Dimension];
             for (int i=0; i<256; i++){
-                lut1[i] = pow((float)i*Colour1 / 255. / 255., gammaCorrection) * maxValue;
-                lut2[i] = pow((float)i*Colour2 / 255. / 255., gammaCorrection) * maxValue;
-                lut3[i] = pow((float)i*Colour3 / 255. / 255., gammaCorrection) * maxValue;
+                lut1[i] = pow((float)i*Color1 / 255. / 255., gammaCorrection) * maxValue;
+                lut2[i] = pow((float)i*Color2 / 255. / 255., gammaCorrection) * maxValue;
+                lut3[i] = pow((float)i*Color3 / 255. / 255., gammaCorrection) * maxValue;
             }
             
             luts[0] = lut1;

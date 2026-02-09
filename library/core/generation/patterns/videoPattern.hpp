@@ -24,7 +24,7 @@ public:
             return;
 
         for (int i = 0; i < width; i++)
-            pixels[i] = params->getSecondaryColour();
+            pixels[i] = params->getSecondaryColor();
     }
 };
 
@@ -134,9 +134,9 @@ public:
         {
             int animationIndex = (frame * video.pixels + i) * video.depth;
 
-            pixels[i] += params->getPrimaryColour() * (float(video.pixelData[animationIndex + 0]) / 255.);
-            pixels[i] += params->getSecondaryColour() * (float(video.pixelData[animationIndex + 1]) / 255.);
-            // pixels[i] += params->getHighlightColour() * (float(video.pixelData[animationIndex + 2]) / 255.);
+            pixels[i] += params->getPrimaryColor() * (float(video.pixelData[animationIndex + 0]) / 255.);
+            pixels[i] += params->getSecondaryColor() * (float(video.pixelData[animationIndex + 1]) / 255.);
+            // pixels[i] += params->getHighlightColor() * (float(video.pixelData[animationIndex + 2]) / 255.);
             pixels[i] += params->getGradient(0) * (float(video.pixelData[animationIndex + 2]) / 255.);
 
             pixels[i] = pixels[i] * transition.getValue();

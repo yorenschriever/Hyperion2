@@ -1,5 +1,5 @@
 #pragma once
-#include "colours.h"
+#include "colors.h"
 #include "core/distribution/chain.hpp"
 #include "core/distribution/inputs/udpInput.hpp"
 #include "core/distribution/inputs/dmxInput.hpp"
@@ -11,7 +11,7 @@
 #include "core/distribution/routing/combine.hpp"
 #include "core/distribution/routing/fallback.hpp"
 #include "core/distribution/routing/switch.hpp"
-#include "core/distribution/luts/colourCorrectionLut.hpp"
+#include "core/distribution/luts/colorCorrectionLut.hpp"
 #include "core/distribution/luts/gammaLut.hpp"
 #include "core/distribution/luts/incandescentLut.hpp"
 #include "core/distribution/luts/laserLut.hpp"

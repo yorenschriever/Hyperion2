@@ -1,6 +1,6 @@
 #pragma once
 #include "IHubController.hpp"
-#include "colours.h"
+#include "colors.h"
 #include "controlHub.hpp"
 #include "core/generation/gradient.hpp"
 #include "core/generation/palette.hpp"

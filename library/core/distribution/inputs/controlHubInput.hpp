@@ -10,8 +10,8 @@
 #include <vector>
 
 // this class attaches a provided set of patterns to a control hub.
-// Patterns should all be the same 'Colour'. You have to provide this colour as template here
-template <class T_COLOUR>
+// Patterns should all be the same 'Color'. You have to provide this color as template here
+template <class T_COLOR>
 class ControlHubInput final : public BaseInput
 {
 public:
@@ -19,7 +19,7 @@ public:
     {
         int column;
         int slot;
-        Pattern<T_COLOUR> *pattern;
+        Pattern<T_COLOR> *pattern;
         bool noMasterDim {false};
         int paramsSlot {0};
         IndexMap *indexMap {nullptr}; 
@@ -38,7 +38,7 @@ public:
     }
 
     //simplified version of the constructor, where all patterns are added to a single column in the control hub
-    ControlHubInput(int length, ControlHub *hub, int column, std::vector<Pattern<T_COLOUR> *>patterns)
+    ControlHubInput(int length, ControlHub *hub, int column, std::vector<Pattern<T_COLOR> *>patterns)
     {
         std::vector<SlotPattern> slotPatterns;
         int slotIndex=0;
@@ -79,13 +79,13 @@ public:
 
     Buffer process() override
     {
-        auto patternBuffer = Buffer(_length * sizeof(T_COLOUR));
-        auto renderBuffer  = Buffer(_length * sizeof(T_COLOUR));
-        renderBuffer.clear<T_COLOUR>();
+        auto patternBuffer = Buffer(_length * sizeof(T_COLOR));
+        auto renderBuffer  = Buffer(_length * sizeof(T_COLOR));
+        renderBuffer.clear<T_COLOR>();
 
         for (auto slotPattern : slotPatterns)
         {
-            patternBuffer.clear<T_COLOUR>();
+            patternBuffer.clear<T_COLOR>();
 
             auto column = hub->findColumn(slotPattern.column);
             auto slot = hub->findSlot(column, slotPattern.slot);
@@ -95,33 +95,33 @@ public:
 
             //Log::info("CONTROL_HUB_INPUT", "calculating pattern active = %d, dim = %d ,masterDim = %d", slot->activated, column->dim, hub->masterDim);
 
-            slotPattern.pattern->Calculate(patternBuffer.as<T_COLOUR>(), _length, slot->activated, hub->getParams(slotPattern.paramsSlot));
+            slotPattern.pattern->Calculate(patternBuffer.as<T_COLOR>(), _length, slot->activated, hub->getParams(slotPattern.paramsSlot));
 
             // apply dimming and copy to output buffer
             for (int i = 0; i < _length; i++)
             {
                 // TODO give a good thought about when we want dimming and when we want to make things transparent.
                 // how to support this in general?
-                if (std::is_same<T_COLOUR, RGBA>::value)
+                if (std::is_same<T_COLOR, RGBA>::value)
                 {
-                    //if the colour space is RGBA, apply colour mixing based on the alpha channel
+                    //if the color space is RGBA, apply color mixing based on the alpha channel
                     RGBA l = patternBuffer.as<RGBA>()[i];
                     l.A = (l.A * dimValue) >> 8;
                     patternBuffer.as<RGBA>()[i] = l;
                 }
                 else
                 {
-                    //if the colour space is not RGBA, apply dimming and sum with the existing value.
-                    patternBuffer.as<T_COLOUR>()[i].dim(dimValue);
+                    //if the color space is not RGBA, apply dimming and sum with the existing value.
+                    patternBuffer.as<T_COLOR>()[i].dim(dimValue);
                 }
                 int index = (slotPattern.indexMap) ? slotPattern.indexMap->map(i) : i;
-                int safeLength = renderBuffer.size() / sizeof(T_COLOUR);
+                int safeLength = renderBuffer.size() / sizeof(T_COLOR);
                 if(index < 0 || index >= safeLength)
                 {
                     Log::error("CONTROL_HUB_INPUT", "Mapped index out of bounds: %d, length: %d", index, safeLength);
                     continue;
                 }
-                renderBuffer.as<T_COLOUR>()[index] += patternBuffer.as<T_COLOUR>()[i];
+                renderBuffer.as<T_COLOR>()[index] += patternBuffer.as<T_COLOR>()[i];
             }
         }   
 

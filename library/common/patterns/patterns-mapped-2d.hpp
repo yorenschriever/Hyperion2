@@ -33,7 +33,7 @@ namespace Mapped2dPatterns
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                RGBA color = params->getSecondaryColour();
+                RGBA color = params->getSecondaryColor();
                 pixels[index] = color * lfo.getValue(-2 * around(map->th(index))) * Utils::rescale(map->r(index), 0, 1, 0, .45) * transition.getValue();
             }
         }
@@ -92,7 +92,7 @@ namespace Mapped2dPatterns
                 for (int column = 0; column < 6; column++)
                 {
                     float fadePosition = fade[column].getValue(radii[column][i] * velocity);
-                    RGBA color = params->getPrimaryColour();
+                    RGBA color = params->getPrimaryColor();
                     pixels[i] += color * fadePosition * transition.getValue();
                 }
             }
@@ -130,7 +130,7 @@ namespace Mapped2dPatterns
             for (int i = 0; i < width; i++)
             {
                 float fadePosition = fade.getValue((1 + map->y(i)) * velocity);
-                RGBA color = params->getSecondaryColour();
+                RGBA color = params->getSecondaryColor();
                 pixels[i] += color * fadePosition;
             }
         }
@@ -280,7 +280,7 @@ namespace Mapped2dPatterns
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                RGBA color = params->getPrimaryColour();
+                RGBA color = params->getPrimaryColor();
                 float lfoArg = fromTop(map->r(index));
                 pixels[index] = color * lfo.getValue(lfoArg) * transition.getValue();
             }
@@ -312,7 +312,7 @@ namespace Mapped2dPatterns
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                RGBA color = params->getPrimaryColour();
+                RGBA color = params->getPrimaryColor();
                 float lfoArg = around(map->th(index));
                 pixels[index] = color * lfo.getValue(lfoArg) * transition.getValue();
             }
@@ -390,7 +390,7 @@ namespace Mapped2dPatterns
 
             for (int i = 0; i < map->size(); i++)
             {
-                pixels[i] += params->getPrimaryColour() * fade.getValue(map->r(i) * velocity) * transition.getValue();
+                pixels[i] += params->getPrimaryColor() * fade.getValue(map->r(i) * velocity) * transition.getValue();
             }
         }
     };
@@ -468,9 +468,9 @@ namespace Mapped2dPatterns
 
             for (int index = 0; index < std::min(width, (int)map->size()); index++)
             {
-                RGBA colour = params->getGradient(abs(map->x(index)) * 255);
-                RGBA dimmedColour = colour * transition.getValue();
-                pixels[index] += dimmedColour;
+                RGBA color = params->getGradient(abs(map->x(index)) * 255);
+                RGBA dimmedColor = color * transition.getValue();
+                pixels[index] += dimmedColor;
             }
         }
     };

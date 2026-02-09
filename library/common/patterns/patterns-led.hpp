@@ -53,9 +53,9 @@ namespace LedPatterns
 
             RGBA col;
             if (colorIndex == 0)
-                col = params->getPrimaryColour();
+                col = params->getPrimaryColor();
             if (colorIndex == 1)
-                col = params->getSecondaryColour();
+                col = params->getSecondaryColor();
 
             RGBA value = col * transition.getValue();
 
@@ -90,7 +90,7 @@ namespace LedPatterns
 
             for (int index = 0; index < width; index++)
             {
-                pixels[perm.at[index]] = params->getSecondaryColour() * lfo.getValue(float(index) / width) * transition.getValue(index, width);
+                pixels[perm.at[index]] = params->getSecondaryColor() * lfo.getValue(float(index) / width) * transition.getValue(index, width);
             }
         }
     };
@@ -161,9 +161,9 @@ namespace LedPatterns
             RGBA color;
             float val = fade.getValue();
             if (val >= 0.5)
-                color = params->getSecondaryColour() + RGBA(255, 255, 255, 255) * ((val - 0.5) * 2.);
+                color = params->getSecondaryColor() + RGBA(255, 255, 255, 255) * ((val - 0.5) * 2.);
             else
-                color = params->getSecondaryColour() * (val * 2.);
+                color = params->getSecondaryColor() * (val * 2.);
 
             for (int index = 0; index < width; index++)
                 pixels[index] = color;
@@ -189,7 +189,7 @@ namespace LedPatterns
 
             RGBA color = RGBA(0, 0, 0, 255);
             if (framecounter <= 1)
-                color = params->getPrimaryColour();
+                color = params->getPrimaryColor();
 
             if (framecounter == 0)
                 framecounter = 5; // params->getVelocity(40,4);
@@ -230,7 +230,7 @@ namespace LedPatterns
             int threshold = float(width) / params->getAmount(thresholdDiv, 2);
 
             for (int index = 0; index < threshold; index++)
-                pixels[perm.at[index]] = params->getSecondaryColour() * transition.getValue();
+                pixels[perm.at[index]] = params->getSecondaryColor() * transition.getValue();
         }
     };
 
@@ -259,7 +259,7 @@ namespace LedPatterns
             int noiseLevel = fade.getValue() * width / 3;
             for (int index = 0; index < noiseLevel; index++)
             {
-                pixels[perm.at[index]] = params->getHighlightColour();
+                pixels[perm.at[index]] = params->getHighlightColor();
             }
         }
     };
@@ -283,7 +283,7 @@ namespace LedPatterns
 
             RGBA color = RGBA(0, 0, 0, 255);
             if (framecounter <= 1)
-                color = params->getHighlightColour();
+                color = params->getHighlightColor();
 
             if (framecounter == 0)
                 framecounter = 5; // params->getVelocity(40,4);
@@ -319,7 +319,7 @@ namespace LedPatterns
             lfo.setDutyCycle(size);
 
             for (int index = 0; index < width; index++)
-                pixels[index] = params->getSecondaryColour() * lfo.getValue(amount * float(index) / width) * transition.getValue(index, width);
+                pixels[index] = params->getSecondaryColor() * lfo.getValue(amount * float(index) / width) * transition.getValue(index, width);
         }
     };
 
@@ -379,9 +379,9 @@ namespace LedPatterns
             {
                 float val = 1.025 * lfo.getValue(float(Transition::fromCenter(index, width, 1000)) / -1000);
                 if (val < 1.0)
-                    pixels[perm.at[index]] = params->getPrimaryColour() * lfo.getValue(float(Transition::fromCenter(index, width, 1000)) / -1000);
+                    pixels[perm.at[index]] = params->getPrimaryColor() * lfo.getValue(float(Transition::fromCenter(index, width, 1000)) / -1000);
                 else
-                    pixels[perm.at[index]] = params->getPrimaryColour() + (params->getSecondaryColour() * (val - 1) / 0.025);
+                    pixels[perm.at[index]] = params->getPrimaryColor() + (params->getSecondaryColor() * (val - 1) / 0.025);
             }
         }
     };
@@ -419,7 +419,7 @@ namespace LedPatterns
             for (int segment = 0; segment < numSegments; segment++)
             {
                 int interval = averagePeriod + perm.at[segment] * (averagePeriod * precision) / numSegments;
-                RGBA col = params->getPrimaryColour() * lfo.getValue(0, interval) * transition.getValue();
+                RGBA col = params->getPrimaryColor() * lfo.getValue(0, interval) * transition.getValue();
                 for (int j = 0; j < segmentSize; j++)
                     pixels[segment * segmentSize + j] = col;
             }
@@ -460,7 +460,7 @@ namespace LedPatterns
 
             for (int ribbe = 0; ribbe < numVisible; ribbe++)
             {
-                RGBA col = params->getPrimaryColour() * fade.getValue() * transition.getValue();
+                RGBA col = params->getPrimaryColor() * fade.getValue() * transition.getValue();
                 for (int j = 0; j < segmentSize; j++)
                     pixels[perm.at[ribbe] * segmentSize + j] += col;
             }
@@ -498,7 +498,7 @@ namespace LedPatterns
 
                 if (perm.at[segmentIndex] > threshold)
                     continue;
-                pixels[index] += params->getHighlightColour() * transition.getValue();
+                pixels[index] += params->getHighlightColor() * transition.getValue();
             }
         }
     };
@@ -535,7 +535,7 @@ namespace LedPatterns
             {
                 int permutedQuantized = perm.at[index * numSegments / width] * width / numSegments;
                 int interval = averagePeriod + permutedQuantized * (averagePeriod * precision) / width;
-                pixels[index] += params->getSecondaryColour() * lfo.getValue(0, interval) * transition.getValue();
+                pixels[index] += params->getSecondaryColor() * lfo.getValue(0, interval) * transition.getValue();
             }
         }
     };
@@ -567,7 +567,7 @@ namespace LedPatterns
 
             for (int i = 0; i < width; i++)
             {
-                pixels[i] = params->getPrimaryColour() * lfo.getValue(float(i) / width * multiply) * transition.getValue();
+                pixels[i] = params->getPrimaryColor() * lfo.getValue(float(i) / width * multiply) * transition.getValue();
             }
         }
     };
@@ -621,7 +621,7 @@ namespace LedPatterns
                 {
                     int distance = abs(centers[bar] - i);
                     float fadeValue = fade.getValue(distance * trailSize + delays[bar] * offset);
-                    pixels[bar * segmentSize + i] += params->getPrimaryColour() * fadeValue * masterFade.getValue() * transition.getValue();
+                    pixels[bar * segmentSize + i] += params->getPrimaryColor() * fadeValue * masterFade.getValue() * transition.getValue();
                 }
             }
         }
@@ -660,7 +660,7 @@ class SideWave : public Pattern<RGBA>
                 {
                     int index = bar * segmentSize + i;
                     float fadeValue = softEdge(i - baseSize, size * lfo.getValue(2. * float(bar) / (width / segmentSize) * offset) * segmentSize);
-                    pixels[index] = params->getPrimaryColour() * fadeValue * transition.getValue();
+                    pixels[index] = params->getPrimaryColor() * fadeValue * transition.getValue();
                 }
             }
         }
@@ -691,7 +691,7 @@ class SideWave : public Pattern<RGBA>
             for (int i = 0; i < width; i++)
             {
                 float phase = ((float)i / width) * amount;
-                pixels[i] = params->getSecondaryColour() * lfo.getValue(phase) * transition.getValue();
+                pixels[i] = params->getSecondaryColor() * lfo.getValue(phase) * transition.getValue();
             }
         }
     };

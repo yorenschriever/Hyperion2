@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/colours.h"
+#include "core/colors.h"
 #include "helpers/fade.h"
 #include "helpers/interval.h"
 #include "helpers/lfo.h"
@@ -12,7 +12,7 @@
 #include <inttypes.h>
 #include <string>
 
-template <class T_COLOUR>
+template <class T_COLOR>
 class Pattern
 {
 
@@ -22,7 +22,7 @@ public:
     //    (only if active is true)
     // width = number of pixels
     // active = is the pattern activated
-    virtual void Calculate(T_COLOUR *frameBuffer, int width, bool active, Params *params){}
+    virtual void Calculate(T_COLOR *frameBuffer, int width, bool active, Params *params){}
 
     std::string name; 
 };

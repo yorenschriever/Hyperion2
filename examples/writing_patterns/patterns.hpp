@@ -46,7 +46,7 @@ namespace ExamplePatterns
     public:
         Palette()
         {
-            this->name = "Palette colours";
+            this->name = "Palette colors";
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -54,15 +54,15 @@ namespace ExamplePatterns
             if (!active)
                 return;
 
-            // You can access the colours in the selected palette though the params argument.
+            // You can access the colors in the selected palette though the params argument.
             for (int i = 0; i < width; i++)
             {
                 if (i < width / 3)
-                    pixels[i] = params->getPrimaryColour();
+                    pixels[i] = params->getPrimaryColor();
                 else if (i < 2 * width / 3)
-                    pixels[i] = params->getSecondaryColour();
+                    pixels[i] = params->getSecondaryColor();
                 else
-                    pixels[i] = params->getHighlightColour();
+                    pixels[i] = params->getHighlightColor();
             }
         }
     };
@@ -136,7 +136,7 @@ namespace ExamplePatterns
                 // pattern underneath it.
                 // The effect is clearly visible if you enable 'Hello world' and
                 // this pattern 'Pattern Layering' together.
-                pixels[i] = params->getHighlightColour() * (float(i) / width);
+                pixels[i] = params->getHighlightColor() * (float(i) / width);
 
                 // The pixels[] array is filled with RGBA(0,0,0,0) (i.e.: all pixels transparent)
                 // before this Calculate function is called. That is why you can return early if
@@ -181,7 +181,7 @@ namespace ExamplePatterns
             {
                 // lfo.getValue() will give you the value in the range 0-1.
                 // This is convenient when you want to do alpha blending,
-                pixels[i] = params->getPrimaryColour() * lfo.getValue();
+                pixels[i] = params->getPrimaryColor() * lfo.getValue();
             }
         }
     };
@@ -214,7 +214,7 @@ namespace ExamplePatterns
                 // Eg: if you change lfo.getValue(phase) to lfo.getValue(2 * phase), it will pass a value
                 // between 0-2 as argument, and therefore fit 2 cycles on the circle. try it.
                 float phase = float(i) / width;
-                pixels[i] = params->getPrimaryColour() * lfo.getValue(phase);
+                pixels[i] = params->getPrimaryColor() * lfo.getValue(phase);
             }
         }
     };
@@ -274,7 +274,7 @@ namespace ExamplePatterns
             for (int i = 0; i < width; i++)
             {
                 float phase = float(i) / width;
-                pixels[i] = params->getPrimaryColour() * lfo.getValue(phase);
+                pixels[i] = params->getPrimaryColor() * lfo.getValue(phase);
             }
         }
     };
@@ -307,7 +307,7 @@ namespace ExamplePatterns
 
             for (int i = 0; i < width; i++)
             {
-                pixels[i] = params->getPrimaryColour() * fade.getValue();
+                pixels[i] = params->getPrimaryColor() * fade.getValue();
             }
         }
     };
@@ -338,7 +338,7 @@ namespace ExamplePatterns
                 // This means that the fade will wait X milliseconds after the trigger to start fading.
                 // By passing a slightly different delay for each pixel it will create a chase effect.
                 float phase = ((float)i) / width;
-                pixels[i] = params->getPrimaryColour() * fade.getValue(500 * phase);
+                pixels[i] = params->getPrimaryColor() * fade.getValue(500 * phase);
             }
         }
     };
@@ -374,7 +374,7 @@ namespace ExamplePatterns
             for (int i = 0; i < width; i++)
             {
                 float phase = ((float)i) / width;
-                pixels[i] = params->getPrimaryColour() * fade.getValue(velocity * phase);
+                pixels[i] = params->getPrimaryColor() * fade.getValue(velocity * phase);
             }
         }
     };
@@ -418,7 +418,7 @@ namespace ExamplePatterns
             {
                 // lookup the number of the pixel we are going to paint:
                 int randomizedPixelIndex = permute.at[i];
-                pixels[randomizedPixelIndex] = params->getPrimaryColour() * fade.getValue();
+                pixels[randomizedPixelIndex] = params->getPrimaryColor() * fade.getValue();
             }
         }
     };
@@ -454,7 +454,7 @@ namespace ExamplePatterns
             for (int i = 0; i < width; i++)
             {
                 float phase = float(i) / width;
-                pixels[i] = params->getPrimaryColour() * lfo.getValue(amount * phase);
+                pixels[i] = params->getPrimaryColor() * lfo.getValue(amount * phase);
             }
         }
     };
@@ -487,7 +487,7 @@ namespace ExamplePatterns
             {
                 float phase = float(i) / width;
                 int randomizedPixelIndex = permute.at[i];
-                pixels[randomizedPixelIndex] = params->getPrimaryColour() * lfo.getValue(phase);
+                pixels[randomizedPixelIndex] = params->getPrimaryColor() * lfo.getValue(phase);
             }
         }
     };
@@ -525,7 +525,7 @@ namespace ExamplePatterns
             for (int i = 0; i < width; i++)
             {
                 float phase = float(i) / width;
-                pixels[i] = params->getPrimaryColour() * fade.getValue(phase * maxDelay);
+                pixels[i] = params->getPrimaryColor() * fade.getValue(phase * maxDelay);
             }
         }
     };
@@ -559,7 +559,7 @@ namespace ExamplePatterns
                 // In this example i need a phase in range [0,1], so i need to rescale the value.
                 // For here on you can use it the same way you did before
                 float phase = Utils::rescale(map->y(i), 0, 1, -1, 1);
-                pixels[i] = params->getPrimaryColour() * lfo.getValue(phase);
+                pixels[i] = params->getPrimaryColor() * lfo.getValue(phase);
             }
         }
     };
@@ -592,7 +592,7 @@ namespace ExamplePatterns
             for (int i = 0; i < width; i++)
             {
                 // multiply your pixels colors with transition.getValue() to apply the fade in and out:
-                pixels[i] = params->getSecondaryColour() * transition.getValue();
+                pixels[i] = params->getSecondaryColor() * transition.getValue();
             }
         }
     };
@@ -620,7 +620,7 @@ namespace ExamplePatterns
             for (int i = 0; i < width; i++)
             {
                 // pass i and width arguments to transition.getValue to tell the transition which pixel we are rendering
-                pixels[i] = params->getSecondaryColour() * transition.getValue(i, width);
+                pixels[i] = params->getSecondaryColor() * transition.getValue(i, width);
             }
         }
     };
@@ -651,7 +651,7 @@ namespace ExamplePatterns
                 // this time we pass a positional argument that has the value x+y. We add 2 to make it
                 // range between 0 and 4. As width argument we pass 4.
                 // This will result in a diagonal transition
-                pixels[i] = params->getSecondaryColour() * transition.getValue(map->x(i) + map->y(i) + 2, 4);
+                pixels[i] = params->getSecondaryColor() * transition.getValue(map->x(i) + map->y(i) + 2, 4);
             }
         }
     };

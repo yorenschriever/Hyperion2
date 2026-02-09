@@ -7,7 +7,7 @@
 #include <algorithm>
 
 // PatternInput displays 1 pattern continuously.
-template <class T_COLOUR>
+template <class T_COLOR>
 class PatternInput final: public BaseInput
 {
 
@@ -16,7 +16,7 @@ public:
 
     // length = the length in pixels
     // pattern = the pattern to display
-    PatternInput(int length, Pattern<T_COLOUR> *pattern)
+    PatternInput(int length, Pattern<T_COLOR> *pattern)
     {
         this->length = length;
         this->pattern = pattern;
@@ -29,10 +29,10 @@ public:
 
     Buffer process() override
     {
-        auto patternBuffer = Buffer(length * sizeof(T_COLOUR));
-        patternBuffer.clear<T_COLOUR>();
+        auto patternBuffer = Buffer(length * sizeof(T_COLOR));
+        patternBuffer.clear<T_COLOR>();
 
-        pattern->Calculate(patternBuffer.as<T_COLOUR>(), length, true, &params);
+        pattern->Calculate(patternBuffer.as<T_COLOR>(), length, true, &params);
 
         fpsCounter.increaseUsedFrameCount();
 
@@ -41,6 +41,6 @@ public:
 
 private:
     int length = 0;
-    T_COLOUR *ledData;
-    Pattern<T_COLOUR> *pattern;
+    T_COLOR *ledData;
+    Pattern<T_COLOR> *pattern;
 };

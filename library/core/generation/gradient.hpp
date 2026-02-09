@@ -1,6 +1,6 @@
 #pragma once
 
-#include "colours.h"
+#include "colors.h"
 #include <stdint.h>
 #include <vector>
 #include "utils.hpp"

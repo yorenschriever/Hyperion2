@@ -115,9 +115,9 @@ namespace LedPatterns
 
             RGBA col;
             if (colorIndex == 0)
-                col = params->getPrimaryColour();
+                col = params->getPrimaryColor();
             if (colorIndex == 1)
-                col = params->getSecondaryColour();
+                col = params->getSecondaryColor();
 
             RGBA value = col * transition.getValue();
 

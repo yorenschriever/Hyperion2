@@ -3,8 +3,8 @@
 #include <inttypes.h>
 #include <math.h>
 
-//LUTs, or look up tables, can help you tweak the colours, and make them look better.
-//For example luts can help you with gamma correction, colour correction, and solve
+//LUTs, or look up tables, can help you tweak the colors, and make them look better.
+//For example luts can help you with gamma correction, color correction, and solve
 //other non linearities in the lamps response.
 class LUT 
 {

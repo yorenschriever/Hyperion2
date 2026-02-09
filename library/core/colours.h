@@ -8,22 +8,22 @@
 #define CONV8TO12 4096 / 255
 #define CONV12TO8 255 / 4096
 
-// Colours currently fulfill 2 purposes:
-// 1. act as a struct to store colour data. This can be used by the
-// transfer function to convert different colour spaces.
-// 2. as a method to create patterns: layer colours on top of each other
+// Colors currently fulfill 2 purposes:
+// 1. act as a struct to store color data. This can be used by the
+// transfer function to convert different color spaces.
+// 2. as a method to create patterns: layer colors on top of each other
 // I have chosen to combine both things into a single set of classes.
-// Colours should support operators to convert themselves to other other
-// colours. This will be used by then transfer function when casting one
-// colour to another
-// They need to have a default constructor that initializes to colour
+// Colors should support operators to convert themselves to other other
+// colors. This will be used by then transfer function when casting one
+// color to another
+// They need to have a default constructor that initializes to color
 // to black. And also a constructor to provide values for all their channels.
 // the method dim() is used to to decrease the brightness, for example
 // by the faders of the apc mini.
-// RGBA is the most advanced colour, it supports alpha, colour blending,
-// colour addition etc. I use RGBA a lot to create contents for patterns
+// RGBA is the most advanced color, it supports alpha, color blending,
+// color addition etc. I use RGBA a lot to create contents for patterns
 // and then cast to RGB to send it out to the leds.
-class Colour
+class Color
 {
 };
 
@@ -45,10 +45,10 @@ class Derby;
 class Strobe;
 class Effect;
 
-class Monochrome : Colour
+class Monochrome : Color
 {
 public:
-    // we need an empty constructor that creates a black colour
+    // we need an empty constructor that creates a black color
     Monochrome()
     {
         this->L = 0;
@@ -99,7 +99,7 @@ public:
     uint8_t L;
 };
 
-class RGB : Colour
+class RGB : Color
 {
 public:
     RGB()
@@ -151,7 +151,7 @@ public:
     uint8_t R, G, B;
 };
 
-class GRB : Colour
+class GRB : Color
 {
 public:
     GRB()
@@ -190,7 +190,7 @@ public:
     uint8_t G, R, B;
 };
 
-class BGR : Colour
+class BGR : Color
 {
 public:
     BGR()
@@ -229,7 +229,7 @@ public:
     uint8_t B, G, R;
 };
 
-class RBG : Colour
+class RBG : Color
 {
 public:
     RBG()
@@ -264,7 +264,7 @@ public:
     uint8_t R, B, G;
 };
 
-class GBR : Colour
+class GBR : Color
 {
 public:
     GBR()
@@ -299,7 +299,7 @@ public:
     uint8_t G, B, R;
 };
 
-class RGB12 : Colour
+class RGB12 : Color
 {
 public:
     RGB12()
@@ -345,7 +345,7 @@ public:
     uint16_t R, G, B;
 };
 
-class GRBW : Colour
+class GRBW : Color
 {
 public:
     GRBW()
@@ -383,7 +383,7 @@ public:
     uint8_t G, R, B, W;
 };
 
-class RGBW : Colour
+class RGBW : Color
 {
 public:
     RGBW()
@@ -421,7 +421,7 @@ public:
     uint8_t R, G, B, W;
 };
 
-class Monochrome12 : Colour
+class Monochrome12 : Color
 {
 public:
     Monochrome12()
@@ -459,7 +459,7 @@ public:
     uint16_t L;
 };
 
-class HSL : Colour
+class HSL : Color
 {
 public:
     HSL()
@@ -486,7 +486,7 @@ public:
     inline void dim(uint8_t value)
     {
         // FIXME this is not the the correct way to dim HSL,
-        // because for example whites will dim via a fully saturated colour now
+        // because for example whites will dim via a fully saturated color now
         // the should become less white
         L = (L * value) >> 8;
     }
@@ -497,7 +497,7 @@ public:
     uint8_t H, S, L;
 };
 
-class Hue : Colour
+class Hue : Color
 {
 public:
     Hue()
@@ -516,7 +516,7 @@ public:
     uint8_t H;
 };
 
-class HSV : Colour
+class HSV : Color
 {
 public:
     HSV()
@@ -552,7 +552,7 @@ public:
     uint8_t H, S, V;
 };
 
-class RGBA : Colour
+class RGBA : Color
 {
 public:
     RGBA()
@@ -591,7 +591,7 @@ public:
     // overload some operators to quickly apply some blend modes
     // https://en.wikipedia.org/wiki/Blend_modes#Normal_blend_mode
 
-    // overload to + operator, so you can use color1 + colour2 to stack 2 colors on top of eachother
+    // overload to + operator, so you can use color1 + color2 to stack 2 colors on top of eachother
     // normal blend mode
     // https://en.wikipedia.org/wiki/Alpha_compositing
     RGBA operator+(RGBA other)
@@ -625,7 +625,7 @@ public:
         }
 
         // outA should be divided by 255, but i left it scaled up here, so i dont lose precision.
-        // this was very noticable when mixing two colours with low A
+        // this was very noticable when mixing two colors with low A
         int outA = other.A * 255 + (this->A * (255 - other.A));
         if (outA == 0)
         { // this is already covered by the checks above?
@@ -665,7 +665,7 @@ public:
     uint8_t R, G, B, A;
 };
 
-class RGBWAmber : Colour
+class RGBWAmber : Color
 {
 public:
     RGBWAmber()
@@ -711,7 +711,7 @@ public:
     uint8_t R = 0, G = 0, B = 0, W = 0, A = 0; //, U;
 };
 
-class RGBWAmberUV : Colour
+class RGBWAmberUV : Color
 {
 public:
     RGBWAmberUV()
@@ -767,7 +767,7 @@ public:
     uint8_t R = 0, G = 0, B = 0, W = 0, A = 0, U = 0;
 };
 
-class MovingHead : Colour
+class MovingHead : Color
 {
 public:
     MovingHead()
@@ -775,17 +775,17 @@ public:
     }
 
     // pan/tilt angles in degrees
-    MovingHead(float pan, float tilt, RGBA colour, uint8_t uv = 0)
+    MovingHead(float pan, float tilt, RGBA color, uint8_t uv = 0)
     {
         this->pan = pan;
         this->tilt = tilt;
-        this->colour = colour;
+        this->color = color;
         this->uv = uv;
     }
 
     inline void dim(uint8_t value)
     {
-        colour.dim(value);
+        color.dim(value);
     }
 
     MovingHead operator+(MovingHead other)
@@ -807,15 +807,15 @@ public:
         // HTP for uv channel
         uv = std::max(uv, other.uv);
 
-        // mix RGB colours
-        colour += other.colour;
+        // mix RGB colors
+        color += other.color;
 
         return *this;
     }
 
     MovingHead operator*(float scale)
     {
-        return MovingHead(pan, tilt, colour * scale, Utils::constrain(uv * scale, 0, 255));
+        return MovingHead(pan, tilt, color * scale, Utils::constrain(uv * scale, 0, 255));
     }
 
     operator Miniwash7();
@@ -823,40 +823,40 @@ public:
     // angles in degrees
     float pan = 0;
     float tilt = 0;
-    RGBA colour;
+    RGBA color;
     uint8_t uv = 0;
 };
 
-class Miniwash7 : Colour
+class Miniwash7 : Color
 {
 public:
     Miniwash7()
     {
         this->pan = 0;
         this->tilt = 0;
-        this->colour = RGBWAmber();
+        this->color = RGBWAmber();
         this->uv = 0;
     }
 
-    Miniwash7(uint16_t pan, uint16_t tilt, RGBWAmber colour, uint8_t uv = 0)
+    Miniwash7(uint16_t pan, uint16_t tilt, RGBWAmber color, uint8_t uv = 0)
     {
         this->pan = pan >> 8;
         this->panfine = (pan & 0xFF) / 8;
         this->tilt = tilt >> 8;
         this->tiltfine = (tilt & 0xFF) / 8;
-        this->colour = colour;
+        this->color = color;
         this->uv = uv;
     }
 
     inline void dim(uint8_t value)
     {
-        colour.dim(value);
+        color.dim(value);
         uv = uv * value / 255;
     }
 
     inline void ApplyLut(LUT *lut)
     {
-        colour.ApplyLut(lut);
+        color.ApplyLut(lut);
     }
 
     uint8_t pan = 0;
@@ -865,28 +865,28 @@ public:
     uint8_t tiltfine = 0;
     uint8_t padding1 = 0;
     uint8_t strobedim = 255;
-    RGBWAmber colour;
+    RGBWAmber color;
     uint8_t uv = 0;
     uint8_t dontuse1 = 0;
     uint8_t dontuse2 = 0;
     uint8_t dontuse3 = 0;
 };
 
-class Derby : Colour
+class Derby : Color
 {
 public:
     Derby()
     {
         this->function = 0;
         this->motor = 0;
-        this->colour = RGB();
+        this->color = RGB();
     }
 
-    Derby(uint8_t function, RGB colour, uint8_t motor = 0)
+    Derby(uint8_t function, RGB color, uint8_t motor = 0)
     {
         this->function = function;
         this->motor = motor;
-        this->colour = colour;
+        this->color = color;
     }
 
     inline void dim(uint8_t value)
@@ -898,8 +898,8 @@ public:
         }
         else
         {
-            // we are in strobe mode, use colour.dim() to adjust the RGB values
-            colour.dim(value);
+            // we are in strobe mode, use color.dim() to adjust the RGB values
+            color.dim(value);
         }
     }
 
@@ -908,11 +908,11 @@ public:
     }
 
     uint8_t function = 0;
-    RGB colour;
+    RGB color;
     uint8_t motor = 0;
 };
 
-class Strobe : Colour
+class Strobe : Color
 {
 public:
     Strobe()
@@ -940,10 +940,10 @@ public:
     uint8_t speed = 0;
 };
 
-class Effect : Colour
+class Effect : Color
 {
 public:
-    // we need an empty constructor that creates a black colour
+    // we need an empty constructor that creates a black color
     Effect()
     {
         this->V = 0;
@@ -989,7 +989,7 @@ inline MovingHead::operator Miniwash7()
     return Miniwash7(
         (Utils::constrain(pan, -180, 360) + 180) * 0xFFFF / (180 + 360),
         (Utils::constrain(tilt, -90, 90) + 90) * 0xFFFF / 180,
-        colour,
+        color,
         uv);
 }
 
