@@ -11,8 +11,8 @@ set(INCLUDE_DIRS
 set(CORE_SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/core" )
 
 #create header files for the certificate and key, so we can import them
-if(NOT EXISTS "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key")
-    message([FATAL_ERROR] "\n\nYou need to generate a certificate first. Read the hyperion readme.md, and then run the following command to generate the certificates:\n\ncd $ENV{HYPERION_LIB_DIR}/scripts/certificate/\n./generate.sh\n\n")
+if(NOT EXISTS "$ENV{HYPERION_LIB_DIR}/web/certificate/hyperion.key")
+    message([FATAL_ERROR] "\n\nYou need to generate a certificate first. Read the hyperion readme.md, and then run the following command to generate the certificates:\n\ncd $ENV{HYPERION_LIB_DIR}/web/certificate/\n./generate.sh\n\n")
 endif()
 
 if (${ESP_PLATFORM})
@@ -29,8 +29,8 @@ if (${ESP_PLATFORM})
             "core/generation/patterns/helpers/tempo"
             "misc"
         EMBED_TXTFILES
-            "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.crt"
-            "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key"
+            "$ENV{HYPERION_LIB_DIR}/web/certificate/hyperion.crt"
+            "$ENV{HYPERION_LIB_DIR}/web/certificate/hyperion.key"
     )
 
     # the next line is a workaround to a bug in esp-idf 5.1
@@ -41,7 +41,7 @@ if (${ESP_PLATFORM})
 
     target_compile_options(${COMPONENT_LIB} PUBLIC "-Wno-maybe-uninitialized")
 
-    file(GLOB_RECURSE WWW_FILES RELATIVE $ENV{HYPERION_LIB_DIR}/scripts/web $ENV{HYPERION_LIB_DIR}/scripts/web/*)
+    file(GLOB_RECURSE WWW_FILES RELATIVE $ENV{HYPERION_LIB_DIR}/web/static $ENV{HYPERION_LIB_DIR}/web/static/*)
     foreach(WWW_FILE ${WWW_FILES})
         list(APPEND GZIP_COMMANDS
                 COMMAND gzip -9 ${CMAKE_BINARY_DIR}/spiffs_image/${WWW_FILE} )
@@ -59,11 +59,11 @@ if (${ESP_PLATFORM})
     endif()
 
 
-    add_custom_target(copy-and-compress-files ALL DEPENDS $ENV{HYPERION_LIB_DIR}/scripts/web ${WWW_FILES_PROJECT_DEPENDS}
+    add_custom_target(copy-and-compress-files ALL DEPENDS $ENV{HYPERION_LIB_DIR}/web/static ${WWW_FILES_PROJECT_DEPENDS}
             # clean up
             COMMAND rm -rf ${CMAKE_BINARY_DIR}/spiffs_image
             # copy spiffs files to build folder
-            COMMAND ${CMAKE_COMMAND} -E copy_directory $ENV{HYPERION_LIB_DIR}/scripts/web ${CMAKE_BINARY_DIR}/spiffs_image
+            COMMAND ${CMAKE_COMMAND} -E copy_directory $ENV{HYPERION_LIB_DIR}/web/static ${CMAKE_BINARY_DIR}/spiffs_image
             # copy the /web folder in the project directory, if it exists
             ${WWW_FILES_PROJECT_COMMAND}
             # create gzip encoded www files
@@ -113,15 +113,15 @@ else ()
     target_link_libraries(Hyperion PUBLIC ${RTMIDI} OpenSSL::SSL)
     target_include_directories(Hyperion PRIVATE $ENV{BOOST_DIR})
 
-    target_compile_definitions(Hyperion PUBLIC WEBSERVER_ROOT="$ENV{HYPERION_LIB_DIR}/scripts/web")
+    target_compile_definitions(Hyperion PUBLIC WEBSERVER_ROOT="$ENV{HYPERION_LIB_DIR}/web/static")
     target_compile_definitions(Hyperion PUBLIC WEBSERVER_PROJECT_ROOT="${CMAKE_SOURCE_DIR}/web")
 
     target_include_directories(Hyperion PUBLIC ${CMAKE_BINARY_DIR}/cert)
-    if("$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key" IS_NEWER_THAN "${CMAKE_BINARY_DIR}/cert/hyperion.key.h")
+    if("$ENV{HYPERION_LIB_DIR}/web/certificate/hyperion.key" IS_NEWER_THAN "${CMAKE_BINARY_DIR}/cert/hyperion.key.h")
         include("$ENV{HYPERION_LIB_DIR}/build-utils/bin2h.cmake")
         file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/cert)
-        bin2h(SOURCE_FILE "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.crt" HEADER_FILE "${CMAKE_BINARY_DIR}/cert/hyperion.crt.h" VARIABLE_NAME "HYPERION_CERT" NULL_TERMINATE "1")
-        bin2h(SOURCE_FILE "$ENV{HYPERION_LIB_DIR}/scripts/certificate/hyperion.key" HEADER_FILE "${CMAKE_BINARY_DIR}/cert/hyperion.key.h" VARIABLE_NAME "HYPERION_KEY" NULL_TERMINATE "1")
+        bin2h(SOURCE_FILE "$ENV{HYPERION_LIB_DIR}/web/certificate/hyperion.crt" HEADER_FILE "${CMAKE_BINARY_DIR}/cert/hyperion.crt.h" VARIABLE_NAME "HYPERION_CERT" NULL_TERMINATE "1")
+        bin2h(SOURCE_FILE "$ENV{HYPERION_LIB_DIR}/web/certificate/hyperion.key" HEADER_FILE "${CMAKE_BINARY_DIR}/cert/hyperion.key.h" VARIABLE_NAME "HYPERION_KEY" NULL_TERMINATE "1")
     endif()
 
 endif ()

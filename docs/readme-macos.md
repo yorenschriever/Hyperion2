@@ -46,8 +46,8 @@ That's it. Close your terminal and reopen (if you still need it).
 ## Create, install and trust a certificate (optional)
 In order to use the web interface of Hyperion, you need to create a certificate, install it, and trust it.
 ```sh
-$HYPERION_LIB_DIR/scripts/certificate/generate.sh
-$HYPERION_LIB_DIR/scripts/certificate/install-mac.sh
+$HYPERION_LIB_DIR/web/certificate/generate.sh
+$HYPERION_LIB_DIR/web/certificate/install-mac.sh
 ```
 This will generate a-self signed certificate. It will also install it on your machine. It will ask your password for permission to do so.
 

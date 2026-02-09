@@ -92,7 +92,7 @@ for CMD in $COMMANDS; do
         build)
             echo "Building ${TARGET}..."
             
-            ${HYPERION_LIB_DIR}/scripts/certificate/generate.sh
+            ${HYPERION_LIB_DIR}/web/certificate/generate.sh
 
             if [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ] || [ $TARGET = 'rpi' ]; then
                 PARAM="-DTARGET=${TARGET} -DSTARGET=${TARGET}"
@@ -150,7 +150,7 @@ for CMD in $COMMANDS; do
             BUILDDIR_DEBUG="$BASEDIR/build/${TARGET}_debug"
             
             if [ $TARGET = 'macos' ] || [ $TARGET = 'linux' ] || [ $TARGET = 'rpi' ]; then
-                ${HYPERION_LIB_DIR}/scripts/certificate/generate.sh
+                ${HYPERION_LIB_DIR}/web/certificate/generate.sh
                 PARAM="-DTARGET=${TARGET} -DSTARGET=${TARGET}"
 
             elif $IS_ESP; then

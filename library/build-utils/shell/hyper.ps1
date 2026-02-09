@@ -89,7 +89,7 @@ foreach ($CMD in $COMMANDS) {
             Write-Host "Building $TARGET..."
             
             # Generate certificates
-            & "$env:HYPERION_LIB_DIR/scripts/certificate/generate.ps1"
+            & "$env:HYPERION_LIB_DIR/web/certificate/generate.ps1"
 
             if ($TARGET -eq "windows") {
                 $PARAM = "-DTARGET=$TARGET", "-DSTARGET=$TARGET"
@@ -151,7 +151,7 @@ foreach ($CMD in $COMMANDS) {
             
             if ($TARGET -eq "windows") {
                 # Generate certificates
-                & "$env:HYPERION_LIB_DIR/scripts/certificate/generate.ps1"
+                & "$env:HYPERION_LIB_DIR/web/certificate/generate.ps1"
                 $PARAM = "-DTARGET=$TARGET", "-DSTARGET=$TARGET"
             }
             elseif ($IS_ESP) {
