@@ -58,7 +58,7 @@ int main()
               new Mapped::ConcentricWavePattern<SinFast>(&ledsterMap),
               new Mapped::HorizontalGradientPattern(&ledsterMap),
           }),
-      new ConvertColor<RGBA, RGB>(),
+      new ColorConverter<RGBA, RGB>(),
       new MonitorOutput(&hyp->webServer, &ledsterMap)
   );
 

@@ -14,7 +14,7 @@ int main()
             {.column = 0, .slot = 0, .pattern = new Mapped::ConcentricWavePattern<SinFast>(&ledsterMap)},
             {.column = 0, .slot = 1, .pattern = new Mapped::HorizontalGradientPattern(&ledsterMap)},
           }),
-    new ConvertColor<RGBA, RGB>(),
+    new ColorConverter<RGBA, RGB>(),
     new MonitorOutput(&hyp->webServer,&ledsterMap));
 
   hyp->start();

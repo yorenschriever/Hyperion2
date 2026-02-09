@@ -24,7 +24,7 @@
 #include "core/distribution/outputs/udpOutput.hpp"
 #include "core/distribution/outputs/artnetOutput.hpp"
 #include "core/distribution/outputs/nullOutput.hpp"
-#include "core/distribution/processors/convertColor.hpp"
+#include "core/distribution/processors/colorConverter.hpp"
 #include "core/generation/controllers/dinMidiControllerFactory.hpp"
 #include "core/generation/controllers/midiBridge.hpp"
 #include "core/generation/controllers/midiController.hpp"

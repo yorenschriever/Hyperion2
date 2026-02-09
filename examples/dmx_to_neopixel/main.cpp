@@ -32,7 +32,7 @@ int main()
   {
     hyp->createChain(
         new DMXInput(1 + i * 64),
-        new ConvertColor<RGB,GBR>(),
+        new ColorConverter<RGB,GBR>(),
         new NeopixelOutput(i + 1));
   }
 

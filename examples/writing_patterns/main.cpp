@@ -95,7 +95,7 @@ void addHaloChain(Hyperion *hyp)
 
     hyp->createChain(
         input,
-        new ConvertColor<RGBA, RGB>(),
+        new ColorConverter<RGBA, RGB>(),
         new MonitorOutput(&hyp->webServer, &haloMap));
 }
 

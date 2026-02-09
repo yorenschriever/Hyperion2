@@ -3,17 +3,17 @@
 
 #include "../interfaces.hpp"
 
-// ConvertColor<SourceColor,TargetColor> will convert the data from source color format
+// ColorConverter<SourceColor,TargetColor> will convert the data from source color format
 // to target format. eg. from RGB to RGBW or from RGB to Monochrome.
-// ConvertColor can also apply a look up table (LUT) to adjust the color
+// ColorConverter can also apply a look up table (LUT) to adjust the color
 template <class T_SOURCE_COLOR, class T_TARGET_COLOR>
-class ConvertColor final:  public IConverter
+class ColorConverter final:  public IConverter
 {
 private:
     LUT *lut = nullptr;
 
 public: 
-    ConvertColor(LUT *lut = nullptr)
+    ColorConverter(LUT *lut = nullptr)
     {
         this->lut = lut;
     }
@@ -30,7 +30,7 @@ public:
         int numPixels = inputBuffer.size() / sizeof(T_SOURCE_COLOR);
         auto outputBuffer = Buffer(numPixels * sizeof(T_TARGET_COLOR));
         
-        // Log::info("ConvertColor", "Converting %d pixels from %d to %d", numPixels, sizeof(T_SOURCE_COLOR), sizeof(T_TARGET_COLOR));
+        // Log::info("ColorConverter", "Converting %d pixels from %d to %d", numPixels, sizeof(T_SOURCE_COLOR), sizeof(T_TARGET_COLOR));
 
         for (int i = 0; i < numPixels; i++)
         {

@@ -44,7 +44,7 @@ void distribute(
     Slicer *splitInput,
     LUT *lut = nullptr)
 {
-    auto defaultConverter = new ConvertColor<T_INPUT_COLOR, T_OUTPUT_COLOR>(lut);
+    auto defaultConverter = new ColorConverter<T_INPUT_COLOR, T_OUTPUT_COLOR>(lut);
 
     for (int i = 0; i < splitInput->size() - 1; i++)
     {
@@ -72,7 +72,7 @@ void distributeAndMonitor(
     hyp->createChain(input,splitInput);
     hyp->createChain(
         splitInput->getSlice(slices.size()-1),
-        new ConvertColor<T_INPUT_COLOR, RGB>(),
+        new ColorConverter<T_INPUT_COLOR, RGB>(),
         new MonitorOutput(&hyp->webServer, pixelMap, 60, monitorDotSize)
     );
 }
@@ -93,7 +93,7 @@ void distributeAndMonitor3d(
     hyp->createChain(input,splitInput);
     hyp->createChain(
         splitInput->getSlice(slices.size()-1),
-        new ConvertColor<T_INPUT_COLOR, RGB>(),
+        new ColorConverter<T_INPUT_COLOR, RGB>(),
         new MonitorOutput3d(&hyp->webServer, pixelMap, 60, monitorDotSize)
     );
 }

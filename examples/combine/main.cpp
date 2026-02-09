@@ -46,7 +46,7 @@ int main()
     );
     hyp->createChain(
         inputLeds,
-        new ConvertColor<RGBA, RGB>(),
+        new ColorConverter<RGBA, RGB>(),
         combined->atOffset(numMonochromePixels * sizeof(Monochrome) + 3)
     );
 
@@ -70,7 +70,7 @@ int main()
     // The monitorOutput expects RGB values per dot, so we convert from monochrome to RGB
     hyp->createChain(
         combined,
-        new ConvertColor<Monochrome, RGB>(),
+        new ColorConverter<Monochrome, RGB>(),
         new MonitorOutput(&hyp->webServer, &map, 60, 0.03)
     );
 

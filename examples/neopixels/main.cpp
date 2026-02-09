@@ -26,7 +26,7 @@ int main()
   {
     hyp->createChain(
         new PatternInput<RGB>(500, new RainbowPattern()),
-        new ConvertColor<RGB, GRB>(),
+        new ColorConverter<RGB, GRB>(),
         new NeopixelOutput(i));
   }
 

@@ -27,7 +27,7 @@ int main()
 
   hyp_on_other_machine->createChain(
     new PatternInput(freakMap.size(),new Mapped::ConcentricWavePattern<SawDown>(&freakMap)),
-    new ConvertColor<RGBA, RGB>(),
+    new ColorConverter<RGBA, RGB>(),
     new UDPOutput("localhost",4445,60)
   );
 
