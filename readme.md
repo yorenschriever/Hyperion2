@@ -16,7 +16,7 @@ You don't have to use them, but if you do, your pattern code will be clean and e
 
 ![](https://github.com/yorenschriever/Hyperion2/blob/main/docs/images/webcontroller.png?raw=true)
 
-![](https://github.com/yorenschriever/Hyperion2/blob/main/docs/images/intallation-bosburcht.jpeg?raw=true)
+![](https://github.com/yorenschriever/Hyperion2/blob/main/docs/images/intallation-chandelier.jpeg?raw=true)
 
 ![](https://github.com/yorenschriever/Hyperion2/blob/main/docs/images/hyperhyper.png?raw=true)
 
