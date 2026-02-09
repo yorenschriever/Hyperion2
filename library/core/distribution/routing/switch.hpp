@@ -86,7 +86,7 @@ public:
         }
 
         int i = 0;
-        for (auto rcv : inReceivers)
+        for (auto &rcv : inReceivers)
         {
             rcv->active = receiverIndex == i;
             i++;

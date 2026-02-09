@@ -6,6 +6,7 @@
 #include "thread.hpp"
 #include <map>
 #include <algorithm>
+#include "core/distribution/utils/hostnameCache.hpp"
 
 class ArtNetUniverse
 {

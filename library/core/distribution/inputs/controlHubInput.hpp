@@ -42,7 +42,7 @@ public:
     {
         std::vector<SlotPattern> slotPatterns;
         int slotIndex=0;
-        for (auto pattern: patterns){
+        for (auto &pattern: patterns){
             slotPatterns.push_back({.column = column, .slot = slotIndex++, .pattern = pattern});
         }
         ControlHubInput_(length, hub, slotPatterns);
@@ -83,7 +83,7 @@ public:
         auto renderBuffer  = Buffer(_length * sizeof(T_COLOR));
         renderBuffer.clear<T_COLOR>();
 
-        for (auto slotPattern : slotPatterns)
+        for (auto &slotPattern : slotPatterns)
         {
             patternBuffer.clear<T_COLOR>();
 
@@ -138,7 +138,7 @@ private:
 
     void setNames()
     {
-        for (auto slotPattern: slotPatterns)
+        for (auto &slotPattern: slotPatterns)
         {
             ControlHub::Slot* slot = hub->findSlot(slotPattern.column, slotPattern.slot);
             auto newName = slotPattern.pattern->name;

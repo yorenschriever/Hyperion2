@@ -18,7 +18,7 @@ public:
         int start_index = 0;
         RGBA start_color;
 
-        for (auto entry : entries)
+        for (auto &entry : entries)
         {
             for (int j = start_index; j < entry.position; j++)
             {

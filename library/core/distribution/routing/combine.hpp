@@ -88,7 +88,7 @@ private:
     void resizeBuffer() override
     {
         int maxLength = 0;
-        for (auto part : parts)
+        for (auto &part : parts)
             maxLength = std::max(maxLength, part->offset + part->length);
 
         buffer = Buffer(maxLength);
@@ -98,7 +98,7 @@ private:
     {
         memcpy((uint8_t*)buffer.data() + offset, inputBuffer.data(), inputBuffer.size());
 
-        for (auto part : parts)
+        for (auto &part : parts)
             part->dirty = false;
 
         //todo missedframecount?
@@ -110,7 +110,7 @@ private:
 
     bool ready() override
     {
-        for (auto part : parts)
+        for (auto &part : parts)
             if (part->dirty)
                 return true;
         return false;

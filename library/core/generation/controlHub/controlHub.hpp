@@ -65,7 +65,7 @@ public:
         if (newValue == false && col->forcedSelection)
         {
             int numberOn = 0;
-            for (auto slot : col->slots)
+            for (auto &slot : col->slots)
                 numberOn += slot.activated ? 1 : 0;
             if (numberOn == 1)
                 return;
@@ -90,7 +90,7 @@ public:
 
         // Log::info(TAG, "onHubSlotActiveChange %d", controllers.size());
 
-        for (auto controller : controllers)
+        for (auto &controller : controllers)
             controller->onHubSlotActiveChange(columnIndex, slotIndex, newValue);
     }
 
@@ -104,7 +104,7 @@ public:
         {
             slot->activated = false;
 
-            for (auto controller : controllers)
+            for (auto &controller : controllers)
                 controller->onHubSlotActiveChange(columnIndex, slotIndex, false);
         }
     }
@@ -122,7 +122,7 @@ public:
 
         slot->activated = active;
 
-        for (auto controller : controllers)
+        for (auto &controller : controllers)
             controller->onHubSlotActiveChange(columnIndex, slotIndex, active);
     }
 
@@ -130,14 +130,14 @@ public:
     {
         if (columnIndex < 0 || columnIndex > columns.size() - 1)
             return;
-        auto column = columns[columnIndex];
+        auto &column = columns[columnIndex];
 
         if (column.dim == value)
             return;
 
         columns[columnIndex].dim = value;
 
-        for (auto controller : controllers)
+        for (auto &controller : controllers)
             controller->onHubColumnDimChange(columnIndex, value);
     }
 
@@ -148,7 +148,7 @@ public:
 
         masterDim = value;
 
-        for (auto controller : controllers)
+        for (auto &controller : controllers)
             controller->onHubMasterDimChange(value);
     }
 
@@ -161,7 +161,7 @@ public:
 
         paramsSet[paramsSlotIndex]->velocity = velocity;
 
-        for (auto controller : controllers)
+        for (auto &controller : controllers)
             controller->onHubVelocityChange(paramsSlotIndex, velocity);
     }
     void setAmount(int paramsSlotIndex, float amount)
@@ -173,7 +173,7 @@ public:
 
         paramsSet[paramsSlotIndex]->amount = amount;
 
-        for (auto controller : controllers)
+        for (auto &controller : controllers)
             controller->onHubAmountChange(paramsSlotIndex, amount);
     }
     void setIntensity(int paramsSlotIndex, float intensity)
@@ -185,7 +185,7 @@ public:
 
         paramsSet[paramsSlotIndex]->intensity = intensity;
 
-        for (auto controller : controllers)
+        for (auto &controller : controllers)
             controller->onHubIntensityChange(paramsSlotIndex, intensity);
     }
 
@@ -198,7 +198,7 @@ public:
 
         paramsSet[paramsSlotIndex]->variant = variant;
 
-        for (auto controller : controllers)
+        for (auto &controller : controllers)
             controller->onHubVariantChange(paramsSlotIndex, variant);
     }
     void setSize(int paramsSlotIndex, float size)
@@ -210,7 +210,7 @@ public:
 
         paramsSet[paramsSlotIndex]->size = size;
 
-        for (auto controller : controllers)
+        for (auto &controller : controllers)
             controller->onHubSizeChange(paramsSlotIndex, size);
     }
     void setOffset(int paramsSlotIndex, float offset)
@@ -222,7 +222,7 @@ public:
 
         paramsSet[paramsSlotIndex]->offset = offset;
 
-        for (auto controller : controllers)
+        for (auto &controller : controllers)
             controller->onHubOffsetChange(paramsSlotIndex, offset);
     }
 

@@ -72,7 +72,7 @@ public:
 
     if (message->size() == 1 && message->at(0) >= 0xF8)
     {
-      for (auto listener: listeners)
+      for (auto &listener: listeners)
         listener->onSystemRealtime(message->at(0));
       return;
     }
@@ -85,21 +85,21 @@ public:
 
       if (message_type == MIDI_NOTE_ON && message->at(1) < MIDI_NUMBER_OF_NOTES)
       {
-        for (auto listener: listeners)
+        for (auto &listener: listeners)
           listener->onNoteOn(channel, message->at(1), message->at(2));
         return;
       }
 
       if (message_type == MIDI_NOTE_OFF && message->at(1) < MIDI_NUMBER_OF_NOTES)
       {
-        for (auto listener: listeners)
+        for (auto &listener: listeners)
           listener->onNoteOff(channel, message->at(1), message->at(2));
         return;
       }
 
       if (message_type == MIDI_CONTROLLER_CHANGE && message->at(1) < MIDI_NUMBER_OF_CONTROLLERS)
       {
-        for (auto listener: listeners)
+        for (auto &listener: listeners)
           listener->onControllerChange(channel, message->at(1), message->at(2));
         return;
       }
@@ -147,8 +147,8 @@ public:
                         .destroyed = cb_destroyed,
                         .userData = userData});
 
-        for (auto deviceClients : devices){
-            for (auto deviceEntry : deviceClients.second)
+        for (auto &deviceClients : devices){
+            for (auto &deviceEntry : deviceClients.second)
             {
                 auto device = deviceEntry.second;
                 cb_created(device, device->name, userData);
@@ -203,7 +203,7 @@ public:
 
         devices[client].insert({deviceId, midiDevice});
 
-        for (auto cb : callbacks)
+        for (auto &cb : callbacks)
             cb.created(midiDevice, name, cb.userData);
     }
 
@@ -212,8 +212,8 @@ public:
         if (devices.count(client)==0)
             return;
 
-        for (auto device_entry : devices[client]){
-            for (auto cb : callbacks)
+        for (auto &device_entry : devices[client]){
+            for (auto &cb : callbacks)
             {
                 auto device = device_entry.second;
                 cb.destroyed(device, device->name, cb.userData);
@@ -231,7 +231,7 @@ public:
 
         // Log::info(TAG, "Deleting midi bridge device for %s (%d) from client %d", device->name.c_str(), deviceId, client);
 
-        for (auto cb : callbacks)
+        for (auto &cb : callbacks)
             cb.destroyed(device, device->name, cb.userData);
         
         devices[client].erase(deviceId);

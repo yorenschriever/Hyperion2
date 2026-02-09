@@ -1,63 +1,58 @@
 #pragma once
-#include <vector>
 #include "interfaces.hpp"
+#include <vector>
 
-class Chain
-{
+class Chain {
 private:
-    ISource *source;
-    std::vector<IConverter *> converters;
-    ISink *sink;
+  ISource *source;
+  std::vector<IConverter *> converters;
+  ISink *sink;
 
 public:
-    Chain(ISource *source, ISink *sink): 
-        source(source), sink(sink){}
+  Chain(ISource *source, ISink *sink) : source(source), sink(sink) {}
 
-    Chain(ISource *source, IConverter * converter, ISink *sink):
-        source(source), converters(std::vector<IConverter *>({converter})), sink(sink){}
+  Chain(ISource *source, IConverter *converter, ISink *sink)
+      : source(source), converters(std::vector<IConverter *>({converter})),
+        sink(sink) {}
 
-    Chain(ISource *source, std::vector<IConverter *> converters, ISink *sink): 
-        source(source), converters(converters), sink(sink){}
+  Chain(ISource *source, std::vector<IConverter *> converters, ISink *sink)
+      : source(source), converters(converters), sink(sink) {}
 
-    bool ready()
-    {
-        if (!source->ready())
-            return false;
+  bool ready() {
+    if (!source->ready())
+      return false;
 
-        for (auto converter : converters)
-        {
-            if (!converter->ready())
-                return false;
-        }
-
-        return sink->ready();
+    for (auto &converter : converters) {
+      if (!converter->ready())
+        return false;
     }
 
-    void process()
-    {
-        if(!ready())
-            return;
+    return sink->ready();
+  }
 
-        auto pixels = source->process();
-        if (pixels.size() == 0)
-            return;
+  void process() {
+    if (!ready())
+      return;
 
-        for (auto converter : converters)
-            pixels = converter->process(pixels);
+    auto pixels = source->process();
+    if (pixels.size() == 0)
+      return;
 
-        sink->process(pixels);
-    }
+    for (auto &converter : converters)
+      pixels = converter->process(pixels);
 
-    void initialize()
-    {
-        source->initialize();
+    sink->process(pixels);
+  }
 
-        for (auto converter : converters)
-            converter->initialize();
-            
-        sink->initialize();
-    }
+  void initialize() {
+    source->initialize();
 
-    ISource* getSource(){ return source; }
-    ISink* getSink(){ return sink; }
+    for (auto &converter : converters)
+      converter->initialize();
+
+    sink->initialize();
+  }
+
+  ISource *getSource() { return source; }
+  ISink *getSink() { return sink; }
 };

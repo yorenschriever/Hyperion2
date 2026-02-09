@@ -17,7 +17,7 @@ class PixelMapJson : public WebServerResponseBuilder
         // Log::info("","Building mapping json. ");
         write(userData, writer, "[\n");
         int outputIndex = 0;
-        for (auto output : outputs)
+        for (auto &output : outputs)
         {
             write(userData, writer, "  {\n");
             write(userData, writer, "    \"path\": \"/ws/monitor%d\",\n", output.mapIndex);

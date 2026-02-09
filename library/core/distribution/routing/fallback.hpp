@@ -13,7 +13,7 @@ public:
         this->switchFunc = [this, timeout]()
         {
             int index = 0;
-            for (auto recv : inReceivers)
+            for (auto &recv : inReceivers)
             {
                 if (Utils::millis() - recv->lastSignal > timeout)
                 {
