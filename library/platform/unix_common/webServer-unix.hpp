@@ -495,7 +495,7 @@ public:
 
     ~websocket_session()
     {
-        Log::info("", "Websocket session destroy");
+        // Log::info("WEBSOCKET", "Websocket session destroy");
         if (receiver)
             receiver->on_disconnect(this);
     }
