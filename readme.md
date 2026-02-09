@@ -84,13 +84,13 @@ Below are example configurations for 4 typical use cases. You can use these as i
 
 ### Signal distribution
 
-Signals are routed from *Inputs* to *Outputs* using a Pipe. ON each frame, *Inputs* provide the pixel data to the *Pipe*. The *Pipe* can transform the data and then sends it to the *Output*. The *Output* then sends out the data to hardware drivers.
+Signals are routed from *Inputs* to *Outputs* using a *Chain*. In between can be links for color space conversion, gamma correction or other curve manipulation. Chain can be composed with routing elements to combine, split or otherwise switch data form the input chains. On each frame, the chain checks if all elements in the chain are ready to process new pixel data, and if so, sends the pixel data through the chain. *Inputs* provide incoming the pixel data, typically from external sources like ArtNet, or by generating patterns. The *Output* then sends out the data to hardware drivers.
 
 Example Inputs are DMXInput, ArtnetInput or Inputs that generate pixel data from your patterns.
 
 Example outputs are NeoPixelOutput, DMXOutput and PWMOutput
 
-Your project can contain multiple pipes. Each pipe needs to have 1 *Input* and 1 *Output*. Optionally the pipe can apply color space conversion and apply a Lookup table (*LUT*). Color space conversion can be used to convert between different representations of color. For example from *RGB* to *BGR* or *RGB* to *Monochrome*. Lookup tables can be used to apply gamma correction, color correction, and correct for other non-linearities in the lamps you are driving. 
+Your project can contain multiple chain. Each pipe chain to have 1 *Input* and 1 *Output*. Optionally the pipe can apply color space conversion and apply a Lookup table (*LUT*). Color space conversion can be used to convert between different representations of color. For example from *RGB* to *BGR* or *RGB* to *Monochrome*. Lookup tables can be used to apply gamma correction, color correction, and correct for other non-linearities in the lamps you are driving. 
 
 ###  Pattern generation
 
@@ -115,16 +115,20 @@ we opened on the machine that the hyper code is running, but you can also access
 ## Make your own project
 
 To create your own project you can create a copy of one of the examples. You can place this project anywhere you like. From there you can start adding pipes and patterns.
-To build your project you type `build [platform]`, for example:
+To build your project you can use the `hyper` command, for example:
 
 ```sh
-build macos
+hyper build
 ```
 
 When the build is completed, you can run your project in the same way:
 
 ```sh
-run macos
+hyper run
+```
+
+```sh
+hyper [--target=target] [--port=port] [commands]
 ```
 
 ![](https://github.com/yorenschriever/Hyperion2/blob/main/docs/images/installation-wings.jpeg?raw=true)
