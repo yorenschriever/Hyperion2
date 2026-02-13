@@ -30,8 +30,8 @@ public:
     static void BroadcastBeat(AbstractTempo *source);
 
     static void AlignPhrase();
+    static void ClearPhraseOffset();
 private:
-    
     static std::set<AbstractTempo *> sources;
     static std::set<TempoListener *> listeners;
     static bool threadStarted;

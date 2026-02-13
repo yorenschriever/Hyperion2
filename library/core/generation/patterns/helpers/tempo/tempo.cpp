@@ -120,12 +120,21 @@ void Tempo::startTaskThread()
 
 void Tempo::AlignPhrase()
 {
+    const int phraseSize = 64;
     // if this function is called this means that the current bar was the start of a phrase
-    // realign the beat counter
-    int beatnr = GetBeatNumber();
-    int barnr = (beatnr / 4) % 8;
-    // i dont want negative beatnumbers. always correct forwards, add 4*8.
-    phraseOffset = (phraseOffset - 4 * barnr + 4 * 8) % 32;
+    // undo the phrase offset
+    int rawBeatNr = GetBeatNumber() - phraseOffset;
+    int beatInbar = rawBeatNr % 4;
+
+    // realign to 0, but dont become negative, that will screw up any modulo operation later
+    phraseOffset = phraseSize - (rawBeatNr % phraseSize);
+    // adjust to bar start
+    phraseOffset += beatInbar; 
+}
+
+void Tempo::ClearPhraseOffset()
+{
+    phraseOffset = 0;
 }
 
 std::set<AbstractTempo *> Tempo::sources;

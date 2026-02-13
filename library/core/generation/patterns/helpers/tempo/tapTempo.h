@@ -59,6 +59,7 @@ public:
             startingpoint = now; // for now the Tempo counter starting point is linked to the first tap
             tapCount = 0;
             validSignal = true;
+            Tempo::ClearPhraseOffset();
             beat(0, period / 1000); // this wont be visible, because if there is no signal, the beatnumber will be 0, so setting it to 0 again doesnt trigger the watcher
         }
 
