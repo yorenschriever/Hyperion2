@@ -2,7 +2,14 @@
     <head>
         <link rel="stylesheet" href="controller/controller.css">
         <link rel="stylesheet" href="toolbar/toolbar.css">
+        <link rel="stylesheet" href="sequencer/sequencer.css">
         <style>
+            html {
+                overflow-y: scroll;
+                height: 100vh;
+                scroll-snap-type: y mandatory;
+            }
+
             #monitors {
                 position: fixed;
                 right:16px;
@@ -14,23 +21,39 @@
             }
             
             .monitor {
-                width: 640;
-                height: 480;
+                width: 640px;
+                height: 480px;
                 resize:both;
                 border: 1px solid #444;
                 z-index: 100; 
+            }
+
+            #sequencer {
+                width: 100%;
+                scroll-snap-align: end;
+                scroll-snap-stop: always;
+                overflow: hidden;
+                max-height: 500px;
+            }
+
+            #controller {
+                scroll-snap-align: start;
+                scroll-snap-stop: always;
+                min-height: 100vh;
             }
         </style>
         </link>
         <title>Controller - Hyperion</title>
         <script type="module">
             import { ControllerApp } from "./controller/controller.js"
+            import { SequencerApp } from "./sequencer/sequencer.js"
             import { Toolbar } from "./toolbar/toolbar.js"
             import { html, render } from './common/preact-standalone.js'
 
             render(html`<${ControllerApp}/>`, document.getElementById('controller'));
+            render(html`<${SequencerApp}/>`, document.getElementById('sequencer'));
             render(html`<${Toolbar}/>`, document.getElementById('toolbar'));
-
+                
             const onBuildIdChange = () =>
             {
                 window.location.reload();
@@ -52,6 +75,7 @@
         </script>
     </head>
     <body>        
+        <div id="sequencer"></div>
         <div id="controller"></div>
         <div id="monitors"></div>
         <div id="toolbar"></div>

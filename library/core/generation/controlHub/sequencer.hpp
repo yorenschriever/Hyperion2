@@ -28,6 +28,26 @@ class Sequencer : public TempoListener
         std::vector<Sequence> sequences;
         int stepNr = 0;
 
+        Sequence *getSequence(int index)
+        {
+            for (auto &sequence : sequences)
+            {
+                if (sequence.index == index)
+                    return &sequence;
+            }
+            return nullptr;
+        }
+
+        Sequence *getSequence(int columnIndex, int slotIndex)
+        {
+            for (auto &sequence : sequences)
+            {
+                if (sequence.columnIndex == columnIndex && sequence.slotIndex == slotIndex)
+                    return &sequence;
+            }
+            return nullptr;
+        }
+
     public:
         Sequencer(ControlHub *hub, WebServer *server)
         {
@@ -37,13 +57,6 @@ class Sequencer : public TempoListener
             socket = WebsocketServer::createInstance(server,"/ws/sequencer");
             socket->onMessage(handler, (void *)this);
             socket->onConnect(connectionHandler, (void *)this);
-
-            //TODO dynamically add/remove sequences
-            for(int i=0;i<hub->getColumnCount();i++){
-                for(int j=0;j<hub->getSlotCount(i);j++){
-                    sequences.push_back({.index = indexCounter++, .columnIndex = i, .slotIndex = j});
-                }
-            }
         }
 
         void OnBeat(int beatNr, const char* sourceName) override
@@ -75,40 +88,61 @@ class Sequencer : public TempoListener
             int endStep = cJSON_GetObjectItem(parsed,"endStep")->valueint;
             bool active = cJSON_GetObjectItem(parsed,"active")->valueint;
             instance->setSteps(sequenceIndex, startStep, endStep, active);
+        } else if (type.compare("add") == 0)
+        {
+            int columnIndex = cJSON_GetObjectItem(parsed,"columnIndex")->valueint;
+            int slotIndex = cJSON_GetObjectItem(parsed,"slotIndex")->valueint;
+            if (instance->getSequence(columnIndex, slotIndex))
+            {
+                Log::error("Sequencer", "Sequence already exists for column %d slot %d", columnIndex, slotIndex);
+                cJSON_Delete(parsed);
+                return;
+            }
+            instance->sequences.push_back({.index = Sequencer::indexCounter++, .columnIndex = columnIndex, .slotIndex = slotIndex});
+            instance->sendSequenceDetails(instance->sequences.back());            
+        } else if (type.compare("remove") == 0)
+        {
+            int index = cJSON_GetObjectItem(parsed,"index")->valueint;
+            auto sequence = instance->getSequence(index);
+            if (!sequence)            {
+                Log::error("Sequencer", "No sequence found with index %d", index);
+                cJSON_Delete(parsed);
+                return;
+            }
+            instance->hub->setSlotActive(sequence->columnIndex, sequence->slotIndex, false, ControlHub::SEQUENCE);
+            instance->sequences.erase(std::remove_if(instance->sequences.begin(), instance->sequences.end(), [index](const Sequence& s) { return s.index == index; }), instance->sequences.end());
+            instance->sendRemoveSequence(index);
         }
-        
+
         cJSON_Delete(parsed);
     }
 
     void setSteps(int sequenceIndex, int startStep, int endStep, bool active)
     {
-        if (sequenceIndex < 0 || sequenceIndex >= sequences.size())
+        Sequence *sequence = getSequence(sequenceIndex);
+        if (!sequence)
             return;
 
         for (int step = startStep; step <= endStep; step++)
         {
             if (step < 0 || step >= STEPS)
                 continue;
-            sequences[sequenceIndex].active[step] = active;
+            sequence->active[step] = active;
         }
 
-        sendSequenceStatus(sequenceIndex);
+        sendSequenceStatus(*sequence);
     }
 
     void sendFullStatus()
     {
-        for (int i = 0; i < sequences.size(); i++){
-            sendSequenceDetails(i);
-            sendSequenceStatus(i);
+        for (auto &sequence : sequences){
+            sendSequenceDetails(sequence);
+            sendSequenceStatus(sequence);
         }
         sendStepNr();
     }
 
-    void sendSequenceDetails(int sequenceIndex){
-        if (sequenceIndex < 0 || sequenceIndex >= sequences.size())
-            return;
-        auto &sequence = sequences[sequenceIndex];
-        
+    void sendSequenceDetails(const Sequence& sequence){
         auto col = hub->findColumn(sequence.columnIndex);
         auto slot = hub->findSlot(sequence.columnIndex, sequence.slotIndex);
 
@@ -122,17 +156,13 @@ class Sequencer : public TempoListener
                 \"colName\":\"%s\",\
                 \"slotName\":\"%s\"\
             }",
-            sequenceIndex,
+            sequence.index,
             col->name.c_str(),
             slot->name.c_str());
     }
 
-    void sendSequenceStatus(int sequenceIndex)
+    void sendSequenceStatus(const Sequence& sequence)
     {
-        if (sequenceIndex < 0 || sequenceIndex >= sequences.size())
-            return;
-        auto &sequence = sequences[sequenceIndex];
-        
         char steps[STEPS+1];
         for (int i = 0; i < STEPS; i++)
             steps[i] = sequence.active[i] ? '1' : '0';  
@@ -144,10 +174,20 @@ class Sequencer : public TempoListener
                 \"index\":%d,\
                 \"steps\":\"%s\"\
             }",
-            sequenceIndex,
+            sequence.index,
             steps);
     }
     
+    void sendRemoveSequence(int sequenceIndex)
+    {
+        socket->sendAll(
+            "{\
+                \"type\":\"remove\",\
+                \"index\":%d\
+            }",
+            sequenceIndex);
+    }
+
     void sendStepNr()
     {
         socket->sendAll(

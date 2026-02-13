@@ -1,6 +1,5 @@
 import { html, useState, createContext, useContext, useCallback, useEffect, useRef } from '../common/preact-standalone.js'
 import { useSocket } from '../common/socket.js'
-import { set } from '../common/set.js';
 
 const stepCount = 64; //TODO
 
@@ -19,15 +18,30 @@ export const SequencerApp = () => {
         if (msg.type == "stepNr") 
             setState(state => ({...state, stepNr: msg.stepNr}))
         if (msg.type == "details"){
-            setState(state => set(state, `sequences.${msg.index}`, {
-                slotName: msg.slotName,
-                colName: msg.colName,
-                steps: Array(stepCount).fill(false)
+            setState(state => ({
+                ...state,
+                sequences: [...state.sequences.filter(s => s.index !== msg.index), {
+                    index: msg.index,
+                    slotName: msg.slotName,
+                    colName: msg.colName,
+                    steps: Array(stepCount).fill(false)
+                }]
+            }))
+        }
+        if (msg.type == "remove") {
+            setState(state => ({
+                ...state,
+                sequences: state.sequences.filter(s => s.index !== msg.index)
             }))
         }
         if (msg.type == "status") {
-            setState(state => set(state, `sequences.${msg.index}.steps`, msg.steps.split("").map(s => s === '1')))
-        }
+            setState(state => ({
+                ...state,
+                sequences: state.sequences.map(s => s.index === msg.index ? 
+                    {...s, steps: msg.steps.split("").map(s => s === '1')} : 
+                    s)
+            }))
+       }
         
         // } else if (msg.type == "runtimeSessionId") {
         //     setState(state => {
@@ -49,14 +63,34 @@ export const SequencerApp = () => {
         // }
     }, setSocketState);
 
+    useEffect(() => {
+        const listener = (event) => {
+            if (event.data?.type === "addSequence") {
+                console.log("Adding sequence", event.data);
+                send(JSON.stringify({
+                    type: "add",
+                    columnIndex: event.data.columnIndex,
+                    slotIndex: event.data.slotIndex
+                }));
+            }
+        };
+        window.addEventListener("message", listener);
+        return () => {
+            window.removeEventListener("message", listener);
+        }
+    }, [])
+
+    if (!state?.sequences.length)
+         return undefined;
+
     return html`
     <div class="sequencer">
-        ${state.sequences.map((sequence, sequenceIndex) => html`<${Track} sequence=${sequence} trackIndex=${sequenceIndex} state=${state} setState=${setState} send=${send}/> `)}    
+        ${state.sequences.map((sequence) => html`<${SequenceTrack} sequence=${sequence} send=${send} stepNr=${state.stepNr}/> `)}    
     </div>
     `;
 }
 
-const Track = ({ sequence, trackIndex, state, setState, send }) => {
+const SequenceTrack = ({ sequence, send, stepNr }) => {
     const [draggedSteps, setDraggedSteps] = useState(Array(stepCount).fill(false));
     const [dragAction, setDragAction] = useState('select'); // 'select' or 'deselect'
 
@@ -68,7 +102,7 @@ const Track = ({ sequence, trackIndex, state, setState, send }) => {
 
         const highlightedSteps = Array(stepCount).fill(false);
         for (let i = 0; i < stepCount; i++) {
-            const stepRef = trackRef.current.children[2].children[i];
+            const stepRef = trackRef.current.children[3].children[i];
             const stepRect = stepRef.getBoundingClientRect();
             if (stepRect.right >= minX && stepRect.left <= maxX) {
                 highlightedSteps[i] = true;
@@ -83,7 +117,7 @@ const Track = ({ sequence, trackIndex, state, setState, send }) => {
         const maxX = Math.max(startX, endX);
 
         let startStep=0, endStep=0;
-        trackRef.current.children[2].childNodes.forEach((stepRef, stepIndex) => {
+        trackRef.current.children[3].childNodes.forEach((stepRef, stepIndex) => {
             const stepRect = stepRef.getBoundingClientRect();
 
             //TODO sometimes the first rect is not selected
@@ -95,14 +129,14 @@ const Track = ({ sequence, trackIndex, state, setState, send }) => {
 
         send(JSON.stringify({
             type: "setSteps",
-            sequenceIndex:trackIndex,
+            sequenceIndex:sequence.index,
             startStep,
             endStep,
             active: dragStepAction?0:1
         }))
 
         setDraggedSteps(Array(stepCount).fill(false));
-    }, [trackIndex, setState]);
+    }, []);
 
     useEffect(() => {
         let startX=0, endX=0, dragging=false, dragStepAction=false;
@@ -145,18 +179,26 @@ const Track = ({ sequence, trackIndex, state, setState, send }) => {
         };
     }, []);
 
+    const removeTrack = () => {
+        send(JSON.stringify({
+            type: "remove",
+            index: sequence.index
+        }))
+    }
+
     return html`
     <div 
         class="track"
         ref=${trackRef}
     >
+        <button class="remove-track" onClick=${removeTrack}>x</button>
         <div class="track-name">${sequence.colName}</div>    
         <div class="track-name">${sequence.slotName}</div>
         <div class="steps" data-drag-action=${dragAction}>
             ${sequence.steps.map((step, stepIndex) => html`
                 <div 
                     class="step" 
-                    data-current=${state.stepNr === stepIndex}
+                    data-current=${stepNr === stepIndex}
                     data-active=${step}
                     data-dragging=${draggedSteps[stepIndex]}
                 ></div>

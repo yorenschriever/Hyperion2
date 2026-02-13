@@ -1,4 +1,4 @@
-* {
+.sequencer {
     padding:0;
     margin:0;
     box-sizing: border-box;
@@ -6,18 +6,16 @@
     color: #ccc;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 10pt;
-}
-    
-body {
-    background-color: #111;
-    margin: 0px;
-}
 
-.track {
+    user-select: none;
+
+    padding: 16px;
+}
+.sequencer .track {
     display: flex;
 }
 
-.track-name {
+.sequencer .track-name {
     width:100px;
     padding:3pt;
     flex: 0 1 100px;
@@ -25,12 +23,12 @@ body {
     white-space: nowrap;
 }
 
-.steps {
+.sequencer .steps {
     display: flex;
     flex: auto;
 }
 
-.step {
+.sequencer .step {
     display: block;
     flex: 1 1 25px;
     height: 25px;
@@ -40,27 +38,40 @@ body {
     transition: background-color 0.4s, border 0.4s;
 }
 
-.step[data-active] {
+.sequencer .step[data-active] {
     background-color: #dd8f00;
     border:1px outset #dd8f00;
 }
 
-[data-drag-action="select"] .step[data-dragging] {
+.sequencer [data-drag-action="select"] .step[data-dragging] {
     filter:brightness(1.25);
 }
 
-[data-drag-action="deselect"] .step[data-dragging] {
+.sequencer [data-drag-action="deselect"] .step[data-dragging] {
     filter:brightness(0.75);
 }
 
-.step[data-current] {
+.sequencer .step[data-current] {
     filter: brightness(1.5);
 }
 
-.step:nth-child(4n) {
+.sequencer .step:nth-child(4n) {
     border-right: 1px solid #444;
 }
 
-.step:nth-child(16n) {
+.sequencer .step:nth-child(16n) {
     border-right: 1px solid #666;
+}
+
+.sequencer .remove-track {
+    border-radius: 100%;
+    width: 14pt;
+    height: 14pt;
+    background-color: #900;
+    top:2px;
+    position: relative;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin-right:4px;
 }

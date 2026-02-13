@@ -77,6 +77,8 @@ body {
 
     cursor: pointer;
     user-select: none;
+
+    position: relative;
 }
 
 .active {
@@ -97,7 +99,6 @@ body {
     height:160px;
     margin-bottom: 12px; 
 }
-
 
 .faderContainer {
     display: flex;
@@ -139,6 +140,29 @@ input[type="range"]::-moz-range-track {
     background: #053a5f;
     border-radius: 15px;
 }
+
+.slot button {
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+    cursor: pointer;
+    padding:0px;
+}
+
+.slot:hover button {
+    opacity: 1;
+}
+
+.slot .sequencer {
+    position: absolute;
+    bottom:4px;
+    right:4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 100%;
+    background-color: darkorange;
+    border: none;
+}
+
 }
 
 

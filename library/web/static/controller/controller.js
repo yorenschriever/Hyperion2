@@ -159,6 +159,18 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
         sender(`{"type":"buttonReleased", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}}`)
     }
 
+    const handleSequencerPressed = (event) => {
+        event.stopPropagation();
+        window.postMessage({
+            type: "addSequence",
+            columnIndex,
+            slotIndex
+        }, "*");
+        window.setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 100);
+    }
+
     let className = "slot";
     if (slot.active & 1) className += " active";
     if (slot.active & 2) className += " active-flash";
@@ -173,6 +185,7 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
         ontouchend=${(event) => { handleReleased(); event.preventDefault(); }}
         >
         ${slot.name}
+        <button class="sequencer" onmousedown=${handleSequencerPressed}></button>
     </div>`;
 }
 
