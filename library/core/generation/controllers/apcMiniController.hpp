@@ -223,7 +223,7 @@ ApcMiniController::Make ApcMiniController::MK2{
     .MIDI_CHANNEL = 0,
 
     .OFF = 0,
-    .GREEN = 23,
-    .RED = 7,
-    .YELLOW = 15
+    .GREEN = 21,
+    .RED = 5,
+    .YELLOW = 9
 };
