@@ -44,6 +44,8 @@
 #include "core/generation/pixelMap/pixelMapSplitter3d.hpp"
 #include "distribution/chain.hpp"
 #include "generation/controlHub/paletteColumn.hpp"
+#include "generation/controlHub/sequencer.hpp"
+#include "generation/controlHub/controlHub.hpp"
 #include "generation/controllers/websocketController.hpp"
 #include "platform/includes/ethernet.hpp"
 #include "platform/includes/log.hpp"
@@ -239,6 +241,8 @@ private:
     webServer = WebServer::createInstance(this->port, this->https);
 
     hub.subscribe(new WebsocketController(&hub, webServer));
+
+    // Sequencer *sequencer = new Sequencer(&hub, webServer);
   }
 
   virtual void setup_midi_bridge()

@@ -100,8 +100,6 @@ public:
             // apply dimming and copy to output buffer
             for (int i = 0; i < _length; i++)
             {
-                // TODO give a good thought about when we want dimming and when we want to make things transparent.
-                // how to support this in general?
                 if (std::is_same<T_COLOR, RGBA>::value)
                 {
                     //if the color space is RGBA, apply color mixing based on the alpha channel

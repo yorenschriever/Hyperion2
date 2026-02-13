@@ -1,0 +1,15 @@
+<html draggable="false">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
+        <link rel="stylesheet" href="sequencer.css">
+        </link>
+        <title>Controller - Hyperion</title>
+        <script type="module">
+            import { SequencerApp } from "./sequencer.js"
+            import { html, render } from '../common/preact-standalone.js'
+
+            render(html`<${SequencerApp}/>`, document.body);
+        </script>
+    </head>
+    <body></body>
+</html>
