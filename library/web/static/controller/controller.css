@@ -149,7 +149,12 @@ input[type="range"]::-moz-range-track {
 }
 
 .slot:hover button {
-    opacity: 1;
+    opacity: 0.2;
+}
+
+.slot button:hover {
+    transition: opacity 0.1s ease-in;
+    opacity: 1;  
 }
 
 .slot .sequencer {
