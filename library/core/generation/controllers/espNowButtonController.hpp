@@ -93,7 +93,7 @@ public:
         }
     }
 
-    void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) override {}
+    void onHubSlotActiveChange(int columnIndex, int slotIndex, uint8_t active) override {}
 
     void onControllerChange(uint8_t channel, uint8_t controller, uint8_t value) override {}
     void onSystemRealtime(uint8_t message) override {}

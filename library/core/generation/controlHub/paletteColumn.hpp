@@ -27,7 +27,7 @@ public:
     init();
   }
 
-  void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) override
+  void onHubSlotActiveChange(int columnIndex, int slotIndex, uint8_t active) override
   {
     if (columnIndex != this->columnIndex)
       return;

@@ -25,6 +25,8 @@ public:
         int MIDI_CHANNEL;
         int OFF;
         int GREEN;
+        int RED;
+        int YELLOW;
     } Make;
 
     static Make MK1;
@@ -130,7 +132,7 @@ public:
     }
     void onSystemRealtime(uint8_t message) override {}
 
-    void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) override
+    void onHubSlotActiveChange(int columnIndex, int slotIndex, uint8_t active) override
     {
         columnIndex -= columnOffset;
         if (columnIndex < 0 || columnIndex > make.WIDTH - 1)
@@ -141,7 +143,13 @@ public:
         int note = (make.HEIGHT - 1 - slotIndex) * make.WIDTH + columnIndex;
         if (note < 0 || note > make.WIDTH * make.HEIGHT)
             return;
-        midi->sendNoteOn(make.MIDI_CHANNEL, note, active ? make.GREEN : make.OFF);
+
+        int color = make.OFF;
+        if (active & ControlHub::DEFAULT) color = make.GREEN;
+        if (active & ControlHub::FLASH) color = make.RED;
+        if (active & ControlHub::SEQUENCE) color = make.YELLOW;
+
+        midi->sendNoteOn(make.MIDI_CHANNEL, note, color);
     }
 
     void setLeds()
@@ -192,7 +200,10 @@ ApcMiniController::Make ApcMiniController::MK1 = {
     .MIDI_CHANNEL = 0,
 
     .OFF = 0,
-    .GREEN = 1};
+    .GREEN = 1,
+    .RED = 3,
+    .YELLOW = 5
+};
 
 ApcMiniController::Make ApcMiniController::MK2{
     .WIDTH = 8,
@@ -212,4 +223,7 @@ ApcMiniController::Make ApcMiniController::MK2{
     .MIDI_CHANNEL = 0,
 
     .OFF = 0,
-    .GREEN = 21};
+    .GREEN = 23,
+    .RED = 7,
+    .YELLOW = 15
+};

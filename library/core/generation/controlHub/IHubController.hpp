@@ -5,7 +5,7 @@
 class IHubController
 {
 public:
-    virtual void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) {};
+    virtual void onHubSlotActiveChange(int columnIndex, int slotIndex, uint8_t active) {};
     virtual void onHubSlotNameChange(int columnIndex, int slotIndex, std::string name) {};
     virtual void onHubColumnDimChange(int columnIndex, uint8_t dim) {};
     virtual void onHubColumnNameChange(int columnIndex, std::string name) {};

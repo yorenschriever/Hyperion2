@@ -83,6 +83,14 @@ body {
     background-color: green;
 }
 
+.active-flash {
+    background-color: red;
+}
+
+.active-sequence {
+    background-color: darkorange;
+}
+
 .fader {
     -webkit-appearance: slider-vertical;
     width:100%;

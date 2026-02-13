@@ -10,7 +10,7 @@ const defaultColumn = {
 }
 
 const defaultSlot = {
-    active: false,
+    active: 0,
     name: ""
 }
 
@@ -65,7 +65,7 @@ export const ControllerApp = () => {
         resizeParams(msg.paramsSlotIndex)
 
         if (msg.type == "onHubSlotActiveChange") {
-            setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.active`, Boolean(msg.active)))
+            setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.active`, msg.active))
         } else if (msg.type == "onHubSlotNameChange") {
             setState(state => set(state, `columns.${msg.columnIndex}.slots.${msg.slotIndex}.name`, msg.name))
         } else if (msg.type == "onHubColumnDimChange") {
@@ -159,9 +159,14 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
         sender(`{"type":"buttonReleased", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}}`)
     }
 
+    let className = "slot";
+    if (slot.active & 1) className += " active";
+    if (slot.active & 2) className += " active-flash";
+    if (slot.active & 4) className += " active-sequence";
+
     return html`
     <div 
-        class="slot ${slot.active ? "active" : ""}" 
+        class="${className}" 
         onmousedown=${handlePressed}
         onmouseup=${handleReleased}
         ontouchstart=${(event) => { handlePressed(); event.preventDefault(); }}

@@ -92,7 +92,7 @@ public:
         }
     }
     
-    void onHubSlotActiveChange(int columnIndex, int slotIndex, bool active) override
+    void onHubSlotActiveChange(int columnIndex, int slotIndex, uint8_t active) override
     {
         int controller = slotIndex * WIDTH + columnIndex;
         if (controller < 0 || controller > WIDTH * HEIGHT)

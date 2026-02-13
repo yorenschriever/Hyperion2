@@ -17,9 +17,13 @@ public:
         paramsSet.push_back(new Params());
     }
 
+    static const uint8_t DEFAULT = 1<<0;
+    static const uint8_t FLASH = 1<<1;
+    static const uint8_t SEQUENCE = 1<<2;
+
     struct Slot
     {
-        bool activated = false;
+        uint8_t activated = 0; //contains flags for default, flash, sequence. 
         bool flash = false;
         bool releaseColumn = false;
         std::string name = "";
@@ -50,35 +54,39 @@ public:
         if (slot == NULL)
             return;
 
-        bool newValue;
-        if (slot->flash)
-            newValue = true;
-        else
-            newValue = !slot->activated;
+        uint8_t newValue = slot->activated;
+        if (slot->flash){
+            //add the flash flag
+            newValue |= FLASH;  
+        } else {
+            //toggle the default active flag
+            newValue ^= DEFAULT; 
+        }
 
-        // Log::info(TAG, "newvalue, slotactivated %d, %d", newValue, slot->activated);
-
+        //Stop if no change
         if (newValue == slot->activated)
             return;
 
+        //ensure forced selection
         auto col = findColumn(columnIndex);
-        if (newValue == false && col->forcedSelection)
+        if ((newValue & DEFAULT) == 0 && col->forcedSelection)
         {
             int numberOn = 0;
             for (auto &slot : col->slots)
-                numberOn += slot.activated ? 1 : 0;
+                numberOn += (slot.activated & DEFAULT) ? 1 : 0;
             if (numberOn == 1)
                 return;
         }
 
+        //release column 
         if (slot->releaseColumn)
         {
             auto column = findColumn(columnIndex);
             for (auto slot_it = column->slots.begin(); slot_it < column->slots.end(); ++slot_it)
             {
-                if (slot_it->activated)
+                if (slot_it->activated & DEFAULT)
                 {
-                    slot_it->activated = false;
+                    slot_it->activated &= ~DEFAULT;
                     int slotIndex = std::distance(column->slots.begin(), slot_it);
                     for (auto controller : controllers)
                         controller->onHubSlotActiveChange(columnIndex, slotIndex, false);
@@ -91,7 +99,7 @@ public:
         // Log::info(TAG, "onHubSlotActiveChange %d", controllers.size());
 
         for (auto &controller : controllers)
-            controller->onHubSlotActiveChange(columnIndex, slotIndex, newValue);
+            controller->onHubSlotActiveChange(columnIndex, slotIndex, slot->activated);
     }
 
     void buttonReleased(int columnIndex, int slotIndex)
@@ -100,9 +108,9 @@ public:
         if (slot == NULL)
             return;
 
-        if (slot->flash && slot->activated)
+        if (slot->flash && (slot->activated & FLASH))
         {
-            slot->activated = false;
+            slot->activated &= ~FLASH;
 
             for (auto &controller : controllers)
                 controller->onHubSlotActiveChange(columnIndex, slotIndex, false);
@@ -114,16 +122,25 @@ public:
      * like flash mode, column release, forced selection etc. 
      * Use with caution.
      */
-    void setSlotActive(int columnIndex, int slotIndex, bool active)
+    void setSlotActive(int columnIndex, int slotIndex, bool active, uint8_t flags = DEFAULT)
     {
         auto slot = findSlot(columnIndex, slotIndex);
         if (slot == NULL)
             return;
 
-        slot->activated = active;
+        uint8_t newValue = slot->activated;
+        if (active)
+            newValue = slot->activated | flags;
+        else
+            newValue = slot->activated & ~flags; 
 
+        if (newValue == slot->activated)
+            return;
+
+        slot->activated = newValue;
+        
         for (auto &controller : controllers)
-            controller->onHubSlotActiveChange(columnIndex, slotIndex, active);
+            controller->onHubSlotActiveChange(columnIndex, slotIndex, slot->activated);
     }
 
     void dim(int columnIndex, uint8_t value)

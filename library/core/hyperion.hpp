@@ -242,7 +242,7 @@ private:
 
     hub.subscribe(new WebsocketController(&hub, webServer));
 
-    // Sequencer *sequencer = new Sequencer(&hub, webServer);
+    Sequencer *sequencer = new Sequencer(&hub, webServer);
   }
 
   virtual void setup_midi_bridge()

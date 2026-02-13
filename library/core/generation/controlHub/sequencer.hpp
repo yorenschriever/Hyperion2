@@ -51,19 +51,7 @@ class Sequencer : public TempoListener
             this->stepNr = beatNr % STEPS;
 
             for (auto &sequence : sequences)
-            {
-                //todo only update on change -> compared to status in the hub, because beats are not linear, and steps can be edited
-                //todo special mode
-                //todo edges? start and end. think about it
-                if (sequence.active[stepNr])
-                {
-                    hub->setSlotActive(sequence.columnIndex, sequence.slotIndex, true);
-                }
-                if (!sequence.active[stepNr])
-                {
-                    hub->setSlotActive(sequence.columnIndex, sequence.slotIndex, false);
-                }
-            }
+                hub->setSlotActive(sequence.columnIndex, sequence.slotIndex, sequence.active[stepNr], ControlHub::SEQUENCE);
 
             sendStepNr();
         }
