@@ -143,15 +143,19 @@ const SequenceTrack = ({ sequence, send, stepNr, index }) => {
     useEffect(() => {
         let startX=0, endX=0, dragging=false, dragStepAction=false;
 
+        const getClientX = (e) => {
+            return e.touches ? e.touches[0].clientX : e.clientX;
+        };
+
         const handleMouseOver = (e) => {
             if (!dragging) return;
-            endX = e.clientX;
+            endX = getClientX(e);
             handleDrag(startX, endX);
         };
 
         const handleMouseDown = (e) => {
             dragging = true;
-            startX = e.clientX;
+            startX = getClientX(e);
             endX = startX;
             dragStepAction = e.target.dataset.active === 'true'; 
             setDragAction(dragStepAction ? 'deselect' : 'select');

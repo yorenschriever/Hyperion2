@@ -133,6 +133,10 @@ body {
     margin-bottom: 6px;  
 }
 
+.paramsHeader:empty {
+    display: none;
+}
+
 input[type="range"]::-webkit-slider-runnable-track {
     background: #053a5f;
     border-radius: 15px;    

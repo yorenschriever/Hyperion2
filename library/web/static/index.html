@@ -69,8 +69,24 @@
                 iframe.contentWindow.onBuildIdChange = onBuildIdChange
             }
 
-            fetch("./monitor2d/mapping.json").then(i=>i.json()).then(scene2d => {if (scene2d.length) createIframe("./monitor2d/", scene2d); });
-            fetch("./monitor/mapping.json"  ).then(i=>i.json()).then(scene3d => {if (scene3d.length) createIframe("./monitor/", scene3d); });
+            const addMonitors = () => {
+                fetch("./monitor2d/mapping.json").then(i=>i.json()).then(scene2d => {if (scene2d.length) createIframe("./monitor2d/", scene2d); });
+                fetch("./monitor/mapping.json"  ).then(i=>i.json()).then(scene3d => {if (scene3d.length) createIframe("./monitor/", scene3d); });
+            }
+            addMonitors();
+
+            window.addEventListener("message", (event) => {
+                if (event.data.type !== "toggleMonitor") return;
+
+                if (event.data.state) {
+                    addMonitors();
+                } else {
+                    const monitors = document.getElementById('monitors');
+                    while (monitors.firstChild) {
+                        monitors.removeChild(monitors.firstChild);
+                    }
+                }
+            });
 
         </script>
     </head>
