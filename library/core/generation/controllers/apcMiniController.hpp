@@ -22,6 +22,7 @@ public:
         int TAP_STOP_NOTE_NUMBER;
         int TAP_ALIGN_NOTE_NUMBER;
         int TOGGLE_COLUMN_OFFSET_NOTE_NUMBER;
+        int TOGGLE_FLASH_NOTE_NUMBER;
         int MIDI_CHANNEL;
         int OFF;
         int GREEN;
@@ -37,6 +38,7 @@ private:
     MidiDevice *midi;
     Make make;
     int columnOffset=0;
+    bool flash = false;
 
     void toggleColumnOffset()
     {
@@ -63,11 +65,19 @@ private:
         
         if (note == make.TOGGLE_COLUMN_OFFSET_NOTE_NUMBER && isOn)
             return toggleColumnOffset();
+        if (note == make.TOGGLE_FLASH_NOTE_NUMBER && isOn) {
+            flash = !flash;
+            midi->sendNoteOn(make.MIDI_CHANNEL, make.TOGGLE_FLASH_NOTE_NUMBER, flash ? make.GREEN : make.OFF);
+            return;
+        }
 
         int column = note % make.WIDTH + columnOffset;
         int row = make.HEIGHT - 1 - note / make.WIDTH;
 
         // Log::info("APCMINI", "keypress %d %d (%d %d)", note, isOn, column, row);
+        if (flash)
+            return hub->setSlotActive(column, row, isOn, ControlHub::FLASH);
+        
         if (isOn)
             hub->buttonPressed(column, row);
         else
@@ -196,6 +206,7 @@ ApcMiniController::Make ApcMiniController::MK1 = {
     .TAP_ALIGN_NOTE_NUMBER = 88,
 
     .TOGGLE_COLUMN_OFFSET_NOTE_NUMBER = 82,
+    .TOGGLE_FLASH_NOTE_NUMBER = 83,
 
     .MIDI_CHANNEL = 0,
 
@@ -219,6 +230,7 @@ ApcMiniController::Make ApcMiniController::MK2{
     .TAP_ALIGN_NOTE_NUMBER = 0x7A,
 
     .TOGGLE_COLUMN_OFFSET_NOTE_NUMBER = 0x70,
+    .TOGGLE_FLASH_NOTE_NUMBER = 0x71,
 
     .MIDI_CHANNEL = 0,
 

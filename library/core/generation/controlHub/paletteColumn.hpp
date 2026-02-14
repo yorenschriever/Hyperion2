@@ -31,10 +31,22 @@ public:
   {
     if (columnIndex != this->columnIndex)
       return;
-    if (!active)
-      return;
     if (slotIndex >= palettes.size())
       return;
+
+    if (!active){
+      if (active == ControlHub::DEFAULT)
+        return;
+
+      //a non default mode was turned off, fall back to a 'green' slot
+      auto slots = hub->findColumn(columnIndex)->slots;
+      int fallbackSlotsIndex = -1;
+      for(int i=0; i<slots.size(); i++){
+        if (slots[i].activated) fallbackSlotsIndex = i;
+      }
+      if (fallbackSlotsIndex != -1) slotIndex = fallbackSlotsIndex;
+      else return;
+    }
 
     for(auto paramsSlotIndex: paramsSlotIndices)
       hub->getParams(paramsSlotIndex)->palette = palettes[slotIndex];
