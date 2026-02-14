@@ -22,6 +22,7 @@ export const SequencerApp = () => {
                 ...state,
                 sequences: [...state.sequences.filter(s => s.index !== msg.index), {
                     index: msg.index,
+                    enabled: msg.enabled,
                     slotName: msg.slotName,
                     colName: msg.colName,
                     steps: Array(stepCount).fill(false)
@@ -38,7 +39,7 @@ export const SequencerApp = () => {
             setState(state => ({
                 ...state,
                 sequences: state.sequences.map(s => s.index === msg.index ? 
-                    {...s, steps: msg.steps.split("").map(s => s === '1')} : 
+                    {...s, enabled: msg.enabled, steps: msg.steps.split("").map(s => s === '1')} : 
                     s)
             }))
        }
@@ -85,12 +86,12 @@ export const SequencerApp = () => {
 
     return html`
     <div class="sequencer">
-        ${state.sequences.map((sequence) => html`<${SequenceTrack} sequence=${sequence} send=${send} stepNr=${state.stepNr}/> `)}    
+        ${state.sequences.map((sequence, index) => html`<${SequenceTrack} key=${sequence.index} index=${index} sequence=${sequence} send=${send} stepNr=${state.stepNr}/> `)}    
     </div>
     `;
 }
 
-const SequenceTrack = ({ sequence, send, stepNr }) => {
+const SequenceTrack = ({ sequence, send, stepNr, index }) => {
     const [draggedSteps, setDraggedSteps] = useState(Array(stepCount).fill(false));
     const [dragAction, setDragAction] = useState('select'); // 'select' or 'deselect'
 
@@ -102,7 +103,7 @@ const SequenceTrack = ({ sequence, send, stepNr }) => {
 
         const highlightedSteps = Array(stepCount).fill(false);
         for (let i = 0; i < stepCount; i++) {
-            const stepRef = trackRef.current.children[3].children[i];
+            const stepRef = trackRef.current.children[4].children[i];
             const stepRect = stepRef.getBoundingClientRect();
             if (stepRect.right >= minX && stepRect.left <= maxX) {
                 highlightedSteps[i] = true;
@@ -117,7 +118,7 @@ const SequenceTrack = ({ sequence, send, stepNr }) => {
         const maxX = Math.max(startX, endX);
 
         let startStep=0, endStep=0;
-        trackRef.current.children[3].childNodes.forEach((stepRef, stepIndex) => {
+        trackRef.current.children[4].childNodes.forEach((stepRef, stepIndex) => {
             const stepRect = stepRef.getBoundingClientRect();
 
             //TODO sometimes the first rect is not selected
@@ -186,6 +187,24 @@ const SequenceTrack = ({ sequence, send, stepNr }) => {
         }))
     }
 
+    const handleToggle = useCallback(() => {
+        send(JSON.stringify({
+            type: "enable",
+            index: sequence.index,
+            value: !sequence.enabled
+        }))
+    }, [sequence.index, sequence.enabled]);
+
+    const hotKeys="1234567890QWERTYUIOPASDFGHJKLZXCVBNM";;
+
+    useEffect(() => {
+        const callback = (event) => (event.key == hotKeys[index].toLocaleLowerCase()) && handleToggle();
+        window.addEventListener('keypress', callback);
+        return () => {
+            window.removeEventListener('keypress', callback);
+        };  
+    }, [handleToggle, index]);
+
     return html`
     <div 
         class="track"
@@ -194,7 +213,8 @@ const SequenceTrack = ({ sequence, send, stepNr }) => {
         <button class="remove-track" onClick=${removeTrack}>x</button>
         <div class="track-name">${sequence.colName}</div>    
         <div class="track-name">${sequence.slotName}</div>
-        <div class="steps" data-drag-action=${dragAction}>
+        <${Toggle} onClick=${handleToggle} checked=${sequence.enabled} label="${hotKeys[index]}"/>
+        <div class="steps ${sequence.enabled ? 'enabled' : 'disabled'}" data-drag-action=${dragAction}>
             ${sequence.steps.map((step, stepIndex) => html`
                 <div 
                     class="step" 
@@ -206,4 +226,12 @@ const SequenceTrack = ({ sequence, send, stepNr }) => {
         </div>
     </div>
     `;
+}
+
+const Toggle = ({ onClick, checked, label }) => {
+    return html`<label class="switch">
+            <input type="checkbox" onClick=${onClick} checked=${checked}/>
+            <span class="slider round"></span>
+            <span class="toggle-label">${label}</span>
+    </label>`;
 }
