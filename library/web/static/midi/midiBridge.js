@@ -19,6 +19,7 @@ export class MidiBridge {
           //   this.initialize();
           // };
           console.error("No midi permission")
+          alert("No midi permission. Please allow midi access in your browser settings and refresh the page.")
         }
       });
     }
