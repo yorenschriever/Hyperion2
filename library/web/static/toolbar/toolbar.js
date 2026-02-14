@@ -38,7 +38,9 @@ const MidiBridgeButton = () => {
                     if (!confirm("Your browser is running on the same host as the hyperion core. Are you sure you need the midi bridge?"))
                         return false;
                 }
-                midiBridge.current = new MidiBridge();
+
+                //this must be called in response to a user action, so we can't ask for permission in the MidiBridge constructor
+                navigator.requestMIDIAccess().then( () =>  midiBridge.current = new MidiBridge());
             } else {
                 midiBridge.current?.destroy();
                 delete midiBridge.current;
