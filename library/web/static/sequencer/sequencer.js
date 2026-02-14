@@ -117,16 +117,17 @@ const SequenceTrack = ({ sequence, send, stepNr, index }) => {
         const minX = Math.min(startX, endX);
         const maxX = Math.max(startX, endX);
 
-        let startStep=0, endStep=0;
+        let startStep=-1, endStep=-1;
         trackRef.current.children[4].childNodes.forEach((stepRef, stepIndex) => {
             const stepRect = stepRef.getBoundingClientRect();
 
-            //TODO sometimes the first rect is not selected
             if (stepRect.right >= minX && stepRect.left <= maxX) {
-                if (startStep === 0) startStep = stepIndex;
+                if (startStep === -1) startStep = stepIndex;
                 endStep = stepIndex;
             }
         });
+
+        if (startStep === -1 || endStep === -1) return;
 
         send(JSON.stringify({
             type: "setSteps",
