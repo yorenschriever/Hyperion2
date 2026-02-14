@@ -100,6 +100,8 @@ public:
         {
             int columnIndex = cJSON_GetObjectItem(parsed, "columnIndex")->valueint;
             int slotIndex = cJSON_GetObjectItem(parsed, "slotIndex")->valueint;
+            // maybe i want to allow duplicates, so i can create different patterns, and toggle the one i need
+            //but with the current code the second copy would override the first one. They need to be combined somehow
             if (instance->getSequence(columnIndex, slotIndex))
             {
                 Log::error("Sequencer", "Sequence already exists for column %d slot %d", columnIndex, slotIndex);

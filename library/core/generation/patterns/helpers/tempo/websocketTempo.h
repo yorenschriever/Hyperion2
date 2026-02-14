@@ -37,6 +37,10 @@ public:
             TapTempo::getInstance()->Tap();
         if (type.compare("stop") == 0)
             TapTempo::getInstance()->Stop();
+        if (type.compare("align") == 0)
+            TapTempo::getInstance()->Align();
+        if (type.compare("alignPhrase") == 0)
+            Tempo::AlignPhrase();
 
         cJSON_Delete(parsed);
     }

@@ -246,13 +246,23 @@ const Tempo = () => {
         setSource(msg.sourceName);
     });
 
-    const onLongPress = () => {
-        send(`{"type":"stop"}`)
-    };
+    const onLongPress = () => send(`{"type":"stop"}`)
+    const onClick = () => send(`{"type":"tap"}`)
+    const alignPhrase = () =>  send(`{"type":"alignPhrase"}`)
+    const align = () =>  send(`{"type":"align"}`)
 
-    const onClick = () => {
-        send(`{"type":"tap"}`)
-    }
+    useEffect(() => {
+        const callback = (event) => {
+            if (event.key === '`') onClick();
+            if (event.key === ' ') alignPhrase();
+            if (event.key === '\\') align();
+            event.preventDefault();
+        };
+        window.addEventListener('keypress', callback);
+        return () => {
+            window.removeEventListener('keypress', callback);
+        };  
+    }, [onClick, alignPhrase, align]);
 
     const longPressEvent = useLongPress(onLongPress, onClick, {delay:500});
 
