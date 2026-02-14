@@ -21,6 +21,7 @@
     flex: 0 1 100px;
     text-overflow: ellipsis;
     white-space: nowrap;
+    overflow: hidden;
 }
 
 .sequencer .steps {
@@ -65,6 +66,10 @@
 
 .sequencer .step:nth-child(16n) {
     border-right: 1px solid #666;
+}
+
+.sequencer .step:last-child {
+    border-right: none;
 }
 
 .sequencer .remove-track {
