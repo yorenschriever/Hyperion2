@@ -39,18 +39,13 @@ function main(scene) {
     return;
   }
 
-//   gl.enable(gl.BLEND);
-//   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-//   gl.clearDepth(1.0); // Clear everything
-//   gl.depthFunc(gl.LEQUAL); // Near things obscure far things
-//   gl.clearColor(...viewParams.clearColor, 1.0); //TODO from view-params
-//   gl.enable(gl.DEPTH_TEST);
-//   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-gl.clearColor(...viewParams.clearColor); // Clear to black, fully opaque
-gl.clearDepth(1.0); // Clear everything
-gl.enable(gl.DEPTH_TEST); // Enable depth testing
-gl.depthFunc(gl.LEQUAL); // Near things obscure fa
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.clearDepth(1.0); // Clear everything
+  gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+  gl.clearColor(...viewParams.clearColor, 1.0); //TODO from view-params
+  gl.enable(gl.DEPTH_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   const vertexShaderSource = `
   attribute vec4 vertexPosition;
@@ -65,23 +60,23 @@ gl.depthFunc(gl.LEQUAL); // Near things obscure fa
 
   void main() {    
     mat4 translation = mat4(
-      vec4(0.01, 0, 0, 0),
-      vec4(0, 0.01, 0, 0),
-      vec4(0, 0, 0.01, 0),
+      vec4(1, 0, 0, 0),
+      vec4(0, 1, 0, 0),
+      vec4(0, 0, 1, 0),
       vec4(sphereOffset, 1));
 
     //https://www.geeks3d.com/20140807/billboarding-vertex-shader-glsl/
     //Set the rotation part of the matrix to identity, so the quad always faces the camera
     mat4 billboard = uModelViewMatrix * translation;
-    // billboard[0][0] = .01; 
-    // billboard[0][1] = 0.0; 
-    // billboard[0][2] = 0.0; 
-    // billboard[1][0] = 0.0; 
-    // billboard[1][1] = .01; 
-    // billboard[1][2] = 0.0; 
-    // billboard[2][0] = 0.0; 
-    // billboard[2][1] = 0.0; 
-    // billboard[2][2] = .01; 
+    billboard[0][0] = .01; 
+    billboard[0][1] = 0.0; 
+    billboard[0][2] = 0.0; 
+    billboard[1][0] = 0.0; 
+    billboard[1][1] = .01; 
+    billboard[1][2] = 0.0; 
+    billboard[2][0] = 0.0; 
+    billboard[2][1] = 0.0; 
+    billboard[2][2] = .01; 
 
     gl_Position = uProjectionMatrix * billboard * vertexPosition;
 
@@ -95,10 +90,9 @@ gl.depthFunc(gl.LEQUAL); // Near things obscure fa
   varying vec4 v_texcoord;
 
   void main() {
-    // float mask = 1.0 - step(1.0, length(v_texcoord.xy * 2. - 1.));
-    // if (mask <= 0.0001) discard;
-    // gl_FragColor = vec4(v_color.rgb * mask, v_color.a * mask);
-    gl_FragColor = v_color;
+    float mask = 1.0 - step(1.0, length(v_texcoord.xy * 2. - 1.));
+    if (mask <= 0.0001) discard;
+    gl_FragColor = vec4(v_color.rgb * mask, v_color.a * mask);
   }
   `;
 
@@ -170,7 +164,7 @@ gl.depthFunc(gl.LEQUAL); // Near things obscure fa
   const colorBuffer = gl.createBuffer();
   //gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
   setAttribute(gl, colorBuffer, programInfo.attribLocations.color, {size:3, divisor:1, type:gl.UNSIGNED_BYTE, normalize:true});
-  gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(totalLights*3), gl.STATIC_DRAW);  
+  gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(totalLights*3), gl.DYNAMIC_DRAW);  
   // gl.enableVertexAttribArray(programInfo.attribLocations.color);
   // {
   //   const size = 3;  
@@ -218,16 +212,14 @@ gl.depthFunc(gl.LEQUAL); // Near things obscure fa
           return;
       }
 
-    //   window.requestAnimationFrame(() => {
-    //     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    //     gl.bufferSubData(
-    //         gl.ARRAY_BUFFER, 
-    //         bufferIndex,
-    //         new Uint8Array(data), 
-    //     );
-    //   });
+      gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+      gl.bufferSubData(
+        gl.ARRAY_BUFFER, 
+        bufferIndex,
+        new Uint8Array(data), 
+      );
  
-    // })
+    })
 
     startLight += scenePart.positions.length;
   });
@@ -235,20 +227,20 @@ gl.depthFunc(gl.LEQUAL); // Near things obscure fa
   const grid = {indices: []}
   //////grid
   //TODO rename draw_grid to something like calc_grid 
-//   const grid = draw_grid(viewParams.gridZ)
+  // const grid = draw_grid(viewParams.gridZ)
 
-//   const gridPositionBuffer = gl.createBuffer();
-//   setAttribute(gl, gridPositionBuffer, programInfo.attribLocations.position, {});
-//   // gl.bindBuffer(gl.ARRAY_BUFFER, gridPositionBuffer);
-//   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(grid.vertices), gl.STATIC_DRAW);
+  // const gridPositionBuffer = gl.createBuffer();
+  // setAttribute(gl, gridPositionBuffer, programInfo.attribLocations.position, {});
+  // // gl.bindBuffer(gl.ARRAY_BUFFER, gridPositionBuffer);
+  // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(grid.vertices), gl.STATIC_DRAW);
 
-//   const gridIndicesBuffer = gl.createBuffer();
-//   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gridIndicesBuffer);
-//   gl.bufferData(
-//     gl.ELEMENT_ARRAY_BUFFER,
-//     new Uint16Array(grid.indices),
-//     gl.STATIC_DRAW
-//   );
+  // const gridIndicesBuffer = gl.createBuffer();
+  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gridIndicesBuffer);
+  // gl.bufferData(
+  //   gl.ELEMENT_ARRAY_BUFFER,
+  //   new Uint16Array(grid.indices),
+  //   gl.STATIC_DRAW
+  // );
 
   // const gridColorBuffer = gl.createBuffer();
   // const gridColors = Array(grid.vertices.length).fill([50, 50, 50]).flat();
@@ -358,15 +350,14 @@ function updateScene(gl, time, programInfo, numInstances, gridIndicesCount)
   );
 
   //clear
-//   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
   //draw lights
   const offset = 0;
   const vertexCount = 6;  //todo derive from global vertices object
   gl.drawArraysInstanced(gl.TRIANGLES, offset, vertexCount, numInstances);
-  gl.finish();
+  // gl.finish()
 
   //draw grid
 
