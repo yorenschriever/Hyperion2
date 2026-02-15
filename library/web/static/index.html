@@ -34,6 +34,10 @@
                         "controller monitors";
                 }
 
+                body.nomonitor {
+                    grid-template-columns: auto;
+                }
+
                 #controller {
                     overflow: scroll;
                 }
@@ -54,6 +58,10 @@
                         "sequencer"
                         "controller"
                         "monitors";
+                }
+
+                body.nomonitor {
+                    grid-template-rows: min-content auto;
                 }
 
                 #controller {
@@ -119,11 +127,13 @@
 
                 if (event.data.state) {
                     addMonitors();
+                    document.body.classList.toggle("nomonitor", false);
                 } else {
                     const monitors = document.getElementById('monitors');
                     while (monitors.firstChild) {
                         monitors.removeChild(monitors.firstChild);
                     }
+                    document.body.classList.toggle("nomonitor", true);
                 }
             });
 
