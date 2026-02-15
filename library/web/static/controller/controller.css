@@ -29,10 +29,6 @@ body {
                    ;
     }
 
-    /* TODO: instead of hardcoded 450, derive the height */
-    /* .slots {
-        max-height: calc(100vh - 450px);
-    } */
 }
 
 .controller {

@@ -1,45 +1,84 @@
 <html>
     <head>
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=0.5"> -->
         <link rel="stylesheet" href="controller/controller.css">
         <link rel="stylesheet" href="toolbar/toolbar.css">
         <link rel="stylesheet" href="sequencer/sequencer.css">
         <style>
-            html {
-                overflow-y: scroll;
-                height: 100vh;
-                scroll-snap-type: y mandatory;
-            }
-
             #monitors {
-                position: fixed;
-                right:16px;
-                bottom: 16px;
                 display: flex;
-                gap:16px;
-                flex-direction:column;
-                max-height: calc(100vh - 32px);
+                grid-area: monitors;
             }
             
             .monitor {
-                width: 640px;
-                height: 480px;
-                resize:both;
                 border: 1px solid #444;
-                z-index: 100; 
+                flex-grow: 1;
             }
 
             #sequencer {
-                width: 100%;
-                scroll-snap-align: end;
-                scroll-snap-stop: always;
-                overflow: hidden;
-                max-height: 500px;
+                grid-area: sequencer;
             }
 
             #controller {
-                scroll-snap-align: start;
-                scroll-snap-stop: always;
-                min-height: 100vh;
+                grid-area: controller;
+            }
+
+            @media (aspect-ratio > 16/9) {
+                body {
+                    height: 100dvh;
+                    display: grid;
+                    grid-template-columns: auto 25vw;
+                    grid-template-rows: min-content auto;
+                    grid-template-areas: 
+                        "sequencer monitors"
+                        "controller monitors";
+                }
+
+                #controller {
+                    overflow: scroll;
+                }
+
+                #monitors {
+                    flex-direction: column;
+                    align-content: stretch;
+                    height: 100dvh;
+                }
+            }
+
+            @media (aspect-ratio < 9/16) {
+                body {
+                    height: 100dvh;
+                    display: grid;
+                    grid-template-rows: min-content auto 25vh;
+                    grid-template-areas: 
+                        "sequencer"
+                        "controller"
+                        "monitors";
+                }
+
+                #controller {
+                    overflow: scroll;
+                }
+
+                #monitors {
+                    flex-direction: row;
+                    align-content: stretch;
+                }
+            }
+
+            @media (9/16 <= aspect-ratio <= 16/9)  {
+                #monitors {
+                    position: fixed;
+                    right:16px;
+                    bottom: 16px;
+                    gap: 16px;
+                    flex-direction: column;
+                }
+
+                .monitor {
+                    width: 640px;
+                    height: 480px;
+                }
             }
         </style>
         </link>
@@ -90,7 +129,7 @@
 
         </script>
     </head>
-    <body>        
+    <body>
         <div id="sequencer"></div>
         <div id="controller"></div>
         <div id="monitors"></div>
