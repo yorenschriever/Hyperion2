@@ -1,5 +1,4 @@
 export const viewParams = {
-    clearColor: [0.1, 0.1, 0.1, 1.0],
     fieldOfView: (80 * Math.PI) / 180,
     gridZ: -0.45,
     transform: [

@@ -21,7 +21,20 @@
     </style>
     <meta charset="utf-8" />
     <title>Monitor - Hyperion</title>
-    <script src="webgl-monitor3.js" type="module" defer></script>
+    <script type="module">
+      import { viewParams } from './view-params.js'
+      import { main, calcViewMatrix3d } from './webgl-monitor.js'
+
+      const getScene = () => {
+        if (window.scene)
+            return Promise.resolve(window.scene)
+        return fetch("./mapping.json").then(i=>i.json())
+      }
+
+      const grid = {z: viewParams.gridZ};
+      getScene().then(scene => main(scene, calcViewMatrix3d(viewParams), grid));
+
+    </script>
   </head>
 
   <body>

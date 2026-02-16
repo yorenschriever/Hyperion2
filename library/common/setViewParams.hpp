@@ -5,7 +5,6 @@
 
 const char viewParamsFmt[] = "\n\
 export const viewParams = {\n\
-    clearColor: [0.1, 0.1, 0.1, 1.0],\n\
     fieldOfView: (%.4f * Math.PI) / 180,\n\
     gridZ: %.4f,\n\
     transform: [\n\
