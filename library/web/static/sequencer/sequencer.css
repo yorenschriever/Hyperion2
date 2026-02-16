@@ -40,7 +40,7 @@
     background-color: #222;
     color: #fff;
     border: 1px solid #222;
-    transition: background-color 0.4s, border 0.4s;
+    transition: background-color 0.4s, border 0.4s, opacity 0.4s;
 }
 
 .sequencer .step[data-active] {
