@@ -185,7 +185,7 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
         ontouchend=${(event) => { handleReleased(); event.preventDefault(); }}
         >
         ${slot.name}
-        <button class="sequencer" onmousedown=${handleSequencerPressed}></button>
+        <button class="addSequencer" onmousedown=${handleSequencerPressed}></button>
     </div>`;
 }
 

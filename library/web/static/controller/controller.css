@@ -92,16 +92,18 @@ body {
 .fader {
     writing-mode: vertical-lr;
     direction: rtl;
-    appearance: slider-vertical;
     width:100%;
     height:160px;
     margin-bottom: 12px; 
-    background-color: transparent;;
+    background-color: transparent;
 }
 
-.fader::-moz-range-track {
-    width: 16px;
-}
+/* without the supports it breaks styling in chrome on my macbook air */
+@supports selector(::-moz-range-track) {
+    .fader::-moz-range-track {
+        width: 16px;
+    }
+} 
 
 .faderContainer {
     display: flex;
@@ -138,14 +140,18 @@ body {
     display: none;
 }
 
+@supports selector(::-webkit-slider-runnable-track) {
 input[type="range"]::-webkit-slider-runnable-track {
     background: #053a5f;
     border-radius: 15px;    
 }
+}
 
+@supports selector(::-moz-range-track) {
 input[type="range"]::-moz-range-track {
     background: #053a5f;
     border-radius: 15px;
+}
 }
 
 .slot button {
@@ -164,7 +170,7 @@ input[type="range"]::-moz-range-track {
     opacity: 1;  
 }
 
-.slot .sequencer {
+.slot .addSequencer {
     position: absolute;
     bottom:4px;
     right:4px;
