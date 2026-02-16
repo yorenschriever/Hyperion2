@@ -17,10 +17,6 @@ int main()
     // add a column to the controller that lets you select a palette
     addPaletteColumn(hyp);
 
-    // Crate a tempo source that give us a constant beat of 120 BPM.
-    // Later you will see how patterns can access this information.
-    Tempo::AddSource(new ConstantTempo(120));
-
     // auto select first palette
     hyp->hub.buttonPressed(0, 0);
 
@@ -40,6 +36,10 @@ int main()
 
     // This starts the main hyperion loop
     hyp->start();
+
+    // Create a tempo source that give us a constant beat of 120 BPM.
+    // Later you will see how patterns can access this information.
+    Tempo::AddSource(new ConstantTempo(120));
 
     // After that there is nothing we have to do anymore.
     // This loops keep your application alive.
