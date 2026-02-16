@@ -1,3 +1,23 @@
+/*
+ * This is a (theoretically) better version of the monitor.
+ * it uses instancing to draw all the lights in a single draw call, 
+ * and should be more efficient.
+ * The code to copy the color data to the GPU is also more efficient, 
+ * as it copies the data without additional buffer manipulation.
+ * The old method duplicated each color value for each vertex.
+ * 
+ * Unfortunately, this version seems to be slower than the old one,
+ * especially on my old macbook air. If i profile the GPU i see
+ * still multiple gpu/cpu interactions, which makes me think that
+ * instancing is not natively implemented there. When profiling on
+ * my M2 i see a single interaction, and the GPU is also done 50x 
+ * faster. The performance monitor doesn't show any difference though.
+ * 
+ * Another cause could be the additional calculations for the billboard.
+ * 
+ * For now i stick with the old method, because it works on all machines.
+ */
+
 import { viewParams } from './view-params.js'
 import { Socket } from '../common/socket.js'
 import './gl-matrix-min.js';

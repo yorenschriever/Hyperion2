@@ -68,6 +68,10 @@
     border-right: 1px solid #666;
 }
 
+.sequencer .step:nth-child(32n) {
+    border-right: 1px solid #888;
+}
+
 .sequencer .step:last-child {
     border-right: none;
 }
