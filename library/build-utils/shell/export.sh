@@ -3,10 +3,10 @@
 # shell knows which scripts to run, and these script know
 # where to find the hyperion code and other important stuff 
 
-# extract the library dir name from the location of this script
-if [[ -z "${HYPERION_LIB_DIR}" ]]; then
-    export HYPERION_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../"; pwd)"
-fi
+# use either $0 or ${BASH_SOURCE[0]} to get the path of the current script, depending on which value is set
+SCRIPT_PATH="${BASH_SOURCE[0]:-$0}"
+echo "SCRIPT_PATH = "$SCRIPT_PATH
+export HYPERION_LIB_DIR="$(cd "$(dirname "$SCRIPT_PATH")/../../"; pwd)"
 
 alias hyper-interactive='$HYPERION_LIB_DIR/platform/docker/run-interactive.sh'
 
