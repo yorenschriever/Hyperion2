@@ -103,6 +103,7 @@ void IRAM_ATTR NeoPixelsEspLegacyRMT::begin_()
     if (port == 0 || port > PinMapping::map.size())
     {
         Log::error(TAG, "port must be between 1-%d (inclusive), but was %d", PinMapping::map.size(), port);
+        xSemaphoreGive(xMutex);
         return;
     }
 

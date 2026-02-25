@@ -27,11 +27,14 @@ public:
     virtual bool ready() override
     {
         int missedFrameCount = -1;
-        while ((sock->receive(patternBuffer.data(), bufferSize)) > 0)
-        {
+        do {
+            int sz = sock->receive(packetBuffer, packetBufferSize);
+            if (sz <= 0) break;
+            bufferSize = sz;
             gotFrame = true;
             missedFrameCount++;
-        }
+        } while (1);
+
         if (missedFrameCount >= 1) 
         {
             //-1 means no frame waiting, 
@@ -50,7 +53,9 @@ public:
 
         fpsCounter.increaseUsedFrameCount();
 
-        return patternBuffer;
+        auto result = Buffer(bufferSize);
+        memcpy(result.data(), packetBuffer, bufferSize);
+        return result;
     }
 
     ~UDPInput()
@@ -62,7 +67,8 @@ public:
 private:
     int port;
     Socket *sock = NULL;
-    const int bufferSize = 2 * MTU;
-    Buffer patternBuffer = Buffer(bufferSize);
+    static const int packetBufferSize = 2 * MTU;
+    uint8_t packetBuffer[packetBufferSize];
     bool gotFrame = false;
+    int bufferSize=0;
 };
