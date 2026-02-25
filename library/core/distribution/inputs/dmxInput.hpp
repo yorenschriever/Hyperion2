@@ -35,7 +35,7 @@ public:
         return (frameNumber != lastFrameNumber);
     }
 
-    Buffer process() override 
+    const Buffer process() override 
     {
         if (!ready())
             return Buffer(0);

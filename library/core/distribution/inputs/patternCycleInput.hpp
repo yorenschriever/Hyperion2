@@ -30,7 +30,7 @@ public:
         return true;
     }
 
-    Buffer process() override 
+    const Buffer process() override 
     {
         auto patternBuffer = Buffer(length * sizeof(T_COLOR));
         patternBuffer.clear<T_COLOR>();

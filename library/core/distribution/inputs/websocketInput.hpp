@@ -51,7 +51,7 @@ public:
         return frameReady;
     }
 
-    Buffer process() override
+    const Buffer process() override
     {
         if (!frameReady)
             return Buffer(0);

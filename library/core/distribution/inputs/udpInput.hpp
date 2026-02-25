@@ -12,7 +12,7 @@ const int MTU = 1400;
 // UDP input is limited to 975  RGB leds/port. More than enough for now
 class UDPInput final: public BaseInput
 {
-
+   
 public:
     UDPInput(int port)
     {
@@ -26,29 +26,12 @@ public:
 
     virtual bool ready() override
     {
-        char buffer[1];
-        return sock->peek(buffer, 1) > 0;
-    }
-
-    Buffer process() override 
-    {
-        const int bufferSize = 2 * MTU;
-        auto patternBuffer = Buffer(bufferSize);
-
-        bool gotFrame = false;
         int missedFrameCount = -1;
-        // read all packets, throw them away, but keep the last one.
         while ((sock->receive(patternBuffer.data(), bufferSize)) > 0)
         {
             gotFrame = true;
             missedFrameCount++;
         }
-
-        if (!gotFrame)
-            return Buffer(0);
-
-        fpsCounter.increaseUsedFrameCount();
-
         if (missedFrameCount >= 1) 
         {
             //-1 means no frame waiting, 
@@ -56,7 +39,17 @@ public:
             //>= 1 means we skipped frames
             fpsCounter.increaseMissedFrameCount(missedFrameCount);
         }
-        
+        return gotFrame;
+    }
+
+    const Buffer process() override 
+    {
+        if (!gotFrame)
+            return Buffer(0);
+        gotFrame = false;
+
+        fpsCounter.increaseUsedFrameCount();
+
         return patternBuffer;
     }
 
@@ -69,4 +62,7 @@ public:
 private:
     int port;
     Socket *sock = NULL;
+    const int bufferSize = 2 * MTU;
+    Buffer patternBuffer = Buffer(bufferSize);
+    bool gotFrame = false;
 };

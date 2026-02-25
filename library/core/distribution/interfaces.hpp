@@ -15,7 +15,7 @@ public:
     //indicates whether the source has data ready to be processed
     virtual bool ready() = 0;
 
-    virtual Buffer process() = 0;
+    virtual const Buffer process() = 0;
 
     virtual FPSCounter *getFpsCounter() = 0;
 };
@@ -38,5 +38,5 @@ class IConverter
 public:
     virtual void initialize() =0;
     virtual bool ready() = 0;
-    virtual Buffer process(const Buffer&) = 0;
+    virtual const Buffer process(const Buffer&) = 0;
 };

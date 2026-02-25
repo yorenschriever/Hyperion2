@@ -77,7 +77,7 @@ public:
         return true;
     }
 
-    Buffer process() override
+    const Buffer process() override
     {
         auto patternBuffer = Buffer(_length * sizeof(T_COLOR));
         auto renderBuffer  = Buffer(_length * sizeof(T_COLOR));

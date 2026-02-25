@@ -102,7 +102,7 @@ public:
         return dirty;
     }
 
-    Buffer process() override
+    const Buffer process() override
     {
         checkSwitchFunc();
         dirty = false;

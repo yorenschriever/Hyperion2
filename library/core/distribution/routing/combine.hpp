@@ -116,7 +116,7 @@ private:
         return false;
     }
 
-    Buffer process() override
+    const Buffer process() override
     {
         fpsCounter.increaseUsedFrameCount();
         return buffer;

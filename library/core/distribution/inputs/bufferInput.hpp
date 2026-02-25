@@ -40,7 +40,7 @@ public:
             initializeCallback(callbackParam);
     }
 
-    Buffer process() override
+    const Buffer process() override
     {
         auto patternBuffer = Buffer(length);
 
