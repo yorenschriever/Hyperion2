@@ -20,6 +20,7 @@
 #include "core/distribution/outputs/spiOutput.hpp"
 #include "core/distribution/outputs/udpOutput.hpp"
 #include "core/distribution/processors/colorConverter.hpp"
+#include "core/distribution/processors/throttle.hpp"
 #include "core/distribution/routing/combine.hpp"
 #include "core/distribution/routing/fallback.hpp"
 #include "core/distribution/routing/slicer.hpp"

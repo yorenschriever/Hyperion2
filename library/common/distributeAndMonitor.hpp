@@ -50,8 +50,11 @@ void distribute(
     {
         hyp->createChain(
             splitInput->getSlice(i),
-            slaves[i].converter ? slaves[i].converter : defaultConverter,
-            new UDPOutput(slaves[i].host, slaves[i].port, 60)
+            {
+                slaves[i].converter ? slaves[i].converter : defaultConverter,
+                new Throttle(),
+            },
+            new UDPOutput(slaves[i].host, slaves[i].port, 120)
         );
     }
 }
