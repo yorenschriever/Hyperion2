@@ -25,7 +25,7 @@ public:
         return true;   
     }
 
-    Buffer process(const Buffer& inputBuffer) override
+    const Buffer process(const Buffer& inputBuffer) override
     {
         int numPixels = inputBuffer.size() / sizeof(T_SOURCE_COLOR);
         auto outputBuffer = Buffer(numPixels * sizeof(T_TARGET_COLOR));
