@@ -139,7 +139,7 @@
 
 
 .fps {
-    --analog-gauge-bg: #f00, #f00, #f90, #ff0, #0f0, #0f0, #0f0, #0f0, #0f0, var(--analog-gauge-range), #0000 0 var(--analog-gauge-range);
+    --analog-gauge-bg: #f00, #f00, #f90, #ff0, #0b0, #0b0, #0b0, #0b0, #0b0, var(--analog-gauge-range), #0000 0 var(--analog-gauge-range);
 }
 
 
