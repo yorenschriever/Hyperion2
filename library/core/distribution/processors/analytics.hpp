@@ -78,12 +78,12 @@ class Analytics final:  public IConverter
     int lastFrameSize = 0;
     int frames = 0;
     std::string name;
-    char *host;
+    const char *host;
     WebServer **webServer;
 
 public: 
 
-    Analytics(WebServer **webServer, std::string name, size_t colorSize = sizeof(RGB), char* host = nullptr)
+    Analytics(WebServer **webServer, std::string name, size_t colorSize = sizeof(RGB), const char* host = nullptr)
     {
         this->webServer = webServer;
         this->name = name;
