@@ -162,7 +162,7 @@ export function main(scene, calcViewMatrix, grid = undefined) {
   }
 
   let then = 0;
-  const fpsElem = document.querySelector("#fps");
+  // const fpsElem = document.querySelector("#fps");
 
   // Draw the scene repeatedly
   function render(now) {
@@ -172,8 +172,8 @@ export function main(scene, calcViewMatrix, grid = undefined) {
 
     updateScene(gl, time, programInfo, buffers, calcViewMatrix);
     time += deltaTime;
-    const fps = 1 / deltaTime; 
-    fpsElem.textContent = fps.toFixed(1);
+    // const fps = 1 / deltaTime; 
+    // fpsElem.textContent = fps.toFixed(1);
 
     requestAnimationFrame(render);
   }

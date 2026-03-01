@@ -20,6 +20,7 @@
 #toolbar a {
     transition: color 0.5s;
     color:#666;
+    cursor: pointer;
 }
 
 #toolbar a.active{ 

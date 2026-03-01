@@ -1,0 +1,173 @@
+.analytics {
+    padding:16px;
+    color: #ccc;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.analytics table { 
+    border-collapse: collapse;
+}
+
+.analytics th, .analytics td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+    color: #ccc;
+}
+
+.analytics th {
+    background-color: #333;
+}
+
+.analytics td {
+    color: #ccc;
+}
+
+.analytics .disconnected td {
+    color: #a00;
+}
+
+.analog-gauge {
+    --analog-gauge-segments: 1;
+    --analog-gauge-segments-w: 1deg;
+    --analog-gauge-start-angle: 235deg;
+    --analog-gauge-range: 250deg;
+    --analog-gauge-bdw: 10cqi;
+    --analog-gauge-bg: #009, #69f, #ff0, #f90, #f00 var(--analog-gauge-range), #0000 0 var(--analog-gauge-range);
+    --analog-gauge-mask-circle: radial-gradient(circle at 50% 50%, #0000 calc(50cqi - var(--analog-gauge-bdw, 10cqi)), #000 0);
+    --analog-gauge-mask-segment: repeating-conic-gradient(
+        from var(--analog-gauge-start-angle, 235deg) at 50% 50%,
+        #000 0 var(--analog-gauge-segments-w, 1deg),
+        #0000 0 calc((var(--analog-gauge-range, 250deg) / var(--analog-gauge-segments, 5))));
+    --analog-gauge-needle-bg: light-dark(#333, #DDD);
+    --analog-gauge-needle-h: 10cqi;
+    --analog-gauge-value-mark-w: 6ch;
+
+    --_w: calc(100cqi/3*2);
+    --_vw: calc(100cqi - (2 * var(--analog-gauge-bdw, 10cqi)));
+    --_m: calc(100cqi/6);
+
+    aspect-ratio: 1;
+    container-type: inline-size;
+    font-family: var(--analog-clock-ff, ui-sans-serif, system-ui, sans-serif);
+    display: grid;
+    grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+    inline-size: 100%;
+  }
+
+  .gauge {
+    background: conic-gradient(from var(--analog-gauge-start-angle, 235deg), var(--analog-gauge-bg));
+    border-radius: 50%;
+    grid-area: 1 / 1 / 4 / 4;
+    mask: var(--analog-gauge-mask-circle), var(--analog-gauge-mask-segment, none);
+    mask-composite: var(--analog-gauge-mask-composite, subtract);
+  }
+
+  .label {
+    font-size: var(--analog-gauge-label-fs, 7.5cqi);
+    font-weight: var(--analog-gauge-label-fw, 200);
+    grid-area: 3 / 2 / 4 / 3;
+    isolation: isolate;
+    line-height: 1.2;
+    place-self: var(--analog-gauge-label-ps, center center);
+    text-align: center;
+    text-box: ex alphabetic;
+  }
+
+  .label-min,
+  .label-max {
+    font-size: var(--analog-gauge-label-fs, 5cqi);
+    font-weight: var(--analog-gauge-label-fw, 400);
+    place-self: center;
+  }
+
+  .label-min { grid-area: 3 / 1 / 4 / 2; }
+  .label-max { grid-area: 3 / 3 / 4 / 4; }
+
+  .value {
+    font-size: var(--analog-gauge-value-fs, 15cqi);
+    font-weight: var(--analog-gauge-value-fw, 200);
+    grid-area: 3 / 2 / 4 / 3;
+    isolation: isolate;
+    place-self: start center;
+    text-box: cap alphabetic;
+    /* overflow: auto; */
+  }
+
+  .needle {
+    align-self: center;
+    background: var(--analog-gauge-needle-bg);
+    clip-path: var(--analog-gauge-needle-cp, polygon(7.5% 50%,78% 0%,83% 35%,83% 65%,78% 100%));
+    grid-area: 2 / 1 / 3 / 3;
+    height: var(--analog-gauge-needle-h);
+    isolation: isolate;
+    mask: radial-gradient(circle at calc(100% - var(--_m)) 50%, #0000 0 2.5cqi, #FFF 2.5cqi);
+    transform-origin: calc(100% - var(--_m)) 50%;
+    width: var(--_w);
+    transition: rotate 3.5s ease-out;
+  }
+
+  .value-marks {
+    all: unset;
+    aspect-ratio: 1;
+    background: var(--analog-gauge-values-bg, #0000);
+    border-radius: 50%;
+    box-sizing: border-box;
+    grid-area: 1 / 1 / 4 / 4;
+    list-style: none;
+    place-self: center;
+    position: relative;
+    width: var(--_vw);
+  }
+
+  .value-mark {
+    --_r: calc((var(--_vw) - var(--analog-gauge-value-mark-w)) / 2);
+    --_d_offset: calc(var(--_d) - 180deg);
+    --_x: calc(var(--_r) + (var(--_r) * cos(var(--_d_offset))));
+    --_y: calc(var(--_r) + (var(--_r) * sin(var(--_d_offset))));
+    aspect-ratio: var(--analog-gauge-value-mark-asr, 1);
+    color: var(--analog-gauge-value-mark-c, light-dark(#0006, #FFF6));
+    display: grid;
+    font-size: var(--analog-gauge-value-mark-fs, 3cqi);
+    font-weight: var(--analog-gauge-value-mark-fw, 400);
+    left: var(--_x);
+    place-content: center;
+    position: absolute;
+    top: var(--_y);
+    width: var(--analog-gauge-value-mark-w);
+  }
+
+
+.fps {
+    --analog-gauge-bg: #f00, #f00, #f90, #ff0, #0f0, #0f0, #0f0, #0f0, #0f0, var(--analog-gauge-range), #0000 0 var(--analog-gauge-range);
+}
+
+
+.fps-icon {
+    --gauge-color: #ccc;
+
+    --analog-gauge-bg: var(--gauge-color), var(--gauge-color) var(--analog-gauge-range), #0000 0 var(--analog-gauge-range);
+    --analog-gauge-needle-bg: var(--gauge-color);
+
+    color: #fff;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+
+    --analog-gauge-value-fs: 45cqi;
+    --analog-gauge-value-fw: 600;
+    --analog-gauge-label-fs: 0;
+
+    width: 38px;
+
+    .value {
+        overflow: auto;
+    }
+}
+
+.fps-icon.disconnected {
+    --gauge-color: #333;
+
+    --analog-gauge-bg: var(--gauge-color), var(--gauge-color) var(--analog-gauge-range), #0000 0 var(--analog-gauge-range);
+    --analog-gauge-needle-bg: var(--gauge-color);
+
+    color: var(--gauge-color);
+} 

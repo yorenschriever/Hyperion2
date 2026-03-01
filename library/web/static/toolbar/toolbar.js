@@ -1,10 +1,12 @@
 import { html, useState, useRef, useEffect, createContext, useContext, useCallback } from '/common/preact-standalone.js'
 import { MidiBridge } from "/midi/midiBridge.js"
+import { AnalyticsIcon } from '../analytics/analytics.js';
 
 export const Toolbar = () => {
 
     return html`
         <${MidiBridgeButton}/>
+        <${AnalyticsButton}/>
         <${WakeLockButton}/>
         <${MonitorButton}/> 
         <${FullscreenButton}/>
@@ -125,6 +127,19 @@ const MonitorButton = () => {
     }
 
     return html`<a onclick=${handleMonitorToggle} class=${state ? "active" : "inactive"}><${MonitorIcon}/></a>`;
+}
+
+const AnalyticsButton = () => {
+    const [state, setState] = useState(false);
+
+    const toggleAnalytics = () => {
+        window.postMessage({type: "toggleAnalytics", state: !state}, "*");
+        setState(st => !st);
+    }
+
+    return html`<a onclick=${toggleAnalytics} class=${state ? "active" : "inactive"}>
+        <${AnalyticsIcon}/>
+    </a>`;
 }
 
 const FullscreenIcon = () => html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">

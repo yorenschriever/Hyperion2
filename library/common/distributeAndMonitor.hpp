@@ -53,6 +53,8 @@ void distribute(
             {
                 slaves[i].converter ? slaves[i].converter : defaultConverter,
                 new Throttle(),
+                //TODO if you provide a custom converter, the size of the output color might be different, leading to an incorrect led count in the analytics
+                new Analytics(&hyp->webServer, slaves[i].host + std::string(":") + std::to_string(slaves[i].port), sizeof(T_OUTPUT_COLOR), slaves[i].host),
             },
             new UDPOutput(slaves[i].host, slaves[i].port, 120)
         );

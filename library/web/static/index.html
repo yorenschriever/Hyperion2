@@ -4,7 +4,13 @@
         <link rel="stylesheet" href="controller/controller.css">
         <link rel="stylesheet" href="toolbar/toolbar.css">
         <link rel="stylesheet" href="sequencer/sequencer.css">
+        <link rel="stylesheet" href="analytics/analytics.css">
+
         <style>
+            :root {
+                color-scheme: dark;
+            }
+
             #monitors {
                 display: flex;
                 grid-area: monitors;
@@ -23,6 +29,17 @@
                 grid-area: controller;
             }
 
+            #analytics {
+                position: fixed;
+                background-color:#222;
+                border:#444 1px solid;
+                overflow: scroll;
+                
+                bottom: 96px;
+                left: 16px;
+                max-height: calc(100vh - 128px);
+            }
+
             @media (aspect-ratio > 21/9) {
                 body {
                     height: 100dvh;
@@ -34,7 +51,7 @@
                         "controller monitors";
                 }
 
-                body.nomonitor {
+                body.noMonitor {
                     grid-template-columns: auto;
                 }
 
@@ -60,7 +77,7 @@
                         "monitors";
                 }
 
-                body.nomonitor {
+                body.noMonitor {
                     grid-template-rows: min-content auto;
                 }
 
@@ -95,6 +112,7 @@
             import { ControllerApp } from "./controller/controller.js"
             import { SequencerApp } from "./sequencer/sequencer.js"
             import { Toolbar } from "./toolbar/toolbar.js"
+            import { AnalyticsApp } from "./analytics/analytics.js"
             import { html, render } from './common/preact-standalone.js'
 
             render(html`<${ControllerApp}/>`, document.getElementById('controller'));
@@ -127,13 +145,24 @@
 
                 if (event.data.state) {
                     addMonitors();
-                    document.body.classList.toggle("nomonitor", false);
+                    document.body.classList.toggle("noMonitor", false);
                 } else {
                     const monitors = document.getElementById('monitors');
                     while (monitors.firstChild) {
                         monitors.removeChild(monitors.firstChild);
                     }
-                    document.body.classList.toggle("nomonitor", true);
+                    document.body.classList.toggle("noMonitor", true);
+                }
+            });
+
+            window.addEventListener("message", (event) => {
+                if (event.data.type !== "toggleAnalytics") return;
+
+                const analyticsElem = document.getElementById('analytics');
+                if (event.data.state) {
+                    render(html`<${AnalyticsApp}/>`, analyticsElem);
+                } else {
+                    render(null, analyticsElem);
                 }
             });
 
@@ -143,6 +172,7 @@
         <div id="sequencer"></div>
         <div id="controller"></div>
         <div id="monitors"></div>
+        <div id="analytics"></div>
         <div id="toolbar"></div>
     </body>
 </html>

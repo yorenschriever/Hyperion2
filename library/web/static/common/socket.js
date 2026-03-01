@@ -43,8 +43,8 @@ export class Socket {
         
         this.socket.onerror = (err) => {
             console.error('Socket encountered error: ', err, 'Closing socket');
-            this.onStatusChange?.(this.socket.readyState);
-            socket.close();
+            this.onStatusChange?.(this.socket?.readyState);
+            this.socket?.close();
 
             //if you enable this, also cancel it in the close() method
             //window.setTimeout(() => this.fixSocket(), 500);

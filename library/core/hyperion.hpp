@@ -21,6 +21,7 @@
 #include "core/distribution/outputs/udpOutput.hpp"
 #include "core/distribution/processors/colorConverter.hpp"
 #include "core/distribution/processors/throttle.hpp"
+#include "core/distribution/processors/analytics.hpp"
 #include "core/distribution/routing/combine.hpp"
 #include "core/distribution/routing/fallback.hpp"
 #include "core/distribution/routing/slicer.hpp"
@@ -108,8 +109,6 @@ public:
       chain->initialize();
 
     Log::info(TAG, "Initialization complete. Starting main loop");
-    Thread::create(UpdateDisplayTask, "UpdateDisplay", Thread::Purpose::control,
-                   3000, this, 4);
     Thread::create(runTask, "run", Thread::Purpose::distribution, 30000, this,
                    1);
   }
@@ -267,137 +266,6 @@ private:
           hyp->midiControllers.erase(device);
         },
         this);
-  }
-
-  template <class InputOutput>
-  void calcFps(const char *name, std::vector<InputOutput *> ioVec,
-               unsigned long elapsedTime, bool firstRun)
-  {
-    int activeChannels = 0;
-    int totalUsedFrames = 0;
-    int totalMissedFrames = 0;
-    int totalTotalFrames = 0;
-    int totalLength = 0;
-    for (auto &io : ioVec)
-    {
-      auto fps = io->getFpsCounter();
-      if (!fps || fps->getTotalFrameCount() == 0)
-        continue;
-
-      activeChannels++;
-      totalUsedFrames += fps->getUsedFrameCount();
-      totalMissedFrames += fps->getMissedFrameCount();
-      totalTotalFrames += fps->getTotalFrameCount();
-      fps->resetFrameCount();
-
-      totalLength += 0; // input->getLength();
-    }
-
-    float outFps = activeChannels == 0 ? 0
-                                       : (float)1000. * totalUsedFrames /
-                                             (elapsedTime) / activeChannels;
-    float inFps = activeChannels == 0 ? 0
-                                      : (float)1000. * totalTotalFrames /
-                                            (elapsedTime) / activeChannels;
-    float misses = totalTotalFrames == 0
-                       ? 0
-                       : 100.0 * (totalMissedFrames) / totalTotalFrames;
-    int avgLength = activeChannels == 0 ? 0 : totalLength / activeChannels;
-
-    if (firstRun)
-      return;
-
-    Log::info("HYP",
-              "%s: FPS: %d of %d (%d%% miss)\t interval: %dms \t freeHeap: %d "
-              "\t avg length: %d \t channels: %d \t totalLights: %d",
-              name, (int)outFps, (int)inFps, (int)misses, (int)elapsedTime,
-              Utils::get_free_heap(), avgLength, activeChannels, totalLength);
-  }
-
-  void calcFps(unsigned long elapsedTime, bool firstRun)
-  {
-    int activeChannels = 0;
-    int totalUsedFrames = 0;
-    int totalMissedFrames = 0;
-    int totalTotalFrames = 0;
-    int totalLength = 0;
-    for (auto &io : chains)
-    {
-      auto fps = io->getSource()->getFpsCounter();
-      if (!fps || fps->getTotalFrameCount() == 0)
-        continue;
-
-      activeChannels++;
-      totalUsedFrames += fps->getUsedFrameCount();
-      totalMissedFrames += fps->getMissedFrameCount();
-      totalTotalFrames += fps->getTotalFrameCount();
-      fps->resetFrameCount();
-
-      totalLength += 0; // input->getLength();
-    }
-
-    float outFps = activeChannels == 0 ? 0
-                                       : (float)1000. * totalUsedFrames /
-                                             (elapsedTime) / activeChannels;
-    float inFps = activeChannels == 0 ? 0
-                                      : (float)1000. * totalTotalFrames /
-                                            (elapsedTime) / activeChannels;
-    float misses = totalTotalFrames == 0
-                       ? 0
-                       : 100.0 * (totalMissedFrames) / totalTotalFrames;
-    int avgLength = activeChannels == 0 ? 0 : totalLength / activeChannels;
-
-    if (firstRun)
-      return;
-
-    Log::info("HYP", "FPS: %d of %d (%d%% miss)", (int)outFps, (int)inFps,
-              (int)misses);
-  }
-
-  static void UpdateDisplayTask(void *parameter)
-  {
-    Hyperion *instance = (Hyperion *)parameter;
-    unsigned long lastFpsUpdate = 0;
-    bool firstRun = true;
-    while (true)
-    {
-
-      unsigned long now = Utils::millis();
-      unsigned long elapsedTime = now - lastFpsUpdate;
-
-      instance->calcFps(elapsedTime, firstRun);
-
-      lastFpsUpdate = now;
-
-      if (firstRun)
-      {
-        // skip the first run, we just started measuring, the stats do not make
-        // sense yet
-        Thread::sleep(500);
-        firstRun = false;
-        continue;
-      }
-
-      // Log::info("HYP", "FPS: %d of %d (%d%% miss)\t interval: %dms \t
-      // freeHeap: %d \t avg length: %d \t channels: %d \t totalLights: %d",
-      // (int)outFps, (int)inFps, (int)misses, (int)elapsedTime,
-      // Utils::get_free_heap(), avgLength, activeChannels, totalLength);
-
-      // Debug.printf("IPAddress: %s\r\n",
-      // Ethernet::GetIp().toString().c_str()); Log::info("Hyperion","Tempo
-      // source: %s\r\n", Tempo::SourceName());
-
-      // Display::setFPS(infps,outfps,misses);
-      // Display::setLeds(totalLength);
-      // Display::setDMX(DMX::IsHealthy());
-      // Display::setMidi(Midi::isConnected(),Midi::isStarted());
-      // Display::setEthernet(Ethernet::isConnected(),Ethernet::isConnecting());
-      // Display::setWifi(Configuration.wifiEnabled,
-      // Wifi::isConnected(),Wifi::isConnecting()); Display::show();
-
-      Thread::sleep(500);
-    }
-    Thread::destroy();
   }
 
   virtual void run()
