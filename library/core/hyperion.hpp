@@ -243,6 +243,8 @@ private:
     hub.subscribe(new WebsocketController(&hub, webServer));
 
     Sequencer *sequencer = new Sequencer(&hub, webServer);
+
+    webServer->addPath("/controller/palettes.css", &PaletteColumn::palettesCss);
   }
 
   virtual void setup_midi_bridge()

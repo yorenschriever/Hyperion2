@@ -29,6 +29,8 @@ public:
             start_color = entry.color;
             start_index = entry.position;
         }
+
+        this->entries = entries;
     }
 
     //position in range 0-255
@@ -42,6 +44,8 @@ public:
     {
         return map[Utils::constrain(position*255,0,255)];
     }
+
+    std::vector<GradientEntry> entries;
 
 private:
     RGBA map[256];
