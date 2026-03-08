@@ -159,6 +159,7 @@ input[type="range"]::-moz-range-track {
     transition: opacity 0.5s ease-in;
     cursor: pointer;
     padding:0px;
+    z-index:1;
 }
 
 .slot:hover button {
