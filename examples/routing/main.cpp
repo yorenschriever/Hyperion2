@@ -5,8 +5,9 @@ class ColorPattern : public Pattern<RGB>
 public:
   ColorPattern(RGB col) : col(col) {}
 
-  void Calculate(RGB *pixels, int width, bool firstFrame, Params *) override
+  void Calculate(RGB *pixels, int width, bool active, Params *) override
   {
+    if (!active) return;
     for (int index = 0; index < width; index++)
       pixels[index] = col;
   }

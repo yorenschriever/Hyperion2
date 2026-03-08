@@ -1,16 +1,13 @@
 import './gl-matrix-min.js';
 import { WebGLDebugUtils } from './webgl-debug.js';
 import { Socket } from '../common/socket.js'
+import { viewParams } from './view-params.js'
 
-let time = 0.0;
-let deltaTime = 0;
 let runtimeSessionId;
 
 const DEBUG = false;
 
-export function main(scene, calcViewMatrix, grid = undefined) {
-  const canvas = document.querySelector("#glcanvas");
-
+export function main(scene, canvas) {
   const gl = DEBUG ?
     WebGLDebugUtils.makeDebugContext(canvas.getContext("webgl2")) :
     canvas.getContext("webgl2");
@@ -61,6 +58,10 @@ export function main(scene, calcViewMatrix, grid = undefined) {
     gl_FragColor = v_color;
   }
   `;
+
+  const type = scene[0].type; //'2d' or '3d'
+  const calcViewMatrix = type === '3d' ? calcViewMatrix3d(viewParams) : calcViewMatrix2d;
+  const grid = type === '3d' ? {z:viewParams.gridZ} : undefined;
 
   // Initialize a shader program; this is where all the lighting
   // for the vertices and so forth is established.
@@ -161,20 +162,9 @@ export function main(scene, calcViewMatrix, grid = undefined) {
     buffers.gridBuffers = gridBuffers;
   }
 
-  let then = 0;
-  // const fpsElem = document.querySelector("#fps");
-
   // Draw the scene repeatedly
   function render(now) {
-    now *= 0.001; // convert to seconds
-    deltaTime = now - then;
-    then = now;
-
-    updateScene(gl, time, programInfo, buffers, calcViewMatrix);
-    time += deltaTime;
-    // const fps = 1 / deltaTime; 
-    // fpsElem.textContent = fps.toFixed(1);
-
+    updateScene(gl, now * 0.001, programInfo, buffers, calcViewMatrix);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
@@ -218,7 +208,6 @@ function loadShader(gl, type, source) {
 
 function updateScene(gl, time, programInfo, buffers, calcViewMatrix)
 {
-  // calcViewMatrix3d(gl, time, viewParams, programInfo);
   calcViewMatrix(gl, time, programInfo);
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

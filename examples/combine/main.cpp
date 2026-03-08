@@ -71,7 +71,7 @@ int main()
     hyp->createChain(
         combined,
         new ColorConverter<Monochrome, RGB>(),
-        new MonitorOutput(&hyp->webServer, &map, 60, 0.03)
+        new MonitorOutput(&hyp->webServer, &map, nullptr, 60, 0.03)
     );
 
     hyp->start();

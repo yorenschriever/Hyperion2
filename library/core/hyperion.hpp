@@ -13,7 +13,6 @@
 #include "core/distribution/outputs/artnetOutput.hpp"
 #include "core/distribution/outputs/dmxOutput.hpp"
 #include "core/distribution/outputs/monitorOutput.hpp"
-#include "core/distribution/outputs/monitorOutput3d.hpp"
 #include "core/distribution/outputs/neopixelOutput.hpp"
 #include "core/distribution/outputs/nullOutput.hpp"
 #include "core/distribution/outputs/pwmOutput.hpp"

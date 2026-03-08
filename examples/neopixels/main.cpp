@@ -3,8 +3,10 @@
 //This reaches 48fps for 500 leds on 8 channels (= 4000 leds)
 class RainbowPattern : public Pattern<RGB>
 {
-  inline void Calculate(RGB *pixels, int width, bool firstFrame, Params*) override
+  inline void Calculate(RGB *pixels, int width, bool active, Params*) override
   {
+    if (!active)
+      return;
     for (int index = 0; index < width; index++)
     {
       pixels[index] = Hue(0xFF * index / width + (Utils::millis() / 10)) ;
@@ -15,7 +17,7 @@ class RainbowPattern : public Pattern<RGB>
 //This empty pattern reaches 64fps for 500 leds on 8 channels (= 4000 leds)
 class EmptyPattern : public Pattern<RGB>
 {
-  inline void Calculate(RGB *pixels, int width, bool firstFrame, Params*) override{}
+  inline void Calculate(RGB *pixels, int width, bool active, Params*) override{}
 };
 
 int main()

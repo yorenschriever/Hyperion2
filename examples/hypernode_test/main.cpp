@@ -4,8 +4,10 @@
 
 class RainbowPattern : public Pattern<RGB>
 {
-  inline void Calculate(RGB *pixels, int width, bool firstFrame, Params*) override
+  inline void Calculate(RGB *pixels, int width, bool active, Params*) override
   {
+    if (!active)
+      return;
     for (int index = 0; index < width; index++)
     {
       pixels[index] = Hue(0xFF * index / width + (Utils::millis() / 10)) ;

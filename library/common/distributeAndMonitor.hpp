@@ -78,7 +78,7 @@ void distributeAndMonitor(
     hyp->createChain(
         splitInput->getSlice(slices.size()-1),
         new ColorConverter<T_INPUT_COLOR, RGB>(),
-        new MonitorOutput(&hyp->webServer, pixelMap, 60, monitorDotSize)
+        new MonitorOutput(&hyp->webServer, pixelMap, nullptr,  60, monitorDotSize)
     );
 }
 
@@ -99,7 +99,7 @@ void distributeAndMonitor3d(
     hyp->createChain(
         splitInput->getSlice(slices.size()-1),
         new ColorConverter<T_INPUT_COLOR, RGB>(),
-        new MonitorOutput3d(&hyp->webServer, pixelMap, 60, monitorDotSize)
+        new MonitorOutput(&hyp->webServer, pixelMap, nullptr, 60, monitorDotSize)
     );
 }
 

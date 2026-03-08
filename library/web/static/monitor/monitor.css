@@ -1,0 +1,23 @@
+.monitors {
+    display: flex;
+}
+
+.monitor {
+    position:relative
+}
+
+.monitor .monitor-name {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #ccc;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 10pt;
+    padding: 6pt;
+    z-index: 1;
+}
+
+.monitor canvas {
+    width: 100%;
+    height: 100%;
+}
