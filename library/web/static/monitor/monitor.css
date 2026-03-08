@@ -21,3 +21,15 @@
     width: 100%;
     height: 100%;
 }
+
+.monitor .preview {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    padding: 8px;
+    z-index: 1;
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    color: #aaa;
+}

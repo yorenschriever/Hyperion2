@@ -95,7 +95,8 @@ public:
 
             //Log::info("CONTROL_HUB_INPUT", "calculating pattern active = %d, dim = %d ,masterDim = %d", slot->activated, column->dim, hub->masterDim);
 
-            slotPattern.pattern->Calculate(patternBuffer.as<T_COLOR>(), _length, slot->activated, hub->getParams(slotPattern.paramsSlot));
+            bool active = (slot->activated & activatedMask) > 0;
+            slotPattern.pattern->Calculate(patternBuffer.as<T_COLOR>(), _length, active, hub->getParams(slotPattern.paramsSlot));
 
             // apply dimming and copy to output buffer
             for (int i = 0; i < _length; i++)
@@ -128,11 +129,21 @@ public:
         return renderBuffer;
     }
 
+    ControlHubInput<T_COLOR>* setActivatedMask(uint8_t mask)
+    {
+        this->activatedMask = mask;
+        return this;
+    }
+
 private:
     int _length = 0;
 
     std::vector<SlotPattern> slotPatterns;
     ControlHub *hub;
+    // the controlhub passes active flags to tell the reason the pattern is active.
+    // with this mask you an specify which flags you want to react to.
+    // this can be useful to listen only to 'preview' slots
+    uint8_t activatedMask = ~ControlHub::PREVIEW;
 
     void setNames()
     {

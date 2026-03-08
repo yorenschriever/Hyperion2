@@ -76,6 +76,12 @@ public:
                 instance->hub->setVariant(paramsSlotIndex, value);
             else if (param.compare("Velocity") == 0)
                 instance->hub->setVelocity(paramsSlotIndex, value);
+        } else if (type.compare("preview") == 0)
+        {
+            int columnIndex = cJSON_GetObjectItem(parsed,"columnIndex")->valueint;
+            int slotIndex = cJSON_GetObjectItem(parsed,"slotIndex")->valueint;
+            bool status = cJSON_GetObjectItem(parsed,"status")->valueint;
+            instance->hub->setSlotActive(columnIndex, slotIndex, status, ControlHub::PREVIEW);
         }
 
         cJSON_Delete(parsed);

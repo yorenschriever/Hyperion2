@@ -34,6 +34,8 @@ public:
     if (slotIndex >= palettes.size())
       return;
 
+    active = active & ~ControlHub::PREVIEW;
+
     if (!active)
     {
       if (active == ControlHub::DEFAULT)
@@ -44,7 +46,7 @@ public:
       int fallbackSlotsIndex = -1;
       for (int i = 0; i < slots.size(); i++)
       {
-        if (slots[i].activated)
+        if (slots[i].activated & ~ControlHub::PREVIEW)
           fallbackSlotsIndex = i;
       }
       if (fallbackSlotsIndex != -1)

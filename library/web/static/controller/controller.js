@@ -159,6 +159,10 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
         sender(`{"type":"buttonReleased", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}}`)
     }
 
+    const handlePreview = (status) => {
+        sender(`{"type":"preview", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}, "status": ${status}}`)
+    }
+
     const handleSequencerPressed = (event) => {
         event.stopPropagation();
         window.postMessage({
@@ -183,6 +187,8 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
         onmouseup=${handleReleased}
         ontouchstart=${(event) => { handlePressed(); event.preventDefault(); }}
         ontouchend=${(event) => { handleReleased(); event.preventDefault(); }}
+        onmouseenter=${(event) => handlePreview(1)}
+        onmouseleave=${(event) => handlePreview(0)}
         >
         ${slot.name}
         <button class="addSequencer" onmousedown=${handleSequencerPressed}></button>

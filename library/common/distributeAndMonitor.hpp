@@ -61,11 +61,11 @@ void distribute(
     }
 }
 
-template <class T_OUTPUT_COLOR = GRB, class T_INPUT_COLOR = RGBA>
+template <class T_OUTPUT_COLOR = GRB, class T_INPUT_COLOR = RGBA, class T_PixelMap = PixelMap>
 void distributeAndMonitor(
     Hyperion *hyp,
     ControlHubInput<T_INPUT_COLOR> *input,
-    PixelMap *pixelMap,
+    T_PixelMap *pixelMap,
     Distribution slaves,
     LUT *lut = nullptr,
     float monitorDotSize=0.01)
@@ -81,25 +81,3 @@ void distributeAndMonitor(
         new MonitorOutput(&hyp->webServer, pixelMap, nullptr,  60, monitorDotSize)
     );
 }
-
-template <class T_OUTPUT_COLOR = GRB, class T_INPUT_COLOR = RGBA>
-void distributeAndMonitor3d(
-    Hyperion *hyp,
-    ControlHubInput<T_INPUT_COLOR> *input,
-    PixelMap3d *pixelMap,
-    Distribution slaves,
-    LUT *lut = nullptr,
-    float monitorDotSize=0.01)
-{
-    auto slices = createSlices<T_INPUT_COLOR>(input->length(), slaves);
-    auto splitInput = new Slicer(slices);
-    distribute<T_OUTPUT_COLOR, T_INPUT_COLOR>(hyp, slaves, splitInput, lut);
-
-    hyp->createChain(input,splitInput);
-    hyp->createChain(
-        splitInput->getSlice(slices.size()-1),
-        new ColorConverter<T_INPUT_COLOR, RGB>(),
-        new MonitorOutput(&hyp->webServer, pixelMap, nullptr, 60, monitorDotSize)
-    );
-}
-

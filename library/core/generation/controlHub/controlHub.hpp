@@ -20,6 +20,8 @@ public:
     static const uint8_t DEFAULT = 1<<0;
     static const uint8_t FLASH = 1<<1;
     static const uint8_t SEQUENCE = 1<<2;
+    static const uint8_t PREVIEW = 1<<3;
+    static const uint8_t ALL = -1;
 
     struct Slot
     {
