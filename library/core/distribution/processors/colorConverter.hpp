@@ -7,7 +7,7 @@
 // to target format. eg. from RGB to RGBW or from RGB to Monochrome.
 // ColorConverter can also apply a look up table (LUT) to adjust the color
 template <class T_SOURCE_COLOR, class T_TARGET_COLOR>
-class ColorConverter final:  public IConverter
+class ColorConverter final:  public IProcessor
 {
 private:
     LUT *lut = nullptr;

@@ -34,8 +34,6 @@ public:
 
         dmx->write(inputBuffer.data(), inputBuffer.size(), 1);
         dmx->show();
-
-        fpsCounter.increaseUsedFrameCount();
     }
 
 private:

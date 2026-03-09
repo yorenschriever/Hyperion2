@@ -1,6 +1,8 @@
 #pragma once
 #include "colors.h"
 #include "core/distribution/chain.hpp"
+#include "core/distribution/analytics/analyticsHub.hpp"
+#include "core/distribution/analytics/analyticsWebsocket.hpp"
 #include "core/distribution/inputs/controlHubInput.hpp"
 #include "core/distribution/inputs/dmxInput.hpp"
 #include "core/distribution/inputs/patternCycleInput.hpp"
@@ -117,13 +119,13 @@ public:
     chains.push_back(new Chain(input, output));
   }
 
-  virtual void createChain(ISource *input, IConverter *converter,
+  virtual void createChain(ISource *input, IProcessor *converter,
                            ISink *output)
   {
     chains.push_back(new Chain(input, converter, output));
   }
 
-  virtual void createChain(ISource *input, std::vector<IConverter *> converters,
+  virtual void createChain(ISource *input, std::vector<IProcessor *> converters,
                            ISink *output)
   {
     chains.push_back(new Chain(input, converters, output));
@@ -241,9 +243,10 @@ private:
 
     hub.subscribe(new WebsocketController(&hub, webServer));
 
-    Sequencer *sequencer = new Sequencer(&hub, webServer);
-
     webServer->addPath("/controller/palettes.css", &PaletteColumn::palettesCss);
+
+    new Sequencer(&hub, webServer);
+    new AnalyticsWebsocket(webServer);
   }
 
   virtual void setup_midi_bridge()

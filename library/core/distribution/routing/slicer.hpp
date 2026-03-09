@@ -86,7 +86,6 @@ public:
         {
             di->setFrameReady();
         }
-        fpsCounter.increaseUsedFrameCount();
     }
 
     ISource *getSlice(int index)
@@ -99,15 +98,9 @@ public:
         return destinationInputs.size();
     }
 
-    FPSCounter *getFpsCounter() override
-    {
-        return &fpsCounter;
-    }
-
 protected:
     std::vector<BufferInput *> destinationInputs;
     std::vector<Slice> slices;
     uint8_t *buffer;
     int bufferSize = 0;
-    FPSCounter fpsCounter;
 };

@@ -36,14 +36,8 @@ class Switch : public ISource
                 return;
             parent->buffer = inputBuffer;
             parent->dirty = true;
-
-            fpsCounter.increaseUsedFrameCount();
         }
 
-        FPSCounter *getFpsCounter() override
-        {
-            return &fpsCounter;
-        }
     private:
         bool active;
         Switch *parent;
@@ -51,8 +45,6 @@ class Switch : public ISource
 
         friend Switch;
         friend Fallback;
-
-        FPSCounter fpsCounter;
     };
 
 public:
@@ -106,20 +98,13 @@ public:
     {
         checkSwitchFunc();
         dirty = false;
-        fpsCounter.increaseUsedFrameCount();
         return buffer;
-    }
-
-    FPSCounter *getFpsCounter() override
-    {
-        return &fpsCounter;
     }
 protected:
     std::vector<SwitchReceiver *> inReceivers;
     SwitchFunc switchFunc;
     bool dirty = false;
     Buffer buffer = Buffer(0);
-    FPSCounter fpsCounter;
 
     void checkSwitchFunc()
     {

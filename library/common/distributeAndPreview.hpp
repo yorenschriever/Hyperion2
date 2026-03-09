@@ -29,8 +29,9 @@ void distributeAndPreview(
             monitorDotSize);
     } else {
         auto slices = createSlices<T_INPUT_COLOR>(input->length(), slaves);
-        auto splitInput = new Slicer(slices);
-        distribute<T_OUTPUT_COLOR, T_INPUT_COLOR>(hyp, slaves, splitInput, lut);
+        auto slicedInputs = new Slicer(slices);
+        hyp->createChain(input,slicedInputs);
+        distribute<T_OUTPUT_COLOR, T_INPUT_COLOR>(hyp, slaves, slicedInputs, lut);
     }
 
     auto slotPatternsValueForPreview =  slotPatternsGenerator();

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../fpsCounter.hpp"
 #include "../interfaces.hpp"
 #include <inttypes.h>
 
@@ -12,13 +11,5 @@ class BaseInput : public ISource
 {
 
 public:
-    virtual FPSCounter *getFpsCounter() override
-    {
-        return &fpsCounter;
-    }
-
     virtual void initialize() override {}
-
-protected:
-    FPSCounter fpsCounter;
 };

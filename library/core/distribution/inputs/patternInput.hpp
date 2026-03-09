@@ -34,8 +34,6 @@ public:
 
         pattern->Calculate(patternBuffer.as<T_COLOR>(), length, true, &params);
 
-        fpsCounter.increaseUsedFrameCount();
-
         return patternBuffer;
     }
 

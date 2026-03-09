@@ -43,9 +43,6 @@ public:
         int frameNumber = dmx->getFrameNumber();
         lastFrameNumber = frameNumber;
 
-        fpsCounter.increaseUsedFrameCount();
-        fpsCounter.increaseMissedFrameCount(frameNumber - lastFrameNumber - 1);
-
         auto patternBuffer = Buffer(length);
 
         memcpy(patternBuffer.data(), dmx->getDataPtr() + startChannel, length);

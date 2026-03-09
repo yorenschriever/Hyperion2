@@ -1,10 +1,9 @@
 #pragma once
-#include "fpsCounter.hpp"
 #include <inttypes.h>
 #include "buffer.hpp"
 
 // ISource and ISink are terms used within the system to form chains,
-// A chain starts with an ISource, and can optionally contain multiple converter objects,
+// A chain starts with an ISource, and can optionally contain multiple processor objects,
 // and ends with an ISink. 
 
 class ISource 
@@ -16,8 +15,6 @@ public:
     virtual bool ready() = 0;
 
     virtual const Buffer process() = 0;
-
-    virtual FPSCounter *getFpsCounter() = 0;
 };
 
 class ISink
@@ -29,11 +26,9 @@ public:
     virtual bool ready() = 0;
 
     virtual void process(const Buffer&) = 0;
-
-    virtual FPSCounter *getFpsCounter() = 0;
 };
 
-class IConverter 
+class IProcessor 
 {
 public:
     virtual void initialize() =0;

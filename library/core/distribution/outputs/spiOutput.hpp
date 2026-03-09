@@ -60,8 +60,6 @@ public:
         memcpy(this->buffer, inputBuffer.data(), length);
 
         spi->send(buffer, length);
-
-        fpsCounter.increaseUsedFrameCount();
     }
 
 

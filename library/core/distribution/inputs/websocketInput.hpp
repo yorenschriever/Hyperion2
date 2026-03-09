@@ -42,8 +42,6 @@ public:
         memcpy(instance->buffer, data, len);
         instance->dataSize = len;
         instance->frameReady = true;
-
-        instance->fpsCounter.increaseMissedFrameCount();
     }
 
     virtual bool ready() override
@@ -64,9 +62,6 @@ public:
         auto patternBuffer = Buffer(dataSize);
 
         memcpy(patternBuffer.data(), buffer, dataSize);
-
-        fpsCounter.getUsedFrameCount();
-        fpsCounter.increaseMissedFrameCount(-1);
 
         return patternBuffer;
     }

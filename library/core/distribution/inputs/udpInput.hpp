@@ -26,22 +26,13 @@ public:
 
     virtual bool ready() override
     {
-        int missedFrameCount = -1;
         do {
             int sz = sock->receive(packetBuffer, packetBufferSize);
             if (sz <= 0) break;
             bufferSize = sz;
             gotFrame = true;
-            missedFrameCount++;
         } while (1);
 
-        if (missedFrameCount >= 1) 
-        {
-            //-1 means no frame waiting, 
-            //0 means 1 frame was waiting and is used. 
-            //>= 1 means we skipped frames
-            fpsCounter.increaseMissedFrameCount(missedFrameCount);
-        }
         return gotFrame;
     }
 
@@ -50,8 +41,6 @@ public:
         if (!gotFrame)
             return Buffer(0);
         gotFrame = false;
-
-        fpsCounter.increaseUsedFrameCount();
 
         auto result = Buffer(bufferSize);
         memcpy(result.data(), packetBuffer, bufferSize);

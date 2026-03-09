@@ -68,8 +68,6 @@ public:
         memcpy(this->buffer, inputBuffer.data(), length);
 
         rmt->send(buffer, length);
-
-        fpsCounter.increaseUsedFrameCount();
     }
 
 private:

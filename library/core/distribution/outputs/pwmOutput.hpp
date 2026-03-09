@@ -49,8 +49,6 @@ public:
         }
 
         pwm->show();
-
-        fpsCounter.increaseUsedFrameCount();
     }
 
 

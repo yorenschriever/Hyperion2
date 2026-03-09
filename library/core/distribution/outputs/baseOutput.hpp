@@ -2,7 +2,6 @@
 
 #include <inttypes.h>
 #include "../interfaces.hpp"
-#include "../fpsCounter.hpp"
 
 class Hyperion;
 
@@ -13,11 +12,4 @@ class BaseOutput : public ISink
 public:
     bool ready() override = 0;
     void process(const Buffer&) override = 0;
-
-    FPSCounter *getFpsCounter() override {
-        return &fpsCounter;
-    }
-
-protected:
-    FPSCounter fpsCounter;
 };

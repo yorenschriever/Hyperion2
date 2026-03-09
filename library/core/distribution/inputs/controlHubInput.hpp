@@ -124,8 +124,6 @@ public:
             }
         }   
 
-        fpsCounter.increaseUsedFrameCount();
-        
         return renderBuffer;
     }
 

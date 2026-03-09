@@ -10,7 +10,7 @@
 #include <string>
 #include <algorithm>
 
-class RepeatFallback final:  public IConverter
+class RepeatFallback final:  public IProcessor
 {
     unsigned long lastFrameTime = 0;
     int fallbacktimeout;

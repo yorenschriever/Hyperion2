@@ -5,7 +5,7 @@
 #include "platform/includes/utils.hpp"
 #include "platform/includes/neoPixels.hpp"
 
-class Throttle final:  public IConverter
+class Throttle final:  public IProcessor
 {
 private:
     int byteTimeNs = 0;

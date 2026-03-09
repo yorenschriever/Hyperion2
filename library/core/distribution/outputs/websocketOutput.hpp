@@ -68,8 +68,6 @@ public:
         memcpy(this->buffer, inputBuffer.data(), length);
 
         server->sendAll(buffer, length);
-
-        fpsCounter.increaseUsedFrameCount();
     }
 
 protected:

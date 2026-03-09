@@ -5,17 +5,17 @@
 class Chain {
 private:
   ISource *source;
-  std::vector<IConverter *> converters;
+  std::vector<IProcessor *> converters;
   ISink *sink;
 
 public:
   Chain(ISource *source, ISink *sink) : source(source), sink(sink) {}
 
-  Chain(ISource *source, IConverter *converter, ISink *sink)
-      : source(source), converters(std::vector<IConverter *>({converter})),
+  Chain(ISource *source, IProcessor *converter, ISink *sink)
+      : source(source), converters(std::vector<IProcessor *>({converter})),
         sink(sink) {}
 
-  Chain(ISource *source, std::vector<IConverter *> converters, ISink *sink)
+  Chain(ISource *source, std::vector<IProcessor *> converters, ISink *sink)
       : source(source), converters(converters), sink(sink) {}
 
   bool ready() {

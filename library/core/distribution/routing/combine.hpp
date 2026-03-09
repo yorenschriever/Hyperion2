@@ -35,18 +35,11 @@ public:
         }
         parent->processCombined(inputBuffer, offset);
         dirty = true;
-
-        fpsCounter.increaseUsedFrameCount();
     }
 
     bool ready() override
     {
         return !dirty;
-    }
-
-    FPSCounter *getFpsCounter() override
-    {
-        return &fpsCounter;
     }
 private:
     ICombine *parent;
@@ -54,7 +47,6 @@ private:
     int length = 0;
     bool dirty = false;
     bool sync;
-    FPSCounter fpsCounter;
 };
 
 // CombinedInput reads the input from multiple sources and glues them together
@@ -75,15 +67,9 @@ public:
         return atOffset(offset-1, sync);
     }
 
-    FPSCounter *getFpsCounter() override    
-    {
-        return &fpsCounter;
-    }
-
 private:
     std::vector<CombinedInputPart *> parts;
     Buffer buffer = Buffer(0);
-    FPSCounter fpsCounter;
 
     void resizeBuffer() override
     {
@@ -100,8 +86,6 @@ private:
 
         for (auto &part : parts)
             part->dirty = false;
-
-        //todo missedframecount?
     }
 
     void initialize() override
@@ -118,7 +102,6 @@ private:
 
     const Buffer process() override
     {
-        fpsCounter.increaseUsedFrameCount();
         return buffer;
     }
 };

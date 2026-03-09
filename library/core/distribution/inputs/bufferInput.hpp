@@ -27,7 +27,6 @@ public:
     void setFrameReady()
     {
         frameReady = true;
-        fpsCounter.increaseMissedFrameCount();
     }
 
     virtual bool ready() override
@@ -51,9 +50,6 @@ public:
 
         auto dataPtr = patternBuffer.data();
         memcpy(dataPtr, buffer, length);
-
-        fpsCounter.increaseUsedFrameCount();
-        fpsCounter.increaseUsedFrameCount(-1);
 
         return patternBuffer;
     }
