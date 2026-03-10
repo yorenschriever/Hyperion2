@@ -3,6 +3,7 @@
 #include "../interfaces.hpp"
 #include "analyticsHub.hpp"
 #include "core/distribution/utils/hostnameCache.hpp"
+#include "platform/includes/socket.hpp"
 #include "platform/includes/log.hpp"
 #include "platform/includes/utils.hpp"
 #include "platform/includes/webServer.hpp"
@@ -21,24 +22,31 @@ public:
             Log::error(TAG, "Cannot construct AnalyticsWebsocket without a server");
             Utils::exit();
         }
-        this->server = WebsocketServer::createInstance(server, "/ws/analytics");
+        this->websocketServer = WebsocketServer::createInstance(server, "/ws/analytics");
+        this->udpSocket = new Socket(AnalyticsHub::analyticsUdpPort, AF_INET, 0, true);
 
         AnalyticsHub::getInstance()->addAnalyticsDestination(this);
     }
 
     void sendAnalytics(const std::vector<AnalyticsHub::Analytics> &analyticsData)
     {
-        for (auto &source : analyticsData)
-        {
-            auto ip = source.host ? HostnameCache::lookup(source.host) : nullptr;
-            std::string ipStr = ip != nullptr ? ip->toString() : "";
+        char buffer[AnalyticsHub::analyticsLineBufferSize];
 
-            char buffer[200];
-            int sz = snprintf(buffer, sizeof(buffer), "{\"name\":\"%s\",\"fps\":%d,\"numLights\":%d, \"ip\":\"%s\"}\n", source.name.c_str(), source.fps, source.lastFrameSize / (int)source.colorSize, ipStr.c_str());
-            server->sendAll(buffer, sz);
+        // send local analytics to websocket clients
+        for (auto &analytics : analyticsData)
+        {
+            int sz = AnalyticsHub::formatAnalyticsLine(buffer, sizeof(buffer), analytics, "local");
+            websocketServer->sendAll(buffer, sz);
         }
+
+        //repeat any received UDP analytics to websocket clients
+        int sz;
+        while ((sz = udpSocket->receive(buffer, sizeof(buffer))) > 0)
+            websocketServer->sendAll(buffer, sz);
     }
 
-    std::unique_ptr<WebsocketServer> server;
+private:
+    Socket *udpSocket;
+    std::unique_ptr<WebsocketServer> websocketServer;
     const char *TAG = "ANALYTICS_WEBSOCKET";
 };

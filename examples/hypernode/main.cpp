@@ -4,12 +4,15 @@
 
 const gpio_num_t STATUS_LED_PIN = GPIO_NUM_3;
 
-void initLed();
-void updateLed(Hyperion *hyp);
-
-bool isReceivingData = false;
-class AnalyticsListener : public AnalyticsHub::Destination
+class AnalyticsLed : public AnalyticsHub::Destination
 {
+    public:
+    bool isReceivingData = false;
+
+    AnalyticsLed() { 
+        AnalyticsHub::getInstance()->addAnalyticsDestination(this);
+    }
+
     void sendAnalytics(const std::vector<AnalyticsHub::Analytics> &analyticsData) override
     {
         for (auto &source : analyticsData)
@@ -24,6 +27,12 @@ class AnalyticsListener : public AnalyticsHub::Destination
     }
 };
 
+void initLed();
+void updateLed(Hyperion *hyp, AnalyticsLed *analytics);
+
+std::string analyticsName(uint16_t port){
+    return Network::getHostName() + std::string(".local:") + std::to_string(port);
+}
 
 int main()
 {
@@ -31,29 +40,42 @@ int main()
 
     auto hyp = new Hyperion();
 
-    Network::setHostName("hypernode1");
-    AnalyticsHub::getInstance()->addAnalyticsDestination(new AnalyticsListener());
-
+    const char *hostName = "hypernode1";
+    Network::setHostName(hostName);
+   
     // Neopixel pipes
     for (int i = 1; i <= 8; i++)
     {
+        auto repeatFallback = new RepeatFallback();
+        int port = 9610 + i;
         hyp->createChain(
-            new UDPInput(9610 + i),
-            new Analytics("NEOPIXEL_PORT_" + std::to_string(i)),
+            new UDPInput(port),
+            new Analytics(analyticsName(port)),
+            repeatFallback->sink);
+        hyp->createChain(repeatFallback->source,
             new NeopixelOutput(i));
     }
 
     // DMX pipe
+    auto repeatFallback = new RepeatFallback();
+    int dmxPort = 9619;
     hyp->createChain(
-        new UDPInput(9619),
-        new Analytics("DMX", 1),
+        new UDPInput(dmxPort),
+        new Analytics(analyticsName(dmxPort)),
+        repeatFallback->sink);
+    hyp->createChain(repeatFallback->source,
         new DMXOutput());
 
     hyp->start(Hyperion::minimal);
 
+    // UDP sockets can only initialize after the network is up,
+    // so we create AnalyticsLed after hyp->start().
+    auto analytics = new AnalyticsLed();
+    new AnalyticsUDP();
+
     while (1)
     {
-        updateLed(hyp);
+        updateLed(hyp, analytics);
         Thread::sleep(5);
     }
 }
@@ -65,10 +87,10 @@ void initLed()
     gpio_set_level(STATUS_LED_PIN, 0);
 }
 
-void updateLed(Hyperion *hyp)
+void updateLed(Hyperion *hyp, AnalyticsLed *analytics)
 {
     // If receiving data, flash fast
-    if (isReceivingData)
+    if (analytics->isReceivingData)
     {
         bool flashFast = Utils::millis() % 100 < 50;
         gpio_set_level(STATUS_LED_PIN, flashFast);
@@ -86,12 +108,14 @@ void updateLed(Hyperion *hyp)
     // If connected and on standby, blip every second
     if (Ethernet::isConnected())
     {
-        bool blip = Utils::millis() % 1000 < 50;
-        gpio_set_level(STATUS_LED_PIN, blip);
+        int doubleBlipMode = Utils::millis() % 1000;
+        bool doubleBlip = doubleBlipMode < 50 || (doubleBlipMode > 150 && doubleBlipMode < 200);
+        gpio_set_level(STATUS_LED_PIN, doubleBlip);
         return;
     }
 
-    // Status led is off by default
-    gpio_set_level(STATUS_LED_PIN, 0);
+    bool blip = Utils::millis() % 1000 < 50;
+    gpio_set_level(STATUS_LED_PIN, blip);
+
 }
 

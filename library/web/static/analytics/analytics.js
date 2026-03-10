@@ -1,32 +1,49 @@
 import { html, useState, createContext, useContext, useCallback, useEffect, useRef } from '../common/preact-standalone.js'
 import { useSocket } from '../common/socket.js'
-import {AnalogGauge} from './gauge.js';
+import { AnalogGauge } from './gauge.js';
+
+const stale = (lastUpdate) => Date.now() - lastUpdate > 2500;
 
 const useAnalytics = () => {
-    const [state, setState] = useState({
-        analytics: {}
-    });
+
+    // Update the analytics every second, also when no data comes in.
+    // Also we don't want to update on every message, to avoid too many re-renders.
+    // So this will the only state. The incoming dat will be stored in a ref.
+    const [time, setTime] = useState(Date.now());
+    useEffect(() => {
+        const interval = setInterval(() => setTime(Date.now()), 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const state = useRef({});
+    
     const [socketState, setSocketState] = useState(WebSocket.CLOSED);
 
     const [send] = useSocket("/ws/analytics", msg => {
-        setState(prevState => {
-            const analytics = JSON.parse(msg);
-            return {
-                ...prevState,
-                analytics: {
-                    ...prevState.analytics,
-                    [analytics.name]: analytics
-                }
-            };
-        });
-    }, setSocketState, setState);
+        msg = JSON.parse(msg);
 
-    let minFps = Object.values(state.analytics).reduce((min, analytics) => Math.min(min, analytics.fps), Infinity);   
+        const current = state.current[msg.name] || {};
+        const next = { ...current, name: msg.name };
+        if (msg.source === "local") {
+            next.numLights = msg.numLights;
+            next.localFps = msg.fps;
+            next.lastLocalUpdate = Date.now();
+        }
+        if (msg.source === "remote") {
+            next.remoteFps = msg.fps;
+            next.lastRemoteUpdate = Date.now();
+        }
+
+        state.current[msg.name] = next;
+    }, setSocketState);
+
+    const valid = Object.values(state.current).filter(analytics => !stale(analytics.lastLocalUpdate));
+    let minFps = valid.reduce((min, analytics) => Math.min(min, analytics.localFps), Infinity);
     if (minFps === Infinity) minFps = 0;
 
-    const totalLights = Object.values(state.analytics).reduce((sum, analytics) => sum + analytics.numLights, 0);
+    const totalLights = valid.reduce((sum, analytics) => sum + analytics.numLights, 0);
 
-    return { state, minFps, totalLights, socketState };
+    return { state: state.current, minFps, totalLights, socketState };
 }
 
 export const AnalyticsIcon = () => {
@@ -37,8 +54,6 @@ export const AnalyticsIcon = () => {
 
 export const AnalyticsApp = () => {
     const { state, minFps, totalLights } = useAnalytics();
-
-    const className = (ip) => ip!='' ? 'connected' : 'disconnected';
 
     return html`
         <div class="analytics">
@@ -53,18 +68,27 @@ export const AnalyticsApp = () => {
                     <th>Source</th>
                     <th>Number of Lights</th>
                     <th>FPS</th>
+                    <th>FPS remote</th>
                 </tr>
             </thead>
             <tbody>
-                ${Object.values(state.analytics).map(analytics => html`
-                    <tr class="${className(analytics.ip)}" key=${analytics.name}>
+                ${Object.values(state).map(analytics => html`
+                    <tr key=${analytics.name}>
                         <td>${analytics.name}</td>
                         <td>${analytics.numLights}</td>
-                        <td>${analytics.fps}</td>
+                        <td><${Fps} fps=${analytics.localFps} lastUpdate=${analytics.lastLocalUpdate} /></td>
+                        <td><${Fps} fps=${analytics.remoteFps} lastUpdate=${analytics.lastRemoteUpdate} /></td>
                     </tr>
                 `)}
             </tbody>
         </table>  
         </div>
     `;
+}
+
+const Fps = ({ fps, lastUpdate }) => {
+    if (stale(lastUpdate))
+         return html`<span className="fps-stale">.</span>`;
+
+    return html`${fps}`;
 }
