@@ -23,8 +23,9 @@ int main()
 
   for(int i=1;i<=8;i++){
     hyp->createChain(
-      new PatternInput(100,new RainbowPattern()),
-      new UDPOutput(target,9610+i,60)
+      new PatternInput(8*60,new RainbowPattern()),
+      new Throttle(),
+      new UDPOutput(target,9610+i,120)
     );
   }
 
