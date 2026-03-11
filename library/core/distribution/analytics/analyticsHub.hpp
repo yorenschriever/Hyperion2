@@ -60,16 +60,20 @@ public:
         return snprintf(
             buffer,
             buffersize,
-            "{\"name\":\"%s\",\"fps\":%d,\"numLights\":%d,\"source\":\"%s\"}\n",
+            "{\"name\":\"%s\",\"fps\":%d,\"numLights\":%d,\"uptime\":%d,\"source\":\"%s\"}",
             analytics.name.c_str(),
             analytics.fps,
             analytics.lastFrameSize / (int)analytics.colorSize,
+            int(Utils::millis() - AnalyticsHub::startupTime)/1000,
             source);
     }
 
 private:
+    static unsigned long startupTime;
+
     AnalyticsHub()
     {
+        startupTime = Utils::millis();
         Thread::create(analyticsTask, "AnalyticsTask", Thread::Purpose::control, 3000, this, 4);
     }
 
@@ -99,3 +103,5 @@ private:
         }
     }
 };
+
+unsigned long AnalyticsHub::startupTime=0;

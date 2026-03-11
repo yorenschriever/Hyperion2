@@ -28,10 +28,12 @@ const useAnalytics = () => {
             next.numLights = msg.numLights;
             next.localFps = msg.fps;
             next.lastLocalUpdate = Date.now();
+            next.localUptime = msg.uptime;
         }
         if (msg.source === "remote") {
             next.remoteFps = msg.fps;
             next.lastRemoteUpdate = Date.now();
+            next.remoteUptime = msg.uptime;
         }
 
         state.current[msg.name] = next;
@@ -65,10 +67,15 @@ export const AnalyticsApp = () => {
         <table>
             <thead>
                 <tr>
+                    <th colspan=3>Local</th>
+                    <th colspan=2>Remote feedback</th>
+                </tr>
+                <tr>
                     <th>Source</th>
-                    <th>Number of Lights</th>
+                    <th>Lights</th>
                     <th>FPS</th>
-                    <th>FPS remote</th>
+                    <th>FPS</th>
+                    <th>Uptime</th>
                 </tr>
             </thead>
             <tbody>
@@ -78,6 +85,7 @@ export const AnalyticsApp = () => {
                         <td>${analytics.numLights}</td>
                         <td><${Fps} fps=${analytics.localFps} lastUpdate=${analytics.lastLocalUpdate} /></td>
                         <td><${Fps} fps=${analytics.remoteFps} lastUpdate=${analytics.lastRemoteUpdate} /></td>
+                        <td>${formatUptime(analytics.remoteUptime)}</td>
                     </tr>
                 `)}
             </tbody>
@@ -91,4 +99,27 @@ const Fps = ({ fps, lastUpdate }) => {
          return html`<span className="fps-stale">.</span>`;
 
     return html`${fps}`;
+}
+
+const formatUptime = (uptime) => {
+    console.log('formatUptime', uptime);
+
+    if (!uptime) return '';
+
+    const seconds = Math.floor(uptime) % 60;
+    const remainderMinutes = Math.floor(uptime / 60);
+
+    if (remainderMinutes === 0) return `${seconds}s`;
+
+    const minutes = remainderMinutes % 60;
+    const remainderHours = Math.floor(remainderMinutes / 60);
+
+    if (remainderHours === 0) return `${minutes}m ${seconds}s`;
+
+    const hours = remainderHours % 24;
+    const days = Math.floor(remainderHours / 24);
+
+    if (days === 0) return `${hours}h ${minutes}m`;
+
+    return `${days}d ${hours}h ${minutes}m`;
 }
