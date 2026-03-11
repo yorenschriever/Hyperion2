@@ -20,7 +20,6 @@ public:
         size_t colorSize = 1;
         int lastFrameSize = 0;
         int fps = 0;
-        const char *host;
     };
 
     class Source
@@ -53,10 +52,28 @@ public:
 
     std::vector<Source *> sources;
     std::vector<Destination *> destinations;
+    static const int analyticsUdpPort = 9630;
+
+    static const int analyticsLineBufferSize = 200;
+    static int formatAnalyticsLine(char *buffer, int buffersize, const AnalyticsHub::Analytics &analytics, const char *source)
+    {
+        return snprintf(
+            buffer,
+            buffersize,
+            "{\"name\":\"%s\",\"fps\":%d,\"numLights\":%d,\"uptime\":%d,\"source\":\"%s\"}",
+            analytics.name.c_str(),
+            analytics.fps,
+            analytics.lastFrameSize / (int)analytics.colorSize,
+            int(Utils::millis() - AnalyticsHub::startupTime)/1000,
+            source);
+    }
 
 private:
+    static unsigned long startupTime;
+
     AnalyticsHub()
     {
+        startupTime = Utils::millis();
         Thread::create(analyticsTask, "AnalyticsTask", Thread::Purpose::control, 3000, this, 4);
     }
 
@@ -86,3 +103,5 @@ private:
         }
     }
 };
+
+unsigned long AnalyticsHub::startupTime=0;

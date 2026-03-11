@@ -20,14 +20,12 @@ private:
     int lastFrameSize = 0;
     volatile int frames = 0;
     std::string name;
-    const char *host;
 
 public:
-    Analytics(std::string name, size_t colorSize = sizeof(RGB), const char *host = nullptr)
+    Analytics(std::string name, size_t colorSize = sizeof(RGB))
     {
         this->name = name;
         this->colorSize = colorSize;
-        this->host = host;
     }
 
     void initialize() override
@@ -50,6 +48,6 @@ public:
         int fps = frames * 1000 / elapsedTime;
         frames = 0;
 
-        return AnalyticsHub::Analytics{name, colorSize, lastFrameSize, fps, host};
+        return AnalyticsHub::Analytics{name, colorSize, lastFrameSize, fps};
     }
 };

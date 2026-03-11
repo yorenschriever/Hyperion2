@@ -108,7 +108,7 @@ public:
                 cJSON_Delete(parsed);
                 return;
             }
-            instance->sequences.push_back({.index = Sequencer::indexCounter++, .columnIndex = columnIndex, .slotIndex = slotIndex, .enabled = true});
+            instance->sequences.push_back({.index = Sequencer::indexCounter++, .columnIndex = columnIndex, .slotIndex = slotIndex, .enabled = true, .active = {false}});
             instance->sendSequenceDetails(instance->sequences.back());
         }
         else if (type.compare("remove") == 0)
