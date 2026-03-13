@@ -39,8 +39,8 @@ const useAnalytics = () => {
         state.current[msg.name] = next;
     }, setSocketState);
 
-    const valid = Object.values(state.current).filter(analytics => !stale(analytics.lastLocalUpdate));
-    let minFps = valid.reduce((min, analytics) => Math.min(min, analytics.localFps || 0), Infinity);
+    const valid = Object.values(state.current).filter(analytics => !stale(analytics.lastLocalUpdate) && analytics.localFps > 0);
+    let minFps = valid.reduce((min, analytics) => Math.min(min, analytics.localFps), Infinity);
     if (minFps === Infinity) minFps = 0;
 
     const totalLights = valid.reduce((sum, analytics) => sum + (analytics.numLights || 0), 0);
