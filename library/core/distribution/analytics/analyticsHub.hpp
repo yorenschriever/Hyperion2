@@ -89,6 +89,8 @@ private:
             now = Utils::millis();
             int elapsed = now - lastSent;
 
+            // Log::info("ANALYTICS_HUB", "Free heap: %d", Utils::get_free_heap());
+
             auto analyticsData = std::vector<Analytics>();
             analyticsData.reserve(instance->sources.size());
             for (auto source : instance->sources)

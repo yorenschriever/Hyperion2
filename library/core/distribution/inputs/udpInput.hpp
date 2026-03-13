@@ -21,7 +21,7 @@ public:
 
     virtual void initialize() override
     {
-        sock = new Socket(this->port);
+        sock = new Socket(this->port, AF_INET, 0, false, 2 * MTU + 200);
     }
 
     virtual bool ready() override
