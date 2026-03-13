@@ -17,12 +17,14 @@ class Socket
 private:
     int addr_family = AF_INET;
     int sock = 0;
+    int rx_buffer_size; 
 
 public:
-    Socket(uint16_t port = 0, int addr_family = AF_INET, int receive_timeout=0, bool broadcast=false)
+    Socket(uint16_t port = 0, int addr_family = AF_INET, int receive_timeout=0, bool broadcast=false, int rx_buffer_size=0)
     {
         int err;
         this->addr_family = addr_family;
+        this->rx_buffer_size = rx_buffer_size;
         struct sockaddr_in6 dest_addr;
         int dest_addr_size = 0;
         ::bzero(&dest_addr, sizeof(dest_addr));
@@ -66,6 +68,12 @@ public:
             if (err != 0)
             {
                 Log::error(TAG, "unable to bind to port %d. error code %d", port, sock);
+            }
+
+            if (rx_buffer_size > 0)
+            {
+                // Sets a max buffer size (smaller than the default) to avoid filling up the memory with old frames if the processing is too slow.
+                setsockopt(sock, SOL_SOCKET, SO_RCVBUF, &rx_buffer_size, sizeof(rx_buffer_size));
             }
         }
 
