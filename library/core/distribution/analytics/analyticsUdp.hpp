@@ -28,7 +28,8 @@ public:
         for (auto &source : analyticsData)
         {
             char buffer[AnalyticsHub::analyticsLineBufferSize];
-            int sz = AnalyticsHub::formatAnalyticsLine(buffer, sizeof(buffer), source, "remote");
+            // +1 for the trailing closing null character.
+            int sz = 1+AnalyticsHub::formatAnalyticsLine(buffer, sizeof(buffer), source, "remote");
             sock->send(&broadcast, AnalyticsHub::analyticsUdpPort, (uint8_t *)buffer, sz);
         }
     }

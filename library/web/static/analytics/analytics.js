@@ -40,10 +40,10 @@ const useAnalytics = () => {
     }, setSocketState);
 
     const valid = Object.values(state.current).filter(analytics => !stale(analytics.lastLocalUpdate));
-    let minFps = valid.reduce((min, analytics) => Math.min(min, analytics.localFps), Infinity);
+    let minFps = valid.reduce((min, analytics) => Math.min(min, analytics.localFps || 0), Infinity);
     if (minFps === Infinity) minFps = 0;
 
-    const totalLights = valid.reduce((sum, analytics) => sum + analytics.numLights, 0);
+    const totalLights = valid.reduce((sum, analytics) => sum + (analytics.numLights || 0), 0);
 
     return { state: state.current, minFps, totalLights, socketState };
 }
@@ -102,8 +102,6 @@ const Fps = ({ fps, lastUpdate }) => {
 }
 
 const formatUptime = (uptime) => {
-    console.log('formatUptime', uptime);
-
     if (!uptime) return '';
 
     const seconds = Math.floor(uptime) % 60;
