@@ -42,7 +42,8 @@ void distribute(
     Hyperion *hyp,
     Distribution slaves,
     Slicer *splitInput,
-    LUT *lut = nullptr)
+    LUT *lut = nullptr,
+    NeoPixels::Timing timing = NeoPixels::Kpbs800)
 {
     auto defaultConverter = new ColorConverter<T_INPUT_COLOR, T_OUTPUT_COLOR>(lut);
 
@@ -52,7 +53,7 @@ void distribute(
             splitInput->getSlice(i),
             {
                 slaves[i].converter ? slaves[i].converter : defaultConverter,
-                new Throttle(),
+                new Throttle(timing),
                 //TODO if you provide a custom converter, the size of the output color might be different, leading to an incorrect led count in the analytics
                 new Analytics(slaves[i].host + std::string(":") + std::to_string(slaves[i].port), sizeof(T_OUTPUT_COLOR)),
             },
@@ -68,12 +69,14 @@ void distributeAndMonitor(
     T_PixelMap *pixelMap,
     Distribution slaves,
     LUT *lut = nullptr,
-    float monitorDotSize=0.01)
+    float monitorDotSize=0.01,
+    NeoPixels::Timing timing = NeoPixels::Kpbs800
+    )
 {
     auto slices = createSlices<T_INPUT_COLOR>(input->length(), slaves);
     auto splitInput = new Slicer(slices);
     hyp->createChain(input,splitInput);
-    distribute<T_OUTPUT_COLOR, T_INPUT_COLOR>(hyp, slaves, splitInput, lut);
+    distribute<T_OUTPUT_COLOR, T_INPUT_COLOR>(hyp, slaves, splitInput, lut, timing);
     hyp->createChain(
         splitInput->getSlice(slices.size()-1),
         new ColorConverter<T_INPUT_COLOR, RGB>(),
