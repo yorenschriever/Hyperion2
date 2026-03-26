@@ -1,7 +1,7 @@
 
 #pragma once
 #include "hyperion.hpp"
-// #include "mappingHelpers.hpp"
+#include "pattern-helpers.hpp"
 #include <math.h>
 #include <vector>
 

@@ -49,7 +49,7 @@ public:
         if (period == 0)
             return 0;
 
-        float phase = Tempo::GetProgress(period); 
+        float phase = 1.-Tempo::GetProgress(period); 
         int periodMs = Tempo::TimeBetweenBeats() * period;
         if (periodMs <= 0)
             return 0;

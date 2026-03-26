@@ -390,19 +390,20 @@ namespace LedPatterns
     class RibbenClivePattern : public Pattern<RGBA>
     {
         Transition transition;
-        const int segmentSize = 60;
-        int averagePeriod = 10000;
-        float precision = 1;
+        int segmentSize;
+        int averagePeriod;
+        float precision;
         LFO<T> lfo = LFO<T>();
         Permute perm;
 
     public:
-        RibbenClivePattern(int averagePeriod = 10000, float precision = 1, float pulsewidth = 0.025)
+        RibbenClivePattern(int averagePeriod = 10000, float precision = 1, float pulsewidth = 0.025, int segmentSize = 60)
         {
             this->averagePeriod = averagePeriod;
             this->precision = precision;
             this->lfo.setDutyCycle(pulsewidth);
             this->name = "Ribben clive";
+            this->segmentSize = segmentSize;
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -410,7 +411,7 @@ namespace LedPatterns
             if (!transition.Calculate(active))
                 return;
 
-            int segmentSize = 60;
+            int segmentSize = this->segmentSize;
             int numSegments = width / segmentSize;
 
             perm.setSize(numSegments);
@@ -432,10 +433,12 @@ namespace LedPatterns
         Permute perm;
         BeatWatcher watcher = BeatWatcher();
         FadeDown fade = FadeDown(2400);
+        int segmentSize;
 
     public:
-        RibbenFlashPattern()
+        RibbenFlashPattern(int segmentSize = 60)
         {
+            this->segmentSize = segmentSize;
             this->name = "Ribben flash";
         }
 
@@ -444,13 +447,11 @@ namespace LedPatterns
             if (!transition.Calculate(active))
                 return;
 
-            int segmentSize = 60;
             int numSegments = width / segmentSize;
             perm.setSize(numSegments);
 
             if (watcher.Triggered())
             {
-
                 perm.permute();
                 fade.reset();
             }
@@ -627,7 +628,7 @@ namespace LedPatterns
         }
     };
 
-class SideWave : public Pattern<RGBA>
+    class SideWave : public Pattern<RGBA>
     {
         Transition transition = Transition(
             200, Transition::none, 0,
@@ -640,6 +641,17 @@ class SideWave : public Pattern<RGBA>
         {
             this->segmentSize = segmentSize;
             this->name = "Side wave";
+        }
+
+        inline float softEdge(float dist, float size, float edgeSize = 0.03)
+        {
+            if (dist > size)
+                return 0;
+
+            if (dist < size - edgeSize)
+                return 1;
+
+            return (size - dist) / edgeSize;
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -696,6 +708,4 @@ class SideWave : public Pattern<RGBA>
         }
     };
 
-
-   
 }

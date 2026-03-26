@@ -235,4 +235,20 @@ public:
             });
         return spherical;
     }
+
+    PixelMap to2d()
+    {
+        PixelMap map2d;
+
+        transform(
+            this->begin(), 
+            this->end(), 
+            back_inserter(map2d), [](PixelPosition3d pos) -> PixelPosition{ 
+                return {
+                    .x = pos.x,
+                    .y = pos.y
+                };
+            });
+        return map2d;
+    }
 };

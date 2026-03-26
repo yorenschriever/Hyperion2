@@ -1,5 +1,6 @@
 #include "pixelMap.hpp"
 #include <math.h>
+#include <cfloat>
 
 PixelMap circleMap(int amount, float radius, float center_x=0, float center_y=0)
 {
@@ -93,4 +94,59 @@ PixelMap panelizeMap(PixelMap map, int panels_x, int panels_y, int pos_x, int po
         start_x,
         start_y
     );
+}
+
+/*
+This rescales a map to fit in a -1 to 1 box. By default it deforms the map.
+This is useful for patterns that work on best a -1 to 1 coordinate system, and your map is smaller (or bigger).
+*/
+PixelMap normalizeMap(PixelMap map, bool keepAspectRatio = false)
+{
+    float min_x = FLT_MAX;
+    float min_y = FLT_MAX;
+    float max_x = -FLT_MAX;
+    float max_y = -FLT_MAX;
+
+    for (auto pos : map)
+    {
+        if (pos.x < min_x)
+            min_x = pos.x;
+        if (pos.y < min_y)
+            min_y = pos.y;
+        if (pos.x > max_x)
+            max_x = pos.x;
+        if (pos.y > max_y)
+            max_y = pos.y;
+    }
+
+    float scale_x;
+    float scale_y;
+    float x;
+    float y;
+
+    if (keepAspectRatio)
+    {
+        float scale = 2. / std::max(max_x - min_x, max_y - min_y);
+        scale_x = scale;
+        scale_y = scale;
+
+        x = -1 - min_x * scale;
+        y = -1 - min_y * scale;
+    }
+    else
+    {
+        scale_x = 2. / (max_x - min_x);
+        scale_y = 2. / (max_y - min_y);
+
+        x = -1 - min_x * scale_x;
+        y = -1 - min_y * scale_y;
+    }
+
+    PixelMap result;
+    for (auto pos : map)
+        result.push_back({
+            pos.x  * scale_x + x,
+            pos.y  * scale_y + y
+        });
+    return result;
 }
