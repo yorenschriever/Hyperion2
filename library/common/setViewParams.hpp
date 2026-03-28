@@ -57,7 +57,7 @@ public:
                         rotateAnimated.vector[0], rotateAnimated.vector[1], rotateAnimated.vector[2]);
     }
 
-    void build(Writer write, void *userData) override
+    void build(Writer write, std::string postBody, void *userData) override
     {
         write(viewParams, size, userData);
     }

@@ -77,7 +77,7 @@ private:
 
   class PalettesCss : public WebServerResponseBuilder
   {
-    void build(WebServerResponseBuilder::Writer writer, void *userData) override
+    void build(WebServerResponseBuilder::Writer writer, std::string postBody, void *userData) override
     {
       for (auto &output : paletteColumns)
       {

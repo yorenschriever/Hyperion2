@@ -229,7 +229,8 @@ private:
 
             auto builder = paths->at(filename);
             set_content_type_from_file(req, filename);
-            builder->build(builderWriter, (void *)req);
+            std::string postBody; //not supported yet
+            builder->build(builderWriter, postBody, (void *)req);
             httpd_resp_send_chunk(req, NULL, 0);
 
             return ESP_OK;

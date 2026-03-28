@@ -16,7 +16,7 @@ class MonitorOutput final: public WebsocketOutput
     class PixelMapJson : public WebServerResponseBuilder
     {
 
-        void build(WebServerResponseBuilder::Writer writer, void *userData) override
+        void build(WebServerResponseBuilder::Writer writer, std::string postBody, void *userData) override
         {
             // Log::info("","Building mapping json. ");
             write(userData, writer, "[\n");
