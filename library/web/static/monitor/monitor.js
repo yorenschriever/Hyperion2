@@ -1,5 +1,6 @@
 import { html, useState, useEffect, useRef} from '../common/preact-standalone.js'
 import { main as initWebGLMonitor } from './webgl-monitor.js';
+import { Socket } from '../common/socket.js'
 
 export const MonitorApp = () => {
 
@@ -31,7 +32,30 @@ const Monitor = ({ scenes }) => {
     const canvasRef = useRef(null);
     useEffect(() => {
         if (!canvasRef.current) return;
-        initWebGLMonitor(scenes, canvasRef.current);
+
+        let runtimeSessionId;
+        const createPixelSource = (scenePart, setBuffer) => {
+
+            new Socket(scenePart.path, data => {
+            if (!(data instanceof ArrayBuffer)){
+                const json = JSON.parse(data)
+                if (json.type=='runtimeSessionId')
+                {
+                    const newBuildId = json.value
+                    if (!runtimeSessionId) runtimeSessionId = newBuildId;
+                    else if (runtimeSessionId != newBuildId) {
+                        delete window.scene
+                        window.onBuildIdChange?.();
+                        window.location.reload();
+                    }
+                }
+                return;
+            }
+            setBuffer(new Uint8Array(data));
+            })
+        };
+
+        initWebGLMonitor(scenes, canvasRef.current, createPixelSource);
     }, [scenes]);
 
     return html`<canvas ref=${canvasRef} width="640" height="480"></canvas>`;

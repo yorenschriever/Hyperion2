@@ -1,13 +1,10 @@
 import './gl-matrix-min.js';
-import { WebGLDebugUtils } from './webgl-debug.js';
-import { Socket } from '../common/socket.js'
+// import { WebGLDebugUtils } from './webgl-debug.js';
 import { viewParams } from './view-params.js'
-
-let runtimeSessionId;
 
 const DEBUG = false;
 
-export function main(scene, canvas) {
+export function main(scene, canvas, createPixelSource) {
   const gl = DEBUG ?
     WebGLDebugUtils.makeDebugContext(canvas.getContext("webgl2")) :
     canvas.getContext("webgl2");
@@ -118,26 +115,10 @@ export function main(scene, canvas) {
 
     const bufferIndex = startLight * 3;
 
-    new Socket(scenePart.path, data => {
-      if (!(data instanceof ArrayBuffer)){
-          const json = JSON.parse(data)
-          if (json.type=='runtimeSessionId')
-          {
-              const newBuildId = json.value
-              if (!runtimeSessionId) runtimeSessionId = newBuildId;
-              else if (runtimeSessionId != newBuildId) {
-                  delete window.scene
-                  window.onBuildIdChange?.();
-                  window.location.reload();
-              }
-          }
-          return;
-      }
-
+    createPixelSource(scenePart, data => {
       gl.bindBuffer(gl.ARRAY_BUFFER, sceneBuffers.color);
-      gl.bufferSubData(gl.ARRAY_BUFFER, bufferIndex,new Uint8Array(data));
- 
-    })
+      gl.bufferSubData(gl.ARRAY_BUFFER, bufferIndex, data);
+    });
 
     startLight += scenePart.positions.length;
   });
@@ -165,7 +146,10 @@ export function main(scene, canvas) {
   // Draw the scene repeatedly
   function render(now) {
     updateScene(gl, now * 0.001, programInfo, buffers, calcViewMatrix);
-    requestAnimationFrame(render);
+
+    // stop when the canvas is unmounted
+    if (document.body.contains(canvas))
+      requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
 }
