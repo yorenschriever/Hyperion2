@@ -18,7 +18,6 @@ struct PixelPosition
 class PixelMap: public vector<PixelPosition>  {
 
 public:
-
     struct PolarPixelPosition
     {
         float r;
@@ -47,9 +46,9 @@ public:
         return this->operator[](index).y;
     }
 
-    Polar toPolar()
+    Polar *toPolar()
     {
-        Polar polar;
+        static Polar polar;
 
         transform(
             this->begin(), 
@@ -60,13 +59,13 @@ public:
                     .th = atan2(pos.y, pos.x)
                 };
             });
-        return polar;
+        return &polar;
     }
 
     //to polar coordinates where th==0 points to the top instead of to the right
-    Polar toPolarRotate90()
+    Polar *toPolarRotate90()
     {
-        Polar polar90;
+        static Polar polar90;
 
         transform(
             this->begin(), 
@@ -77,7 +76,7 @@ public:
                     .th = atan2(pos.x, -1*pos.y)
                 };
             });
-        return polar90;
+        return &polar90;
     }
 };
 
