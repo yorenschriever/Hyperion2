@@ -1,5 +1,5 @@
 #pragma once
-#include "colors.h"
+#include "core/colors.h"
 #include "gradient.hpp"
 #include <string>
 

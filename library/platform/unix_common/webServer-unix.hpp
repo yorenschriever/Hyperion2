@@ -89,6 +89,8 @@ mime_type(beast::string_view path) //;
         return "text/plain";
     if (iequals(ext, ".js"))
         return "application/javascript";
+    if (iequals(ext, ".mjs"))
+        return "application/javascript";
     if (iequals(ext, ".json"))
         return "application/json";
     if (iequals(ext, ".xml"))
@@ -203,7 +205,8 @@ handle_request(
     {
         // Make sure we can handle the method
         if (req.method() != http::verb::get &&
-            req.method() != http::verb::head)
+            req.method() != http::verb::head && 
+            req.method() != http::verb::post)
             return bad_request("Unknown HTTP-method");
 
         // Request path must be absolute and not contain "..".
@@ -215,7 +218,7 @@ handle_request(
         auto str_target = std::string(req.target());
         if (paths->count(str_target) > 0)
         {
-            // Log::info("WebServerUnix", "path found with WebServerResponseBuilder: %s", str_target.c_str());
+            // Log::info("WebServerUnix", "path found with WebServerResponseBuilder. body: %s", req.body().c_str());
 
             try
             {
@@ -234,7 +237,7 @@ handle_request(
                 };
 
                 auto builder = paths->at(str_target);
-                builder->build(builderWriter, (void *)&res.body().data);
+                builder->build(builderWriter, req.body(), (void *)&res.body().data);
                 int body_size = res.body().data.size();
 
                 // Log::info("WEBSERVER","response = %s", res.body().data.c_str());

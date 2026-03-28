@@ -26,7 +26,7 @@ int Utils::random(int minimum, int maximum)
 
 float Utils::random_f()
 {
-    return float(rand())/RAND_MAX;
+    return float(rand())/float(RAND_MAX);
 }
 
 void Utils::random_seed()
