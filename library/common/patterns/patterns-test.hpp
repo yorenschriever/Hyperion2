@@ -112,6 +112,104 @@ class DistributionPattern : public Pattern<RGBA>
         }
     };
 
+
+
+    class OrderBarsPattern : public Pattern<RGBA>
+    {
+    public:
+        int barSize;
+        int counterSize;
+        Distribution distribution;
+        std::vector<int> sizes;
+        static const int numColors = 13;
+        RGB colors[numColors] = {
+            0xFF0000,
+            0x00FF00,
+            0x0000FF,
+            0x00FFFF,
+            0xFF00FF,
+            0xFFFF00,
+            0xFFFFFF,
+            
+            0xFF7F00,
+            0xFF007F,
+            0x7FFF00,
+            0x7F00FF,
+            0x00FF7F,
+            0x007FFF,
+        };
+        OrderBarsPattern(Distribution distribution, int barSize=60, int counterSize=4, const char *name = "Order bars")
+        {
+            this->barSize = barSize;
+            this->counterSize = counterSize;
+            this->distribution = distribution;
+            this->name = name;
+
+            std::transform(distribution.begin(), distribution.end(), std::back_inserter(sizes), 
+                [](Slave slave) -> int{ return slave.size; });
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            int globalIndex = 0;
+            for (int d=0;d<distribution.size();d++){
+                int size = distribution[d].size;
+                RGBA color = colors[d % numColors];
+
+                for (int i = 0; i < size; i++)
+                {
+                    int posInBar = i % barSize; 
+                    int barCount = i / barSize;
+
+                    int sz = counterSize*2;
+                    int indicatorSlot = barCount % sz;
+                    bool isSpacer = (posInBar % sz) >= counterSize;
+                    bool indicatorActive = (posInBar / sz <= indicatorSlot) && !isSpacer;
+
+                    if (indicatorActive)
+                        pixels[globalIndex] = color;
+                    globalIndex++;
+                }
+            }
+
+            // int numBars = width / barSize;
+            // for (int i = 0; i < numBars; i++)
+            // {
+            //     int colIndex = (i / counterSize) % numColors;
+            //     for (int j = 0; j < barSize; j++)
+            //     {
+            //         int index = i*barSize + j;
+            //         if (index > width)
+            //             break;
+            //         if (j < fadeSize)
+            //             pixels[index] = colors[colIndex] * (1. - (((float)j) / float(fadeSize)));
+            //     }
+            // }
+
+            // int start = 0;
+            // int colIndex = 0;
+            // for (auto size : sizes)
+            // {
+            //     RGBA color = colors[colIndex % numColors];
+            //     for (int i = 0; i < size; i++)
+            //     {
+            //         int index = i+start;
+            //         if (index > width)
+            //             break;
+            //         if (i % barSize < fadeSize)
+            //             pixels[index] = color * (1. - (((float)(i % barSize)) / float(fadeSize)));
+            //     }
+
+            //     start += size;
+            //     colIndex++;
+            // }
+        }
+    };
+
+
     class OneColor : public Pattern<RGBA>
     {
     public:
