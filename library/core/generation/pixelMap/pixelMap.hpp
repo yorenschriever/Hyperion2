@@ -46,10 +46,13 @@ public:
         return this->operator[](index).y;
     }
 
+    Polar polar;
     Polar *toPolar()
     {
-        static Polar polar;
+        if (polar.size() == this->size())
+            return &polar;
 
+        polar.clear();
         transform(
             this->begin(), 
             this->end(), 
@@ -63,10 +66,13 @@ public:
     }
 
     //to polar coordinates where th==0 points to the top instead of to the right
+    Polar polar90;
     Polar *toPolarRotate90()
     {
-        static Polar polar90;
+        if (polar90.size() == this->size())
+            return &polar90;
 
+        polar90.clear();
         transform(
             this->begin(), 
             this->end(), 
@@ -170,15 +176,18 @@ public:
         return this->operator[](index).z;
     }
 
-    Cylindrical toCylindricalXY(float centerX=0, float centerY=0)
+    Cylindrical cylindricalXY;
+    Cylindrical *toCylindricalXY(float centerX=0, float centerY=0)
     {
-        Cylindrical cylindricalXY;
+        if (cylindricalXY.size() == this->size())
+            return &cylindricalXY;
 
+        cylindricalXY.clear();
         transform(
             this->begin(), 
             this->end(), 
             back_inserter(cylindricalXY), [centerX,centerY](PixelPosition3d pos) -> CylindricalPixelPosition{ 
-                float x = pos.y - centerX;
+                float x = pos.x - centerX;
                 float y = pos.y - centerY;
                 return {
                     .r = sqrt(y * y + x * x),
@@ -186,14 +195,17 @@ public:
                     .z = pos.z
                 };
             });
-        return cylindricalXY;
+        return &cylindricalXY;
     }
 
     //to Cylindrical coordinates where th==0 points to the top instead of to the right
-    Cylindrical toCylindricalXZ(float centerX=0, float centerZ=0)
+    Cylindrical cylindricalXZ;
+    Cylindrical *toCylindricalXZ(float centerX=0, float centerZ=0)
     {
-        Cylindrical cylindricalXZ;
+        if (cylindricalXZ.size() == this->size())
+            return &cylindricalXZ;
 
+        cylindricalXZ.clear();
         transform(
             this->begin(), 
             this->end(), 
@@ -206,17 +218,44 @@ public:
                     .z = pos.y
                 };
             });
-        return cylindricalXZ;
+        return &cylindricalXZ;
     }
 
-    Spherical toSphericalXZ(float centerX=0, float centerY =0, float centerZ=0)
-    {
-        Spherical spherical;
 
+    Cylindrical cylindricalYZ;
+    Cylindrical *toCylindricalYZ(float centerY=0, float centerZ=0)
+    {
+        if (cylindricalYZ.size() == this->size())
+            return &cylindricalYZ;
+
+        cylindricalYZ.clear();
         transform(
             this->begin(), 
             this->end(), 
-            back_inserter(spherical), [centerX, centerY, centerZ](PixelPosition3d pos) -> SphericalPixelPosition{ 
+            back_inserter(cylindricalYZ), [centerY, centerZ](PixelPosition3d pos) -> CylindricalPixelPosition{ 
+                float y = pos.y - centerY;
+                float z = pos.z - centerZ;
+                return {
+                    .r = sqrt(z * z + y * y),
+                    .th = atan2(y, -1*z),
+                    .z = pos.x
+                };
+            });
+        return &cylindricalYZ;
+    }
+
+
+    Spherical sphericalXZ;
+    Spherical *toSphericalXZ(float centerX=0, float centerY =0, float centerZ=0)
+    {
+        if (sphericalXZ.size() == this->size())
+            return &sphericalXZ;
+
+        sphericalXZ.clear();
+        transform(
+            this->begin(), 
+            this->end(), 
+            back_inserter(sphericalXZ), [centerX, centerY, centerZ](PixelPosition3d pos) -> SphericalPixelPosition{ 
                 float x = pos.x - centerX;
                 float y = pos.y - centerY;
                 float z = pos.z - centerZ;
@@ -232,13 +271,16 @@ public:
                     .phi = phi
                 };
             });
-        return spherical;
+        return &sphericalXZ;
     }
 
-    PixelMap to2d()
+    PixelMap map2d;
+    PixelMap *to2d()
     {
-        PixelMap map2d;
+        if (map2d.size() == this->size())
+            return &map2d;
 
+        map2d.clear();
         transform(
             this->begin(), 
             this->end(), 
@@ -248,6 +290,6 @@ public:
                     .y = pos.y
                 };
             });
-        return map2d;
+        return &map2d;
     }
 };

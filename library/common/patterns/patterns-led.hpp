@@ -584,6 +584,7 @@ namespace LedPatterns
         int beatDivs[6] = {16, 8, 4, 2, 1, 1};
         int centers[48];
         int delays[48];
+        float durations[48];
         FadeDown masterFade;
 
     public:
@@ -602,8 +603,9 @@ namespace LedPatterns
                 masterFade.reset();
                 for (int i = 0; i < 48; i++)
                 {
-                    centers[i] = Utils::random(15, 45);
+                    centers[i] = Utils::random(segmentSize * 0.25, segmentSize * 0.75);
                     delays[i] = Utils::random(0, 500);
+                    durations[i] = Utils::random_f()*2+0.5;
                 }
             }
 
@@ -621,7 +623,7 @@ namespace LedPatterns
                 for (int i = 0; i < segmentSize; i++)
                 {
                     int distance = abs(centers[bar] - i);
-                    float fadeValue = fade.getValue(distance * trailSize + delays[bar] * offset);
+                    float fadeValue = fade.getValue(distance * trailSize * durations[bar] + delays[bar] * offset);
                     pixels[bar * segmentSize + i] += params->getPrimaryColor() * fadeValue * masterFade.getValue() * transition.getValue();
                 }
             }

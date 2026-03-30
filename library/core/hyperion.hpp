@@ -36,6 +36,8 @@
 #include "core/generation/controllers/midiControllerFactory.hpp"
 #include "core/generation/palettes.hpp"
 #include "core/generation/patterns/helpers/fade.h"
+#include "core/generation/patterns/helpers/triggerFade.h"
+#include "core/generation/patterns/helpers/triggerTimeline.h"
 #include "core/generation/patterns/helpers/lfo.h"
 #include "core/generation/patterns/helpers/lfoTempo.h"
 #include "core/generation/patterns/helpers/tempo/constantTempo.h"

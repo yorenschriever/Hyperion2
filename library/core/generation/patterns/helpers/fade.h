@@ -116,9 +116,16 @@ public:
         this->startingpoint = Utils::millis();
     }
 
-    bool isFinished(int maxDelay = 0)
+    // Both arguments are optional.
+    // Use maxDelay if you call getValue(startDelay). Pass the largest value you are going to pass as startDelay as maxDelay
+    // Same for maxDuration, pass the maximum value you are going to pass as durationArg in getValue.
+    // If you dont provide the getValue arguments, you can omit them here as well, it will use the internal duration and assume no startDelay.
+    bool isFinished(int maxDelay = 0, int maxDuration = -1)
     {
-        return Utils::millis() - startingpoint > duration + maxDelay;
+        if (maxDuration <= 0)
+            maxDuration = this->duration;
+
+        return Utils::millis() - startingpoint > maxDuration + maxDelay;
     }
 
     void setDuration(int duration) {

@@ -59,7 +59,7 @@ public:
         // (Not all plaforms handle modulus of negative numbers the same)
         long phaseMs = periodMs * phase;
         long correctionMs = std::ceil(deltaPhase) * periodMs;
-        phaseMs = (phaseMs + deltaPhaseMs + correctionMs) % periodMs;
+        phaseMs = Utils::mod(phaseMs + deltaPhaseMs + correctionMs, 0, periodMs);
 
         // Log::info("LFOTempo", "LFOTempo: phase: %f, phaseMs: %d, periodMs: %d, deltaPhase: %f, deltaPhaseMs: %d", phase, phaseMs, periodMs, deltaPhase, deltaPhaseMs);
 
