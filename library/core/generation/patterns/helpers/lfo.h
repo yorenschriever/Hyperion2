@@ -44,6 +44,7 @@ public:
 
     // phase value between 0-1
     float getPhase() { return getPhase(0, period); }
+    float getPhase(float deltaPhase) { return getPhase(deltaPhase, period); }
     float getPhase(float deltaPhase, int periodArg)
     {
         if (periodArg == 0)
