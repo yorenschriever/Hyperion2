@@ -64,6 +64,18 @@ PixelMap resizeAndTranslateMap(PixelMap map, float scale, float x=0, float y=0)
     return result;
 }
 
+PixelMap3d resizeAndTranslateMap3d(PixelMap3d map, float scale, float x=0, float y=0, float z=0)
+{
+    PixelMap3d result;
+    for (auto pos : map)
+        result.push_back({
+            pos.x * scale + x,
+            pos.y * scale + y,
+            pos.z * scale + z
+        });
+    return result;
+}
+
 PixelMap rotateMap(PixelMap map, float angle)
 {
     PixelMap result;

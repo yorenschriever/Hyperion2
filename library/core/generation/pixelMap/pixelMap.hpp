@@ -57,9 +57,11 @@ public:
             this->begin(), 
             this->end(), 
             back_inserter(polar), [](PixelPosition pos) -> PolarPixelPosition{ 
+                float x = pos.x;
+                float y = pos.y;
                 return {
-                    .r = sqrt(pos.y * pos.y + pos.x * pos.x),
-                    .th = atan2(pos.y, pos.x)
+                    .r = sqrt(y * y + x * x),
+                    .th = atan2(y, x)
                 };
             });
         return &polar;
@@ -77,9 +79,11 @@ public:
             this->begin(), 
             this->end(), 
             back_inserter(polar90), [](PixelPosition pos) -> PolarPixelPosition{ 
+                float x = pos.x;
+                float y = pos.y;
                 return {
-                    .r = sqrt(pos.y * pos.y + pos.x * pos.x),
-                    .th = atan2(pos.x, -1*pos.y)
+                    .r = sqrt(y * y + x * x),
+                    .th = atan2(x, -1*y)
                 };
             });
         return &polar90;
@@ -177,7 +181,7 @@ public:
     }
 
     Cylindrical cylindricalXY;
-    Cylindrical *toCylindricalXY(float centerX=0, float centerY=0)
+    Cylindrical *toCylindricalXY()
     {
         if (cylindricalXY.size() == this->size())
             return &cylindricalXY;
@@ -186,9 +190,9 @@ public:
         transform(
             this->begin(), 
             this->end(), 
-            back_inserter(cylindricalXY), [centerX,centerY](PixelPosition3d pos) -> CylindricalPixelPosition{ 
-                float x = pos.x - centerX;
-                float y = pos.y - centerY;
+            back_inserter(cylindricalXY), [](PixelPosition3d pos) -> CylindricalPixelPosition{ 
+                float x = pos.x;
+                float y = pos.y;
                 return {
                     .r = sqrt(y * y + x * x),
                     .th = atan2(y, x),
@@ -200,7 +204,7 @@ public:
 
     //to Cylindrical coordinates where th==0 points to the top instead of to the right
     Cylindrical cylindricalXZ;
-    Cylindrical *toCylindricalXZ(float centerX=0, float centerZ=0)
+    Cylindrical *toCylindricalXZ()
     {
         if (cylindricalXZ.size() == this->size())
             return &cylindricalXZ;
@@ -209,9 +213,9 @@ public:
         transform(
             this->begin(), 
             this->end(), 
-            back_inserter(cylindricalXZ), [centerX, centerZ](PixelPosition3d pos) -> CylindricalPixelPosition{ 
-                float x = pos.x - centerX;
-                float z = pos.z - centerZ;
+            back_inserter(cylindricalXZ), [](PixelPosition3d pos) -> CylindricalPixelPosition{ 
+                float x = pos.x;
+                float z = pos.z;
                 return {
                     .r = sqrt(z * z + x * x),
                     .th = atan2(x, -1*z),
@@ -223,7 +227,7 @@ public:
 
 
     Cylindrical cylindricalYZ;
-    Cylindrical *toCylindricalYZ(float centerY=0, float centerZ=0)
+    Cylindrical *toCylindricalYZ()
     {
         if (cylindricalYZ.size() == this->size())
             return &cylindricalYZ;
@@ -232,9 +236,9 @@ public:
         transform(
             this->begin(), 
             this->end(), 
-            back_inserter(cylindricalYZ), [centerY, centerZ](PixelPosition3d pos) -> CylindricalPixelPosition{ 
-                float y = pos.y - centerY;
-                float z = pos.z - centerZ;
+            back_inserter(cylindricalYZ), [](PixelPosition3d pos) -> CylindricalPixelPosition{ 
+                float y = pos.y;
+                float z = pos.z;
                 return {
                     .r = sqrt(z * z + y * y),
                     .th = atan2(y, -1*z),
@@ -246,7 +250,7 @@ public:
 
 
     Spherical sphericalXZ;
-    Spherical *toSphericalXZ(float centerX=0, float centerY =0, float centerZ=0)
+    Spherical *toSphericalXZ()
     {
         if (sphericalXZ.size() == this->size())
             return &sphericalXZ;
@@ -255,10 +259,10 @@ public:
         transform(
             this->begin(), 
             this->end(), 
-            back_inserter(sphericalXZ), [centerX, centerY, centerZ](PixelPosition3d pos) -> SphericalPixelPosition{ 
-                float x = pos.x - centerX;
-                float y = pos.y - centerY;
-                float z = pos.z - centerZ;
+            back_inserter(sphericalXZ), [](PixelPosition3d pos) -> SphericalPixelPosition{ 
+                float x = pos.x;
+                float y = pos.y;
+                float z = pos.z;
                 float r = sqrt(x * x + y * y + z * z);
                 if (r == 0) // avoid division by zero
                     return { .r = 0, .th = 0, .phi = 0 };
