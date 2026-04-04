@@ -657,9 +657,22 @@ public:
     {
         return RGBA(R, G, B, Utils::constrain(A * scale, 0, 0xFF));
     }
+
+    RGBA operator*=(float scale)
+    {
+        A = Utils::constrain(A * scale, 0, 0xFF);
+        return *this;
+    }
+
     RGBA operator/(float scale)
     {
         return RGBA(R, G, B, Utils::constrain(A / scale, 0, 0xFF));
+    }
+
+    RGBA operator/=(float scale)
+    {
+        A = Utils::constrain(A / scale, 0, 0xFF);
+        return *this;
     }
 
     uint8_t R, G, B, A;
