@@ -56,6 +56,12 @@ public:
         return result;
     }
 
+    //returns the time between the last frame and the current frame in ms.
+    unsigned int GetDelta()
+    {
+        return endInterval - startInterval;
+    }
+
     void SetDuration(int duration)
     {
         if (duration == this->duration)
