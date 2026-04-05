@@ -202,9 +202,15 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
         onmouseleave=${(event) => handlePreview(0)}
         >
         ${slot.name}
-        <button class="addSequencer" onmousedown=${handleSequencerPressed} title="Add to sequencer"></button>
+        <button class="addSequencer" onmousedown=${handleSequencerPressed} title="Add to sequencer"><${SequenceIcon}/></button>
     </div>`;
 }
+const SequenceIcon = () => html`
+    <svg style="fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+    <path xmlns="http://www.w3.org/2000/svg" d="M170.666667 213.333333 170.666667 810.666667 341.333333 810.666667 341.333333 213.333333M469.333333 213.333333 469.333333 810.666667 938.666667 512"/>
+    </svg>
+`;
+
 
 const DimFader = ({ column, columnIndex }) => {
     const sender = useContext(SendMessage);
