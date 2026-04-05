@@ -150,6 +150,7 @@ const Column = ({ column, columnIndex }) => html`
 
 const Slot = ({ slot, columnIndex, slotIndex }) => {
     const sender = useContext(SendMessage);
+    const [usePreview, setUsePreview] = useState(false);
 
     const handlePressed = () => {
         sender(`{"type":"buttonPressed", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}}`)
@@ -160,8 +161,17 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
     }
 
     const handlePreview = (status) => {
+        if (!usePreview) return;
         sender(`{"type":"preview", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}, "status": ${status}}`)
     }
+
+    useEffect(() => {
+        const listener = window.addEventListener("message", (event) => {
+                if (event.data.type !== "togglePreview") return;
+                setUsePreview(event.data.state);
+            });
+        return () => window.removeEventListener("message", listener);
+    }, [])
 
     const handleSequencerPressed = (event) => {
         event.stopPropagation();
@@ -179,6 +189,7 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
     if (slot.active & 1) className += " active";
     if (slot.active & 2) className += " active-flash";
     if (slot.active & 4) className += " active-sequence";
+    if (slot.active & 8) className += " active-preview";
 
     return html`
     <div 
@@ -191,7 +202,7 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
         onmouseleave=${(event) => handlePreview(0)}
         >
         ${slot.name}
-        <button class="addSequencer" onmousedown=${handleSequencerPressed}></button>
+        <button class="addSequencer" onmousedown=${handleSequencerPressed} title="Add to sequencer"></button>
     </div>`;
 }
 

@@ -9,6 +9,7 @@ export const Toolbar = () => {
         <${AnalyticsButton}/>
         <${WakeLockButton}/>
         <${MonitorButton}/> 
+        <${PreviewButton}/>
         <${FullscreenButton}/>
     `;
 }
@@ -54,7 +55,7 @@ const MidiBridgeButton = () => {
     let className = state ? "active" : "inactive"
     if (midiBridge.current?.error) className = "error";
 
-    return html`<a onclick=${toggleState} class=${className}><${MidiIcon}/></a>`;
+    return html`<a onclick=${toggleState} class=${className} title="MIDI Bridge"><${MidiIcon}/></a>`;
 }
 
 const WakeLockButton = () => {
@@ -99,7 +100,7 @@ const WakeLockButton = () => {
     let className = state ? "active" : "inactive"
     if (error) className = "error";
 
-    return html`<a onclick=${toggleState} class=${className}><${CoffeeIcon}/></a>`;
+    return html`<a onclick=${toggleState} class=${className} title="Wake lock"><${CoffeeIcon}/></a>`;
 }
 
 const FullscreenButton = () => {
@@ -115,7 +116,7 @@ const FullscreenButton = () => {
         }
     }
 
-    return html`<a onclick=${toggleFullScreen} class=${state ? "active" : "inactive"}><${FullscreenIcon}/></a>`;
+    return html`<a onclick=${toggleFullScreen} class=${state ? "active" : "inactive"} title="fullscreen"><${FullscreenIcon}/></a>`;
 }
 
 const MonitorButton = () => {
@@ -126,7 +127,18 @@ const MonitorButton = () => {
         setState(st => !st);
     }
 
-    return html`<a onclick=${handleMonitorToggle} class=${state ? "active" : "inactive"}><${MonitorIcon}/></a>`;
+    return html`<a onclick=${handleMonitorToggle} class=${state ? "active" : "inactive"} title="Show monitor window"><${MonitorIcon}/></a>`;
+}
+
+const PreviewButton = () => {
+    const [state, setState] = useState(false);
+
+    const handlePreviewToggle = () => { 
+        window.postMessage({type: "togglePreview", state: !state}, "*");
+        setState(st => !st);
+    }
+
+    return html`<a onclick=${handlePreviewToggle} class=${state ? "active" : "inactive"} title="Preview on mouseover"><${PreviewIcon}/></a>`;
 }
 
 const AnalyticsButton = () => {
@@ -137,7 +149,7 @@ const AnalyticsButton = () => {
         setState(st => !st);
     }
 
-    return html`<a onclick=${toggleAnalytics} class=${state ? "active" : "inactive"}>
+    return html`<a onclick=${toggleAnalytics} class=${state ? "active" : "inactive"} title="Show performance analytics">
         <${AnalyticsIcon}/>
     </a>`;
 }
@@ -165,3 +177,9 @@ const MonitorIcon = () => html`
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="2 2 20 20">
   <path fill="currentcolor" d="M6.5 21v-1.825L7.675 18H3.5c-0.4 0 -0.75 -0.15 -1.05 -0.45 -0.3 -0.3 -0.45 -0.65 -0.45 -1.05V4.5c0 -0.4 0.15 -0.75 0.45 -1.05C2.75 3.15 3.1 3 3.5 3h17c0.4 0 0.75 0.15 1.05 0.45 0.3 0.3 0.45 0.65 0.45 1.05v12c0 0.4 -0.15 0.75 -0.45 1.05 -0.3 0.3 -0.65 0.45 -1.05 0.45h-4.2l1.2 1.175V21H6.5Zm-3 -4.5h17V4.5H3.5v12Z" stroke-width="0.5"></path>
 </svg>`
+
+const PreviewIcon = () => html`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"  >
+    <path fill="currentcolor" d="M480.384 319.872c-123.712 0-224 100.288-224 224s100.288 224 224 224 224-100.288 224-224S604.096 319.872 480.384 319.872zM480.384 703.872c-88.384 0-160-71.616-160-160s71.616-160 160-160 160 71.616 160 160S568.768 703.872 480.384 703.872zM924.096 431.296c-108.352-146.496-266.944-239.104-444.032-239.104S144.448 284.8 36.096 431.296c-47.872 64.704-47.872 160.832 0 225.472 108.352 146.496 266.944 239.104 444.032 239.104s335.616-92.608 444.032-239.104C971.968 592.128 971.968 496 924.096 431.296zM875.968 603.712C775.488 748.736 630.784 832 478.976 832c-151.68 0-296.384-83.264-396.928-228.224-23.936-34.56-23.936-84.736 0-119.296 100.544-145.088 245.248-228.224 396.928-228.224 151.808 0 296.512 83.2 396.992 228.224C899.904 518.976 899.904 569.216 875.968 603.712z"  />
+</svg>
+`
