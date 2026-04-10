@@ -82,6 +82,13 @@ public:
             int slotIndex = cJSON_GetObjectItem(parsed,"slotIndex")->valueint;
             bool status = cJSON_GetObjectItem(parsed,"status")->valueint;
             instance->hub->setSlotActive(columnIndex, slotIndex, status, ControlHub::PREVIEW);
+        } else if (type.compare("previewMode") == 0)
+        {
+            int mode = cJSON_GetObjectItem(parsed,"mode")->valueint;
+            uint8_t mask = ~ControlHub::PREVIEW;
+            if (mode==1) mask = ControlHub::PREVIEW;
+            if (mode==2) mask = ControlHub::ALL;
+            instance->hub->updatePreviewActivatedMasks(mask);
         }
 
         cJSON_Delete(parsed);
@@ -165,6 +172,20 @@ public:
     }",
             paramsSlotIndex,
             name.c_str());
+    }
+
+    void OnUpdatePreviewActivatedMasks(uint8_t mask) override
+    {
+        int mode = 0;
+        if (mask == ControlHub::PREVIEW) mode = 1;
+        if (mask == ControlHub::ALL) mode = 2;
+
+        socket->sendAll(
+            "{\
+                \"type\":\"onPreviewModeChange\",\
+                \"mode\":%d\
+            }",
+            mode);
     }
 
 private:

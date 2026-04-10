@@ -78,6 +78,8 @@ export const ControllerApp = () => {
             setState(state => set(state, `paramsSet.${msg.paramsSlotIndex}.params.${msg.param}`, msg.value))
         } else if (msg.type == "onHubParamsNameChange") {
             setState(state => set(state, `paramsSet.${msg.paramsSlotIndex}.name`, msg.name))
+        } else if (msg.type == "onPreviewModeChange") {
+            setState(state => set(state, `previewMode`, msg.mode))
         } else if (msg.type == "runtimeSessionId") {
             setState(state => {
                 if (!state.runtimeSessionId)
@@ -150,7 +152,7 @@ const Column = ({ column, columnIndex }) => html`
 
 const Slot = ({ slot, columnIndex, slotIndex }) => {
     const sender = useContext(SendMessage);
-    const [usePreview, setUsePreview] = useState(false);
+    const [usePreview, setUsePreview] = useState(0);
 
     const handlePressed = () => {
         sender(`{"type":"buttonPressed", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}}`)
@@ -161,14 +163,19 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
     }
 
     const handlePreview = (status) => {
-        if (!usePreview) return;
+        if (usePreview == 0) return;
         sender(`{"type":"preview", "columnIndex":${columnIndex}, "slotIndex": ${slotIndex}, "status": ${status}}`)
+    }
+
+    const setPreviewMode = (mode) => {
+        sender(`{"type":"previewMode", "mode": ${mode}}`)
     }
 
     useEffect(() => {
         const listener = window.addEventListener("message", (event) => {
                 if (event.data.type !== "togglePreview") return;
                 setUsePreview(event.data.state);
+                setPreviewMode(event.data.state);
             });
         return () => window.removeEventListener("message", listener);
     }, [])
@@ -205,6 +212,7 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
         <button class="addSequencer" onmousedown=${handleSequencerPressed} title="Add to sequencer"><${SequenceIcon}/></button>
     </div>`;
 }
+
 const SequenceIcon = () => html`
     <svg style="fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
     <path xmlns="http://www.w3.org/2000/svg" d="M170.666667 213.333333 170.666667 810.666667 341.333333 810.666667 341.333333 213.333333M469.333333 213.333333 469.333333 810.666667 938.666667 512"/>

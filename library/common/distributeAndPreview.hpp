@@ -13,7 +13,6 @@ void distributeAndPreview(
     Distribution slaves,
     LUT *lut = nullptr,
     float monitorDotSize=0.01,
-    int activatedMask = ControlHub::ALL, //use this to show only the preview, or also the active patterns (ControlHub::ALL or ControlHub::PREVIEW)
     bool showMasterMonitor = false) //set to true is you want 2 windows: one for the monitor and one for the preview. If false, only the preview window will be shown. Use that in combination with ControlHub::ALL
 {
     auto slotPatterns = slotPatternsGenerator();
@@ -40,7 +39,8 @@ void distributeAndPreview(
         // slotPattern.paramsSlot = 1; //use a different params slot for preview, so you can preview palettes and other params (needs to have a proper ui first)
     }
     hyp->createChain(
-        (new ControlHubInput<RGBA>(pixelMap->size(), &hyp->hub, slotPatternsValueForPreview))->setActivatedMask(activatedMask),
+        (new ControlHubInput<RGBA>(pixelMap->size(), &hyp->hub, slotPatternsValueForPreview))
+            ->setIsPreview(true),
         new ColorConverter<RGBA, RGB>(),
         new MonitorOutput(&hyp->webServer,pixelMap,"Preview", 60, monitorDotSize));
 }

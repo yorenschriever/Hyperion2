@@ -37,7 +37,7 @@ int main()
     new MonitorOutput(&hyp->webServer,map,nullptr, 60, 0.1));
 
   hyp->createChain(
-    (new ControlHubInput<RGBA>(map->size(), &hyp->hub, slotPatterns))->setActivatedMask(ControlHub::PREVIEW),
+    (new ControlHubInput<RGBA>(map->size(), &hyp->hub, slotPatterns))->setIsPreview(),
     new ColorConverter<RGBA, RGB>(),
     new MonitorOutput(&hyp->webServer,map,"Preview", 60, 0.1));
 

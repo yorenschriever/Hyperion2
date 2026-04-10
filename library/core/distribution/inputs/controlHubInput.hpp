@@ -12,7 +12,7 @@
 // this class attaches a provided set of patterns to a control hub.
 // Patterns should all be the same 'Color'. You have to provide this color as template here
 template <class T_COLOR>
-class ControlHubInput final : public BaseInput
+class ControlHubInput final : public IControlHubInputBase, public BaseInput
 {
 public:
     struct SlotPattern 
@@ -64,6 +64,8 @@ private:
         }
 
         setNames();
+
+        hub->registerInput(this);
     }
 
 public:
@@ -127,10 +129,27 @@ public:
         return renderBuffer;
     }
 
-    ControlHubInput<T_COLOR>* setActivatedMask(uint8_t mask)
+    ControlHubInput<T_COLOR>* setIsPreview(bool preview = true) override
+    {
+        Log::info("CONTROL_HUB_INPUT", "setting isPreview to %d", preview);
+        this->isPreview = preview;
+        return this;
+    }
+
+    bool getIsPreview() const override
+    {
+        return this->isPreview;
+    }
+
+    ControlHubInput<T_COLOR>* setActivatedMask(uint8_t mask) override
     {
         this->activatedMask = mask;
         return this;
+    }
+
+    uint8_t getActivatedMask() const override
+    {
+        return this->activatedMask;
     }
 
 private:
@@ -142,6 +161,7 @@ private:
     // with this mask you an specify which flags you want to react to.
     // this can be useful to listen only to 'preview' slots
     uint8_t activatedMask = ~ControlHub::PREVIEW;
+    bool isPreview = false;
 
     void setNames()
     {

@@ -18,4 +18,6 @@ public:
     virtual void onHubSizeChange(int paramsSlotIndex, float size) {};
     virtual void onHubOffsetChange(int paramsSlotIndex, float offset) {};
     virtual void onHubParamsNameChange(int paramsSlotIndex, std::string name) {};
+
+    virtual void OnUpdatePreviewActivatedMasks(uint8_t mask) {};
 };

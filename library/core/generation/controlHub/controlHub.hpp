@@ -8,6 +8,14 @@
 #include <set>
 #include <vector>
 
+class IControlHubInputBase {
+public:
+    virtual IControlHubInputBase* setActivatedMask(uint8_t mask) = 0;
+    virtual uint8_t getActivatedMask() const = 0;
+    virtual IControlHubInputBase* setIsPreview(bool preview) = 0;
+    virtual bool getIsPreview() const = 0;
+};
+
 class ControlHub
 {
 
@@ -45,6 +53,7 @@ private:
     std::vector<Column> columns;
     std::vector<IHubController *> controllers;
     std::vector<Params *> paramsSet;
+    std::vector<IControlHubInputBase *> inputs;
     const char *TAG = "CONTROL_HUB";
 
 public:
@@ -286,6 +295,16 @@ public:
             controller->onHubIntensityChange(paramsSlotIndex, params->intensity);
             controller->onHubParamsNameChange(paramsSlotIndex, params->name);
         }
+
+        // send the preview state (mask of the controlhub inputs that are active in the preview)
+
+        for (auto &input : inputs)
+            if (input->getIsPreview()) {
+                uint8_t mask = input->getActivatedMask();
+                controller->OnUpdatePreviewActivatedMasks(mask);
+                break;
+            }
+        
     }
 
     void expandTo(unsigned int minColumns, unsigned int minRows, bool expandAllColumns = false)
@@ -445,4 +464,21 @@ public:
         return paramsSet[paramsSlotIndex];
     }
 
+    void registerInput(IControlHubInputBase *input)
+    {
+        inputs.push_back(input);
+    }
+
+    void updatePreviewActivatedMasks(uint8_t mask)
+    {
+        for (auto &input : inputs){
+            if (input->getIsPreview()) 
+                input->setActivatedMask(mask);
+        }
+
+        for (auto &controller : controllers){
+            controller->OnUpdatePreviewActivatedMasks(mask);
+        }
+            
+    }
 };
