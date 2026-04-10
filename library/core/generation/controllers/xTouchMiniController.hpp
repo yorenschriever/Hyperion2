@@ -18,6 +18,7 @@ private:
     const int ROTARY1_CONTROLLER_NUMBER = 1;
     const int MIDI_CHANNEL = 10;
 
+    const int paramsSlot = 0;
 public:
     XTouchMiniController(ControlHub *hub, MidiDevice *midi)
     {
@@ -27,7 +28,7 @@ public:
         hub->subscribe(this);
         midi->addMidiListener(this);
 
-        //Log::info(TAG, "constructor");
+        hub->sendCurrentStatus(this);  
     }
 
     ~XTouchMiniController(){
@@ -39,12 +40,10 @@ public:
 
     void onControllerChange(uint8_t channel, uint8_t controller, uint8_t value) override
     {
-        Log::info(TAG, "onControllerChange %d %d %d", channel, controller, value);
+        // Log::info(TAG, "onControllerChange %d %d %d", channel, controller, value);
 
         if (channel != MIDI_CHANNEL)
             return;
-
-        int paramsSlot = 0;
 
         if (controller == ROTARY1_CONTROLLER_NUMBER || controller == ROTARY1_CONTROLLER_NUMBER+10)
             return hub->setVelocity(paramsSlot,scale127toFloat(value));
@@ -61,27 +60,33 @@ public:
     }
     
     void onHubVelocityChange(int paramsSlotIndex, float velocity) override {
+        if (paramsSlotIndex != paramsSlot) return;
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER, velocity*127);
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+10, velocity*127);
 
     };
     void onHubAmountChange(int paramsSlotIndex, float amount) override {
+        if (paramsSlotIndex != paramsSlot) return;
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+1, amount*127);
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+11, amount*127);
     };
     void onHubSizeChange(int paramsSlotIndex, float size) override {
+        if (paramsSlotIndex != paramsSlot) return;
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+2, size*127);
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+12, size*127);
     };
     void onHubOffsetChange(int paramsSlotIndex, float offset) override {
+        if (paramsSlotIndex != paramsSlot) return;
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+3, offset*127);
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+13, offset*127);
     };
     void onHubVariantChange(int paramsSlotIndex, float variant) override {
+        if (paramsSlotIndex != paramsSlot) return;
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+4, variant*127);
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+14, variant*127);    
     };
     void onHubIntensityChange(int paramsSlotIndex, float intensity) override {
+        if (paramsSlotIndex != paramsSlot) return;
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+5, intensity*127);
         midi->sendControllerChange(MIDI_CHANNEL, ROTARY1_CONTROLLER_NUMBER+15, intensity*127);
     };

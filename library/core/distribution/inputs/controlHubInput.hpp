@@ -131,7 +131,6 @@ public:
 
     ControlHubInput<T_COLOR>* setIsPreview(bool preview = true) override
     {
-        Log::info("CONTROL_HUB_INPUT", "setting isPreview to %d", preview);
         this->isPreview = preview;
         return this;
     }
