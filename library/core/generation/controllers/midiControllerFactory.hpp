@@ -4,6 +4,7 @@
 #include "korgNanoKontrol2.hpp"
 #include "midiMixController.hpp"
 #include "espNowButtonController.hpp"
+#include "xTouchMiniController.hpp"
 #include "core/generation/controlHub/IHubController.hpp"
 #include "midiController.hpp"
 #include <memory>
@@ -22,6 +23,8 @@ public:
             return std::unique_ptr<MidiMixController>(new MidiMixController(hub,device));
         if (name.find("nanoKONTROL2 SLIDER/KNOB")==0)
             return std::unique_ptr<KorgNanoKontrol2controller>(new KorgNanoKontrol2controller(hub,device));
+        if (name.find("X-TOUCH MINI")==0)
+            return std::unique_ptr<XTouchMiniController>(new XTouchMiniController(hub,device));
         Log::info("MidiControllerFactory", "Midi device not recognized: %s", name.c_str());
         return nullptr;
     }
