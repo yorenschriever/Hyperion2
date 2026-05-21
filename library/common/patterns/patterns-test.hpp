@@ -309,4 +309,33 @@ class DistributionPattern : public Pattern<RGBA>
         }
     };
 
+    class Motion : public Pattern<RGBA>
+    { 
+    public:
+        int barSize;
+        int fadeSize;
+        Motion(int barSize=60, int fadeSize=10)
+        {
+            this->barSize = barSize;
+            this->fadeSize = fadeSize;
+            this->name = "Motion";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!active)
+                return;
+
+            for (int i = 0; i < width; i++)
+            {
+                int pos = barSize - 1 - (i % barSize);
+                int t = (Utils::millis()/250) % fadeSize;
+
+                if (pos == t)
+                    pixels[i] = RGBA(255,255,255,255);
+            }
+        }
+    };
+
+
 }
