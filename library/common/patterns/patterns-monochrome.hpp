@@ -342,9 +342,6 @@ namespace MonochromePatterns
         }
         inline void Calculate(Monochrome *pixels, int width, bool active, Params *params) override
         {
-            if (!active)
-                return;
-
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 

@@ -47,6 +47,8 @@
 #include "core/generation/patterns/helpers/tempo/tempo.h"
 #include "core/generation/patterns/helpers/tempo/websocketTempo.h"
 #include "core/generation/pixelMap/mapHelpers.hpp"
+#include "core/generation/pixelMap/turtle.hpp"
+#include "core/generation/pixelMap/turtle3d.hpp"
 #include "core/generation/pixelMap/pixelMap.hpp"
 #include "core/generation/pixelMap/spatialGrid.hpp"
 #include "core/generation/pixelMap/pixelMapSplitter3d.hpp"
