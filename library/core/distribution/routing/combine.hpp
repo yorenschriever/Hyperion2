@@ -55,6 +55,10 @@ class Combine final : public ISource, ICombine
     friend CombinedInputPart;
 
 public:
+    /* 
+    The combined output will only indicate to be ready when all parts that are marked as sync have new data. 
+    This avoids jitter
+    */
     CombinedInputPart *atOffset(int offset, bool sync = true)
     {
         auto part = new CombinedInputPart(this, offset, sync);
@@ -83,9 +87,6 @@ private:
     void processCombined(Buffer inputBuffer, int offset) override
     {
         memcpy((uint8_t*)buffer.data() + offset, inputBuffer.data(), inputBuffer.size());
-
-        for (auto &part : parts)
-            part->dirty = false;
     }
 
     void initialize() override
@@ -95,13 +96,16 @@ private:
     bool ready() override
     {
         for (auto &part : parts)
-            if (part->dirty)
-                return true;
-        return false;
+            if (part->sync && !part->dirty)
+                return false;
+        return true;
     }
 
     const Buffer process() override
     {
+        for (auto &part : parts)
+            part->dirty = false;
+
         return buffer;
     }
 };
