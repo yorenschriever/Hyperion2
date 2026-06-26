@@ -59,6 +59,8 @@ export function main(scene, canvas, createPixelSource) {
   const type = scene[0].type; //'2d' or '3d'
   const calcViewMatrix = type === '3d' ? calcViewMatrix3d(viewParams) : calcViewMatrix2d;
   const grid = type === '3d' ? {z:viewParams.gridZ} : undefined;
+  if (type=='2d') //in 2d all spheres are drawn in the same plane, so depth test is not needed, also it creates ugly artifacts when spheres overlap
+    gl.disable(gl.DEPTH_TEST);
 
   // Initialize a shader program; this is where all the lighting
   // for the vertices and so forth is established.
