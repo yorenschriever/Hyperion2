@@ -1,4 +1,5 @@
 #include "pixelMap.hpp"
+#include "core/distribution/utils/indexMap.hpp"
 #include <math.h>
 #include <cfloat>
 
@@ -53,27 +54,37 @@ PixelMap combineMaps(std::vector<PixelMap> maps)
     return result;
 }
 
-PixelMap resizeAndTranslateMap(PixelMap map, float scale, float x=0, float y=0)
+PixelMap resizeAndTranslateMap(PixelMap map, float scaleX, float scaleY, float x, float y)
 {
     PixelMap result;
     for (auto pos : map)
         result.push_back({
-            pos.x * scale + x,
-            pos.y * scale + y
+            pos.x * scaleX + x,
+            pos.y * scaleY + y
+        });
+    return result;
+}
+
+PixelMap resizeAndTranslateMap(PixelMap map, float scale, float x=0, float y=0)
+{
+    return resizeAndTranslateMap(map, scale, scale, x, y);
+}
+
+PixelMap3d resizeAndTranslateMap3d(PixelMap3d map, float scaleX, float scaleY, float scaleZ, float x, float y, float z)
+{
+    PixelMap3d result;
+    for (auto pos : map)
+        result.push_back({
+            pos.x * scaleX + x,
+            pos.y * scaleY + y,
+            pos.z * scaleZ + z
         });
     return result;
 }
 
 PixelMap3d resizeAndTranslateMap3d(PixelMap3d map, float scale, float x=0, float y=0, float z=0)
 {
-    PixelMap3d result;
-    for (auto pos : map)
-        result.push_back({
-            pos.x * scale + x,
-            pos.y * scale + y,
-            pos.z * scale + z
-        });
-    return result;
+    return resizeAndTranslateMap3d(map, scale, scale, scale, x, y, z);
 }
 
 PixelMap rotateMap(PixelMap map, float angle)
@@ -160,5 +171,21 @@ PixelMap normalizeMap(PixelMap map, bool keepAspectRatio = false)
             pos.x  * scale_x + x,
             pos.y  * scale_y + y
         });
+    return result;
+}
+
+PixelMap applyIndexMap(PixelMap map, IndexMap *indexMap)
+{
+    PixelMap result;
+    for (int i=0; i<map.size(); i++)
+        result.push_back(map[indexMap->map(i)]);
+    return result;
+}
+
+PixelMap3d applyIndexMap(PixelMap3d map, IndexMap *indexMap)
+{
+    PixelMap3d result;
+    for (int i=0; i<map.size(); i++)
+        result.push_back(map[indexMap->map(i)]);
     return result;
 }
