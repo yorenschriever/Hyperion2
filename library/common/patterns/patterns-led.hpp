@@ -64,6 +64,26 @@ namespace LedPatterns
         }
     };
 
+class DuoTonePattern : public Pattern<RGBA>
+    {
+        Transition transition;
+
+    public:
+        DuoTonePattern()
+        {
+            this->name = "Duo tone";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
+
+            for (int index = 0; index < width; index++)
+                pixels[index] = (index % 2 == 0 ? params->getPrimaryColor() : params->getSecondaryColor()) * transition.getValue();
+        }
+    };
+
     class GlowPattern : public Pattern<RGBA>
     {
         Permute perm;
