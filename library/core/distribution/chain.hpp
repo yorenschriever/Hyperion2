@@ -23,7 +23,7 @@ public:
       return false;
 
     for (auto &converter : converters) {
-      if (!converter->ready())
+      if (converter && !converter->ready())
         return false;
     }
 
@@ -39,7 +39,10 @@ public:
       return;
 
     for (auto &converter : converters)
+    {
+      if (!converter) continue;
       pixels = converter->process(pixels);
+    }
 
     sink->process(pixels);
   }
@@ -48,7 +51,8 @@ public:
     source->initialize();
 
     for (auto &converter : converters)
-      converter->initialize();
+      if (converter) 
+        converter->initialize();
 
     sink->initialize();
   }
