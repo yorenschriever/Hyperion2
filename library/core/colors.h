@@ -38,6 +38,7 @@ class GBR;
 class Monochrome12;
 class RGB12;
 class RGBA;
+class RGBAmber;
 class RGBWAmber;
 class RGBWAmberUV;
 class Miniwash7;
@@ -586,6 +587,7 @@ public:
     operator RGBW();
     operator GRBW();
     operator RGBWAmber();
+    operator RGBAmber();
     operator RGBWAmberUV();
 
     // overload some operators to quickly apply some blend modes
@@ -723,6 +725,46 @@ public:
 
     uint8_t R = 0, G = 0, B = 0, W = 0, A = 0; //, U;
 };
+
+class RGBAmber : Color
+{
+public:
+    RGBAmber()
+    {
+        this->R = 0;
+        this->G = 0;
+        this->B = 0;
+        this->A = 0;
+    }
+
+    RGBAmber(uint8_t R, uint8_t G, uint8_t B, uint8_t A) //, uint8_t U)
+    {
+        this->R = R;
+        this->G = G;
+        this->B = B;
+        this->A = A;
+    }
+
+    inline void ApplyLut(LUT *lut)
+    {
+        R = lut->luts[0 % lut->Dimension][R];
+        G = lut->luts[1 % lut->Dimension][G];
+        B = lut->luts[2 % lut->Dimension][B];
+        A = lut->luts[3 % lut->Dimension][A];
+        // U = lut->luts[4 % lut->Dimension][U];
+    }
+
+    inline void dim(uint8_t value)
+    {
+        R = (R * value) >> 8;
+        G = (G * value) >> 8;
+        B = (B * value) >> 8;
+        A = (A * value) >> 8;
+    }
+
+    uint8_t R = 0, G = 0, B = 0, A = 0;
+};
+
 
 class RGBWAmberUV : Color
 {
@@ -1028,6 +1070,17 @@ inline RGBA::operator GRBW()
         (R - W)* A / 255, 
         (B - W)* A / 255, 
         W * A / 255);
+}
+inline RGBA::operator RGBAmber()
+{
+    // amber = (RGB: 255, 191, 0)
+    int amberinred = R * 255 / 255;                 // value 0-255 indicating how much amber we can extract from this channel
+    int amberingreen = G * 255 / 191;               // value 0-255 indicating how much amber we can extract from this channel
+    uint8_t Amber = std::min(amberinred, amberingreen); // the most amber we can extract from the channels combined
+    R = R - Amber;
+    G = G - (Amber * 191 / 255);
+
+    return RGBAmber(R * A / 255, G * A / 255, B * A / 255, Amber * A / 255);
 }
 inline RGBA::operator RGBWAmber()
 {
