@@ -27,3 +27,19 @@ public:
         return start + segmentSize - 1 - (i % segmentSize);
     }
 };
+
+class ReverseMapper : public IndexMap
+{
+    int size;
+
+public:
+    ReverseMapper(int size)
+    {
+        this->size = size;
+    }
+
+    int map(int i) override
+    {
+        return size - 1 - i;
+    }
+};
