@@ -103,18 +103,8 @@ public:
             // apply dimming and copy to output buffer
             for (int i = 0; i < _length; i++)
             {
-                if (std::is_same<T_COLOR, RGBA>::value)
-                {
-                    //if the color space is RGBA, apply color mixing based on the alpha channel
-                    RGBA l = patternBuffer.as<RGBA>()[i];
-                    l.A = (l.A * dimValue) >> 8;
-                    patternBuffer.as<RGBA>()[i] = l;
-                }
-                else
-                {
-                    //if the color space is not RGBA, apply dimming and sum with the existing value.
-                    patternBuffer.as<T_COLOR>()[i].dim(dimValue);
-                }
+                patternBuffer.as<T_COLOR>()[i].dim(dimValue);
+
                 int index = (slotPattern.indexMap) ? slotPattern.indexMap->map(i) : i;
                 int safeLength = renderBuffer.size() / sizeof(T_COLOR);
                 if(index < 0 || index >= safeLength)

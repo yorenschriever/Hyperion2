@@ -574,9 +574,7 @@ public:
 
     inline void dim(uint8_t value)
     {
-        R = (R * value) >> 8;
-        G = (G * value) >> 8;
-        B = (B * value) >> 8;
+        A = (A * value) / 0xFF;
     }
 
     operator RGB();
@@ -618,7 +616,7 @@ public:
             return *this;
         }
         if (A == 0)
-        { // not sure about this one
+        { 
             R = other.R;
             G = other.G;
             B = other.B;
@@ -627,10 +625,10 @@ public:
         }
 
         // outA should be divided by 255, but i left it scaled up here, so i dont lose precision.
-        // this was very noticable when mixing two colors with low A
+        // this was very noticeable when mixing two colors with low A
         int outA = other.A * 255 + (this->A * (255 - other.A));
         if (outA == 0)
-        { // this is already covered by the checks above?
+        {
             this->R = 0;
             this->G = 0;
             this->B = 0;
@@ -645,15 +643,6 @@ public:
         this->A = outA / 255;
         return *this;
     }
-
-    // TODO multiply blend mode
-    //  RGBA operator* (RGBA* other){
-    //      return RGBA(
-    //          ?,
-    //          ?,
-    //          ?,
-    //          this->A);
-    //  }
 
     RGBA operator*(float scale)
     {
