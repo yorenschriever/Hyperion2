@@ -66,13 +66,15 @@ namespace LedPatterns
 
 class DuoTonePattern : public Pattern<RGBA>
     {
-        Transition transition;
+        Transition transition = Transition(700,700);
+        int groupSize;
 
     public:
-        DuoTonePattern()
+        DuoTonePattern(int groupSize = 1)
         {
+            this->groupSize = groupSize;
             this->name = "Duo tone";
-        }
+        }   
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
         {
@@ -80,7 +82,37 @@ class DuoTonePattern : public Pattern<RGBA>
                 return; // the fade out is done. we can skip calculating pattern data
 
             for (int index = 0; index < width; index++)
-                pixels[index] = (index % 2 == 0 ? params->getPrimaryColor() : params->getSecondaryColor()) * transition.getValue();
+                pixels[index] = (index % (2 * groupSize) < groupSize ? params->getPrimaryColor() : params->getSecondaryColor()) * transition.getValue();
+        }
+    };
+
+    class GradientPattern : public Pattern<RGBA>
+    {
+        Transition transition = Transition(700,700);
+        int quantize;
+        int gradientSize;
+
+    public:
+        GradientPattern(int gradientSize = 60, int quantize = 1)
+        {
+            this->quantize = quantize;
+            this->gradientSize = gradientSize;
+            this->name = "Gradient";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
+
+            for (int index = 0; index < width; index++){
+                int gradientPos = index % gradientSize;
+                int quantizedPos = (gradientPos / quantize) * quantize;
+
+                float gradientIndex = float(quantizedPos) / gradientSize;
+                
+                pixels[index] = params->getGradientf(gradientIndex) * transition.getValue();
+            }
         }
     };
 
