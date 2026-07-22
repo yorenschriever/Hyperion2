@@ -67,8 +67,8 @@ namespace MonochromePatterns
     class FastStrobePattern : public Pattern<Monochrome>
     {
         Transition transition = Transition(
-            1000, Transition::none, 0,
-            0, Transition::none, 0);
+            0, Transition::none, 0,
+            500, Transition::none, 0);
 
     public:
         FastStrobePattern()
