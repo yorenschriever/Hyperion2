@@ -348,8 +348,8 @@ function draw_grid(gridz = 0) {
   for (let j = 0; j < slices + 1; j++) {
     for (let i = 0; i < slices + 1; i++) {
       const x = -1 + 2 * i / slices
-      const y = gridz
-      const z = -1 + 2 * j / slices
+      const y = -1 + 2 * j / slices
+      const z = gridz
       grid.vertices.push(x, y, z);
     }
   }
