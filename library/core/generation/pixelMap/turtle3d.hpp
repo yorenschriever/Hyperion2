@@ -90,6 +90,16 @@ public:
         roll(rollAngle);
     }
 
+    void scale(float factor)
+    {
+        for(auto &trail : *this)
+        {
+            trail.x *= factor;
+            trail.y *= factor;
+            trail.z *= factor;
+        }
+    }
+
     float pos_x;
     float pos_y;
     float pos_z;

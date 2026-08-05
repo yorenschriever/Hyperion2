@@ -61,6 +61,15 @@ public:
 		direction = newDirection;
 	}
 
+    void scale(float factor)
+    {
+        for(auto &trail : *this)
+        {
+            trail.x *= factor;
+            trail.y *= factor;
+        }
+    }
+
 	float pos_x;
 	float pos_y;
 	float direction;
