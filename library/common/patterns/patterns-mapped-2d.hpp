@@ -395,8 +395,6 @@ namespace Mapped2dPatterns
         }
     };
 
-
-
     class RadialGlitterFadePattern : public Pattern<RGBA>
     {
         Transition transition = Transition(
@@ -475,8 +473,54 @@ namespace Mapped2dPatterns
         }
     };
 
-    
+class VerticalGradientPattern : public Pattern<RGBA>
+    {
+        PixelMap *map;
+        Transition transition;
 
+    public:
+        VerticalGradientPattern(PixelMap *map)
+        {
+            this->name = "Vertical gradient";
+            this->map = map;
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
+            {
+                RGBA color = params->getGradient((1-abs(map->y(index))) * 255);
+                RGBA dimmedColor = color * transition.getValue();
+                pixels[index] += dimmedColor;
+            }
+        }
+    };
+
+    class RadialGradientPattern : public Pattern<RGBA>
+    {
+        PixelMap::Polar *map;
+        Transition transition;
+
+    public:
+        RadialGradientPattern(PixelMap::Polar *map)
+        {
+            this->name = "Radial gradient";
+            this->map = map;
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            for (int i = 0; i < std::min(width, (int)map->size()); i++)
+                pixels[i] = params->getGradientf(map->r(i)) * transition.getValue();
+        }
+    };
+    
     class AngularFadePattern : public Pattern<RGBA>
     {
         Transition transition = Transition(

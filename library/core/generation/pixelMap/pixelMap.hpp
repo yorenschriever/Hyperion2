@@ -278,22 +278,61 @@ public:
         return &sphericalXZ;
     }
 
-    PixelMap map2d;
-    PixelMap *to2d()
+    PixelMap topView;
+    PixelMap *toTopView()
     {
-        if (map2d.size() == this->size())
-            return &map2d;
+        if (topView.size() == this->size())
+            return &topView;
 
-        map2d.clear();
+        topView.clear();
         transform(
             this->begin(), 
             this->end(), 
-            back_inserter(map2d), [](PixelPosition3d pos) -> PixelPosition{ 
+            back_inserter(topView), [](PixelPosition3d pos) -> PixelPosition{ 
                 return {
                     .x = pos.x,
                     .y = pos.y
                 };
             });
-        return &map2d;
+        return &topView;
     }
+
+    PixelMap frontView;
+    PixelMap *toFrontView()
+    {
+        if (frontView.size() == this->size())
+            return &frontView;
+
+        frontView.clear();
+        transform(
+            this->begin(), 
+            this->end(), 
+            back_inserter(frontView), [](PixelPosition3d pos) -> PixelPosition{ 
+                return {
+                    .x = pos.x,
+                    .y = pos.z
+                };
+            });
+        return &frontView;
+    }
+
+    PixelMap sideView;
+    PixelMap *toSideView()
+    {
+        if (sideView.size() == this->size())
+            return &sideView;
+
+        sideView.clear();
+        transform(
+            this->begin(), 
+            this->end(), 
+            back_inserter(sideView), [](PixelPosition3d pos) -> PixelPosition{ 
+                return {
+                    .x = pos.y,
+                    .y = pos.z
+                };
+            });
+        return &sideView;
+    }
+
 };

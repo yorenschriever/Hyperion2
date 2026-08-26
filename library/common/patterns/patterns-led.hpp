@@ -86,6 +86,28 @@ class DuoTonePattern : public Pattern<RGBA>
         }
     };
 
+    class DuoToneGradientPattern : public Pattern<RGBA>
+    {
+        Transition transition = Transition(700,700);
+        int groupSize;
+
+    public:
+        DuoToneGradientPattern(int groupSize = 1)
+        {
+            this->groupSize = groupSize;
+            this->name = "Duo tone gradient";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return; // the fade out is done. we can skip calculating pattern data
+
+            for (int index = 0; index < width; index++)
+                pixels[index] = (index % (2 * groupSize) < groupSize ? params->getGradientf(0.25) : params->getGradientf(0.75)) * transition.getValue();
+        }
+    };
+
     class GradientPattern : public Pattern<RGBA>
     {
         Transition transition = Transition(700,700);
@@ -759,6 +781,47 @@ class DuoTonePattern : public Pattern<RGBA>
                 float phase = ((float)i / width) * amount;
                 pixels[i] = params->getSecondaryColor() * lfo.getValue(phase) * transition.getValue();
             }
+        }
+    };
+
+
+
+    class BeatShakePattern : public Pattern<RGBA>
+    {
+        BeatWatcher watcher = BeatWatcher();
+        FadeDown fader = FadeDown(300, WaitAtEnd);
+        Permute perm = Permute(0);
+        int segmentSize;
+
+    public:
+        BeatShakePattern(int segmentSize = 60)
+        {
+            this->name = "Beat shake";
+            this->segmentSize = segmentSize;
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            int numSegments = ceil((float)width / segmentSize);
+            float spread = params->getVelocity(500. / numSegments, 0);
+
+            if (!active && fader.isFinished(numSegments * spread))
+            {
+                watcher.Triggered();
+                return;
+            }
+
+            perm.setSize(numSegments);
+            fader.setDuration(params->getSize(100, 400));
+
+            if (active && watcher.Triggered())
+            {
+                perm.permute();
+                fader.reset();
+            }
+
+            for (int index = 0; index < width; index++)
+                pixels[index] = params->getPrimaryColor() * fader.getValue(perm.at[index / segmentSize] * spread);
         }
     };
 
