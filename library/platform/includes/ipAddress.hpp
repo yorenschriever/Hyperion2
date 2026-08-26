@@ -66,7 +66,7 @@ public:
         errcode = getaddrinfo(hostname, NULL, &hints, &addressInfo);
         if (errcode != 0)
         {
-            Log::error("IPADDRESS", "error resolving hostname %s", hostname);
+            // Log::error("IPADDRESS", "error resolving hostname %s", hostname);
             return IPAddress(NULL, NULL);
         }
 
