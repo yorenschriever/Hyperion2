@@ -189,3 +189,71 @@ PixelMap3d applyIndexMap(PixelMap3d map, IndexMap *indexMap)
         result.push_back(map[indexMap->map(i)]);
     return result;
 }
+
+PixelMap3d circleMap3d(int amount, float radius, float center_x=0, float center_y=0, float center_z=0)
+{
+    PixelMap3d map;
+    for (int i=0; i<amount; i++)
+    {
+        map.push_back({
+            .x = float(center_x + radius * cos(float(i) / amount * 2 * M_PI)),
+            .y = float(center_y + radius * sin(float(i) / amount * 2 * M_PI)),
+            .z = center_z
+        });
+    }
+    return map;
+}
+
+PixelMap3d make3d(PixelMap map, float z)
+{
+    PixelMap3d result;
+    for (auto pos : map)
+        result.push_back({
+            pos.x,
+            pos.y,
+            z
+        });
+    return result;
+}
+
+PixelMap3d rotate3d(PixelMap3d map, float amount, float normal[3])
+{
+    PixelMap3d result;
+
+    const float angle = amount / 180.0f * M_PI;
+    const float nx = normal[0];
+    const float ny = normal[1];
+    const float nz = normal[2];
+    const float length = std::sqrt(nx * nx + ny * ny + nz * nz);
+
+    if (length == 0.0f)
+    {
+        return map;
+    }
+
+    const float ux = nx / length;
+    const float uy = ny / length;
+    const float uz = nz / length;
+    const float cosA = std::cos(angle);
+    const float sinA = std::sin(angle);
+
+    for (auto pos : map)
+    {
+        const float x = pos.x;
+        const float y = pos.y;
+        const float z = pos.z;
+
+        const float dot = ux * x + uy * y + uz * z;
+        const float cross_x = uy * z - uz * y;
+        const float cross_y = uz * x - ux * z;
+        const float cross_z = ux * y - uy * x;
+
+        result.push_back({
+            x * cosA + cross_x * sinA + ux * dot * (1.0f - cosA),
+            y * cosA + cross_y * sinA + uy * dot * (1.0f - cosA),
+            z * cosA + cross_z * sinA + uz * dot * (1.0f - cosA)
+        });
+    }
+
+    return result;
+}

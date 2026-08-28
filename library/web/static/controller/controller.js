@@ -187,9 +187,9 @@ const Slot = ({ slot, columnIndex, slotIndex }) => {
             columnIndex,
             slotIndex
         }, "*");
-        window.setTimeout(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 100);
+        // window.setTimeout(() => {
+        //     window.scrollTo({ top: 0, behavior: 'smooth' });
+        // }, 100);
     }
 
     let className = "slot";

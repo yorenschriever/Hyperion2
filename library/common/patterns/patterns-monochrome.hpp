@@ -125,7 +125,7 @@ namespace MonochromePatterns
             framecounter--;
 
             Monochrome color = 0;
-            if (framecounter <= 1)
+            if (framecounter < 1)
                 color = 255;
 
             if (framecounter == 0)
