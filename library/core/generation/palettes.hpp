@@ -577,3 +577,45 @@ Palette scarletPromise{
     .secondary = RGB(217, 121, 37),
     .highlight = RGB(255, 235, 180),
     .name = "ScarletPromise"};
+
+
+Palette regalia{
+    .gradient = Gradient({
+        {.position = 0, .color = RGB(20, 0, 30)},
+        {.position = 45, .color = RGB(100, 20, 150)},
+        {.position = 120, .color = RGB(180, 80, 220)},
+        {.position = 180, .color = RGB(220, 150, 50)},
+        {.position = 255, .color = RGB(255, 215, 0)}
+    }),
+    .primary = RGB(218, 165, 32),
+    .secondary = RGB(147, 51, 234),
+    .highlight = RGB(255, 255, 200),
+    .name = "Regalia"};
+
+
+Palette aurelion{
+    .gradient = Gradient({
+        {.position = 0, .color = RGB(20, 10, 40)},
+        {.position = 45, .color = RGB(75, 0, 130)},
+        {.position = 120, .color = RGB(138, 43, 226)},
+        {.position = 180, .color = RGB(200, 100, 255)},
+        {.position = 220, .color = RGB(255, 180, 0)},
+        {.position = 255, .color = RGB(255, 215, 0)}
+    }),
+    .primary = RGB(218, 165, 32),
+    .secondary = RGB(138, 43, 226),
+    .highlight = RGB(255, 255, 200),
+    .name = "Aurelion"};
+
+Palette regal_alchemy{
+    .gradient = Gradient({
+        {.position = 0, .color = RGB(25, 0, 51)},
+        {.position = 45, .color = RGB(138, 43, 226)},
+        {.position = 120, .color = RGB(218, 112, 214)},
+        {.position = 200, .color = RGB(255, 215, 0)},
+        {.position = 255, .color = RGB(255, 240, 45)}
+    }),
+    .primary = RGB(218, 165, 32),
+    .secondary = RGB(186, 85, 211),
+    .highlight = RGB(255, 255, 200),
+    .name = "Regal Alchemy"};
