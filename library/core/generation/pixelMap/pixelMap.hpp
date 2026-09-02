@@ -24,6 +24,12 @@ public:
         float th;
     };
 
+    PixelMap(const PixelMap& other)
+    {
+        //copy the elements, but not the derived structures like polar or polar90
+        this->assign(other.begin(), other.end());
+    }
+
     class Polar: public vector<PolarPixelPosition>
     {
         public:
@@ -116,6 +122,12 @@ public:
         float th; //angle from top
         float phi; //angle from x-axis in xy-plane
     };
+
+    PixelMap3d(const PixelMap3d& other)
+    {
+        //copy the elements, but not the derived structures like cylindricalXY or spherical
+        this->assign(other.begin(), other.end());
+    }
 
     class Cylindrical: public vector<CylindricalPixelPosition>
     {

@@ -95,8 +95,6 @@ namespace MaskPatterns
         }
     };
 
-
-
     class SideChainCompressorMask : public Pattern<RGBA>
     {
         FadeDown fade = FadeDown(500,WaitAtEnd);
@@ -125,7 +123,6 @@ namespace MaskPatterns
                 pixels[index] = color;
         }
     };
-
 
     class SegmentGlitchMaskPattern : public Pattern<RGBA>
     {

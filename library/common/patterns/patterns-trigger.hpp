@@ -136,14 +136,16 @@ namespace TriggerPatterns
         PixelMap *map;
         bool lastActive;
         int velocity;
+        int direction;
 
     public:
-        LineLaunch(PixelMap *map, int velocity = 100, int length = 20)
+        LineLaunch(PixelMap *map, int velocity = 100, int length = 20, int direction = 1)
         {
             this->map = map;
             this->name = "Line launch";
             this->fade.setDuration(length);
             this->velocity = velocity;
+            this->direction = direction;
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -153,7 +155,7 @@ namespace TriggerPatterns
 
             for (int i = 0; i < width; i++)
             {
-                float fadePosition = fade.getValue((1 + map->y(i)) * velocity);
+                float fadePosition = fade.getValue((1 + direction*map->y(i)) * velocity );
                 RGBA color = params->getSecondaryColor();
                 pixels[i] = color * fadePosition;
             }
