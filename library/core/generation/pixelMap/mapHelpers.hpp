@@ -2,8 +2,9 @@
 #include "core/distribution/utils/indexMap.hpp"
 #include <math.h>
 #include <cfloat>
+#include <memory>
 
-PixelMap circleMap(int amount, float radius, float center_x=0, float center_y=0)
+PixelMapPtr circleMap(int amount, float radius, float center_x=0, float center_y=0)
 {
     PixelMap map;
     for (int i=0; i<amount; i++)
@@ -13,11 +14,10 @@ PixelMap circleMap(int amount, float radius, float center_x=0, float center_y=0)
             .y = float(center_y + radius * sin(float(i) / amount * 2 * M_PI))
         });
     }
-    // map.push_back({0,0});
-    return map;
+    return std::make_shared<PixelMap>(map);
 }
 
-PixelMap gridMap(int amount_hor, int amount_ver, float distance_x=0, float distance_y=0, float center_x=0, float center_y=0)
+PixelMapPtr gridMap(int amount_hor, int amount_ver, float distance_x=0, float distance_y=0, float center_x=0, float center_y=0)
 {
     PixelMap map;
 
@@ -43,64 +43,64 @@ PixelMap gridMap(int amount_hor, int amount_ver, float distance_x=0, float dista
             });
         }
     }
-    return map;
+    return std::make_shared<PixelMap>(map);
 }
 
-PixelMap combineMaps(std::vector<PixelMap> maps)
+PixelMapPtr combineMaps(std::vector<PixelMapPtr> maps)
 {
     PixelMap result;
     for (auto map : maps)
-        result.insert(result.end(), map.begin(), map.end());
-    return result;
+        result.insert(result.end(), map->begin(), map->end());
+    return std::make_shared<PixelMap>(result);
 }
 
-PixelMap resizeAndTranslateMap(PixelMap map, float scaleX, float scaleY, float x, float y)
+PixelMapPtr resizeAndTranslateMap(PixelMapPtr map, float scaleX, float scaleY, float x, float y)
 {
     PixelMap result;
-    for (auto pos : map)
+    for (auto pos : *map)
         result.push_back({
             pos.x * scaleX + x,
             pos.y * scaleY + y
         });
-    return result;
+    return std::make_shared<PixelMap>(result);
 }
 
-PixelMap resizeAndTranslateMap(PixelMap map, float scale, float x=0, float y=0)
+PixelMapPtr resizeAndTranslateMap(PixelMapPtr map, float scale, float x=0, float y=0)
 {
     return resizeAndTranslateMap(map, scale, scale, x, y);
 }
 
-PixelMap3d resizeAndTranslateMap3d(PixelMap3d map, float scaleX, float scaleY, float scaleZ, float x, float y, float z)
+PixelMap3dPtr resizeAndTranslateMap3d(PixelMap3dPtr map, float scaleX, float scaleY, float scaleZ, float x, float y, float z)
 {
     PixelMap3d result;
-    for (auto pos : map)
+    for (auto pos : *map)
         result.push_back({
             pos.x * scaleX + x,
             pos.y * scaleY + y,
             pos.z * scaleZ + z
         });
-    return result;
+    return std::make_shared<PixelMap3d>(result);
 }
 
-PixelMap3d resizeAndTranslateMap3d(PixelMap3d map, float scale, float x=0, float y=0, float z=0)
+PixelMap3dPtr resizeAndTranslateMap3d(PixelMap3dPtr map, float scale, float x=0, float y=0, float z=0)
 {
     return resizeAndTranslateMap3d(map, scale, scale, scale, x, y, z);
 }
 
-PixelMap rotateMap(PixelMap map, float angle)
+PixelMapPtr rotateMap(PixelMapPtr map, float angle)
 {
     PixelMap result;
     angle = angle / 180 * M_PI;
-    for (auto pos : map)
+    for (auto pos : *map)
     {
         float x = pos.x * cos(angle) - pos.y * sin(angle);
         float y = pos.x * sin(angle) + pos.y * cos(angle);
         result.push_back({x, y});
     }
-    return result;
+    return std::make_shared<PixelMap>(result);
 }
 
-PixelMap panelizeMap(PixelMap map, int panels_x, int panels_y, int pos_x, int pos_y)
+PixelMapPtr panelizeMap(PixelMapPtr map, int panels_x, int panels_y, int pos_x, int pos_y)
 {
     float scale = 1. / std::max(panels_x, panels_y);
     // float start_x  = (((panels_x-1) + pos_x) * scale );
@@ -123,14 +123,14 @@ PixelMap panelizeMap(PixelMap map, int panels_x, int panels_y, int pos_x, int po
 This rescales a map to fit in a -1 to 1 box. By default it deforms the map.
 This is useful for patterns that work on best a -1 to 1 coordinate system, and your map is smaller (or bigger).
 */
-PixelMap normalizeMap(PixelMap map, bool keepAspectRatio = false)
+PixelMapPtr normalizeMap(PixelMapPtr map, bool keepAspectRatio = false)
 {
     float min_x = FLT_MAX;
     float min_y = FLT_MAX;
     float max_x = -FLT_MAX;
     float max_y = -FLT_MAX;
 
-    for (auto pos : map)
+    for (auto pos : *map)
     {
         if (pos.x < min_x)
             min_x = pos.x;
@@ -166,31 +166,31 @@ PixelMap normalizeMap(PixelMap map, bool keepAspectRatio = false)
     }
 
     PixelMap result;
-    for (auto pos : map)
+    for (auto pos : *map)
         result.push_back({
             pos.x  * scale_x + x,
             pos.y  * scale_y + y
         });
-    return result;
+    return std::make_shared<PixelMap>(result);
 }
 
-PixelMap applyIndexMap(PixelMap map, IndexMap *indexMap)
+PixelMapPtr applyIndexMap(PixelMapPtr map, IndexMap *indexMap)
 {
     PixelMap result;
-    for (int i=0; i<map.size(); i++)
-        result.push_back(map[indexMap->map(i)]);
-    return result;
+    for (int i=0; i<map->size(); i++)
+        result.push_back((*map)[indexMap->map(i)]);
+    return std::make_shared<PixelMap>(result);
 }
 
-PixelMap3d applyIndexMap(PixelMap3d map, IndexMap *indexMap)
+PixelMap3dPtr applyIndexMap(PixelMap3dPtr map, IndexMap *indexMap)
 {
     PixelMap3d result;
-    for (int i=0; i<map.size(); i++)
-        result.push_back(map[indexMap->map(i)]);
-    return result;
+    for (int i=0; i<map->size(); i++)
+        result.push_back((*map)[indexMap->map(i)]);
+    return std::make_shared<PixelMap3d>(result);
 }
 
-PixelMap3d circleMap3d(int amount, float radius, float center_x=0, float center_y=0, float center_z=0)
+PixelMap3dPtr circleMap3d(int amount, float radius, float center_x=0, float center_y=0, float center_z=0)
 {
     PixelMap3d map;
     for (int i=0; i<amount; i++)
@@ -201,22 +201,22 @@ PixelMap3d circleMap3d(int amount, float radius, float center_x=0, float center_
             .z = center_z
         });
     }
-    return map;
+    return std::make_shared<PixelMap3d>(map);
 }
 
-PixelMap3d make3d(PixelMap map, float z)
+PixelMap3dPtr make3d(PixelMapPtr map, float z)
 {
     PixelMap3d result;
-    for (auto pos : map)
+    for (auto pos : *map)
         result.push_back({
             pos.x,
             pos.y,
             z
         });
-    return result;
+    return std::make_shared<PixelMap3d>(result);
 }
 
-PixelMap3d rotate3d(PixelMap3d map, float amount, float normal[3])
+PixelMap3dPtr rotate3d(PixelMap3dPtr map, float amount, float normal[3])
 {
     PixelMap3d result;
 
@@ -237,7 +237,7 @@ PixelMap3d rotate3d(PixelMap3d map, float amount, float normal[3])
     const float cosA = std::cos(angle);
     const float sinA = std::sin(angle);
 
-    for (auto pos : map)
+    for (auto pos : *map)
     {
         const float x = pos.x;
         const float y = pos.y;
@@ -255,5 +255,5 @@ PixelMap3d rotate3d(PixelMap3d map, float amount, float normal[3])
         });
     }
 
-    return result;
+    return std::make_shared<PixelMap3d>(result);
 }

@@ -51,15 +51,15 @@ int main()
   // the rest of the code is a simple controller, so you can see that you device actually connects to something.
   hyp->createChain(
       new ControlHubInput<RGBA>(
-          ledsterMap.size(),
+          ledsterMap->size(),
           &hyp->hub,
           0,
           {
-              new Mapped::ConcentricWavePattern<SinFast>(&ledsterMap),
-              new Mapped::HorizontalGradientPattern(&ledsterMap),
+              new Mapped::ConcentricWavePattern<SinFast>(ledsterMap),
+              new Mapped::HorizontalGradientPattern(ledsterMap),
           }),
       new ColorConverter<RGBA, RGB>(),
-      new MonitorOutput(&hyp->webServer, &ledsterMap)
+      new MonitorOutput(&hyp->webServer, ledsterMap)
   );
 
   hyp->start();

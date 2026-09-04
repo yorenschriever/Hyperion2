@@ -1,41 +1,41 @@
-#pragma once
+// #pragma once
 
-#include <algorithm>
-#include <cstring>
-#include <vector>
-#include "pixelMap.hpp"
+// #include <algorithm>
+// #include <cstring>
+// #include <vector>
+// #include "pixelMap.hpp"
 
-class PixelMapSplitter
-{
-public:
-    PixelMapSplitter(PixelMap *sourceMap, std::vector<int> lengths)
-    {
-        this->sourceMap = sourceMap;
+// class PixelMapSplitter
+// {
+// public:
+//     PixelMapSplitter(PixelMapPtrsourceMap, std::vector<int> lengths)
+//     {
+//         this->sourceMap = sourceMap;
 
-        auto start = sourceMap->begin();
-        for (int length : lengths)
-        {
+//         auto start = sourceMap->begin();
+//         for (int length : lengths)
+//         {
 
-            PixelMap map(length);
-            copy(start, start+length, map.begin());
-            destinationMaps.push_back(map);
+//             PixelMap map(length);
+//             copy(start, start+length, map.begin());
+//             destinationMaps.push_back(map);
 
-            start += length;
-        }
-    }
+//             start += length;
+//         }
+//     }
 
-    PixelMap *getMap(int index)
-    {
-        return &(destinationMaps[index]);
-    }
+//     PixelMapPtrgetMap(int index)
+//     {
+//         return &(destinationMaps[index]);
+//     }
 
-    int size()
-    {
-        return destinationMaps.size();
-    }
+//     int size()
+//     {
+//         return destinationMaps.size();
+//     }
 
-private:
-    PixelMap *sourceMap = NULL;
-    std::vector<PixelMap> destinationMaps;
+// private:
+//     PixelMapPtrsourceMap = NULL;
+//     std::vector<PixelMap> destinationMaps;
 
-};
+// };

@@ -2,7 +2,7 @@
 #include "hyperion.hpp"
 
 template <class T_DMX_COLOR = Monochrome, class T_INPUT_COLOR = Monochrome>
-void DMXAndMonitor(Hyperion *hyp, ControlHubInput<T_INPUT_COLOR> *input, int size, Combine *dmxCombine, int startChannel, PixelMap *pixelMap, float monitorDotSize = 0.01, LUT *lut = nullptr)
+void DMXAndMonitor(Hyperion *hyp, ControlHubInput<T_INPUT_COLOR> *input, int size, Combine *dmxCombine, int startChannel, PixelMapPtr pixelMap, float monitorDotSize = 0.01, LUT *lut = nullptr)
 {
     auto clone = new Slicer(
         {

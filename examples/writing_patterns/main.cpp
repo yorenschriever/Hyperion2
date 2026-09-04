@@ -1,5 +1,4 @@
 #include "hyperion.hpp"
-#include "mapping/haloMap.hpp"
 #include "patterns.hpp"
 
 // forward declarations. This lets us call the functions before we defined them.
@@ -61,8 +60,10 @@ void addHaloChain(Hyperion *hyp)
     // in your pattern library in the same color space makes it easy to re-use them.
     // The monitor needs data in RGB format, so we use a ConvertPipe to do the conversion.
 
+    auto haloMap = circleMap(100, 0.8);
+
     auto input = new ControlHubInput<RGBA>(
-        haloMap.size(), //The number of leds it is going to ask the patterns to generate color data for. 
+        haloMap->size(), //The number of leds it is going to ask the patterns to generate color data for. 
         &hyp->hub, //The control hub to connect to
         {
             {.column = 1, .slot = 0, .pattern = new ExamplePatterns::HelloWorld()},
@@ -86,17 +87,17 @@ void addHaloChain(Hyperion *hyp)
             {.column = 5, .slot = 1, .pattern = new ExamplePatterns::LFOGlow()},
             {.column = 5, .slot = 2, .pattern = new ExamplePatterns::FadeChase()},
 
-            {.column = 6, .slot = 0, .pattern = new ExamplePatterns::MappedPattern(&haloMap)},
+            {.column = 6, .slot = 0, .pattern = new ExamplePatterns::MappedPattern(haloMap)},
 
             {.column = 7, .slot = 0, .pattern = new ExamplePatterns::TransitionPattern()},
             {.column = 7, .slot = 1, .pattern = new ExamplePatterns::SpatialTransitionPattern()},
-            {.column = 7, .slot = 2, .pattern = new ExamplePatterns::MappedSpatialTransitionPattern(&haloMap)},
+            {.column = 7, .slot = 2, .pattern = new ExamplePatterns::MappedSpatialTransitionPattern(haloMap)},
         });
 
     hyp->createChain(
         input,
         new ColorConverter<RGBA, RGB>(),
-        new MonitorOutput(&hyp->webServer, &haloMap));
+        new MonitorOutput(&hyp->webServer, haloMap));
 }
 
 void addPaletteColumn(Hyperion *hyp)

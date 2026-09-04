@@ -25,7 +25,7 @@ class BeerBubblesPattern : public Pattern<RGBA>
     };
 
     Bubble bubbles[MAX_BUBBLES];
-    PixelMap *map;
+    PixelMapPtr map;
     Transition transition = Transition(500, 1500);
     Timeline time;
     SpatialGrid grid;
@@ -43,7 +43,7 @@ class BeerBubblesPattern : public Pattern<RGBA>
     }
 
 public:
-    BeerBubblesPattern(PixelMap *map)
+    BeerBubblesPattern(PixelMapPtr map)
     {
         this->name = "Beer bubbles";
         this->map = map;

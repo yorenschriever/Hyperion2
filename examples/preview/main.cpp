@@ -30,7 +30,7 @@ int main()
     {.column = 0, .slot = 2, .pattern = new ColorPattern(RGBA(0, 0, 255, 255), "Blue")},
   };
 
-  auto map = new PixelMap(circleMap(20, 0.8));
+  auto map = circleMap(20, 0.8);
   hyp->createChain(
     new ControlHubInput<RGBA>(map->size(), &hyp->hub, slotPatterns),
     new ColorConverter<RGBA, RGB>(),

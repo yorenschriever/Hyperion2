@@ -8,14 +8,14 @@ int main()
 
   hyp->createChain(
     new ControlHubInput<RGBA>(
-          ledsterMap.size(),
+          ledsterMap->size(),
           &hyp->hub,
           {
-            {.column = 0, .slot = 0, .pattern = new Mapped::ConcentricWavePattern<SinFast>(&ledsterMap)},
-            {.column = 0, .slot = 1, .pattern = new Mapped::HorizontalGradientPattern(&ledsterMap)},
+            {.column = 0, .slot = 0, .pattern = new Mapped::ConcentricWavePattern<SinFast>(ledsterMap)},
+            {.column = 0, .slot = 1, .pattern = new Mapped::HorizontalGradientPattern(ledsterMap)},
           }),
     new ColorConverter<RGBA, RGB>(),
-    new MonitorOutput(&hyp->webServer,&ledsterMap));
+    new MonitorOutput(&hyp->webServer,ledsterMap));
 
   hyp->start();
 

@@ -49,13 +49,13 @@ class MonitorOutput final: public WebsocketOutput
         std::vector<PixelMap> maps;
 
     public:
-        unsigned int addOutput(PixelMap *map, const char* instanceName, float size)
+        unsigned int addOutput(PixelMapPtr map, const char* instanceName, float size)
         {
             outputs.push_back({.map = map, .mapIndex = ++mapIndex, .size=size, .instanceName = instanceName});
             return mapIndex;
         }
 
-        unsigned int addOutput(PixelMap3d *map, const char* instanceName, float size)
+        unsigned int addOutput(PixelMap3dPtr map, const char* instanceName, float size)
         {
             outputs.push_back({.map3d = map, .mapIndex = ++mapIndex, .size=size, .instanceName = instanceName});
             return mapIndex;
@@ -64,8 +64,8 @@ class MonitorOutput final: public WebsocketOutput
     private:
         struct PixelMonitorOutput
         {
-            PixelMap *map = nullptr; //either map or map3d will be used, never both
-            PixelMap3d *map3d = nullptr;
+            PixelMapPtr map = nullptr; //either map or map3d will be used, never both
+            PixelMap3dPtr map3d = nullptr;
             unsigned int mapIndex;
             float size;
             const char* instanceName;
@@ -87,13 +87,13 @@ class MonitorOutput final: public WebsocketOutput
     };
 
 public:
-    MonitorOutput(WebServer **webServer, PixelMap *map, const char* instanceName=nullptr, unsigned int fps = 60, float size = 0.01) : WebsocketOutput(webServer, pathBuf, fps)
+    MonitorOutput(WebServer **webServer, PixelMapPtr map, const char* instanceName=nullptr, unsigned int fps = 60, float size = 0.01) : WebsocketOutput(webServer, pathBuf, fps)
     {
         this->webServer = webServer;
         snprintf(pathBuf, 20, "/ws/monitor%d", pixelMapJson.addOutput(map, instanceName, size));
     }
 
-    MonitorOutput(WebServer **webServer, PixelMap3d *map, const char* instanceName=nullptr, unsigned int fps = 60, float size = 0.01) : WebsocketOutput(webServer, pathBuf, fps)
+    MonitorOutput(WebServer **webServer, PixelMap3dPtr map, const char* instanceName=nullptr, unsigned int fps = 60, float size = 0.01) : WebsocketOutput(webServer, pathBuf, fps)
     {
         this->webServer = webServer;
         snprintf(pathBuf, 20, "/ws/monitor%d", pixelMapJson.addOutput(map, instanceName, size));

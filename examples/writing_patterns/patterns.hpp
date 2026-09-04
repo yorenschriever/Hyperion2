@@ -538,10 +538,10 @@ namespace ExamplePatterns
     {
     public:
         LFO<SinFast> lfo;
-        PixelMap *map;
+        PixelMapPtr map;
 
         // For mapped patterns, the constructor needs to receive the map and store it in a property
-        MappedPattern(PixelMap *map)
+        MappedPattern(PixelMapPtr map)
         {
             this->name = "Mapped";
             this->map = map;
@@ -632,10 +632,10 @@ namespace ExamplePatterns
         Transition transition = Transition(
             200, Transition::fromStart, 500,
             200, Transition::fromStart, 500);
-        PixelMap *map;
+        PixelMapPtr map;
 
     public:
-        MappedSpatialTransitionPattern(PixelMap *map)
+        MappedSpatialTransitionPattern(PixelMapPtr map)
         {
             this->name = "Mapped spatial transition";
             this->map = map;

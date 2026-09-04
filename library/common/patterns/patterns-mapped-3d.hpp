@@ -9,13 +9,13 @@ namespace Mapped3dPatterns
 {
     class StaticGradientPattern : public Pattern<RGBA>
     {
-        PixelMap3d *map;
+        PixelMap3dPtr map;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
 
     public:
-        StaticGradientPattern(PixelMap3d *map)
+        StaticGradientPattern(PixelMap3dPtr map)
         {
             this->map = map;
             this->name = "Static gradient";
@@ -50,12 +50,12 @@ namespace Mapped3dPatterns
             FadeDown(200),
             FadeDown(200)};
         BeatWatcher watcher = BeatWatcher();
-        PixelMap3d *map;
+        PixelMap3dPtr map;
         Permute perm;
         int pos = 0;
 
     public:
-        OnBeatColumnChaseUpPattern(PixelMap3d *map)
+        OnBeatColumnChaseUpPattern(PixelMap3dPtr map)
         {
             this->map = map;
             this->perm = Permute(map->size());
@@ -100,10 +100,10 @@ namespace Mapped3dPatterns
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<SinFast> lfo;
-        PixelMap3d::Cylindrical *map;
+        PixelMap3d::CylindricalPtr map;
 
     public:
-        GrowShrink(PixelMap3d::Cylindrical *map)
+        GrowShrink(PixelMap3d::CylindricalPtr map)
         {
             this->map = map;
             this->name = "Grow shrink";
@@ -141,10 +141,10 @@ namespace Mapped3dPatterns
         Transition transition = Transition(
                 200, Transition::fromStart, 1200,
                 500, Transition::fromEnd, 1500);
-        PixelMap3d::Cylindrical *map;
+        PixelMap3d::CylindricalPtr map;
 
     public:
-        VerticallyIsolated(PixelMap3d::Cylindrical *map)
+        VerticallyIsolated(PixelMap3d::CylindricalPtr map)
         {
             this->map = map;
             this->name = "Vertically isolated";
@@ -170,12 +170,12 @@ namespace Mapped3dPatterns
     class RotatingRingsPattern : public Pattern<RGBA>
     {
         Transition transition;
-        PixelMap3d::Cylindrical *map;
+        PixelMap3d::CylindricalPtr map;
         LFO<Sin> ring1;
         LFO<Sin> ring2;
 
     public:
-        RotatingRingsPattern(PixelMap3d::Cylindrical *map)
+        RotatingRingsPattern(PixelMap3d::CylindricalPtr map)
         {
             this->map = map;
             this->name = "Rotating rings";

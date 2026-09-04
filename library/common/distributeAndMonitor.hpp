@@ -62,11 +62,11 @@ void distribute(
     }
 }
 
-template <class T_OUTPUT_COLOR = GRB, class T_INPUT_COLOR = RGBA, class T_PixelMap = PixelMap>
+template <class T_OUTPUT_COLOR = GRB, class T_INPUT_COLOR = RGBA, class T_PixelMapPtr = PixelMapPtr>
 void distributeAndMonitor(
     Hyperion *hyp,
     ControlHubInput<T_INPUT_COLOR> *input,
-    T_PixelMap *pixelMap,
+    T_PixelMapPtr pixelMap,
     Distribution slaves,
     LUT *lut = nullptr,
     float monitorDotSize=0.01,

@@ -10,12 +10,12 @@ int main()
     auto map = gridMap(100, 100);
 
     hyp->createChain(
-        new ControlHubInput<RGBA>(map.size(), &hyp->hub, {
-            {.column = 0, .slot = 0, .pattern = new BeerBubblesPattern(&map)},
+        new ControlHubInput<RGBA>(map->size(), &hyp->hub, {
+            {.column = 0, .slot = 0, .pattern = new BeerBubblesPattern(map)},
         }),
         {new ColorConverter<RGBA, RGB>(),
         new Analytics("bubblePattern")},
-        new MonitorOutput(&hyp->webServer, &map, nullptr, 120, 0.01)
+        new MonitorOutput(&hyp->webServer, map, nullptr, 120, 0.01)
     );
 
     hyp->hub.setSlotActive(0, 0, true);

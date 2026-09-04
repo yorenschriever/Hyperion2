@@ -14,10 +14,10 @@ namespace Mapped2dPatterns
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<Glow> lfo;
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
 
     public:
-        Lighthouse(PixelMap::Polar *map)
+        Lighthouse(PixelMap::PolarPtr map)
         {
             this->map = map;
             this->name = "Lighthouse";
@@ -57,7 +57,7 @@ namespace Mapped2dPatterns
         int pos = 0;
 
     public:
-        GrowingCirclesPattern(PixelMap *map)
+        GrowingCirclesPattern(PixelMapPtr map)
         {
             for (int i = 0; i < 6; i++)
             {
@@ -103,10 +103,10 @@ namespace Mapped2dPatterns
     {
         FadeDown fade = FadeDown(50);
         BeatWatcher watcher = BeatWatcher();
-        PixelMap *map;
+        PixelMapPtr map;
 
     public:
-        LineLaunch(PixelMap *map)
+        LineLaunch(PixelMapPtr map)
         {
             this->map = map;
             this->name = "Line launch";
@@ -139,11 +139,11 @@ namespace Mapped2dPatterns
     class SpiralPattern : public Pattern<RGBA>
     {
         Transition transition = Transition();
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
         LFO<SinFast> lfo;
 
     public:
-        SpiralPattern(PixelMap::Polar *map)
+        SpiralPattern(PixelMap::PolarPtr map)
         {
             this->map = map;
             this->name = "Spiral";
@@ -189,12 +189,12 @@ namespace Mapped2dPatterns
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
         FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
 
     public:
-        DotBeatPattern(PixelMap::Polar *map)
+        DotBeatPattern(PixelMap::PolarPtr map)
         {
             this->map = map;
             this->name = "Dot beat";
@@ -229,10 +229,10 @@ namespace Mapped2dPatterns
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<Glow> lfo;
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
 
     public:
-        HorizontalSin(PixelMap::Polar *map)
+        HorizontalSin(PixelMap::PolarPtr map)
         {
             this->map = map;
             this->name = "Horizontal sin";
@@ -261,10 +261,10 @@ namespace Mapped2dPatterns
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<SawDown> lfo;
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
 
     public:
-        HorizontalSaw(PixelMap::Polar *map)
+        HorizontalSaw(PixelMap::PolarPtr map)
         {
             this->map = map;
             this->name = "Horzontal saw";
@@ -293,10 +293,10 @@ namespace Mapped2dPatterns
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<SawDown> lfo;
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
 
     public:
-        RadialSaw(PixelMap::Polar *map)
+        RadialSaw(PixelMap::PolarPtr map)
         {
             this->map = map;
             this->name = "Radial saw";
@@ -325,10 +325,10 @@ namespace Mapped2dPatterns
             200, Transition::none, 0,
             1000, Transition::none, 0);
         LFO<SinFast> lfo;
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
 
     public:
-        GrowShrink(PixelMap::Polar *map)
+        GrowShrink(PixelMap::PolarPtr map)
         {
             this->map = map;
             this->name = "Grow shrink";
@@ -362,13 +362,13 @@ namespace Mapped2dPatterns
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
         FadeDown fade = FadeDown(200);
         // std::vector<float> normalizedRadii;
         BeatWatcher watcher = BeatWatcher();
 
     public:
-        RadialFadePattern(PixelMap::Polar *map)
+        RadialFadePattern(PixelMap::PolarPtr map)
         {
             this->name = "Radial fade";
             this->map = map;
@@ -400,13 +400,13 @@ namespace Mapped2dPatterns
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
         FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
         Permute perm;
 
     public:
-        RadialGlitterFadePattern(PixelMap::Polar *map)
+        RadialGlitterFadePattern(PixelMap::PolarPtr map)
         {
             this->name = "Radial glitter fade";
             this->map = map;
@@ -447,13 +447,13 @@ namespace Mapped2dPatterns
 
     class HorizontalGradientPattern : public Pattern<RGBA>
     {
-        PixelMap *map;
+        PixelMapPtr map;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
 
     public:
-        HorizontalGradientPattern(PixelMap *map)
+        HorizontalGradientPattern(PixelMapPtr map)
         {
             this->name = "Horizontal gradient";
             this->map = map;
@@ -475,11 +475,11 @@ namespace Mapped2dPatterns
 
 class VerticalGradientPattern : public Pattern<RGBA>
     {
-        PixelMap *map;
+        PixelMapPtr map;
         Transition transition;
 
     public:
-        VerticalGradientPattern(PixelMap *map)
+        VerticalGradientPattern(PixelMapPtr map)
         {
             this->name = "Vertical gradient";
             this->map = map;
@@ -501,11 +501,11 @@ class VerticalGradientPattern : public Pattern<RGBA>
 
     class RadialGradientPattern : public Pattern<RGBA>
     {
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
         Transition transition;
 
     public:
-        RadialGradientPattern(PixelMap::Polar *map)
+        RadialGradientPattern(PixelMap::PolarPtr map)
         {
             this->name = "Radial gradient";
             this->map = map;
@@ -526,12 +526,12 @@ class VerticalGradientPattern : public Pattern<RGBA>
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
         FadeDown fade = FadeDown(200);
         BeatWatcher watcher = BeatWatcher();
 
     public:
-        AngularFadePattern(PixelMap::Polar *map)
+        AngularFadePattern(PixelMap::PolarPtr map)
         {
             this->name = "Angular fade";
             this->map = map;

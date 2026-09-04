@@ -5,11 +5,11 @@
 using SlotPatterns = std::vector<ControlHubInput<RGBA>::SlotPattern>;
 using SlotPatternsGenerator = std::function<SlotPatterns()>;
 
-template <class T_OUTPUT_COLOR = GRB, class T_INPUT_COLOR = RGBA, class T_PixelMap = PixelMap>
+template <class T_OUTPUT_COLOR = GRB, class T_INPUT_COLOR = RGBA, class T_PixelMapPtr = PixelMapPtr>
 void distributeAndPreview(
     Hyperion *hyp,
     SlotPatternsGenerator slotPatternsGenerator,
-    T_PixelMap *pixelMap,
+    T_PixelMapPtr pixelMap,
     Distribution slaves,
     LUT *lut = nullptr,
     float monitorDotSize=0.01,

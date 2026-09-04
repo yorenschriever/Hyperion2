@@ -12,7 +12,7 @@ namespace Mapped
     template <class T>
     class ConcentricWavePattern : public Pattern<RGBA>
     {
-        PixelMap *map;
+        PixelMapPtr map;
         int numWaves;
         LFO<T> lfo;
         LFO<Square> lfoColor;
@@ -21,7 +21,7 @@ namespace Mapped
             1000, Transition::none, 0);
 
     public:
-        ConcentricWavePattern(PixelMap *map, int numWaves = 1, int numColorWaves=2, int period = 5000)
+        ConcentricWavePattern(PixelMapPtr map, int numWaves = 1, int numColorWaves=2, int period = 5000)
         {
             this->map = map;
             this->numWaves = numWaves;
@@ -48,7 +48,7 @@ namespace Mapped
     template <class T>
     class HorizontalWavePattern : public Pattern<RGBA>
     {
-        PixelMap *map;
+        PixelMapPtr map;
         LFO<T> lfo;
         // LFO<Square> lfoColor;
         Transition transition = Transition(
@@ -56,7 +56,7 @@ namespace Mapped
             1000, Transition::none, 0);
 
     public:
-        HorizontalWavePattern(PixelMap *map, int period = 5000)
+        HorizontalWavePattern(PixelMapPtr map, int period = 5000)
         {
             this->map = map;
             this->lfo = LFO<T>(period);
@@ -82,7 +82,7 @@ namespace Mapped
     //template <class T>
     class ConcentricPulsePattern : public Pattern<RGBA>
     {
-        PixelMap *map;
+        PixelMapPtr map;
         Fade<Down, Linear> fades[5] = {
             Fade<Down, Linear>(200),
             Fade<Down, Linear>(200),
@@ -93,7 +93,7 @@ namespace Mapped
         bool lastActive = false;
 
     public:
-        ConcentricPulsePattern(PixelMap *map)
+        ConcentricPulsePattern(PixelMapPtr map)
         {
             this->map = map;
         }
@@ -126,7 +126,7 @@ namespace Mapped
 
     class RadarPattern : public Pattern<RGBA>
     {
-        PixelMap *map;
+        PixelMapPtr map;
         LFO<SawDown> lfo;
         Transition transition = Transition(
             200, Transition::none, 0,
@@ -134,7 +134,7 @@ namespace Mapped
         std::vector<float> scaledAngles;
 
     public:
-        RadarPattern(PixelMap *map, int period = 5000)
+        RadarPattern(PixelMapPtr map, int period = 5000)
         {
             this->map = map;
             this->lfo = LFO<SawDown>(period);
@@ -160,13 +160,13 @@ namespace Mapped
 
     class HorizontalGradientPattern : public Pattern<RGBA>
     {
-        PixelMap *map;
+        PixelMapPtr map;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
 
     public:
-        HorizontalGradientPattern(PixelMap *map)
+        HorizontalGradientPattern(PixelMapPtr map)
         {
             this->map = map;
         }
@@ -188,7 +188,7 @@ namespace Mapped
 
     class HorizontalDitheredGradientPattern : public Pattern<RGBA>
     {
-        PixelMap *map;
+        PixelMapPtr map;
         Transition transition = Transition(
             200, Transition::none, 0,
             1000, Transition::none, 0);
@@ -196,7 +196,7 @@ namespace Mapped
         const size_t maxNoiseMapSize = 100;
 
     public:
-        HorizontalDitheredGradientPattern(PixelMap *map)
+        HorizontalDitheredGradientPattern(PixelMapPtr map)
         {
             this->map = map;
             for (int i = 0; i < std::min(map->size(), maxNoiseMapSize); i++)
@@ -222,7 +222,7 @@ namespace Mapped
     template <class T>
     class DiagonalWavePattern : public Pattern<RGBA>
     {
-        PixelMap *map;
+        PixelMapPtr map;
         LFO<T> lfo;
         float numWaves;
         Transition transition = Transition(
@@ -230,7 +230,7 @@ namespace Mapped
             1000, Transition::none, 0);
 
     public:
-        DiagonalWavePattern(PixelMap *map, int period = 5000, float numWaves = 1, float pulseWidth = 0.5, float skew = 1)
+        DiagonalWavePattern(PixelMapPtr map, int period = 5000, float numWaves = 1, float pulseWidth = 0.5, float skew = 1)
         {
             this->map = map;
             this->lfo = LFO<T>(period);

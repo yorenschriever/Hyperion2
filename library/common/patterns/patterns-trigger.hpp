@@ -99,11 +99,11 @@ namespace TriggerPatterns
     class GrowingCirclePattern : public Pattern<RGBA>
     {
         FadeDown fade;
-        PixelMap::Polar *map;
+        PixelMap::PolarPtr map;
         bool lastActive;
 
     public:
-        GrowingCirclePattern(PixelMap::Polar *map)
+        GrowingCirclePattern(PixelMap::PolarPtr map)
         {
             this->map = map;
             this->name = "Growing circles";
@@ -133,13 +133,13 @@ namespace TriggerPatterns
     class LineLaunch : public Pattern<RGBA>
     {
         TriggerFade<> fade;
-        PixelMap *map;
+        PixelMapPtr map;
         bool lastActive;
         int velocity;
         int direction;
 
     public:
-        LineLaunch(PixelMap *map, int velocity = 100, int length = 20, int direction = 1)
+        LineLaunch(PixelMapPtr map, int velocity = 100, int length = 20, int direction = 1)
         {
             this->map = map;
             this->name = "Line launch";
@@ -270,13 +270,13 @@ class FadeFromRandom : public Pattern<RGBA>
 
     class GlitterFade : public Pattern<RGBA>
     {
-        PixelMap3d::Cylindrical *map;
+        PixelMap3d::CylindricalPtr map;
         LFO<Glow> lfo;
         TriggerFade<> fade;
         Permute perm;
 
     public:
-        GlitterFade(PixelMap3d::Cylindrical *map)
+        GlitterFade(PixelMap3d::CylindricalPtr map)
         {
             this->map = map;
             this->name = "Glitter fade";

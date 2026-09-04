@@ -19,7 +19,7 @@ private:
 };
 
 void instance1(Hyperion* hyp) {
-  auto map = new PixelMap(circleMap(20, 0.8));
+  auto map = circleMap(20, 0.8);
   hyp->createChain(
     new ControlHubInput<RGBA>(
           map->size(),
@@ -34,7 +34,7 @@ void instance1(Hyperion* hyp) {
 }
 
 void instance2(Hyperion* hyp) {
-  auto map = new PixelMap(gridMap(5,5));
+  auto map = gridMap(5,5);
   hyp->createChain(
     new ControlHubInput<RGBA>(
           map->size(),

@@ -38,7 +38,7 @@ class SpatialGrid
     }
 
 public:
-    void build(PixelMap *map)
+    void build(PixelMapPtr map)
     {
         cells.clear();
         cells.resize(GRID_SIZE * GRID_SIZE);
@@ -135,7 +135,7 @@ class SpatialGrid3D
     }
 
 public:
-    void build(PixelMap3d *map)
+    void build(PixelMap3dPtr map)
     {
         cells.clear();
         cells.resize(GRID_SIZE * GRID_SIZE * GRID_SIZE);

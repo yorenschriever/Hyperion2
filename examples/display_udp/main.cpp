@@ -13,7 +13,7 @@ int main()
 
   hyp->createChain(
       new UDPInput(4445),
-      new MonitorOutput(&hyp->webServer, &freakMap));
+      new MonitorOutput(&hyp->webServer, freakMap));
   hyp->start();
 
   // End of the example
@@ -26,7 +26,7 @@ int main()
   auto hyp_on_other_machine = new Hyperion();
 
   hyp_on_other_machine->createChain(
-    new PatternInput(freakMap.size(),new Mapped::ConcentricWavePattern<SawDown>(&freakMap)),
+    new PatternInput(freakMap->size(),new Mapped::ConcentricWavePattern<SawDown>(freakMap)),
     new ColorConverter<RGBA, RGB>(),
     new UDPOutput("localhost",4445,60)
   );
