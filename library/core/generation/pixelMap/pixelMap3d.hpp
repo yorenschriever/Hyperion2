@@ -240,4 +240,83 @@ public:
                   .y = pos.z}; });
         return std::make_shared<PixelMap>(sideView);
     }
+
+    PixelMap3dPtr resizeAndTranslate(float scaleX, float scaleY, float scaleZ, float x, float y, float z) const
+    {
+        PixelMap3d result = *this;
+        for (auto &pos : result)
+        {
+            pos.x = pos.x * scaleX + x;
+            pos.y = pos.y * scaleY + y;
+            pos.z = pos.z * scaleZ + z;
+        }
+        return std::make_shared<PixelMap3d>(result);
+    }
+
+    PixelMap3dPtr resize(float scale) const
+    {
+        return resizeAndTranslate(scale, scale, scale, 0, 0, 0);
+    }
+
+    PixelMap3dPtr resize(float scaleX, float scaleY, float scaleZ) const
+    {
+        return resizeAndTranslate(scaleX, scaleY, scaleZ, 0, 0, 0);
+    }
+
+    PixelMap3dPtr translate(float x, float y, float z) const
+    {
+        return resizeAndTranslate(1, 1, 1, x, y, z);
+    }
+
+    PixelMap3dPtr rotate(float amount, float normal[3], AngularUnits units = AngularUnits::DEG) const
+    {
+        PixelMap3d result = *this;
+
+        const float angle = toRadians(amount, units);
+        ;
+        const float nx = normal[0];
+        const float ny = normal[1];
+        const float nz = normal[2];
+        const float length = std::sqrt(nx * nx + ny * ny + nz * nz);
+
+        if (length == 0.0f)
+        {
+            return std::make_shared<PixelMap3d>(result);
+        }
+
+        const float ux = nx / length;
+        const float uy = ny / length;
+        const float uz = nz / length;
+        const float cosA = std::cos(angle);
+        const float sinA = std::sin(angle);
+
+        for (auto &pos : result)
+        {
+            const float x = pos.x;
+            const float y = pos.y;
+            const float z = pos.z;
+
+            const float dot = ux * x + uy * y + uz * z;
+            const float cross_x = uy * z - uz * y;
+            const float cross_y = uz * x - ux * z;
+            const float cross_z = ux * y - uy * x;
+
+            pos.x = x * cosA + cross_x * sinA + ux * dot * (1.0f - cosA);
+            pos.y = y * cosA + cross_y * sinA + uy * dot * (1.0f - cosA);
+            pos.z = z * cosA + cross_z * sinA + uz * dot * (1.0f - cosA);
+        }
+
+        return std::make_shared<PixelMap3d>(result);
+    }
 };
+
+PixelMap3dPtr PixelMap::to3d() const
+{
+    PixelMap3d result;
+    result.reserve(this->size());
+    for (auto pos : *this)
+        result.push_back({pos.x,
+                          pos.y,
+                          0});
+    return std::make_shared<PixelMap3d>(result);
+}
