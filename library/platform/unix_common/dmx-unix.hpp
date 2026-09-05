@@ -176,7 +176,9 @@ public:
         memcpy(backBuffer, frontBuffer, dmxChannelCount+1); 
         txThread = std::thread(&DMXUnix::transmit, this);
     }
-    bool ready() override { return !busy.load(std::memory_order_acquire); };
+    bool ready() override { 
+        return fd != -1 && !busy.load(std::memory_order_acquire); 
+    };
     void clearTxBuffer() override {};
 
 
