@@ -304,4 +304,44 @@ class FadeFromRandom : public Pattern<RGBA>
         }
     };
 
+
+    class RadialGlitterFadePattern : public Pattern<RGBA>
+    {
+        PixelMap3d::CylindricalPtr map;
+        TriggerFade<> fade;
+        // BeatWatcher watcher = BeatWatcher();
+        Permute perm;
+        // Permute perm2;
+        // int fadeNr =0;
+
+    public:
+        RadialGlitterFadePattern(PixelMap3d::CylindricalPtr map)
+        {
+            this->map = map;
+            this->perm = Permute(map->size());
+            this->name = "Radial glitter fade";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+
+            int maxDuration = params->getIntensity(1000, 100);
+            float velocity = params->getVelocity(2000, 100);
+
+            if (!fade.isActive(active, velocity, maxDuration))
+                return;
+
+            for (int i = 0; i < map->size(); i++)
+            {
+                int duration = maxDuration / 5;
+                if (perm.at[i] % 20 == 0)
+                    duration = maxDuration * perm.at[i] / map->size();
+
+                float conePos = 0.7+map->r(i) - map->z(i);
+                float fadePosition = fade.getValue(conePos * velocity, duration);
+                RGBA color = params->getGradient(fadePosition * 255);
+                pixels[i] = color * fadePosition * (1.5 - map->r(i));
+            }
+        }
+    };
 }
