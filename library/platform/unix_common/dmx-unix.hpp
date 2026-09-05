@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cerrno>
 #include <cstring>
@@ -11,10 +12,10 @@
 #include <termios.h>
 #include <thread>
 #include <unistd.h>
+#include <utility>
 
 #include "dmx.hpp"
 
-constexpr char devicePath[] = "/dev/cu.usbserial-00000000";
 constexpr unsigned long dmxBaudRate = 250000;
 constexpr useconds_t breakDurationMicroseconds = 100;
 constexpr useconds_t markAfterBreakMicroseconds = 12;
@@ -25,8 +26,35 @@ constexpr char TAG[] = "DMXUnix";
 class DMXUnix : public DMX
 {
 private:
+    const char* devicePath; 
     int fd = -1; // file descriptor for the DMX device
-    unsigned char txBuffer[dmxChannelCount+1];
+    unsigned char bufferA[dmxChannelCount+1];
+    unsigned char bufferB[dmxChannelCount+1];
+    unsigned char *backBuffer = bufferA;  // written to by write()
+    unsigned char *frontBuffer = bufferB; // being (or last) transmitted
+    std::atomic<bool> busy{false}; // true while frontBuffer is being transmitted on txThread
+    std::thread txThread;
+
+    volatile int tx_size = 0;
+    bool fullframe = true;
+    int minchannels = 0;
+    int trailingchannels = 0;
+
+    void transmit() {
+
+        int frontBufferLen = 1 + dmxChannelCount;
+        if (!fullframe)
+        {
+            frontBufferLen = 1+std::min(
+                std::max(minchannels, tx_size + trailingchannels), 
+                (int)dmxChannelCount);
+        }
+
+        sendDmxFrame(fd, frontBuffer, frontBufferLen);
+        tx_size=0;
+        busy.store(false, std::memory_order_release);
+        
+    }
 
     bool writeAll(int serialPort, const unsigned char* data, std::size_t size) {
         while (size > 0) {
@@ -45,22 +73,22 @@ private:
 
     bool sendDmxFrame(int serialPort, const unsigned char* frame, std::size_t frameSize) {
         if (tcflush(serialPort, TCIOFLUSH) == -1 || ioctl(serialPort, TIOCSBRK) == -1) {
-            std::cerr << "Unable to start DMX break on " << devicePath << ": " << std::strerror(errno) << '\n';
+            Log::error(TAG, "Unable to start DMX break on %s: %s", devicePath, std::strerror(errno));
             return false;
         }
         if (usleep(breakDurationMicroseconds) == -1) {
             const int errorNumber = errno;
             ioctl(serialPort, TIOCCBRK);
-            std::cerr << "Unable to hold DMX break on " << devicePath << ": " << std::strerror(errorNumber) << '\n';
+            Log::error(TAG, "Unable to hold DMX break on %s: %s", devicePath, std::strerror(errorNumber));
             return false;
         }
         if (ioctl(serialPort, TIOCCBRK) == -1 || usleep(markAfterBreakMicroseconds) == -1) {
-            std::cerr << "Unable to finish DMX break on " << devicePath << ": " << std::strerror(errno) << '\n';
+            Log::error(TAG, "Unable to finish DMX break on %s: %s", devicePath, std::strerror(errno));
             return false;
         }
 
         if (!writeAll(serialPort, frame, frameSize) || tcdrain(serialPort) == -1) {
-            std::cerr << "Unable to send DMX frame to " << devicePath << ": " << std::strerror(errno) << '\n';
+            Log::error(TAG, "Unable to send DMX frame to %s: %s", devicePath, std::strerror(errno));
             return false;
         }
 
@@ -68,9 +96,9 @@ private:
     }
 
 public:
-    DMXUnix() {
+    DMXUnix(const char* devicePath) {
+        this->devicePath = devicePath;
         initialize();
-        txBuffer[0] = 0; // initialize the first byte of the DMX buffer to 0
     }
 
     //read is not implemented
@@ -81,6 +109,9 @@ public:
     
     void initialize()
     {
+        bufferA[0] = 0; // initialize the start code of both buffers to 0
+        bufferB[0] = 0;
+
         const int serialPort = open(devicePath, O_RDWR | O_NOCTTY);
         if (serialPort == -1) {
             Log::error(TAG, "Unable to open %s: %s", devicePath, std::strerror(errno));
@@ -124,27 +155,43 @@ public:
             return;
         }
 
-        // int copylength = std::min(size, (startFrameSize + universeSize) - startChannel);
-        int copylength = std::min(len, (int)(sizeof(txBuffer) - startChannel));
+        int copylength = std::min(len, ((int)dmxChannelCount + 1 - startChannel));
         if (copylength > 0)
-            memcpy(txBuffer + startChannel, data, copylength);
+            memcpy(backBuffer + startChannel, data, copylength);
 
         //tx_size is number of dmx bytes to transmit. so: start frame byte + dmx channel bytes
-        // tx_size = std::max((int)tx_size, startChannel + copylength);
+        tx_size = std::max((int)tx_size, startChannel + copylength);
 
     }
 
     void show() override {
-        sendDmxFrame(fd, txBuffer, sizeof(txBuffer));
-    }                                   
-    bool ready() override { return true; };
+        bool expected = false;
+        if (!busy.compare_exchange_strong(expected, true)) {
+            return; // previous frame still transmitting
+        }
+        if (txThread.joinable()) {
+            txThread.join(); // reap the finished worker before starting a new one
+        }
+        std::swap(frontBuffer, backBuffer);
+        memcpy(backBuffer, frontBuffer, dmxChannelCount+1); 
+        txThread = std::thread(&DMXUnix::transmit, this);
+    }
+    bool ready() override { return !busy.load(std::memory_order_acquire); };
     void clearTxBuffer() override {};
 
-    //TODO
-    void sendFullFrame(bool) override {};                                
-    void setUniverseSize(int minsize, int trailingchannels) override {}; 
+
+    void sendFullFrame(bool enable) override {
+        fullframe = enable;
+    };                                
+    void setUniverseSize(int minsize, int trailingchannels) override {
+        this->minchannels = minsize;;
+        this->trailingchannels = trailingchannels;
+    }; 
 
     ~DMXUnix() override {
+        if (txThread.joinable()) {
+            txThread.join();
+        }
         if (fd != -1) {
             close(fd);
             fd = -1;

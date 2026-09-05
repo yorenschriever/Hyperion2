@@ -1,9 +1,19 @@
-// #include "dmx.hpp"
-// #include "log.hpp"
+#include "dmx.hpp"
+#include "log.hpp"
+#include "../unix_common/dmx-unix.hpp"
 
-// DMX* DMX::getInstance(unsigned int port)
-// {
-//     Log::error("DMX","DMX not supported on this platform. DMX data will not be sent /received");
-//     return nullptr;
-// }
-#include "../unix_common/dmx.cpp"
+DMXUnix *unixInstance = nullptr;
+
+DMX *DMX::getInstance(unsigned int port)
+{
+    if (port != 0)
+    {
+        Log::error("dmx", "dmx instance on port %d is not available on this platform", port);
+        return nullptr;
+    }
+
+    if (unixInstance == nullptr)
+        unixInstance = new DMXUnix("/dev/cu.usbserial-00000000");
+
+    return unixInstance;
+}
