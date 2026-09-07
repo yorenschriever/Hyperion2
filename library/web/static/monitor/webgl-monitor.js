@@ -19,7 +19,8 @@ export function isOrbitDefault() {
   const { orbit } = viewParams;
   return orbit.azimuth === defaultOrbit.azimuth &&
     orbit.elevation === defaultOrbit.elevation &&
-    orbit.distance === defaultOrbit.distance;
+    orbit.distance === defaultOrbit.distance &&
+    orbit.panY === defaultOrbit.panY;
 }
 
 export function resetOrbitView() {
@@ -281,7 +282,7 @@ function calcViewMatrix3d_(gl, programInfo, viewParams) {
     );
   }
 
-  const { azimuth, elevation, distance } = viewParams.orbit;
+  const { azimuth, elevation, distance, panY } = viewParams.orbit;
 
   const modelViewMatrix = mat4.create();
   mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -distance]);
@@ -289,6 +290,8 @@ function calcViewMatrix3d_(gl, programInfo, viewParams) {
   mat4.rotate(modelViewMatrix, modelViewMatrix, azimuth, [0, 1, 0]);
   // orient xy plane to be horizontal
   mat4.rotate(modelViewMatrix, modelViewMatrix, -Math.PI / 2, [1, 0, 0]);
+  // shift the orbit target up/down along the scene's vertical axis
+  mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -panY]);
 
   gl.uniformMatrix4fv(
     programInfo.uniformLocations.modelViewMatrix,
@@ -298,22 +301,31 @@ function calcViewMatrix3d_(gl, programInfo, viewParams) {
 }
 
 // Orbits the camera around the origin like Google Earth: one-finger/mouse drag rotates,
-// pinch (touch) or ctrl/trackpad-pinch wheel zooms. No panning/translation is supported.
+// pinch (touch, or ctrl+trackpad-wheel) zooms, and two-finger drag (or plain wheel scroll) pans up/down.
 function setupOrbitControls(canvas, orbit) {
   const pointers = new Map();
   const rotateSpeed = 0.01;
+  const panSpeed = 0.005;
   const minDistance = 0.6;
   const maxDistance = 6;
   const minElevation = -1.5;
   const maxElevation = 1.5;
+  const minPanY = -1.5;
+  const maxPanY = 1.5;
   let pinchStartDistance = null;
   let pinchStartZoom = null;
+  let lastMidpoint = null;
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
   const pointerDistance = () => {
     const [a, b] = [...pointers.values()];
     return Math.hypot(a.x - b.x, a.y - b.y);
+  };
+
+  const pointerMidpoint = () => {
+    const [a, b] = [...pointers.values()];
+    return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   };
 
   canvas.style.touchAction = 'none';
@@ -324,6 +336,7 @@ function setupOrbitControls(canvas, orbit) {
     if (pointers.size === 2) {
       pinchStartDistance = pointerDistance();
       pinchStartZoom = orbit.distance;
+      lastMidpoint = pointerMidpoint();
     }
   });
 
@@ -336,8 +349,13 @@ function setupOrbitControls(canvas, orbit) {
       const distance = pointerDistance();
       if (distance > 0 && pinchStartDistance) {
         orbit.distance = clamp(pinchStartZoom * (pinchStartDistance / distance), minDistance, maxDistance);
-        notifyOrbitChange();
       }
+      const midpoint = pointerMidpoint();
+      if (lastMidpoint) {
+        orbit.panY = clamp(orbit.panY - (midpoint.y - lastMidpoint.y) * panSpeed, minPanY, maxPanY);
+      }
+      lastMidpoint = midpoint;
+      notifyOrbitChange();
       return;
     }
 
@@ -355,6 +373,7 @@ function setupOrbitControls(canvas, orbit) {
     if (pointers.size < 2) {
       pinchStartDistance = null;
       pinchStartZoom = null;
+      lastMidpoint = null;
     }
   };
   canvas.addEventListener('pointerup', releasePointer);
@@ -363,7 +382,12 @@ function setupOrbitControls(canvas, orbit) {
 
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
-    orbit.distance = clamp(orbit.distance * Math.exp(e.deltaY * 0.001), minDistance, maxDistance);
+    if (e.ctrlKey) {
+      // trackpad pinch gesture is reported as a wheel event with ctrlKey set
+      orbit.distance = clamp(orbit.distance * Math.exp(e.deltaY * 0.001), minDistance, maxDistance);
+    } else {
+      orbit.panY = clamp(orbit.panY - e.deltaY * panSpeed, minPanY, maxPanY);
+    }
     notifyOrbitChange();
   }, { passive: false });
 }

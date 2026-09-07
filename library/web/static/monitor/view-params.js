@@ -2,6 +2,7 @@ export const defaultOrbit = {
     azimuth: 0,
     elevation: 0.25,
     distance: 2,
+    panY: 0,
 }
 
 export const viewParams = {
