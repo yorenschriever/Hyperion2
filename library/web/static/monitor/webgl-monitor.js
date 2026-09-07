@@ -1,8 +1,31 @@
 import './gl-matrix-min.js';
 // import { WebGLDebugUtils } from './webgl-debug.js';
-import { viewParams } from './view-params.js'
+import { viewParams, defaultOrbit } from './view-params.js'
 
 const DEBUG = false;
+
+const orbitChangeListeners = new Set();
+
+function notifyOrbitChange() {
+  orbitChangeListeners.forEach(listener => listener());
+}
+
+export function subscribeOrbitChange(listener) {
+  orbitChangeListeners.add(listener);
+  return () => orbitChangeListeners.delete(listener);
+}
+
+export function isOrbitDefault() {
+  const { orbit } = viewParams;
+  return orbit.azimuth === defaultOrbit.azimuth &&
+    orbit.elevation === defaultOrbit.elevation &&
+    orbit.distance === defaultOrbit.distance;
+}
+
+export function resetOrbitView() {
+  Object.assign(viewParams.orbit, defaultOrbit);
+  notifyOrbitChange();
+}
 
 export function main(scene, canvas, createPixelSource) {
   const gl = DEBUG ?
@@ -61,6 +84,8 @@ export function main(scene, canvas, createPixelSource) {
   const grid = type === '3d' ? {z:viewParams.gridZ} : undefined;
   if (type=='2d') //in 2d all spheres are drawn in the same plane, so depth test is not needed, also it creates ugly artifacts when spheres overlap
     gl.disable(gl.DEPTH_TEST);
+  if (type=='3d')
+    setupOrbitControls(canvas, viewParams.orbit);
 
   // Initialize a shader program; this is where all the lighting
   // for the vertices and so forth is established.
@@ -238,10 +263,10 @@ function setAttribute(gl, buffer, location, {size=3, divisor=0, type=gl.FLOAT, n
 }
 
 export function calcViewMatrix3d(viewParams) {
-  return (gl, time, programInfo) => calcViewMatrix3d_(gl, time, programInfo, viewParams);
+  return (gl, _time, programInfo) => calcViewMatrix3d_(gl, programInfo, viewParams);
 }
 
-function calcViewMatrix3d_(gl, time, programInfo, viewParams) {
+function calcViewMatrix3d_(gl, programInfo, viewParams) {
   {
     const fieldOfView = viewParams.fieldOfView; //(80 * Math.PI) / 180; // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
@@ -256,28 +281,91 @@ function calcViewMatrix3d_(gl, time, programInfo, viewParams) {
     );
   }
 
+  const { azimuth, elevation, distance } = viewParams.orbit;
+
   const modelViewMatrix = mat4.create();
-  viewParams.transform.forEach(transformation => {
-    if (transformation.type==='translate'){
-      mat4.translate(
-        modelViewMatrix, // destination matrix
-        modelViewMatrix, // matrix to translate
-        transformation.amount
-      );
-    } else if (transformation.type==='rotate') {
-      mat4.rotate(
-        modelViewMatrix, // destination matrix
-        modelViewMatrix, // matrix to rotate
-        transformation.amount(time),
-        transformation.vector
-      ); 
-    }
-  })
+  mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -distance]);
+  mat4.rotate(modelViewMatrix, modelViewMatrix, elevation, [1, 0, 0]);
+  mat4.rotate(modelViewMatrix, modelViewMatrix, azimuth, [0, 1, 0]);
+  // orient xy plane to be horizontal
+  mat4.rotate(modelViewMatrix, modelViewMatrix, -Math.PI / 2, [1, 0, 0]);
+
   gl.uniformMatrix4fv(
     programInfo.uniformLocations.modelViewMatrix,
     false,
     modelViewMatrix
   );
+}
+
+// Orbits the camera around the origin like Google Earth: one-finger/mouse drag rotates,
+// pinch (touch) or ctrl/trackpad-pinch wheel zooms. No panning/translation is supported.
+function setupOrbitControls(canvas, orbit) {
+  const pointers = new Map();
+  const rotateSpeed = 0.01;
+  const minDistance = 0.6;
+  const maxDistance = 6;
+  const minElevation = -1.5;
+  const maxElevation = 1.5;
+  let pinchStartDistance = null;
+  let pinchStartZoom = null;
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const pointerDistance = () => {
+    const [a, b] = [...pointers.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  };
+
+  canvas.style.touchAction = 'none';
+
+  canvas.addEventListener('pointerdown', e => {
+    canvas.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.size === 2) {
+      pinchStartDistance = pointerDistance();
+      pinchStartZoom = orbit.distance;
+    }
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    const prev = pointers.get(e.pointerId);
+    if (!prev) return;
+
+    if (pointers.size === 2) {
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const distance = pointerDistance();
+      if (distance > 0 && pinchStartDistance) {
+        orbit.distance = clamp(pinchStartZoom * (pinchStartDistance / distance), minDistance, maxDistance);
+        notifyOrbitChange();
+      }
+      return;
+    }
+
+    const dx = e.clientX - prev.x;
+    const dy = e.clientY - prev.y;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    orbit.azimuth += dx * rotateSpeed;
+    orbit.elevation = clamp(orbit.elevation + dy * rotateSpeed, minElevation, maxElevation);
+    notifyOrbitChange();
+  });
+
+  const releasePointer = e => {
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) {
+      pinchStartDistance = null;
+      pinchStartZoom = null;
+    }
+  };
+  canvas.addEventListener('pointerup', releasePointer);
+  canvas.addEventListener('pointercancel', releasePointer);
+  canvas.addEventListener('pointerleave', releasePointer);
+
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    orbit.distance = clamp(orbit.distance * Math.exp(e.deltaY * 0.001), minDistance, maxDistance);
+    notifyOrbitChange();
+  }, { passive: false });
 }
 
 export function calcViewMatrix2d(gl, time, programInfo) {

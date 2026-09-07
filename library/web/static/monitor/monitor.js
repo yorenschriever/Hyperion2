@@ -1,5 +1,5 @@
 import { html, useState, useEffect, useRef} from '../common/preact-standalone.js'
-import { main as initWebGLMonitor } from './webgl-monitor.js';
+import { main as initWebGLMonitor, resetOrbitView, subscribeOrbitChange, isOrbitDefault } from './webgl-monitor.js';
 import { Socket } from '../common/socket.js'
 
 export const MonitorApp = () => {
@@ -30,6 +30,15 @@ export const MonitorApp = () => {
 
 const Monitor = ({ scenes }) => {
     const canvasRef = useRef(null);
+    const is3d = scenes[0]?.type === '3d';
+    const [isDefaultView, setIsDefaultView] = useState(true);
+
+    useEffect(() => {
+        if (!is3d) return;
+        setIsDefaultView(isOrbitDefault());
+        return subscribeOrbitChange(() => setIsDefaultView(isOrbitDefault()));
+    }, [is3d]);
+
     useEffect(() => {
         if (!canvasRef.current) return;
 
@@ -58,5 +67,8 @@ const Monitor = ({ scenes }) => {
         initWebGLMonitor(scenes, canvasRef.current, createPixelSource);
     }, [scenes]);
 
-    return html`<canvas ref=${canvasRef} width="640" height="480"></canvas>`;
+    return html`
+        <canvas ref=${canvasRef} width="640" height="480"></canvas>
+        ${is3d && !isDefaultView && html`<button class="reset-view" onClick=${resetOrbitView}>Reset view</button>`}
+    `;
 }

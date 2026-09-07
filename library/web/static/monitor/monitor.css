@@ -33,3 +33,22 @@
     height: 48px;
     color: #aaa;
 }
+
+.monitor .reset-view {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    z-index: 1;
+    cursor: pointer;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 9pt;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #ccc;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+.monitor .reset-view:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
