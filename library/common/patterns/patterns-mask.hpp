@@ -1,8 +1,10 @@
 
 #pragma once
-#include "hyperion.hpp"
 #include <math.h>
 #include <vector>
+
+#include "hyperion.hpp"
+#include "pattern-helpers.hpp"
 
 namespace MaskPatterns
 {
@@ -161,6 +163,46 @@ namespace MaskPatterns
         }
     };
 
+    template <class T = Glow>
+    class CliveMaskPattern : public Pattern<RGBA>
+    {
+        Transition transition;
+        int segmentSize;
+        int averagePeriod;
+        float precision;
+        LFO<T> lfo = LFO<T>();
+        Permute perm;
+
+    public:
+        CliveMaskPattern(int segmentSize = 60, int averagePeriod = 10000, float precision = 1)
+        {
+            this->averagePeriod = averagePeriod;
+            this->precision = precision;
+            this->name = "Clive mask";
+            this->segmentSize = segmentSize;
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            int numSegments = width / segmentSize;
+
+            perm.setSize(numSegments);
+            lfo.setDutyCycle(params->getAmount(0.1, 0.5));
+
+            for (int segment = 0; segment < numSegments; segment++)
+            {
+                int interval = averagePeriod + perm.at[segment] * (averagePeriod * precision) / numSegments;
+                float val = 1.-lfo.getValue(0, interval);
+                RGBA col = RGBA(0,0,0,255) * val * transition.getValue();
+                for (int j = 0; j < segmentSize; j++)
+                    pixels[segment * segmentSize + j] = col;
+            }
+        }
+    };
+
     class RibbenFlashMaskPattern : public Pattern<RGBA>
     {
         Transition transition;
@@ -204,6 +246,38 @@ namespace MaskPatterns
             {
                 for (int j = 0; j < segmentSize; j++)
                     pixels[perm.at[segment] * segmentSize + j] = black;
+            }
+        }
+    };
+
+    class HorizontalSinMask : public Pattern<RGBA>
+    {
+        Transition transition = Transition(
+            200, Transition::none, 0,
+            1000, Transition::none, 0);
+        LFO<Glow> lfo;
+        PixelMap::PolarPtr map;
+
+    public:
+        HorizontalSinMask(PixelMap::PolarPtr map)
+        {
+            this->map = map;
+            this->name = "Horizontal sin mask";
+        }
+
+        inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
+        {
+            if (!transition.Calculate(active))
+                return;
+
+            lfo.setPeriod(params->getVelocity(11000, 500));
+            lfo.setDutyCycle(params->getSize(0.03, 0.5));
+            int amount = params->getAmount(1, 7.99);
+
+            for (int index = 0; index < std::min(width, (int)map->size()); index++)
+            {
+                float value = 1-lfo.getValue(amount * around(map->th(index)));
+                pixels[index] = RGBA(0,0,0,255) * value * transition.getValue();
             }
         }
     };

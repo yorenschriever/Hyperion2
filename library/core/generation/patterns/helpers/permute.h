@@ -3,6 +3,7 @@
 
 #include "log.hpp"
 #include <stdint.h>
+#include <mutex>
 // Permute can be used to get a list of numbers in random order
 class Permute
 {
@@ -25,7 +26,6 @@ public:
         at = (int*) realloc(at, size * sizeof(int));
         this->size = size;
 
-        order();
         permute();
     }
 
@@ -33,6 +33,9 @@ public:
     {
         if (size <= 1)
             return;
+
+        order();
+
         unsigned int i;
         for (i = 0; i <= size - 2; i++)
         {

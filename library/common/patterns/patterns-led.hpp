@@ -140,14 +140,16 @@ class DuoTonePattern : public Pattern<RGBA>
 
     class GlowPattern : public Pattern<RGBA>
     {
-        Permute perm;
+        Permute perm, perm2;
         LFO<Glow> lfo;
         Transition transition;
+        float density;
 
     public:
-        GlowPattern()
+        GlowPattern(float density = 0.5)
         {
             this->name = "Glow";
+            this->density = density;
         }
 
         inline void Calculate(RGBA *pixels, int width, bool active, Params *params) override
@@ -158,13 +160,14 @@ class DuoTonePattern : public Pattern<RGBA>
             float amount = params->getAmount();
             float velocity = params->getVelocity(10000, 500);
 
-            lfo.setPeriod(velocity / amount);
+            lfo.setPeriod(velocity);
             lfo.setDutyCycle(amount);
             perm.setSize(width);
+            perm2.setSize(width);
 
-            for (int index = 0; index < width; index++)
+            for (int index = 0; index < width * density; index++)
             {
-                pixels[perm.at[index]] = params->getSecondaryColor() * lfo.getValue(float(index) / width) * transition.getValue(index, width);
+                pixels[perm.at[index]] = params->getPrimaryColor() * lfo.getValue(float(perm2.at[index]) / width) * transition.getValue(index, width);
             }
         }
     };
@@ -430,13 +433,15 @@ class DuoTonePattern : public Pattern<RGBA>
 
     class GlowPulsePattern : public Pattern<RGBA>
     {
-        Permute perm;
+        Permute perm, perm2;
         LFO<Glow> lfo;
         Transition transition;
+        float density;
 
     public:
-        GlowPulsePattern()
+        GlowPulsePattern(float density = 0.5)
         {
+            this->density = density;
             this->name = "Glow pulse";
         }
 
@@ -445,17 +450,20 @@ class DuoTonePattern : public Pattern<RGBA>
             if (!transition.Calculate(active))
                 return; // the fade out is done. we can skip calculating pattern data
 
-            lfo.setPeriod(500 + 10000 * (1.0f - params->getVelocity()));
+            float velocity = params->getVelocity(10000,500);
+
+            lfo.setPeriod(velocity);
             lfo.setDutyCycle(params->getAmount());
             perm.setSize(width);
+            perm2.setSize(width);
 
-            for (int index = 0; index < width; index++)
+            for (int index = 0; index < width * density; index++)
             {
-                float val = 1.025 * lfo.getValue(float(Transition::fromCenter(index, width, 1000)) / -1000);
+                float val = 1.025 * lfo.getValue(float(perm2.at[index])/ width);
                 if (val < 1.0)
-                    pixels[perm.at[index]] = params->getPrimaryColor() * lfo.getValue(float(Transition::fromCenter(index, width, 1000)) / -1000);
+                    pixels[perm.at[index]] = params->getSecondaryColor() * lfo.getValue(float(perm2.at[index]) / width);
                 else
-                    pixels[perm.at[index]] = params->getPrimaryColor() + (params->getSecondaryColor() * (val - 1) / 0.025);
+                    pixels[perm.at[index]] = params->getSecondaryColor() + (params->getPrimaryColor() * (val - 1) / 0.025);
             }
         }
     };

@@ -321,8 +321,11 @@ namespace MonochromePatterns
 
             uint8_t val = timeline.GetTimelinePosition() < 25 ? 255 * transition.getValue() : 0;
 
-            for (int index = 0; index < width / 2; index++)
-                pixels[perm.at[index]] = Monochrome(val);
+            for (int index = 0; index < width / 2; index++){
+                int idx = perm.at[index];
+                pixels[idx] = Monochrome(val);
+            }
+                
         }
     };
 
