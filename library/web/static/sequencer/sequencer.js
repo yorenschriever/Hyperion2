@@ -81,21 +81,60 @@ export const SequencerApp = () => {
         }
     }, [])
 
+    // toIndex/position describe where the row was hovered *before* removal, moveSequence resolves the final splice index
+    const moveSequence = useCallback((fromIndex, toIndex, position) => {
+        if (fromIndex === toIndex) return;
+        setState(state => {
+            const sequences = [...state.sequences];
+            const [moved] = sequences.splice(fromIndex, 1);
+            const shiftedTarget = toIndex > fromIndex ? toIndex - 1 : toIndex;
+            const insertAt = position === 'after' ? shiftedTarget + 1 : shiftedTarget;
+            sequences.splice(insertAt, 0, moved);
+            return { ...state, sequences };
+        });
+    }, []);
+
+    const [dragInfo, setDragInfo] = useState({ from: null, over: null, position: null });
+
+    const handleRowDragStart = useCallback((index) => {
+        setDragInfo({ from: index, over: null, position: null });
+    }, []);
+
+    const handleRowDragOver = useCallback((index, position) => {
+        setDragInfo(info => (info.from === null || info.from === index) ? info : { ...info, over: index, position });
+    }, []);
+
+    const handleRowDragEnd = useCallback(() => {
+        setDragInfo({ from: null, over: null, position: null });
+    }, []);
+
     if (!state?.sequences.length)
          return undefined;
 
     return html`
     <div class="sequencer">
-        ${state.sequences.map((sequence, index) => html`<${SequenceTrack} key=${sequence.index} index=${index} sequence=${sequence} send=${send} stepNr=${state.stepNr}/> `)}    
+        ${state.sequences.map((sequence, index) => html`<${SequenceTrack} 
+            key=${sequence.index} 
+            index=${index} 
+            sequence=${sequence} 
+            send=${send} 
+            stepNr=${state.stepNr} 
+            moveSequence=${moveSequence}
+            dragInfo=${dragInfo}
+            onRowDragStart=${handleRowDragStart}
+            onRowDragOver=${handleRowDragOver}
+            onRowDragEnd=${handleRowDragEnd}
+        /> `)}    
     </div>
     `;
 }
 
-const SequenceTrack = ({ sequence, send, stepNr, index }) => {
+const SequenceTrack = ({ sequence, send, stepNr, index, moveSequence, dragInfo, onRowDragStart, onRowDragOver, onRowDragEnd }) => {
     const [draggedSteps, setDraggedSteps] = useState(Array(stepCount).fill(false));
     const [dragAction, setDragAction] = useState('select'); // 'select' or 'deselect'
 
     const trackRef = useRef(null);
+    const stepsRef = useRef(null);
 
     const handleDrag = useCallback((startX, endX) => {
         const minX = Math.min(startX, endX);
@@ -103,7 +142,7 @@ const SequenceTrack = ({ sequence, send, stepNr, index }) => {
 
         const highlightedSteps = Array(stepCount).fill(false);
         for (let i = 0; i < stepCount; i++) {
-            const stepRef = trackRef.current.children[4].children[i];
+            const stepRef = stepsRef.current.children[i];
             const stepRect = stepRef.getBoundingClientRect();
             if (stepRect.right >= minX && stepRect.left <= maxX) {
                 highlightedSteps[i] = true;
@@ -118,7 +157,7 @@ const SequenceTrack = ({ sequence, send, stepNr, index }) => {
         const maxX = Math.max(startX, endX);
 
         let startStep=-1, endStep=-1;
-        trackRef.current.children[4].childNodes.forEach((stepRef, stepIndex) => {
+        stepsRef.current.childNodes.forEach((stepRef, stepIndex) => {
             const stepRect = stepRef.getBoundingClientRect();
 
             if (stepRect.right >= minX && stepRect.left <= maxX) {
@@ -167,23 +206,62 @@ const SequenceTrack = ({ sequence, send, stepNr, index }) => {
             handleDragEnd(startX, endX, dragStepAction);
         };
 
-        trackRef.current.addEventListener('mousedown', handleMouseDown);
+        stepsRef.current.addEventListener('mousedown', handleMouseDown);
         document.addEventListener('mouseup', handleMouseUp);
         document.addEventListener('mousemove', handleMouseOver);
 
-        trackRef.current.addEventListener('touchstart', handleMouseDown);
+        stepsRef.current.addEventListener('touchstart', handleMouseDown);
         document.addEventListener('touchend', handleMouseUp);
         document.addEventListener('touchmove', handleMouseOver);
         return () => {
-            trackRef.current.removeEventListener('mousedown', handleMouseDown);
+            stepsRef.current.removeEventListener('mousedown', handleMouseDown);
             document.removeEventListener('mouseup', handleMouseUp);
             document.removeEventListener('mousemove', handleMouseOver);
             
-            trackRef.current.removeEventListener('touchstart', handleMouseDown);
+            stepsRef.current.removeEventListener('touchstart', handleMouseDown);
             document.removeEventListener('touchend', handleMouseUp);
             document.removeEventListener('touchmove', handleMouseOver);
         };
     }, []);
+
+    // native drag-and-drop is only armed while the handle is held down, so the rest of the row stays interactive
+    const [armed, setArmed] = useState(false);
+
+    const handleHandleMouseDown = useCallback(() => {
+        setArmed(true);
+    }, []);
+
+    const handleHandleMouseUp = useCallback(() => {
+        setArmed(false);
+    }, []);
+
+    const handleDragStart = useCallback((e) => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(index));
+        onRowDragStart(index);
+    }, [index, onRowDragStart]);
+
+    const handleTrackDragOver = useCallback((e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const rect = trackRef.current.getBoundingClientRect();
+        const position = (e.clientY - rect.top) < rect.height / 2 ? 'before' : 'after';
+        onRowDragOver(index, position);
+    }, [index, onRowDragOver]);
+
+    const handleTrackDrop = useCallback((e) => {
+        e.preventDefault();
+        if (dragInfo.from !== null) moveSequence(dragInfo.from, index, dragInfo.position);
+        onRowDragEnd();
+    }, [index, dragInfo, moveSequence, onRowDragEnd]);
+
+    const handleDragEndNative = useCallback(() => {
+        setArmed(false);
+        onRowDragEnd();
+    }, [onRowDragEnd]);
+
+    const isDragging = dragInfo.from === index;
+    const dropPosition = (dragInfo.over === index && dragInfo.from !== index) ? dragInfo.position : null;
 
     const removeTrack = () => {
         send(JSON.stringify({
@@ -214,12 +292,26 @@ const SequenceTrack = ({ sequence, send, stepNr, index }) => {
     <div 
         class="track"
         ref=${trackRef}
+        draggable=${armed}
+        data-dragging=${isDragging}
+        data-drop-position=${dropPosition}
+        onDragStart=${handleDragStart}
+        onDragOver=${handleTrackDragOver}
+        onDrop=${handleTrackDrop}
+        onDragEnd=${handleDragEndNative}
     >
+        <div 
+            class="drag-handle" 
+            onMouseDown=${handleHandleMouseDown}
+            onMouseUp=${handleHandleMouseUp}
+            onTouchStart=${handleHandleMouseDown}
+            onTouchEnd=${handleHandleMouseUp}
+        >⠿</div>
         <button class="remove-track" onClick=${removeTrack}>x</button>
         <div class="track-name">${sequence.colName}</div>    
         <div class="track-name">${sequence.slotName}</div>
         <${Toggle} onClick=${handleToggle} checked=${sequence.enabled} label="${hotKeys[index]}"/>
-        <div class="steps ${sequence.enabled ? 'enabled' : 'disabled'}" data-drag-action=${dragAction}>
+        <div class="steps ${sequence.enabled ? 'enabled' : 'disabled'}" data-drag-action=${dragAction} ref=${stepsRef}>
             ${sequence.steps.map((step, stepIndex) => html`
                 <div 
                     class="step" 
