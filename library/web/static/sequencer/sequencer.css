@@ -113,6 +113,31 @@
     cursor: grabbing;
 }
 
+.sequencer .preview-track {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    margin-right: 4px;
+    color: #888;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.sequencer .preview-track:hover,
+.sequencer .preview-track:active {
+    color: #dd8f00;
+}
+
+.sequencer .preview-track svg {
+    width: 16px;
+    height: 16px;
+}
+
 .sequencer .remove-track {
     border-radius: 100%;
     width: 14pt;

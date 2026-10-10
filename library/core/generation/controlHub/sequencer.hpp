@@ -96,6 +96,14 @@ public:
             bool active = cJSON_GetObjectItem(parsed, "active")->valueint;
             instance->setSteps(sequenceIndex, startStep, endStep, active);
         }
+        else if (type.compare("preview") == 0)
+        {
+            int sequenceIndex = cJSON_GetObjectItem(parsed, "sequenceIndex")->valueint;
+            bool status = cJSON_GetObjectItem(parsed, "status")->valueint;
+            auto sequence = instance->getSequence(sequenceIndex);
+            if (sequence)
+                instance->hub->setSlotActive(sequence->columnIndex, sequence->slotIndex, status, ControlHub::PREVIEW);
+        }
         else if (type.compare("add") == 0)
         {
             int columnIndex = cJSON_GetObjectItem(parsed, "columnIndex")->valueint;
@@ -121,6 +129,7 @@ public:
                 cJSON_Delete(parsed);
                 return;
             }
+            instance->hub->setSlotActive(sequence->columnIndex, sequence->slotIndex, false, ControlHub::PREVIEW);
             instance->updateHub(*sequence);
             instance->sequences.erase(std::remove_if(instance->sequences.begin(), instance->sequences.end(), [index](const Sequence &s)
                                                      { return s.index == index; }),

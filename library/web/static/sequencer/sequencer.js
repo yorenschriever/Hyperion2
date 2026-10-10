@@ -135,6 +135,33 @@ const SequenceTrack = ({ sequence, send, stepNr, index, moveSequence, dragInfo, 
 
     const trackRef = useRef(null);
     const stepsRef = useRef(null);
+    const previewing = useRef(false);
+
+    const handlePreviewStart = useCallback((event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (previewing.current) return;
+        previewing.current = true;
+        send(JSON.stringify({ type: "preview", sequenceIndex: sequence.index, status: 1 }));
+    }, [send, sequence.index]);
+
+    const handlePreviewEnd = useCallback(() => {
+        if (!previewing.current) return;
+        previewing.current = false;
+        send(JSON.stringify({ type: "preview", sequenceIndex: sequence.index, status: 0 }));
+    }, [send, sequence.index]);
+
+    useEffect(() => {
+        document.addEventListener('mouseup', handlePreviewEnd);
+        document.addEventListener('touchend', handlePreviewEnd);
+        window.addEventListener('blur', handlePreviewEnd);
+        return () => {
+            document.removeEventListener('mouseup', handlePreviewEnd);
+            document.removeEventListener('touchend', handlePreviewEnd);
+            window.removeEventListener('blur', handlePreviewEnd);
+            handlePreviewEnd();
+        };
+    }, [handlePreviewEnd]);
 
     const handleDrag = useCallback((startX, endX) => {
         const minX = Math.min(startX, endX);
@@ -307,6 +334,15 @@ const SequenceTrack = ({ sequence, send, stepNr, index, moveSequence, dragInfo, 
             onTouchStart=${handleHandleMouseDown}
             onTouchEnd=${handleHandleMouseUp}
         >⠿</div>
+        <button
+            class="preview-track"
+            title="Preview pattern"
+            aria-label="Preview pattern"
+            onMouseDown=${handlePreviewStart}
+            onMouseUp=${handlePreviewEnd}
+            onTouchStart=${handlePreviewStart}
+            onTouchEnd=${handlePreviewEnd}
+        ><${PreviewIcon}/></button>
         <button class="remove-track" onClick=${removeTrack}>x</button>
         <div class="track-name">${sequence.colName}</div>    
         <div class="track-name">${sequence.slotName}</div>
@@ -324,6 +360,11 @@ const SequenceTrack = ({ sequence, send, stepNr, index, moveSequence, dragInfo, 
     </div>
     `;
 }
+
+const PreviewIcon = () => html`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+    <path fill="currentcolor" d="M480.384 319.872c-123.712 0-224 100.288-224 224s100.288 224 224 224 224-100.288 224-224S604.096 319.872 480.384 319.872zM480.384 703.872c-88.384 0-160-71.616-160-160s71.616-160 160-160 160 71.616 160 160S568.768 703.872 480.384 703.872zM924.096 431.296c-108.352-146.496-266.944-239.104-444.032-239.104S144.448 284.8 36.096 431.296c-47.872 64.704-47.872 160.832 0 225.472 108.352 146.496 266.944 239.104 444.032 239.104s335.616-92.608 444.032-239.104C971.968 592.128 971.968 496 924.096 431.296zM875.968 603.712C775.488 748.736 630.784 832 478.976 832c-151.68 0-296.384-83.264-396.928-228.224-23.936-34.56-23.936-84.736 0-119.296 100.544-145.088 245.248-228.224 396.928-228.224 151.808 0 296.512 83.2 396.992 228.224C899.904 518.976 899.904 569.216 875.968 603.712z" />
+</svg>`
 
 const Toggle = ({ onClick, checked, label }) => {
     return html`<label class="switch">
